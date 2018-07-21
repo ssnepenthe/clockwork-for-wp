@@ -1,0 +1,10 @@
+{
+    "name": "ssnepenthe/clockwork-for-wp",
+    "description": "A basic Clockwork integration for WordPress",
+    "type": "wordpress-plugin",
+    "license": "MIT",
+    "require": {
+        "itsgoingd/clockwork": "^2.2",
+        "pimple/pimple": "^3.2"
+    }
+}
