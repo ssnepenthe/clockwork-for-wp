@@ -6,5 +6,6 @@
     "require": {
         "itsgoingd/clockwork": "^2.2",
         "pimple/pimple": "^3.2"
-    }
+    },
+    "autoload": { "classmap": ["src/"] }
 }
