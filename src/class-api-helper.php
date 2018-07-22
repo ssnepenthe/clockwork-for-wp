@@ -12,18 +12,32 @@ class Api_Helper {
 	const DIRECTION_QUERY_VAR = 'cfw_direction';
 	const COUNT_QUERY_VAR = 'cfw_count';
 
+	/**
+	 * @var StorageInterface
+	 */
 	protected $storage;
 
+	/**
+	 * @param StorageInterface $storage
+	 */
 	public function __construct( StorageInterface $storage ) {
 		$this->storage = $storage;
 	}
 
+	/**
+	 * @param  array<string, string> $rules
+	 * @return array<string, string>
+	 */
 	public function register_rewrites( $rules ) {
 		// @todo Verify that these should be enabled from config.
 		// @todo Verify this filter is working over add_rewrite_rule on init.
 		return array_merge( [ self::REWRITE_REGEX => self::REWRITE_QUERY ], $rules );
 	}
 
+	/**
+	 * @param  array<int, string> $vars
+	 * @return array<int, string>
+	 */
 	public function register_query_vars( $vars ) {
 		return array_merge( $vars, [
 			self::ID_QUERY_VAR,
@@ -32,6 +46,9 @@ class Api_Helper {
 		] );
 	}
 
+	/**
+	 * @return void
+	 */
 	public function serve_json() {
 		$id = get_query_var( self::ID_QUERY_VAR );
 

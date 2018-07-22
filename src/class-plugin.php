@@ -10,9 +10,19 @@ class Plugin extends Container {
 	const EARLY_EVENT = -999;
 	const LATE_EVENT = 999;
 
+	/**
+	 * @var boolean
+	 */
 	protected $booted = false;
+
+	/**
+	 * @var array<int, Provider>
+	 */
 	protected $providers = [];
 
+	/**
+	 * @return void
+	 */
 	public function boot() {
 		if ( $this->booted ) {
 			return;
@@ -32,8 +42,12 @@ class Plugin extends Container {
 		$this->booted = true;
 	}
 
-	public function register( Provider $provider, array $values = [] )
-	{
+	/**
+	 * @param  Provider            $provider
+	 * @param  array<mixed, mixed> $values
+	 * @return static
+	 */
+	public function register( Provider $provider, array $values = [] ) {
 		$this->providers[] = $provider;
 
 		parent::register( $provider, $values );
@@ -46,13 +60,31 @@ class Plugin extends Container {
 		return $this;
 	}
 
+	/**
+	 * @param  string             $tag
+	 * @param  array<int, string> $handler
+	 * @param  integer            $priority
+	 * @param  integer            $accepted_args
+	 * @return static
+	 */
 	public function on( string $tag, array $handler, int $priority = 10, int $accepted_args = 1 ) {
 		// @todo Some validation on $handler?
 
 		// Because add_action is just an alias of add_filter.
-		add_filter( $tag, function() use ( $handler ) {
-			return call_user_func_array( [ $this[ $handler[0] ], $handler[1] ], func_get_args() );
-		}, $priority, $accepted_args );
+		add_filter(
+			$tag,
+			/**
+			 * @return mixed
+			 */
+			function() use ( $handler ) {
+				return call_user_func_array(
+					[ $this[ $handler[0] ], $handler[1] ],
+					func_get_args()
+				);
+			},
+			$priority,
+			$accepted_args
+		);
 
 		return $this;
 	}

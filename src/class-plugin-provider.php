@@ -9,6 +9,10 @@ use Clockwork\DataSource\PhpDataSource;
 use Pimple\ServiceProviderInterface as Provider;
 
 class Plugin_Provider implements Provider, Bootable_Provider {
+	/**
+	 * @param  Plugin $container
+	 * @return void
+	 */
 	public function boot( Plugin $container ) {
 		if ( $container['config']->is_collecting_data() ) {
 			$this->listen_to_events( $container );
@@ -23,61 +27,79 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 		$container->on( 'template_redirect', [ 'helpers.request', 'send_headers' ] );
 	}
 
+	/**
+	 * @param  Container $container
+	 * @return void
+	 */
 	public function register( Container $container ) {
-		$container['config'] = function( Container $c ) {
-			return new Config( apply_filters( 'cfw_config', [
-				'enabled' => false, // bool
-				'collect_data_always' => true, // bool
-				'filter' => [ 'cache' ], // array of strings
-				'filtered_uris' => [ // array of strings
-					'yolo',
-					'fomo',
-				],
-				'headers' => [ // array of string key => string value
-					'holler' => 'baller',
-				],
-				'server_timing' => 20, // int
-				'storage_expiration' => 60 * 24 * 7, // int
-				'storage_files_path' => WP_CONTENT_DIR . '/cfw-data', // string
-			] ) );
-		};
+		$container['config'] =
+			/**
+			 * @return Config
+			 */
+			function( Container $c ) {
+				return new Config();
+			};
 
-		$container['clockwork'] = function( Container $c ) {
-			$clockwork = new Clockwork();
+		$container['clockwork'] =
+			/**
+			 * @return Clockwork
+			 */
+			function( Container $c ) {
+				$clockwork = new Clockwork();
 
-			$clockwork
-				->addDataSource( new PhpDataSource() )
-				->setStorage( $c['clockwork.storage'] );
+				$clockwork
+					->addDataSource( new PhpDataSource() )
+					->setStorage( $c['clockwork.storage'] );
 
-			return $clockwork;
-		};
+				return $clockwork;
+			};
 
-		$container['clockwork.storage'] = function( Container $c ) {
-			// @todo Move params to config.
-			$storage = new FileStorage(
-				$c['config']->get_storage_files_path(),
-				0700,
-				$c['config']->get_storage_expiration()
-			);
+		$container['clockwork.storage'] =
+			/**
+			 * @return \Clockwork\Storage\StorageInterface
+			 */
+			function( Container $c ) {
+				// @todo Move params to config.
+				$storage = new FileStorage(
+					$c['config']->get_storage_files_path(),
+					0700,
+					$c['config']->get_storage_expiration()
+				);
 
-			$storage->filter = $c['config']->get_filter();
+				$storage->filter = $c['config']->get_filter();
 
-			return $storage;
-		};
+				return $storage;
+			};
 
-		$container['helpers.api'] = function( Container $c ) {
-			return new Api_Helper( $c['clockwork.storage'] );
-		};
+		$container['helpers.api'] =
+			/**
+			 * @return Api_Helper
+			 */
+			function( Container $c ) {
+				return new Api_Helper( $c['clockwork.storage'] );
+			};
 
-		$container['helpers.request'] = function( Container $c ) {
-			return new Request_Helper( $c['clockwork'], $c['config'] );
-		};
+		$container['helpers.request'] =
+			/**
+			 * @return Request_Helper
+			 */
+			function( Container $c ) {
+				return new Request_Helper( $c['clockwork'], $c['config'] );
+			};
 	}
 
+	/**
+	 * @param  Plugin $container
+	 * @return void
+	 */
 	protected function listen_to_events( Plugin $container ) {
 		$container->on( 'shutdown', [ 'helpers.request', 'finalize_request' ], Plugin::LATE_EVENT );
 	}
 
+	/**
+	 * @param  Plugin $container
+	 * @return void
+	 */
 	protected function register_api_rewrites( Plugin $container ) {
 		$container
 			->on( 'query_vars', [ 'helpers.api', 'register_query_vars' ] )
