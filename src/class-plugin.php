@@ -67,7 +67,7 @@ class Plugin extends Container {
 	 * @param  integer            $accepted_args
 	 * @return static
 	 */
-	public function on( string $tag, array $handler, int $priority = 10, int $accepted_args = 1 ) {
+	public function on( $tag, array $handler, $priority = 10, $accepted_args = 1 ) {
 		// @todo Some validation on $handler?
 
 		// Because add_action is just an alias of add_filter.
