@@ -13,6 +13,50 @@ class Config {
 	/**
 	 * @return boolean
 	 */
+	public function is_collecting_cache_data() {
+		return ! in_array( 'cache', $this->get_filter(), true );
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function is_collecting_db_data() {
+		return defined( 'SAVEQUERIES' )
+			&& SAVEQUERIES
+			&& ! in_array( 'databaseQueries', $this->get_filter(), true );
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function is_collecting_email_data() {
+		return ! in_array( 'emailsData', $this->get_filter(), true );
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function is_collecting_event_data() {
+		return ! in_array( 'events', $this->get_filter(), true );
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function is_collecting_rewrite_data() {
+		return ! in_array( 'routes', $this->get_filter(), true );
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function is_collecting_theme_data() {
+		return ! in_array( 'viewsData', $this->get_filter(), true );
+	}
+
+	/**
+	 * @return boolean
+	 */
 	public function is_enabled() {
 		return true;
 	}
