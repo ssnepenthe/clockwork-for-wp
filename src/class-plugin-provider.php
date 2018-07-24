@@ -49,6 +49,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 
 				$clockwork
 					->addDataSource( new PhpDataSource() )
+					->addDataSource( $c['datasource.wp'] )
 					->setStorage( $c['clockwork.storage'] );
 
 				return $clockwork;
@@ -69,6 +70,14 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 				$storage->filter = $c['config']->get_filter();
 
 				return $storage;
+			};
+
+		$container['datasource.wp'] =
+			/**
+			 * @return Wp_Data_Source
+			 */
+			function( Container $c ) {
+				return new Wp_Data_Source();
 			};
 
 		$container['helpers.api'] =
@@ -93,6 +102,8 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 	 * @return void
 	 */
 	protected function listen_to_events( Plugin $container ) {
+		$container['datasource.wp']->listen_to_events();
+
 		$container->on( 'shutdown', [ 'helpers.request', 'finalize_request' ], Plugin::LATE_EVENT );
 	}
 
