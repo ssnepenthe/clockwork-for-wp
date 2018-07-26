@@ -74,7 +74,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 				}
 
 				if ( $c['config']->is_collecting_theme_data() ) {
-					$clockwork->addDataSource( new Theme_Data_Source() );
+					$clockwork->addDataSource( $c['datasource.theme'] );
 				}
 
 				$clockwork->setStorage( $c['clockwork.storage'] );
@@ -105,6 +105,14 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 			 */
 			function( Container $c ) {
 				return new Wp_Mail_Data_Source();
+			};
+
+		$container['datasource.theme'] =
+			/**
+			 * @return Theme_Data_Source
+			 */
+			function( Container $c ) {
+				return new Theme_Data_Source();
 			};
 
 		$container['datasource.wp'] =
@@ -138,6 +146,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 	 */
 	protected function listen_to_events( Plugin $container ) {
 		$container['datasource.mail']->listen_to_events();
+		$container['datasource.theme']->listen_to_events();
 		$container['datasource.wp']->listen_to_events();
 
 		$container->on( 'shutdown', [ 'helpers.request', 'finalize_request' ], Plugin::LATE_EVENT );

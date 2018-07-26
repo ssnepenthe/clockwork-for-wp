@@ -7,38 +7,68 @@ use Clockwork\Request\Timeline;
 use Clockwork\DataSource\DataSource;
 
 class Theme_Data_Source extends DataSource {
-	/**
-	 * @var Timeline
-	 */
-	protected $timeline;
+	protected $views;
 
-	/**
-	 * @param Timeline|null $timeline
-	 */
-	public function __construct( Timeline $timeline = null ) {
-		$this->timeline = $timeline ?: new Timeline();
+	public function __construct( Timeline $views = null ) {
+		$this->views = $views ?: new Timeline();
 	}
 
 	public function resolve( Request $request ) {
-		$request->timelineData = array_merge(
-			$request->timelineData,
-			$this->timeline->finalize( $request->time )
-		);
-		$request->viewsData = $this->collect_views_data();
+		$this->register_template_parts();
+
+		$request->viewsData = array_merge( $request->viewsData, $this->views->finalize() );
 
 		return $request;
 	}
 
-	/**
-	 * @return array<string, array>
-	 */
-	protected function collect_views_data() {
+	public function listen_to_events() {
+		add_filter( 'template_include', function( $template ) {
+			$relative = str_replace(
+				[ get_template_directory(), get_stylesheet_directory() ],
+				'',
+				$template
+			);
+
+			$this->register_template( $relative );
+
+			return $template;
+		} );
+	}
+
+	public function register_template( $template ) {
+		$hash = hash( 'md5', $template );
+
+		$this->views->addEvent( "view_{$hash}", 'Rendering a view', null, null, [
+			'name' => ltrim( $template, '/' ),
+			'data' => '(unknown)', // @todo Can we retrieve data used to render view? Probably not since it comes from globals or global function calls...
+		] );
+
+		return $template;
+	}
+
+	protected function register_template_parts() {
+		foreach ( $this->get_included_theme_files() as $template ) {
+			$slug = ltrim( str_replace( '.php', '', $template ), '/' );
+
+			if ( did_action( "get_template_part_{$slug}" ) ) {
+				$this->register_template( $template );
+			} else {
+				$slug = preg_replace( '/\-[^\-]+$/', '', $slug );
+
+				if ( did_action( "get_template_part_{$slug}" ) ) {
+					$this->register_template( $template );
+				}
+			}
+		}
+	}
+
+	protected function get_included_theme_files() {
 		$template = get_template_directory();
 		$stylesheet = get_stylesheet_directory();
 		$includes = get_included_files();
 
 		// @todo This will list all included theme files. I think it would be a drastic improvement to only show the main template file (the file included @ template_include) and included template parts (files for which a get_template_part_{$slug} action has been triggered).
-		$templates = array_filter(
+		return array_filter(
 			array_combine(
 				$includes,
 				array_map(
@@ -62,16 +92,5 @@ class Theme_Data_Source extends DataSource {
 			},
 			ARRAY_FILTER_USE_BOTH
 		);
-
-		$views = new Timeline();
-
-		foreach ( $templates as $absolute => $relative ) {
-			$views->addEvent( "view_{$absolute}", 'Rendering a view', null, null, [
-				'name' => $relative,
-				'data' => '(unknown)', // @todo Can we retrieve data used to render view? Probably not since it comes from globals or global function calls...
-			] );
-		}
-
-		return $views->finalize();
 	}
 }
