@@ -57,19 +57,19 @@ class Wp_Hook_Data_Source extends DataSource {
 	 */
 	protected function format_callback( $callback, $priority ) {
 		if ( is_string( $callback ) ) {
-			return "{$callback}@{$priority}";
+			return "{$callback} (priority {$priority})";
 		}
 
 		if ( is_array( $callback ) && 2 === count( $callback ) ) {
 			if ( is_object( $callback[0] ) ) {
-				return get_class( $callback[0] ) . "->{$callback[1]}@{$priority}";
+				return get_class( $callback[0] ) . "->{$callback[1]} (priority {$priority})";
 			} else {
-				return "{$callback[0]}::{$callback[1]}@{$priority}";
+				return "{$callback[0]}::{$callback[1]} (priority {$priority})";
 			}
 		}
 
 		if ( $callback instanceof \Closure ) {
-			return "Closure@{$priority}";
+			return "Closure (priority {$priority})";
 		}
 
 		return "(Unknown)";
