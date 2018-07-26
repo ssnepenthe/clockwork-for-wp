@@ -8,39 +8,78 @@ use Clockwork\DataSource\DataSource;
 
 class Wpdb_Data_Source extends DataSource {
 	/**
-	 * @var wpdb
+	 * @var wpdb|null
 	 */
 	protected $wpdb;
 
-	public function __construct( wpdb $wpdb ) {
+	public function __construct( $wpdb ) {
 		$this->wpdb = $wpdb;
 	}
 
 	public function resolve( Request $request ) {
-		$request->databaseQueries = $this->collect_queries();
+		$queries = $this->collect_queries();
+
+		if ( count( $queries ) > 0 ) {
+			$request->databaseQueries = $this->collect_queries();
+		}
 
 		return $request;
 	}
 
-	/**
-	 * @return array<int, array>
-	 */
+	protected function capitalize_keywords( $query ) {
+		// Adapted from Clockwork\EloquentDataSource::createRunnableQuery().
+		$keywords = [
+			'select',
+			'insert',
+			'update',
+			'delete',
+			'where',
+			'from',
+			'limit',
+			'is',
+			'null',
+			'having',
+			'group by',
+			'order by',
+			'asc',
+			'desc',
+		];
+
+		return preg_replace_callback(
+			'/\b' . implode( '\b|\b', $keywords ) . '\b/i',
+			function ( $match ) {
+				return strtoupper( $match[0] );
+			},
+			$query
+		);
+	}
+
 	protected function collect_queries() {
-		return array_map(
+		if (
+			! is_object( $this->wpdb )
+			|| ! property_exists( $this->wpdb, 'queries' )
+			|| empty( $this->wpdb->queries )
+		) {
+			return [];
+		}
+
+		$queries = array_map(
 			/**
 			 * @psalm-param array{0: string, 1: float, 2: string}  $query
-			 * @psalm-return array{query: string, duration: float}
+			 * @psalm-return array{query: string, duration: float}|false
 			 */
 			function( $query ) {
-				list( $query, $duration, $caller ) = $query;
+				if ( ! is_array( $query ) ) {
+					return false;
+				}
+
+				$q = isset( $query[0] ) ? $query[0] : '';
+				$d = isset( $query[1] ) ? $query[1] : 0;
 
 				return [
-					// @todo Consider highlighting keywords in query.
-					'query' => $query,
-					// @todo Verify multiplier - wpdb uses microtime which returns seconds - we want milliseconds so this should be correct.
-					'duration' => $duration * 1000,
-					// @todo Consider populating this value based on queried table?
-					// 'model' => '',
+					'query' => $this->capitalize_keywords( $q ),
+					'duration' => $d * 1000,
+					'model' => $this->guess_model( $q ),
 					// @todo Probably not able to record this data without configuring a db dropin.
 					// 'file' => '',
 					// 'line' => '',
@@ -48,5 +87,34 @@ class Wpdb_Data_Source extends DataSource {
 			},
 			$this->wpdb->queries
 		);
+
+		return array_filter( $queries );
+	}
+
+	protected function guess_model( $query ) {
+		// This is really rough... Also - is it even necessary to include this?
+		if ( 1 === preg_match( '/from\s+([^\s]+)/i', $query, $matches ) ) {
+			$table = $matches[1];
+
+			// @todo Should we include "old tables"?
+			foreach ( [
+				'/blog(?:_version)?s$/' => 'BLOG',
+				'/comment(?:s|meta)$/' => 'COMMENT',
+				'/links$/' => 'LINK',
+				'/options$/' => 'OPTION',
+				'/post(?:s|meta)$/' => 'POST',
+				'/registration_log$/' => 'REGISTRATION',
+				'/signups$/' => 'SIGNUP',
+				'/site(?:categories|meta)?$/' => 'SITE',
+				'/term(?:s|_relationships|_taxonomy|meta)$/' => 'TERM',
+				'/user(?:s|meta)$/' => 'USER',
+			] as $pattern => $model ) {
+				if ( 1 === preg_match( $pattern, $table ) ) {
+					return $model;
+				}
+			}
+		}
+
+		return '(unkown)';
 	}
 }
