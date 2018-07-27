@@ -35,8 +35,8 @@ class Wp_Rewrite_Data_Source extends DataSource {
 			 */
 			function( $regex, $query ) {
 				return [
-					'uri' => $regex,
-					'action' => $query,
+					'uri' => $query,
+					'action' => $regex,
 				];
 			},
 			$rules,
