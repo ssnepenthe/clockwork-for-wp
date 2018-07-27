@@ -62,6 +62,13 @@ class Config {
 	}
 
 	/**
+	 * @return boolean
+	 */
+	public function is_web_enabled() {
+		return true;
+	}
+
+	/**
 	 * @return array<int, string>
 	 */
 	public function get_filter() {

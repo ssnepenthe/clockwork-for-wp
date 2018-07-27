@@ -5,7 +5,7 @@ namespace Clockwork_For_Wp;
 use Clockwork\Storage\StorageInterface;
 
 class Api_Helper {
-	const REWRITE_REGEX = '__clockwork\/([0-9-]+|app|latest)(?:\/(next|previous))?(?(2)\/(\d+))?';
+	const REWRITE_REGEX = '__clockwork\/([0-9-]+|latest)(?:\/(next|previous))?(?(2)\/(\d+))?';
 	const REWRITE_QUERY = 'index.php?cfw_id=$matches[1]&cfw_direction=$matches[2]&cfw_count=$matches[3]';
 
 	const ID_QUERY_VAR = 'cfw_id';
@@ -50,17 +50,34 @@ class Api_Helper {
 	 * @return void
 	 */
 	public function serve_json() {
-		$id = get_query_var( self::ID_QUERY_VAR );
+		// @todo Handle 404s.
+		$id = get_query_var( self::ID_QUERY_VAR, null );
 
-		if ( ! $id ) {
-			return;
+		if ( null === $id ) {
+			return; // @todo
 		}
 
-		$data = $this->storage->find( $id );
+		$direction = get_query_var( self::DIRECTION_QUERY_VAR, null );
+		$count = get_query_var( self::COUNT_QUERY_VAR, null );
 
-		// @todo Verify data is array/not null?
-		// @todo Handle direction and count vars.
+		if ( 'previous' !== $direction && 'next' !== $direction ) {
+			$direction = null;
+		}
 
-		wp_send_json( $data );
+		if ( null !== $count ) {
+			$count = (int) $count;
+		}
+
+		if ( 'previous' === $direction ) {
+			$data = $this->storage->previous( $id, $count );
+		} elseif ( 'next' === $direction ) {
+			$data = $this->storage->next( $id, $count );
+		} elseif ( 'latest' === $id ) {
+			$data = $this->storage->latest();
+		} else {
+			$data = $this->storage->find( $id );
+		}
+
+		wp_send_json( $data ); // @todo
 	}
 }

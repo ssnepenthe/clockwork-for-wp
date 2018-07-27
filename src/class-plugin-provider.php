@@ -25,6 +25,10 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 		$this->register_api_rewrites( $container );
 
 		$container->on( 'template_redirect', [ 'helpers.request', 'send_headers' ] );
+
+		if ( $container['config']->is_web_enabled() ) {
+			$this->register_web_routes( $container );
+		}
 	}
 
 	/**
@@ -138,6 +142,14 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 			function( Container $c ) {
 				return new Request_Helper( $c['clockwork'], $c['config'] );
 			};
+
+		$container['helpers.web'] =
+			/**
+			 * @return Web_Helper
+			 */
+			function( Container $c ) {
+				return new Web_Helper();
+			};
 	}
 
 	/**
@@ -161,5 +173,14 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 			->on( 'query_vars', [ 'helpers.api', 'register_query_vars' ] )
 			->on( 'rewrite_rules_array', [ 'helpers.api', 'register_rewrites' ] )
 			->on( 'template_redirect', [ 'helpers.api', 'serve_json' ] );
+	}
+
+	protected function register_web_routes( Plugin $container ) {
+		$container
+			->on( 'query_vars', [ 'helpers.web', 'register_query_vars' ] )
+			->on( 'rewrite_rules_array', [ 'helpers.web', 'register_rewrites' ] )
+			->on( 'template_redirect', [ 'helpers.web', 'redirect_shortcut' ] )
+			->on( 'redirect_canonical', [ 'helpers.web', 'prevent_canonical_redirect' ], 10, 2 )
+			->on( 'template_redirect', [ 'helpers.web', 'serve_web_assets' ] );
 	}
 }
