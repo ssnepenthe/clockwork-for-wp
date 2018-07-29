@@ -43,6 +43,7 @@ class Request_Helper {
 	public function send_headers() {
 		if (
 			! $this->config->is_collecting_data()
+			|| $this->is_request_for_filtered_uri()
 			|| ! $this->config->is_enabled()
 			|| headers_sent() // Shouldn't happen.
 		) {

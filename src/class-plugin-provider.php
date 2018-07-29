@@ -41,7 +41,13 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 			 * @return Config
 			 */
 			function( Container $c ) {
-				return new Config();
+				$args = apply_filters( 'cfw_config_args', [] );
+
+				$config = new Config( $args );
+
+				do_action( 'cfw_config_init', $config );
+
+				return $config;
 			};
 
 		$container['clockwork'] =
