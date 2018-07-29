@@ -3,7 +3,6 @@
 namespace Clockwork_For_Wp;
 
 use Clockwork\Clockwork;
-use Clockwork\Helpers\ServerTiming;
 
 class Request_Helper {
 	/**
@@ -59,15 +58,6 @@ class Request_Helper {
 
 		foreach ( $this->config->get_headers() as $header_name => $header_value ) {
 			header( "X-Clockwork-Header-{$header_name}: {$header_value}" );
-		}
-
-		$events_count = $this->config->get_server_timing();
-
-		if ( false !== $events_count ) {
-			header( 'Server-Timing: ' . ServerTiming::fromRequest(
-				$this->clockwork->getRequest(),
-				$events_count
-			)->value() );
 		}
 	}
 

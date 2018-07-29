@@ -7,7 +7,6 @@ class Config {
 	protected $filter;
 	protected $filtered_uris;
 	protected $headers;
-	protected $server_timing;
 	protected $storage_expiration;
 	protected $storage_files_path;
 	protected $web_enabled;
@@ -18,7 +17,6 @@ class Config {
 			'filter' => [ 'routes' ],
 			'filtered_uris' => [ '\/__clockwork(?:\/.*)?' ],
 			'headers' => [],
-			'server_timing' => 10,
 			'storage_expiration' => 60 * 24 * 7,
 			'storage_files_path' => WP_CONTENT_DIR . '/cfw-data',
 			'web_enabled' => true,
@@ -37,7 +35,7 @@ class Config {
 	 * @return boolean
 	 */
 	public function is_collecting_data() {
-		return $this->is_enabled();
+		return $this->is_enabled(); // @todo || is_collecting_data_always?
 	}
 
 	/**
@@ -153,21 +151,6 @@ class Config {
 		}
 
 		$this->headers = $new_headers;
-
-		return $this;
-	}
-
-	/**
-	 * @return false|integer
-	 *
-	 * @todo Better name?
-	 */
-	public function get_server_timing() {
-		return $this->server_timing;
-	}
-
-	public function set_server_timing( $server_timing ) {
-		$this->server_timing = (int) $server_timing;
 
 		return $this;
 	}
