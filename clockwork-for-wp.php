@@ -35,7 +35,7 @@ function _cfw_init() {
 	// @todo Move to external file to prevent namespaces killing execution on 5.2?
     $plugin = new Clockwork_For_Wp\Plugin();
 
-    // $plugin->register(new WordPress_Provider());
+    $plugin->register(new Clockwork_For_Wp\WordPress_Provider());
     $plugin->register( new Clockwork_For_Wp\Plugin_Provider() );
 
     add_action( 'plugins_loaded', [ $plugin, 'boot' ] );
