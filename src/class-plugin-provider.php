@@ -24,7 +24,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 
 		$this->register_api_rewrites( $container );
 
-		$container->on( 'template_redirect', [ 'helpers.request', 'send_headers' ] );
+		$container->on( 'wp_loaded', [ 'helpers.request', 'send_headers' ] );
 
 		if ( $container['config']->is_web_enabled() ) {
 			$this->register_web_routes( $container );
