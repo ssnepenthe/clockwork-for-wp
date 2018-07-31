@@ -59,6 +59,8 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 
 				$clockwork
 					->addDataSource( new PhpDataSource() )
+					// @todo Should this be conditionally added?
+					->addDataSource( $c['datasource.http'] )
 					->addDataSource( $c['datasource.wp'] );
 
 				if ( $c['config']->is_collecting_cache_data() ) {
@@ -107,6 +109,14 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 				$storage->filter = $c['config']->get_filter();
 
 				return $storage;
+			};
+
+		$container['datasource.http'] =
+			/**
+			 * @return Wp_Http_Data_Source
+			 */
+			function( Container $c ) {
+				return new Wp_Http_Data_Source();
 			};
 
 		$container['datasource.mail'] =
@@ -163,6 +173,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 	 * @return void
 	 */
 	protected function listen_to_events( Plugin $container ) {
+		$container['datasource.http']->listen_to_events();
 		$container['datasource.mail']->listen_to_events();
 		$container['datasource.theme']->listen_to_events();
 		$container['datasource.wp']->listen_to_events();
