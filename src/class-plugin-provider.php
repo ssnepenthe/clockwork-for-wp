@@ -174,8 +174,15 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 	 */
 	protected function listen_to_events( Plugin $container ) {
 		$container['datasource.http']->listen_to_events();
-		$container['datasource.mail']->listen_to_events();
-		$container['datasource.theme']->listen_to_events();
+
+		if ( $container['config']->is_collecting_email_data() ) {
+			$container['datasource.mail']->listen_to_events();
+		}
+
+		if ( $container['config']->is_collecting_theme_data() ) {
+			$container['datasource.theme']->listen_to_events();
+		}
+
 		$container['datasource.wp']->listen_to_events();
 
 		$container->on( 'shutdown', [ 'helpers.request', 'finalize_request' ], Plugin::LATE_EVENT );
