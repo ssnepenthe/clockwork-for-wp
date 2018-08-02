@@ -1,6 +1,6 @@
 <?php
 
-namespace Clockwork_For_Wp;
+namespace Clockwork_For_Wp\Data_Source;
 
 use WP_Error;
 use Clockwork\Request\Log;
@@ -8,7 +8,7 @@ use Clockwork\Request\Request;
 use Clockwork\Request\Timeline;
 use Clockwork\DataSource\DataSource;
 
-class Wp_Mail_Data_Source extends DataSource {
+class Wp_Mail extends DataSource {
 	protected $emails;
 	protected $log;
 
@@ -30,7 +30,6 @@ class Wp_Mail_Data_Source extends DataSource {
 	}
 
 	public function record_email_attempt( $args ) {
-		// @todo To and headers args have not been normalized yet... Can be a string or an array.
 		$to = isset( $args['to'] ) ? $args['to'] : '';
 
 		$this->emails->addEvent(

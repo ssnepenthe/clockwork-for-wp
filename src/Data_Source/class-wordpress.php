@@ -1,15 +1,16 @@
 <?php
 
-namespace Clockwork_For_Wp;
+namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\Request\Log;
+use Clockwork_For_Wp\Plugin;
 use Clockwork\Request\Request;
 use Clockwork\Request\Timeline;
 use Clockwork\Helpers\Serializer;
 use Clockwork\DataSource\DataSource;
 
 // @todo Inject globals.
-class Wp_Data_Source extends DataSource {
+class WordPress extends DataSource {
 	protected $log;
 
 	/**

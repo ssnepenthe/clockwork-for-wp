@@ -1,12 +1,12 @@
 <?php
 
-namespace Clockwork_For_Wp;
+namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\Request\Request;
 use Clockwork\Request\Timeline;
 use Clockwork\DataSource\DataSource;
 
-class Theme_Data_Source extends DataSource {
+class Theme extends DataSource {
 	protected $views;
 
 	public function __construct( Timeline $views = null ) {

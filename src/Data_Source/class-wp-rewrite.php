@@ -1,12 +1,12 @@
 <?php
 
-namespace Clockwork_For_Wp;
+namespace Clockwork_For_Wp\Data_Source;
 
 use WP_Rewrite;
 use Clockwork\Request\Request;
 use Clockwork\DataSource\DataSource;
 
-class Wp_Rewrite_Data_Source extends DataSource {
+class Wp_Rewrite extends DataSource {
 	protected $rewrite;
 
 	public function __construct( WP_Rewrite $rewrite ) {

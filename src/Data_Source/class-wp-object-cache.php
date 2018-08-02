@@ -1,19 +1,19 @@
 <?php
 
-namespace Clockwork_For_Wp;
+namespace Clockwork_For_Wp\Data_Source;
 
-use WP_Object_Cache;
+use WP_Object_Cache as Cache;
 use Clockwork\Request\Request;
 use Clockwork\DataSource\DataSource;
 
-class Wp_Object_Cache_Data_Source extends DataSource {
+class Wp_Object_Cache extends DataSource {
 	/**
 	 * @var WP_Object_Cache
 	 */
 	protected $cache;
 
 	// @todo Maybe drop the type-hint? Are there any circumstances where this wouldn't be available?
-	public function __construct( WP_Object_Cache $cache ) {
+	public function __construct( Cache $cache ) {
 		$this->cache = $cache;
 	}
 

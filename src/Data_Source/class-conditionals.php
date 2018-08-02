@@ -1,11 +1,11 @@
 <?php
 
-namespace Clockwork_For_Wp;
+namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\Request\Request;
 use Clockwork\DataSource\DataSource;
 
-class Conditionals_Data_Source extends DataSource {
+class Conditionals extends DataSource {
 	public function resolve( Request $request ) {
 		$request->userData( 'conditionals' )
 			->title( 'Conditionals' )

@@ -1,13 +1,13 @@
 <?php
 
-namespace Clockwork_For_Wp;
+namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\Request\Log;
 use Clockwork\Request\Request;
 use Clockwork\Request\Timeline;
 use Clockwork\DataSource\DataSource;
 
-class Wp_Http_Data_Source extends DataSource {
+class Wp_Http extends DataSource {
 	protected $log;
 	protected $timeline;
 

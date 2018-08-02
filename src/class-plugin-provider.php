@@ -60,18 +60,18 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 				$clockwork
 					->addDataSource( new PhpDataSource() )
 					// @todo Should these be conditionally added?
-					->addDataSource( new Conditionals_Data_Source() )
+					->addDataSource( new Data_Source\Conditionals() )
 					->addDataSource( $c['datasource.http'] )
 					->addDataSource( $c['datasource.wp'] );
 
 				if ( $c['config']->is_collecting_cache_data() ) {
 					$clockwork->addDataSource(
-						new Wp_Object_Cache_Data_Source( $c['wp_object_cache'] )
+						new Data_Source\Wp_Object_Cache( $c['wp_object_cache'] )
 					);
 				}
 
 				if ( $c['config']->is_collecting_db_data() ) {
-					$clockwork->addDataSource( new Wpdb_Data_Source( $c['wpdb'] ) );
+					$clockwork->addDataSource( new Data_Source\Wpdb( $c['wpdb'] ) );
 				}
 
 				if ( $c['config']->is_collecting_email_data() ) {
@@ -79,11 +79,11 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 				}
 
 				if ( $c['config']->is_collecting_event_data() ) {
-					$clockwork->addDataSource( new Wp_Hook_Data_Source() );
+					$clockwork->addDataSource( new Data_Source\Wp_Hook() );
 				}
 
 				if ( $c['config']->is_collecting_rewrite_data() ) {
-					$clockwork->addDataSource( new Wp_Rewrite_Data_Source( $c['wp_rewrite'] ) );
+					$clockwork->addDataSource( new Data_Source\Wp_Rewrite( $c['wp_rewrite'] ) );
 				}
 
 				if ( $c['config']->is_collecting_theme_data() ) {
@@ -116,7 +116,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 			 * @return Wp_Http_Data_Source
 			 */
 			function( Container $c ) {
-				return new Wp_Http_Data_Source();
+				return new Data_Source\Wp_Http();
 			};
 
 		$container['datasource.mail'] =
@@ -124,7 +124,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 			 * @return Wp_Mail_Data_Source
 			 */
 			function( Container $c ) {
-				return new Wp_Mail_Data_Source();
+				return new Data_Source\Wp_Mail();
 			};
 
 		$container['datasource.theme'] =
@@ -132,7 +132,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 			 * @return Theme_Data_Source
 			 */
 			function( Container $c ) {
-				return new Theme_Data_Source();
+				return new Data_Source\Theme();
 			};
 
 		$container['datasource.wp'] =
@@ -140,7 +140,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 			 * @return Wp_Data_Source
 			 */
 			function( Container $c ) {
-				return new Wp_Data_Source();
+				return new Data_Source\WordPress();
 			};
 
 		$container['helpers.api'] =

@@ -1,12 +1,11 @@
 <?php
 
-namespace Clockwork_For_Wp;
+namespace Clockwork_For_Wp\Data_Source;
 
-use wpdb;
 use Clockwork\Request\Request;
 use Clockwork\DataSource\DataSource;
 
-class Wpdb_Data_Source extends DataSource {
+class Wpdb extends DataSource {
 	/**
 	 * @var wpdb|null
 	 */
@@ -93,6 +92,7 @@ class Wpdb_Data_Source extends DataSource {
 
 	protected function guess_model( $query ) {
 		// This is really rough... Also - is it even necessary to include this?
+		// @todo Fails on inserts and updates - also with table names in backticks.
 		if ( 1 === preg_match( '/from\s+([^\s]+)/i', $query, $matches ) ) {
 			$table = $matches[1];
 
