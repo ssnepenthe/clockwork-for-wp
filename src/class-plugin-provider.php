@@ -59,7 +59,8 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 
 				$clockwork
 					->addDataSource( new PhpDataSource() )
-					// @todo Should this be conditionally added?
+					// @todo Should these be conditionally added?
+					->addDataSource( new Conditionals_Data_Source() )
 					->addDataSource( $c['datasource.http'] )
 					->addDataSource( $c['datasource.wp'] );
 
