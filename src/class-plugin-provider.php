@@ -36,6 +36,8 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 	 * @return void
 	 */
 	public function register( Container $container ) {
+		require_once $container['dir'] . '/inc/helpers.php';
+
 		$container['config'] =
 			/**
 			 * @return Config
@@ -60,7 +62,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 				$clockwork
 					->addDataSource( new PhpDataSource() )
 					// @todo Should these be conditionally added?
-					->addDataSource( new Data_Source\Conditionals() )
+					->addDataSource( $c['datasource.conditionals'] )
 					->addDataSource( $c['datasource.http'] )
 					->addDataSource( $c['datasource.wp'] );
 
@@ -109,6 +111,16 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 				$storage->filter = $c['config']->get_filter();
 
 				return $storage;
+			};
+
+		$container['datasource.conditionals'] =
+			/**
+			 * @return Data_Source\Conditionals
+			 *
+			 * @todo Better method of allowing user to provide custom conditional list.
+			 */
+			function( Container $c ) {
+				return new Data_Source\Conditionals();
 			};
 
 		$container['datasource.http'] =
