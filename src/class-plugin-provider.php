@@ -22,7 +22,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 			return;
 		}
 
-		$this->register_api_rewrites( $container );
+		$this->register_api_routes( $container );
 
 		$container->on( 'wp_loaded', [ 'helpers.request', 'send_headers' ] );
 
@@ -99,7 +99,6 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 			 * @return \Clockwork\Storage\StorageInterface
 			 */
 			function( Container $c ) {
-				// @todo Move params to config.
 				$storage = new FileStorage(
 					$c['config']->get_storage_files_path(),
 					0700,
@@ -121,7 +120,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 
 		$container['datasource.mail'] =
 			/**
-			 * @return Wp_Hook_Data_Source
+			 * @return Wp_Mail_Data_Source
 			 */
 			function( Container $c ) {
 				return new Wp_Mail_Data_Source();
@@ -192,7 +191,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 	 * @param  Plugin $container
 	 * @return void
 	 */
-	protected function register_api_rewrites( Plugin $container ) {
+	protected function register_api_routes( Plugin $container ) {
 		$container
 			->on( 'query_vars', [ 'helpers.api', 'register_query_vars' ] )
 			->on( 'rewrite_rules_array', [ 'helpers.api', 'register_rewrites' ] )

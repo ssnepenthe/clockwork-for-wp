@@ -67,7 +67,6 @@ class Theme_Data_Source extends DataSource {
 		$stylesheet = get_stylesheet_directory();
 		$includes = get_included_files();
 
-		// @todo This will list all included theme files. I think it would be a drastic improvement to only show the main template file (the file included @ template_include) and included template parts (files for which a get_template_part_{$slug} action has been triggered).
 		return array_filter(
 			array_combine(
 				$includes,

@@ -32,11 +32,6 @@ class Plugin extends Container {
 			if ( $provider instanceof Bootable_Provider ) {
 				$provider->boot( $this );
 			}
-
-			// @todo
-			// if ( $provider instanceof Subscriber_Provider ) {
-			//     $provider->subscribe( $this );
-			// }
 		}
 
 		$this->booted = true;
@@ -51,11 +46,6 @@ class Plugin extends Container {
 		$this->providers[] = $provider;
 
 		parent::register( $provider, $values );
-
-		// @todo
-		// if ( $this->booted ) {
-		// 	$provider->boot( $this );
-		// }
 
 		return $this;
 	}

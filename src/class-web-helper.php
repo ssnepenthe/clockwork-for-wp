@@ -63,13 +63,13 @@ class Web_Helper {
 
 			readfile( $file['path'] );
 			die;
-		} else {
-			// @todo Should we handle 404 earlier than template_redirect? Can we make the wp class handle it for us?
-			global $wp_query;
-
-			$wp_query->set_404();
-			status_header( 404 );
-			nocache_headers();
 		}
+
+		// @todo Should we handle 404 earlier than template_redirect? Can we make the wp class handle it for us?
+		global $wp_query;
+
+		$wp_query->set_404();
+		status_header( 404 );
+		nocache_headers();
 	}
 }
