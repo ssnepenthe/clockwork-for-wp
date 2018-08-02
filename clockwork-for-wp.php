@@ -25,22 +25,21 @@ if ( file_exists( dirname( __FILE__ ) . '/vendor/autoload.php' ) ) {
 
 // @todo Verify server requirements are met.
 
-function _cfw_init() {
-	static $initialized = false;
+function _cfw_instance( $id = null ) {
+	static $instance = null;
 
-	if ( $initialized ) {
-		return;
+	if ( null === $instance ) {
+		// @todo Move to external file to prevent namespaces killing execution on 5.2?
+		$instance = new Clockwork_For_Wp\Plugin( [
+			'dir' => dirname( __FILE__ ),
+		] );
+
+		$instance
+			->register( new Clockwork_For_Wp\WordPress_Provider() )
+			->register( new Clockwork_For_Wp\Plugin_Provider() );
 	}
 
-	// @todo Move to external file to prevent namespaces killing execution on 5.2?
-    $plugin = new Clockwork_For_Wp\Plugin();
-
-    $plugin->register(new Clockwork_For_Wp\WordPress_Provider());
-    $plugin->register( new Clockwork_For_Wp\Plugin_Provider() );
-
-    add_action( 'plugins_loaded', [ $plugin, 'boot' ] );
-
-	$initialized = true;
+	return null === $id ? $instance : $instance[ $id ];
 }
 
-_cfw_init();
+add_action( 'plugins_loaded', [ _cfw_instance(), 'boot' ] );
