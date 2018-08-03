@@ -5,10 +5,8 @@ namespace Clockwork_For_Wp\Data_Source;
 use WP;
 use WP_Query;
 use Clockwork\Request\Log;
-use Clockwork_For_Wp\Plugin;
 use Clockwork\Request\Request;
 use Clockwork\Request\Timeline;
-use Clockwork\Helpers\Serializer;
 use Clockwork\DataSource\DataSource;
 
 // @todo Inject globals.
