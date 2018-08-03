@@ -43,7 +43,7 @@ class Theme extends DataSource {
 			$this->included_template = $template;
 
 			return $template;
-		} );
+		}, Plugin::LATE_EVENT );
 	}
 
 	protected function all_template_parts() {
