@@ -42,4 +42,4 @@ function _cfw_instance( $id = null ) {
 	return null === $id ? $instance : $instance[ $id ];
 }
 
-add_action( 'plugins_loaded', [ _cfw_instance(), 'boot' ] );
+add_action( 'init', [ _cfw_instance(), 'boot' ] );
