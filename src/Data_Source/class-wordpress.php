@@ -46,97 +46,14 @@ class WordPress extends DataSource {
 	 * @return void
 	 */
 	public function listen_to_events() {
-		global $timestart;
-
-		$current_time = microtime( true );
-
 		$this->timeline->startEvent( 'total', 'Total execution', 'start' );
 
 		$this->timeline->addEvent(
-			'initialization',
-			'WP initialization',
-			'start',
-			$current_time
+			'core_timer',
+			'Core timer start',
+			$GLOBALS['timestart'],
+			$GLOBALS['timestart']
 		);
-
-		$this->timeline->addEvent(
-			'plugins_loaded',
-			'Plugins loaded',
-			$current_time,
-			$current_time
-		);
-
-		add_action(
-			'setup_theme',
-			/**
-			 * @return void
-			 */
-			function() {
-				$this->timeline->startEvent( 'theme_initialization', 'Theme initialization' );
-			},
-			Plugin::EARLY_EVENT
-		);
-
-		add_action(
-			'after_setup_theme',
-			/**
-			 * @return void
-			 */
-			function() {
-				$this->timeline->endEvent( 'theme_initialization' );
-			},
-			Plugin::LATE_EVENT
-		);
-
-		add_action(
-			'init',
-			/**
-			 * @return void
-			 */
-			function() {
-				// @todo Can this be divided into more specific segments?
-				$this->timeline->startEvent( 'pre_render', 'Pre render' );
-			},
-			Plugin::EARLY_EVENT
-		);
-
-		add_action(
-			'template_redirect',
-			/**
-			 * @return void
-			 */
-			function() {
-				$this->timeline->endEvent( 'pre_render' );
-			},
-			Plugin::LATE_EVENT
-		);
-
-		add_action(
-			'template_include',
-			/**
-			 * @param string  $template
-			 * @return string
-			 */
-			function( $template ) {
-				$this->timeline->startEvent( 'render', 'Render' );
-
-				return $template;
-			},
-			Plugin::EARLY_EVENT
-		);
-
-		add_action(
-			'wp_footer',
-			/**
-			 * @return void
-			 */
-			function() {
-				$this->timeline->endEvent( 'render' );
-			},
-			Plugin::LATE_EVENT
-		);
-
-		$this->timeline->addEvent( 'core_timer', 'Core timer start', $timestart, $timestart );
 
 		// @todo Not sure if this is actually a good idea...
 		$this->hijack_doing_it_wrong();
