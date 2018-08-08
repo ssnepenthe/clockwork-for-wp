@@ -37,10 +37,9 @@ class Wp_Hook extends DataSource {
 			foreach ( $wp_filter[ $tag ] as $priority => $callbacks ) {
 				foreach ( $callbacks as $callback ) {
 					// @todo Not enough detail...
-					$event['listeners'][] = $this->format_callback(
-						$callback['function'],
-						$priority
-					);
+					$event['listeners'][] = \Clockwork_For_Wp\callable_to_display_string(
+						$callback['function']
+					) . " (priority {$priority})";
 				}
 			}
 
@@ -48,30 +47,5 @@ class Wp_Hook extends DataSource {
 		}
 
 		return $events;
-	}
-
-	/**
-	 * @param  callable $callback
-	 * @param  integer  $priority
-	 * @return string
-	 */
-	protected function format_callback( $callback, $priority ) {
-		if ( is_string( $callback ) ) {
-			return "{$callback} (priority {$priority})";
-		}
-
-		if ( is_array( $callback ) && 2 === count( $callback ) ) {
-			if ( is_object( $callback[0] ) ) {
-				return get_class( $callback[0] ) . "->{$callback[1]} (priority {$priority})";
-			} else {
-				return "{$callback[0]}::{$callback[1]} (priority {$priority})";
-			}
-		}
-
-		if ( $callback instanceof \Closure ) {
-			return "Closure (priority {$priority})";
-		}
-
-		return "(Unknown)";
 	}
 }
