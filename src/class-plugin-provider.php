@@ -67,6 +67,8 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 					->addDataSource( $c['datasource.wp'] );
 
 				if ( $c['config']->is_collecting_cache_data() ) {
+					$clockwork->addDataSource( $c['datasource.transients'] );
+
 					$clockwork->addDataSource(
 						new Data_Source\Wp_Object_Cache( $c['wp_object_cache'] )
 					);
@@ -147,6 +149,14 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 				return new Data_Source\Theme();
 			};
 
+		$container['datasource.transients'] =
+			/**
+			 * @return Data_Source\Transients
+			 */
+			function( Container $c ) {
+				return new Data_Source\Transients();
+			};
+
 		$container['datasource.wp'] =
 			/**
 			 * @return Wp_Data_Source
@@ -186,6 +196,10 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 	 */
 	protected function listen_to_events( Plugin $container ) {
 		$container['datasource.http']->listen_to_events();
+
+		if ( $container['config']->is_collecting_cache_data() ) {
+			$container['datasource.transients']->listen_to_events();
+		}
 
 		if ( $container['config']->is_collecting_email_data() ) {
 			$container['datasource.mail']->listen_to_events();
