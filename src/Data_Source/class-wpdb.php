@@ -69,7 +69,7 @@ class Wpdb extends DataSource {
 			 */
 			function( $query ) {
 				if ( ! is_array( $query ) ) {
-					return false;
+					return null;
 				}
 
 				$q = isset( $query[0] ) ? $query[0] : '';
