@@ -90,10 +90,6 @@ class Wp_Http extends DataSource {
 	}
 
 	protected function record_request_failure( $error, $args ) {
-		if ( ! $this->args_have_meta( $args ) ) {
-			return $this->record_meta_error( $args );
-		}
-
 		$this->log->error( "HTTP request for {$args['_cfw_meta']['url']} failed", [
 			'args' => $args,
 			'error' => $error,
