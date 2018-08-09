@@ -91,11 +91,9 @@ class Wpdb extends DataSource {
 	}
 
 	protected function guess_model( $query ) {
-		// This is really rough... Also - is it even necessary to include this?
-		// @todo Fails on inserts and updates - also with table names in backticks.
-		if ( 1 === preg_match( '/from\s+([^\s]+)/i', $query, $matches ) ) {
-			$table = $matches[1];
+		$pattern = '/(?:from|into|update)\s+(`)?(?<table>[^\s`]+)(?(1)`)/i';
 
+		if ( 1 === preg_match( $pattern, $query, $matches ) ) {
 			// @todo Should we include "old tables"?
 			foreach ( [
 				'/blog(?:_version)?s$/' => 'BLOG',
@@ -109,7 +107,7 @@ class Wpdb extends DataSource {
 				'/term(?:s|_relationships|_taxonomy|meta)$/' => 'TERM',
 				'/user(?:s|meta)$/' => 'USER',
 			] as $pattern => $model ) {
-				if ( 1 === preg_match( $pattern, $table ) ) {
+				if ( 1 === preg_match( $pattern, $matches['table'] ) ) {
 					return $model;
 				}
 			}
