@@ -19,7 +19,7 @@ class Wpdb extends DataSource {
 		$queries = $this->collect_queries();
 
 		if ( count( $queries ) > 0 ) {
-			$request->databaseQueries = $this->collect_queries();
+			$request->databaseQueries = $queries;
 		}
 
 		return $request;
