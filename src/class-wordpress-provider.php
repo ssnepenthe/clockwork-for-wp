@@ -10,10 +10,6 @@ class WordPress_Provider implements Provider {
      * @param Container $pimple A container instance
      */
 	public function register( Container $container ) {
-		$container['wp'] = $container->factory( function() {
-			return $GLOBALS['wp'];
-		} );
-
 		$container['wpdb'] = $container->factory( function() {
 			return $GLOBALS['wpdb'];
 		} );
@@ -24,10 +20,6 @@ class WordPress_Provider implements Provider {
 			}
 
 			return $GLOBALS['wp_object_cache'];
-		} );
-
-		$container['wp_query'] = $container->factory( function() {
-			return $GLOBALS['wp_query'];
 		} );
 
 		$container['wp_rewrite'] = $container->factory( function() {

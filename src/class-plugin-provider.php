@@ -162,7 +162,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 			 * @return Wp_Data_Source
 			 */
 			function( Container $c ) {
-				return new Data_Source\WordPress( $c['wp'], $c['wp_query'] );
+				return new Data_Source\WordPress();
 			};
 
 		$container['helpers.api'] =

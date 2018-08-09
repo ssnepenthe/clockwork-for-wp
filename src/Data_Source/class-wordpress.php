@@ -3,7 +3,6 @@
 namespace Clockwork_For_Wp\Data_Source;
 
 use WP;
-use WP_Query;
 use Clockwork\Request\Log;
 use Clockwork\Request\Request;
 use Clockwork\Request\Timeline;
@@ -17,15 +16,11 @@ class WordPress extends DataSource {
 	 * @var Timeline
 	 */
 	protected $timeline;
-	protected $wp;
-	protected $wp_query;
 
 	/**
 	 * @param Timeline|null $timeline
 	 */
-	public function __construct( WP $wp, WP_Query $wp_query, Log $log = null, Timeline $timeline = null ) {
-		$this->wp = $wp;
-		$this->wp_query = $wp_query;
+	public function __construct( Log $log = null, Timeline $timeline = null ) {
 		$this->log = $log ?: new Log();
 		$this->timeline = $timeline ?: new Timeline();
 	}
@@ -107,10 +102,13 @@ class WordPress extends DataSource {
 	 * Adapted from Query Monitor QM_Collector_Request class.
 	 */
 	protected function query_vars() {
+		// @todo wp_query global is declared after plugins_loaded which means it can't be injected...
+		global $wp_query;
+
 		$plugin_vars = apply_filters( 'query_vars', [] );
 
 		$query_vars = array_filter(
-			$this->wp_query->query_vars,
+			$wp_query->query_vars,
 			function( $value, $key ) use ( $plugin_vars ) {
 				return ( isset( $plugin_vars[ $key ] ) && '' !== $value ) || ! empty( $value );
 			},
@@ -135,9 +133,12 @@ class WordPress extends DataSource {
 
 	protected function request_table() {
 		$table = array_map( function( $var ) {
+			// @todo wp global is declared after plugins_loaded which means it can't be injected...
+			global $wp;
+
 			return [
 				'Variable' => $var,
-				'Value' => $this->wp->{$var} ? $this->wp->{$var} : false,
+				'Value' => $wp->{$var} ? $wp->{$var} : false,
 			];
 		}, [ 'request', 'query_string', 'matched_rule', 'matched_query' ] );
 
