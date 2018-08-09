@@ -48,7 +48,7 @@ class Wp_Http extends DataSource {
 				$this->record_request_failure( $args );
 			}
 
-			$this->record_request_finish( $args );
+			$this->record_request_finish( $preempt, $args );
 
 			return $preempt;
 		}, 10, 3 );
@@ -62,7 +62,7 @@ class Wp_Http extends DataSource {
 				$this->record_request_failure( $response, $args );
 			}
 
-			$this->record_request_finish( $args );
+			$this->record_request_finish( $response, $args );
 		}, 10, 5 );
 	}
 
@@ -96,7 +96,16 @@ class Wp_Http extends DataSource {
 		] );
 	}
 
-	protected function record_request_finish( $args ) {
+	protected function record_request_finish( $response, $args ) {
+		$this->log->info( "HTTP request for {$args['_cfw_meta']['url']} succeeded", [
+			'args' => $args,
+			// @todo Should this be included? Just serves to increase the metadata storage requirements.
+			// 'body' => wp_remote_retrieve_body( $response ),
+			'cookies' => wp_remote_retrieve_cookies( $response ),
+			'headers' => wp_remote_retrieve_headers( $response )->getAll(),
+			'status' => wp_remote_retrieve_response_code( $response ),
+		] );
+
 		$this->timeline->endEvent( "http_{$args['_cfw_meta']['fingerprint']}" );
 	}
 
