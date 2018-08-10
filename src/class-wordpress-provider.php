@@ -10,6 +10,10 @@ class WordPress_Provider implements Provider {
      * @param Container $pimple A container instance
      */
 	public function register( Container $container ) {
+		$container['content_width'] = $container->factory( function() {
+			return isset( $GLOBALS['content_width'] ) ? $GLOBALS['content_width'] : null;
+		} );
+
 		$container['timestart'] = $container->factory( function() {
 			return isset( $GLOBALS['timestart'] ) ? $GLOBALS['timestart'] : null;
 		} );

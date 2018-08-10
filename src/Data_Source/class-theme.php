@@ -4,13 +4,18 @@ namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork_For_Wp\Plugin;
 use Clockwork\Request\Request;
-use Clockwork\Request\Timeline;
 use Clockwork\DataSource\DataSource;
 
 class Theme extends DataSource {
-	protected $body_classes = [];
-	protected $included_template = '';
-	protected $template_parts = [];
+	protected $body_classes;
+	protected $content_width;
+	protected $included_template;
+
+	public function __construct( $content_width = null ) {
+		$this->set_body_classes( [] );
+		$this->set_content_width( $content_width );
+		$this->set_included_template( '' );
+	}
 
 	public function resolve( Request $request ) {
 		$panel = $request->userData( 'theme' )->title( 'Theme' );
@@ -34,16 +39,34 @@ class Theme extends DataSource {
 
 	public function listen_to_events() {
 		add_filter( 'body_class', function( $classes ) {
-			$this->body_classes = $classes;
+			$this->set_body_classes( $classes );
 
 			return $classes;
 		}, Plugin::LATE_EVENT );
 
 		add_filter( 'template_include', function( $template ) {
-			$this->included_template = $template;
+			$this->set_included_template( $template );
 
 			return $template;
 		}, Plugin::LATE_EVENT );
+	}
+
+	public function set_body_classes( $body_classes ) {
+		if ( ! is_array( $body_classes ) ) {
+			$body_classes = [];
+		}
+
+		$this->body_classes = array_values( array_map( function( $class ) {
+			return (string) $class;
+		}, $body_classes ) );
+	}
+
+	public function set_content_width( $content_width ) {
+		$this->content_width = is_int( $content_width ) ? $content_width : null;
+	}
+
+	public function set_included_template( $included_template ) {
+		$this->included_template = is_string( $included_template ) ? $included_template : '';
 	}
 
 	protected function all_template_parts() {
@@ -119,10 +142,10 @@ class Theme extends DataSource {
 			];
 		}
 
-		if ( isset( $GLOBALS['content_width'] ) && $GLOBALS['content_width'] ) {
+		if ( null !== $this->content_width ) {
 			$miscellaneous[] = [
 				'Item' => 'Content Width',
-				'Value' => isset( $GLOBALS['content_width'] ) ? $GLOBALS['content_width'] : 0,
+				'Value' => $this->content_width,
 			];
 		}
 

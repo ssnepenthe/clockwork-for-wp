@@ -155,7 +155,18 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 			 * @return Theme_Data_Source
 			 */
 			function( Container $c ) {
-				return new Data_Source\Theme();
+				$source = new Data_Source\Theme();
+				$dep_handler = function() use ( $c, $source ) {
+					$source->set_content_width( $c['content_width'] );
+				};
+
+				if ( did_action( 'init' ) ) {
+					$dep_handler();
+				} else {
+					add_action( 'init', $dep_handler, Plugin::EARLY_EVENT );
+				}
+
+				return $source;
 			};
 
 		$container['datasource.transients'] =
