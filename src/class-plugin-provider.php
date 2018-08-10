@@ -95,6 +95,10 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 					$clockwork->addDataSource( $c['datasource.theme'] );
 				}
 
+				if ( in_array( 'xdebug', get_loaded_extensions(), true ) ) {
+					$clockwork->addDataSource( $c['datasource.xdebug'] );
+				}
+
 				$clockwork->setStorage( $c['clockwork.storage'] );
 
 				return $clockwork;
@@ -197,12 +201,20 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 				return $source;
 			};
 
+		$container['datasource.xdebug'] =
+			/**
+			 * @return Data_Source\Xdebug
+			 */
+			function( Container $c ) {
+				return new Data_Source\Xdebug();
+			};
+
 		$container['helpers.api'] =
 			/**
 			 * @return Api_Helper
 			 */
 			function( Container $c ) {
-				return new Api_Helper( $c['clockwork.storage'] );
+				return new Api_Helper( $c['clockwork'], $c['clockwork.storage'] );
 			};
 
 		$container['helpers.request'] =
@@ -243,6 +255,10 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 		}
 
 		$container['datasource.wp']->listen_to_events();
+
+		if ( in_array( 'xdebug', get_loaded_extensions(), true ) ) {
+			$container['datasource.xdebug']->listen_to_events();
+		}
 
 		$container->on( 'shutdown', [ 'helpers.request', 'finalize_request' ], Plugin::LATE_EVENT );
 	}

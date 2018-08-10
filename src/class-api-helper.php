@@ -2,25 +2,31 @@
 
 namespace Clockwork_For_Wp;
 
+use Clockwork\Clockwork;
 use Clockwork\Storage\StorageInterface;
 
 class Api_Helper {
+	const EXTENDED_REWRITE_REGEX = '__clockwork\/([0-9-]+|latest)\/extended';
+	const EXTENDED_REWRITE_QUERY = 'index.php?cfw_id=$matches[1]&cfw_extended=1';
 	const REWRITE_REGEX = '__clockwork\/([0-9-]+|latest)(?:\/(next|previous))?(?(2)\/(\d+))?';
 	const REWRITE_QUERY = 'index.php?cfw_id=$matches[1]&cfw_direction=$matches[2]&cfw_count=$matches[3]';
 
 	const ID_QUERY_VAR = 'cfw_id';
 	const DIRECTION_QUERY_VAR = 'cfw_direction';
 	const COUNT_QUERY_VAR = 'cfw_count';
+	const EXTENDED_QUERY_VAR = 'cfw_extended';
 
 	/**
 	 * @var StorageInterface
 	 */
 	protected $storage;
+	protected $clockwork;
 
 	/**
 	 * @param StorageInterface $storage
 	 */
-	public function __construct( StorageInterface $storage ) {
+	public function __construct( Clockwork $clockwork, StorageInterface $storage ) {
+		$this->clockwork = $clockwork;
 		$this->storage = $storage;
 	}
 
@@ -31,7 +37,10 @@ class Api_Helper {
 	public function register_rewrites( $rules ) {
 		// @todo Verify that these should be enabled from config.
 		// @todo Verify this filter is working over add_rewrite_rule on init.
-		return array_merge( [ self::REWRITE_REGEX => self::REWRITE_QUERY ], $rules );
+		return array_merge( [
+			self::EXTENDED_REWRITE_REGEX => self::EXTENDED_REWRITE_QUERY,
+			self::REWRITE_REGEX => self::REWRITE_QUERY,
+		], $rules );
 	}
 
 	/**
@@ -43,6 +52,7 @@ class Api_Helper {
 			self::ID_QUERY_VAR,
 			self::DIRECTION_QUERY_VAR,
 			self::COUNT_QUERY_VAR,
+			self::EXTENDED_QUERY_VAR
 		] );
 	}
 
@@ -59,6 +69,7 @@ class Api_Helper {
 
 		$direction = get_query_var( self::DIRECTION_QUERY_VAR, null );
 		$count = get_query_var( self::COUNT_QUERY_VAR, null );
+		$extended = get_query_var( self::EXTENDED_QUERY_VAR, null );
 
 		if ( 'previous' !== $direction && 'next' !== $direction ) {
 			$direction = null;
@@ -68,6 +79,16 @@ class Api_Helper {
 			$count = (int) $count;
 		}
 
+		if ( null !== $extended ) {
+			$extended = true;
+		}
+
+		$data = $this->get_data( $id, $direction, $count, $extended );
+
+		wp_send_json( $data ); // @todo
+	}
+
+	protected function get_data( $id = null, $direction = null, $count = null, $extended = null ) {
 		if ( 'previous' === $direction ) {
 			$data = $this->storage->previous( $id, $count );
 		} elseif ( 'next' === $direction ) {
@@ -78,6 +99,10 @@ class Api_Helper {
 			$data = $this->storage->find( $id );
 		}
 
-		wp_send_json( $data ); // @todo
+		if ( $extended ) {
+			$this->clockwork->extendRequest( $data );
+		}
+
+		return $data;
 	}
 }
