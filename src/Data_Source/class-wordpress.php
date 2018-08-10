@@ -40,14 +40,16 @@ class WordPress extends DataSource {
 		// @todo Consider options for filling the "controller" slot.
 		// @todo Consider configuring a custom error handler to save errors in the "log" slot.
 
+		$panel = $request->userData( 'wordpress' )->title( 'WordPress' );
+
+		$panel->counters( [ 'WP Version' => get_bloginfo( 'version' ) ] );
+
 		$request_table = $this->request_table();
 		$has_request_data = 0 !== count( $request_table );
 		$query_vars_table = $this->query_vars_table();
 		$has_query_vars_data = 0 !== count( $query_vars_table );
 
 		if ( $has_request_data || $has_query_vars_data ) {
-			$panel = $request->userData( 'wordpress' )->title( 'WordPress' );
-
 			if ( $has_request_data ) {
 				$panel->table( 'Request', $request_table );
 			}
@@ -56,6 +58,8 @@ class WordPress extends DataSource {
 				$panel->table( 'Query Vars', $query_vars_table );
 			}
 		}
+
+		$panel->table( 'Constants', $this->constants_table() );
 
 		$request->timelineData = array_merge(
 			$request->timelineData,
@@ -93,6 +97,35 @@ class WordPress extends DataSource {
 
 	public function set_wp_query( $wp_query ) {
 		$this->wp_query = $wp_query instanceof WP_Query ? $wp_query : null;
+	}
+
+	protected function constants_table() {
+		// @todo Filterable list? Should they be limited to bool?
+		// List currently matches the one from the environment tab in the Query Monitor plugin.
+		$constants = [
+			'WP_DEBUG',
+			'WP_DEBUG_DISPLAY',
+			'WP_DEBUG_LOG',
+			'SCRIPT_DEBUG',
+			'WP_CACHE',
+			'CONCATENATE_SCRIPTS',
+			'COMPRESS_SCRIPTS',
+			'COMPRESS_CSS',
+			'WP_LOCAL_DEV',
+		];
+
+		if ( is_multisite() ) {
+			$constants[] = 'SUNRISE';
+		}
+
+		return array_map( function( $constant ) {
+			return [
+				'Name' => $constant,
+				'Value' => defined( $constant )
+					? filter_var( constant( $constant ), FILTER_VALIDATE_BOOLEAN )
+					: 'undefined',
+			];
+		}, $constants );
 	}
 
 	/**
