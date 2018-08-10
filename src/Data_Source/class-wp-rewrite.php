@@ -2,14 +2,14 @@
 
 namespace Clockwork_For_Wp\Data_Source;
 
-use WP_Rewrite;
+use WP_Rewrite as Rewrite;
 use Clockwork\Request\Request;
 use Clockwork\DataSource\DataSource;
 
 class Wp_Rewrite extends DataSource {
 	protected $rewrite;
 
-	public function __construct( WP_Rewrite $rewrite ) {
+	public function __construct( Rewrite $rewrite ) {
 		$this->rewrite = $rewrite;
 	}
 
