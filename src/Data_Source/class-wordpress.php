@@ -3,22 +3,33 @@
 namespace Clockwork_For_Wp\Data_Source;
 
 use WP;
+use WP_Query;
 use Clockwork\Request\Request;
 use Clockwork\Request\Timeline;
 use Clockwork\DataSource\DataSource;
 
-// @todo Inject globals.
 class WordPress extends DataSource {
 	/**
 	 * @var Timeline
 	 */
 	protected $timeline;
+	protected $timestart;
+	protected $wp;
+	protected $wp_query;
 
 	/**
 	 * @param Timeline|null $timeline
 	 */
-	public function __construct( Log $log = null, Timeline $timeline = null ) {
-		$this->timeline = $timeline ?: new Timeline();
+	public function __construct(
+		$timestart,
+		$wp = null,
+		$wp_query = null,
+		Timeline $timeline = null
+	) {
+		$this->set_timeline( $timeline ?: new Timeline() );
+		$this->set_timestart( $timestart );
+		$this->set_wp( $wp );
+		$this->set_wp_query( $wp_query );
 	}
 
 	/**
@@ -63,22 +74,39 @@ class WordPress extends DataSource {
 		$this->timeline->addEvent(
 			'core_timer',
 			'Core timer start',
-			$GLOBALS['timestart'],
-			$GLOBALS['timestart']
+			$this->timestart,
+			$this->timestart
 		);
+	}
+
+	public function set_timeline( Timeline $timeline ) {
+		$this->timeline = $timeline;
+	}
+
+	public function set_timestart( $timestart ) {
+		$this->timestart = is_float( $timestart ) ? $timestart : null;
+	}
+
+	public function set_wp( $wp ) {
+		$this->wp = $wp instanceof WP ? $wp : null;
+	}
+
+	public function set_wp_query( $wp_query ) {
+		$this->wp_query = $wp_query instanceof WP_Query ? $wp_query : null;
 	}
 
 	/**
 	 * Adapted from Query Monitor QM_Collector_Request class.
 	 */
 	protected function query_vars() {
-		// @todo wp_query global is declared after plugins_loaded which means it can't be injected...
-		global $wp_query;
+		if ( null === $this->wp_query ) {
+			return [];
+		}
 
 		$plugin_vars = apply_filters( 'query_vars', [] );
 
 		$query_vars = array_filter(
-			$wp_query->query_vars,
+			$this->wp_query->query_vars,
 			function( $value, $key ) use ( $plugin_vars ) {
 				return ( isset( $plugin_vars[ $key ] ) && '' !== $value ) || ! empty( $value );
 			},
@@ -102,13 +130,14 @@ class WordPress extends DataSource {
 	}
 
 	protected function request_table() {
-		$table = array_map( function( $var ) {
-			// @todo wp global is declared after plugins_loaded which means it can't be injected...
-			global $wp;
+		if ( null === $this->wp ) {
+			return [];
+		}
 
+		$table = array_map( function( $var ) {
 			return [
 				'Variable' => $var,
-				'Value' => $wp->{$var} ? $wp->{$var} : false,
+				'Value' => $this->wp->{$var} ? $this->wp->{$var} : false,
 			];
 		}, [ 'request', 'query_string', 'matched_rule', 'matched_query' ] );
 
