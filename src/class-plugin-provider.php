@@ -63,6 +63,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 					->addDataSource( new PhpDataSource() )
 					// @todo Should these be conditionally added?
 					->addDataSource( $c['datasource.conditionals'] )
+					->addDataSource( $c['datasource.errors'] )
 					->addDataSource( $c['datasource.http'] )
 					->addDataSource( $c['datasource.wp'] );
 
@@ -123,6 +124,14 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 			 */
 			function( Container $c ) {
 				return new Data_Source\Conditionals();
+			};
+
+		$container['datasource.errors'] =
+			/**
+			 * @return Data_Source\Errors
+			 */
+			function( Container $c ) {
+				return new Data_Source\Errors();
 			};
 
 		$container['datasource.http'] =
@@ -195,6 +204,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 	 * @return void
 	 */
 	protected function listen_to_events( Plugin $container ) {
+		$container['datasource.errors']->listen_to_events();
 		$container['datasource.http']->listen_to_events();
 
 		if ( $container['config']->is_collecting_cache_data() ) {

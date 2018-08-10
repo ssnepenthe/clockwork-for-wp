@@ -3,15 +3,12 @@
 namespace Clockwork_For_Wp\Data_Source;
 
 use WP;
-use Clockwork\Request\Log;
 use Clockwork\Request\Request;
 use Clockwork\Request\Timeline;
 use Clockwork\DataSource\DataSource;
 
 // @todo Inject globals.
 class WordPress extends DataSource {
-	protected $log;
-
 	/**
 	 * @var Timeline
 	 */
@@ -21,7 +18,6 @@ class WordPress extends DataSource {
 	 * @param Timeline|null $timeline
 	 */
 	public function __construct( Log $log = null, Timeline $timeline = null ) {
-		$this->log = $log ?: new Log();
 		$this->timeline = $timeline ?: new Timeline();
 	}
 
@@ -50,7 +46,6 @@ class WordPress extends DataSource {
 			}
 		}
 
-		$request->log = array_merge( $request->log, $this->log->toArray() );
 		$request->timelineData = array_merge(
 			$request->timelineData,
 			$this->timeline->finalize( $request->time )
@@ -71,31 +66,6 @@ class WordPress extends DataSource {
 			$GLOBALS['timestart'],
 			$GLOBALS['timestart']
 		);
-
-		// @todo Not sure if this is actually a good idea...
-		$this->hijack_doing_it_wrong();
-	}
-
-	protected function hijack_doing_it_wrong() {
-		add_filter( 'doing_it_wrong_trigger_error', '__return_false' );
-
-		add_action( 'doing_it_wrong_run', function( $function, $message, $version ) {
-			// @todo Translations!
-			$context = [
-				'link' => 'https://codex.wordpress.org/Debugging_in_WordPress',
-			];
-
-			if ( is_string( $version ) ) {
-				$context['version'] = $version;
-			}
-
-			if ( is_string( $message ) ) {
-				$context['message'] = $message;
-			}
-
-			// @todo What is appropriate level here? Core triggers an error.
-			$this->log->warning( "_doing_it_wrong: {$function} was called incorrectly", $context );
-		}, 10, 3 );
 	}
 
 	/**
