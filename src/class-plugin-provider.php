@@ -171,20 +171,17 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 			 * @return Wp_Data_Source
 			 */
 			function( Container $c ) {
-				// The wp and wp_query globals are declared after the plugins_loaded hook and before
-				// the setup_theme hook. The wp instance is further "initialized" just before the
-				// init hook. What follows is a bit of a (gross) workaround for the fact that
-				// datasource.wp is resolved on the plugins_loaded hook with neither yet available.
-				if ( did_action( 'init' ) ) {
-					return new Data_Source\WordPress( $c['wp'], $c['wp_query'] );
-				}
-
 				$source = new Data_Source\WordPress( $c['timestart'] );
-
-				add_action( 'init', function() use ( $c, $source ) {
+				$dep_handler = function() use ( $c, $source ) {
 					$source->set_wp( $c['wp'] );
 					$source->set_wp_query( $c['wp_query'] );
-				}, Plugin::EARLY_EVENT );
+				};
+
+				if ( did_action( 'init' ) ) {
+					$dep_handler();
+				} else {
+					add_action( 'init', $dep_handler, Plugin::EARLY_EVENT );
+				}
 
 				return $source;
 			};

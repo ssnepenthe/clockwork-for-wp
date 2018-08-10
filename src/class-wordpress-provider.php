@@ -11,11 +11,11 @@ class WordPress_Provider implements Provider {
      */
 	public function register( Container $container ) {
 		$container['timestart'] = $container->factory( function() {
-			return $GLOBALS['timestart'];
+			return isset( $GLOBALS['timestart'] ) ? $GLOBALS['timestart'] : null;
 		} );
 
 		$container['wp'] = $container->factory( function() {
-			return $GLOBALS['wp'];
+			return isset( $GLOBALS['wp'] ) ? $GLOBALS['wp'] : null;
 		} );
 
 		$container['wpdb'] = $container->factory( function() {
@@ -35,7 +35,7 @@ class WordPress_Provider implements Provider {
 		} );
 
 		$container['wp_query'] = $container->factory( function() {
-			return $GLOBALS['wp_query'];
+			return isset( $GLOBALS['wp_query'] ) ? $GLOBALS['wp_query'] : null;
 		} );
 	}
 }
