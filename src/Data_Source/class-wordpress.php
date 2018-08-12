@@ -7,6 +7,7 @@ use Clockwork\Request\Timeline;
 use Clockwork\DataSource\DataSource;
 
 class WordPress extends DataSource {
+	protected $conditionals;
 	/**
 	 * @var Timeline
 	 */
@@ -28,6 +29,51 @@ class WordPress extends DataSource {
 		$this->set_timestart( $timestart );
 		$this->set_wp( $wp );
 		$this->set_wp_query( $wp_query );
+
+		// @todo Allow user to modify the conditional list?
+		$this->conditionals = [
+			'list' => [
+				'is_404',
+				'is_admin',
+				'is_archive',
+				'is_attachment',
+				'is_author',
+				'is_blog_admin',
+				'is_category',
+				'is_comment_feed',
+				'is_customize_preview',
+				'is_date',
+				'is_day',
+				'is_embed',
+				'is_feed',
+				'is_front_page',
+				'is_home',
+				// @todo Special handling for multisite functions on single site installs?
+				'is_main_network',
+				'is_main_site',
+				'is_month',
+				'is_network_admin',
+				'is_page',
+				'is_page_template',
+				'is_paged',
+				'is_post_type_archive',
+				'is_preview',
+				'is_robots',
+				'is_rtl',
+				'is_search',
+				'is_single',
+				'is_singular',
+				'is_ssl',
+				'is_sticky',
+				'is_tag',
+				'is_tax',
+				'is_time',
+				'is_trackback',
+				'is_user_admin',
+				'is_year',
+			],
+			'table' => [],
+		];
 	}
 
 	/**
@@ -40,7 +86,20 @@ class WordPress extends DataSource {
 
 		$panel = $request->userData( 'wordpress' )->title( 'WordPress' );
 
-		$panel->counters( [ 'WP Version' => get_bloginfo( 'version' ) ] );
+		$val_counter = function( $value ) {
+			return count( array_filter(
+				$this->conditionals_table(),
+				function( $row ) use ( $value ) {
+					return $row['Value'] === $value;
+				} )
+			);
+		};
+
+		$panel->counters( [
+			'WP Version' => get_bloginfo( 'version' ),
+			'Matched Conditionals' => $val_counter( 'true' ),
+			'Unmatched Conditionals' => $val_counter( 'false' ),
+		] );
 
 		$request_table = $this->request_table();
 		$query_vars_table = $this->query_vars_table();
@@ -54,6 +113,7 @@ class WordPress extends DataSource {
 		}
 
 		$panel->table( 'Constants', $this->constants_table() );
+		$panel->table( 'Conditionals', $this->conditionals_table() );
 
 		$request->timelineData = array_merge(
 			$request->timelineData,
@@ -91,6 +151,27 @@ class WordPress extends DataSource {
 
 	public function set_wp_query( $wp_query ) {
 		$this->wp_query = is_object( $wp_query ) ? $wp_query : null;
+	}
+
+	protected function conditionals_table() {
+		if ( 0 === count( $this->conditionals['table'] ) ) {
+			$this->conditionals['table'] = array_map( function( $conditional ) {
+				return [
+					'Function' => \Clockwork_For_Wp\callable_to_display_string( $conditional ),
+					'Value' => true === (bool) call_user_func( $conditional ) ? 'true' : 'false',
+				];
+			}, $this->conditionals['list'] );
+
+			usort( $this->conditionals['table'], function( $a, $b ) {
+				if ( $a['Value'] === $b['Value'] ) {
+					return strcmp( $a['Name'], $b['Name'] );
+				}
+
+				return 'true' === $a['Value'] ? -1 : 1;
+			} );
+		}
+
+		return $this->conditionals['table'];
 	}
 
 	protected function constants_table() {
