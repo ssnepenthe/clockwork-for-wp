@@ -2,8 +2,6 @@
 
 namespace Clockwork_For_Wp\Data_Source;
 
-use WP;
-use WP_Query;
 use Clockwork\Request\Request;
 use Clockwork\Request\Timeline;
 use Clockwork\DataSource\DataSource;
@@ -45,18 +43,14 @@ class WordPress extends DataSource {
 		$panel->counters( [ 'WP Version' => get_bloginfo( 'version' ) ] );
 
 		$request_table = $this->request_table();
-		$has_request_data = 0 !== count( $request_table );
 		$query_vars_table = $this->query_vars_table();
-		$has_query_vars_data = 0 !== count( $query_vars_table );
 
-		if ( $has_request_data || $has_query_vars_data ) {
-			if ( $has_request_data ) {
-				$panel->table( 'Request', $request_table );
-			}
+		if ( 0 !== count( $request_table ) ) {
+			$panel->table( 'Request', $request_table );
+		}
 
-			if ( $has_query_vars_data ) {
-				$panel->table( 'Query Vars', $query_vars_table );
-			}
+		if ( 0 !== count( $query_vars_table ) ) {
+			$panel->table( 'Query Vars', $query_vars_table );
 		}
 
 		$panel->table( 'Constants', $this->constants_table() );
@@ -92,47 +86,51 @@ class WordPress extends DataSource {
 	}
 
 	public function set_wp( $wp ) {
-		$this->wp = $wp instanceof WP ? $wp : null;
+		$this->wp = is_object( $wp ) ? $wp : null;
 	}
 
 	public function set_wp_query( $wp_query ) {
-		$this->wp_query = $wp_query instanceof WP_Query ? $wp_query : null;
+		$this->wp_query = is_object( $wp_query ) ? $wp_query : null;
 	}
 
 	protected function constants_table() {
-		// @todo Filterable list? Should they be limited to bool?
-		// List currently matches the one from the environment tab in the Query Monitor plugin.
-		$constants = [
-			'WP_DEBUG',
-			'WP_DEBUG_DISPLAY',
-			'WP_DEBUG_LOG',
-			'SCRIPT_DEBUG',
-			'WP_CACHE',
-			'CONCATENATE_SCRIPTS',
-			'COMPRESS_SCRIPTS',
-			'COMPRESS_CSS',
-			'WP_LOCAL_DEV',
-		];
+		return array_map(
+			function( $constant ) {
+				$value = 'undefined';
 
-		if ( is_multisite() ) {
-			$constants[] = 'SUNRISE';
-		}
+				if ( defined( $constant ) ) {
+					$value = filter_var( constant( $constant ), FILTER_VALIDATE_BOOLEAN )
+						? 'true'
+						: 'false';
+				}
 
-		return array_map( function( $constant ) {
-			return [
-				'Name' => $constant,
-				'Value' => defined( $constant )
-					? filter_var( constant( $constant ), FILTER_VALIDATE_BOOLEAN )
-					: 'undefined',
-			];
-		}, $constants );
+				return [
+					'Name' => $constant,
+					'Value' => $value,
+				];
+			},
+			// @todo Filterable list? Should they be limited to bool? List currently matches the one
+			// from the environment tab in the Query Monitor plugin.
+			array_filter( [
+				'WP_DEBUG',
+				'WP_DEBUG_DISPLAY',
+				'WP_DEBUG_LOG',
+				'SCRIPT_DEBUG',
+				'WP_CACHE',
+				'CONCATENATE_SCRIPTS',
+				'COMPRESS_SCRIPTS',
+				'COMPRESS_CSS',
+				'WP_LOCAL_DEV',
+				is_multisite() ? 'SUNRISE' : '',
+			] )
+		);
 	}
 
 	/**
 	 * Adapted from Query Monitor QM_Collector_Request class.
 	 */
 	protected function query_vars() {
-		if ( null === $this->wp_query ) {
+		if ( null === $this->wp_query || ! property_exists( $this->wp_query, 'query_vars' ) ) {
 			return [];
 		}
 
@@ -154,12 +152,16 @@ class WordPress extends DataSource {
 	protected function query_vars_table() {
 		$query_vars = $this->query_vars();
 
-		return array_map( function( $value, $key ) {
-			return [
-				'Variable' => $key,
-				'Value' => $value,
-			];
-		}, $query_vars, array_keys( $query_vars ) );
+		return array_map(
+			function( $value, $key ) {
+				return [
+					'Variable' => $key,
+					'Value' => $value,
+				];
+			},
+			$query_vars,
+			array_keys( $query_vars )
+		);
 	}
 
 	protected function request_table() {
@@ -167,15 +169,19 @@ class WordPress extends DataSource {
 			return [];
 		}
 
-		$table = array_map( function( $var ) {
-			return [
-				'Variable' => $var,
-				'Value' => $this->wp->{$var} ? $this->wp->{$var} : false,
-			];
-		}, [ 'request', 'query_string', 'matched_rule', 'matched_query' ] );
-
-		return array_filter( $table, function( $row ) {
-			return false !== $row['Value'];
-		} );
+		return array_map(
+			function( $var ) {
+				return [
+					'Variable' => $var,
+					'Value' => $this->wp->{$var},
+				];
+			},
+			array_filter(
+				[ 'request', 'query_string', 'matched_rule', 'matched_query' ],
+				function( $var ) {
+					return property_exists( $this->wp, $var ) && $this->wp->{$var};
+				}
+			)
+		);
 	}
 }
