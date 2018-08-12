@@ -31,7 +31,7 @@ class WordPress_Provider implements Provider {
 				wp_cache_init();
 			}
 
-			return $GLOBALS['wp_object_cache'];
+			return isset( $GLOBALS['wp_object_cache'] ) ? $GLOBALS['wp_object_cache'] : null;
 		} );
 
 		$container['wp_rewrite'] = $container->factory( function() {

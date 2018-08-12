@@ -68,11 +68,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 					->addDataSource( $c['datasource.wp'] );
 
 				if ( $c['config']->is_collecting_cache_data() ) {
-					$clockwork->addDataSource( $c['datasource.transients'] );
-
-					$clockwork->addDataSource(
-						new Data_Source\Wp_Object_Cache( $c['wp_object_cache'] )
-					);
+					$clockwork->addDataSource( $c['datasource.cache'] );
 				}
 
 				if ( $c['config']->is_collecting_db_data() ) {
@@ -118,6 +114,14 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 				$storage->filter = $c['config']->get_filter();
 
 				return $storage;
+			};
+
+		$container['datasource.cache'] =
+			/**
+			 * @return Data_Source\Cache
+			 */
+			function( Container $c ) {
+				return new Data_Source\Cache( $c['wp_object_cache'] );
 			};
 
 		$container['datasource.conditionals'] =
@@ -171,14 +175,6 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 				}
 
 				return $source;
-			};
-
-		$container['datasource.transients'] =
-			/**
-			 * @return Data_Source\Transients
-			 */
-			function( Container $c ) {
-				return new Data_Source\Transients();
 			};
 
 		$container['datasource.wp'] =
@@ -243,7 +239,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 		$container['datasource.http']->listen_to_events();
 
 		if ( $container['config']->is_collecting_cache_data() ) {
-			$container['datasource.transients']->listen_to_events();
+			$container['datasource.cache']->listen_to_events();
 		}
 
 		if ( $container['config']->is_collecting_email_data() ) {
