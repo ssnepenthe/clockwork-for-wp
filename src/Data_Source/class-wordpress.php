@@ -164,7 +164,7 @@ class WordPress extends DataSource {
 
 			usort( $this->conditionals['table'], function( $a, $b ) {
 				if ( $a['Value'] === $b['Value'] ) {
-					return strcmp( $a['Name'], $b['Name'] );
+					return strcmp( $a['Function'], $b['Function'] );
 				}
 
 				return 'true' === $a['Value'] ? -1 : 1;
