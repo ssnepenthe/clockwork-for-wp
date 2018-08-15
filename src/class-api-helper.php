@@ -21,39 +21,23 @@ class Api_Helper {
 	 */
 	protected $storage;
 	protected $clockwork;
+	protected $routes;
 
 	/**
 	 * @param StorageInterface $storage
 	 */
-	public function __construct( Clockwork $clockwork, StorageInterface $storage ) {
+	public function __construct( Clockwork $clockwork, StorageInterface $storage, $routes ) {
 		$this->clockwork = $clockwork;
+		$this->routes = $routes;
 		$this->storage = $storage;
 	}
 
 	/**
-	 * @param  array<string, string> $rules
-	 * @return array<string, string>
+	 * @hook init
 	 */
-	public function register_rewrites( $rules ) {
-		// @todo Verify that these should be enabled from config.
-		// @todo Verify this filter is working over add_rewrite_rule on init.
-		return array_merge( [
-			self::EXTENDED_REWRITE_REGEX => self::EXTENDED_REWRITE_QUERY,
-			self::REWRITE_REGEX => self::REWRITE_QUERY,
-		], $rules );
-	}
-
-	/**
-	 * @param  array<int, string> $vars
-	 * @return array<int, string>
-	 */
-	public function register_query_vars( $vars ) {
-		return array_merge( $vars, [
-			self::ID_QUERY_VAR,
-			self::DIRECTION_QUERY_VAR,
-			self::COUNT_QUERY_VAR,
-			self::EXTENDED_QUERY_VAR
-		] );
+	public function register_routes() {
+		$this->routes->add( $this->build_extended_route() );
+		$this->routes->add( $this->build_standard_route() );
 	}
 
 	/**
@@ -86,6 +70,30 @@ class Api_Helper {
 		$data = $this->get_data( $id, $direction, $count, $extended );
 
 		wp_send_json( $data ); // @todo
+	}
+
+	protected function build_extended_route() {
+		$route = new Route( self::EXTENDED_REWRITE_REGEX, self::EXTENDED_REWRITE_QUERY );
+
+		$route->set_query_vars( [ self::ID_QUERY_VAR, self::EXTENDED_QUERY_VAR ] );
+
+		$route->map( 'GET', [ $this, 'serve_json' ] );
+
+		return $route;
+	}
+
+	protected function build_standard_route() {
+		$route = new Route( self::REWRITE_REGEX, self::REWRITE_QUERY );
+
+		$route->set_query_vars( [
+			self::ID_QUERY_VAR,
+			self::DIRECTION_QUERY_VAR,
+			self::COUNT_QUERY_VAR,
+		] );
+
+		$route->map( 'GET', [ $this, 'serve_json' ] );
+
+		return $route;
 	}
 
 	protected function get_data( $id = null, $direction = null, $count = null, $extended = null ) {

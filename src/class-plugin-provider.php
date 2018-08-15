@@ -14,21 +14,24 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 	 * @return void
 	 */
 	public function boot( Plugin $container ) {
+		// @todo Should these all run late?
+		$container
+			->on( 'option_rewrite_rules', [ 'routes', 'merge_rewrite_rules' ] )
+			->on( 'pre_update_option_rewrite_rules', [ 'routes', 'diff_rewrite_rules' ] )
+			->on( 'query_vars', [ 'routes', 'merge_query_vars' ] )
+			->on( 'rewrite_rules_array', [ 'routes', 'merge_rewrite_rules' ] )
+			->on( 'template_redirect', [ 'routes', 'call_matched_handler' ], Plugin::LATE_EVENT );
+
 		if ( $container['config']->is_collecting_data() ) {
 			$this->listen_to_events( $container );
 		}
 
-		if ( ! $container['config']->is_enabled() ) {
-			return;
+		if ( $container['config']->is_enabled() ) {
+			$container->on( 'wp_loaded', [ 'helpers.request', 'send_headers' ] );
 		}
 
 		$this->register_api_routes( $container );
-
-		$container->on( 'wp_loaded', [ 'helpers.request', 'send_headers' ] );
-
-		if ( $container['config']->is_web_enabled() ) {
-			$this->register_web_routes( $container );
-		}
+		$this->register_web_routes( $container );
 	}
 
 	/**
@@ -199,7 +202,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 			 * @return Api_Helper
 			 */
 			function( Container $c ) {
-				return new Api_Helper( $c['clockwork'], $c['clockwork.storage'] );
+				return new Api_Helper( $c['clockwork'], $c['clockwork.storage'], $c['routes'] );
 			};
 
 		$container['helpers.request'] =
@@ -215,7 +218,12 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 			 * @return Web_Helper
 			 */
 			function( Container $c ) {
-				return new Web_Helper();
+				return new Web_Helper( $c['routes'] );
+			};
+
+		$container['routes'] =
+			function( Container $c ) {
+				return new Route_Manager( $c['wp'] );
 			};
 	}
 
@@ -253,18 +261,22 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 	 * @return void
 	 */
 	protected function register_api_routes( Plugin $container ) {
-		$container
-			->on( 'query_vars', [ 'helpers.api', 'register_query_vars' ] )
-			->on( 'rewrite_rules_array', [ 'helpers.api', 'register_rewrites' ] )
-			->on( 'template_redirect', [ 'helpers.api', 'serve_json' ] );
+		if ( $container['config']->is_enabled() ) {
+			$container
+				->on( 'init', [ 'helpers.api', 'register_routes' ] )
+				->on( 'template_redirect', [ 'helpers.api', 'serve_json' ] );
+		}
 	}
 
 	protected function register_web_routes( Plugin $container ) {
-		$container
-			->on( 'query_vars', [ 'helpers.web', 'register_query_vars' ] )
-			->on( 'rewrite_rules_array', [ 'helpers.web', 'register_rewrites' ] )
-			->on( 'template_redirect', [ 'helpers.web', 'redirect_shortcut' ] )
-			->on( 'redirect_canonical', [ 'helpers.web', 'prevent_canonical_redirect' ], 10, 2 )
-			->on( 'template_redirect', [ 'helpers.web', 'serve_web_assets' ] );
+		// @todo Should ->is_web_enabled() check ->is_enabled() internally?
+		// @todo Or maybe we should we allow the web app to be served even when clockwork is disabled?
+		if ( $container['config']->is_enabled() && $container['config']->is_web_enabled() ) {
+			$container
+				->on( 'init', [ 'helpers.web', 'register_routes' ] )
+				->on( 'template_redirect', [ 'helpers.web', 'redirect_shortcut' ] )
+				->on( 'redirect_canonical', [ 'helpers.web', 'prevent_canonical_redirect' ], 10, 2 )
+				->on( 'template_redirect', [ 'helpers.web', 'serve_web_assets' ] );
+		}
 	}
 }

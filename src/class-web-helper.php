@@ -5,6 +5,12 @@ namespace Clockwork_For_Wp;
 use Clockwork\Web\Web;
 
 class Web_Helper {
+	protected $routes;
+
+	public function __construct( $routes ) {
+		$this->routes = $routes;
+	}
+
 	// @todo Move to request helper and ensure this covers both api and web requests?
 	public function prevent_canonical_redirect( $redirect, $requested ) {
 		$clockwork = home_url( '__clockwork' );
@@ -30,15 +36,12 @@ class Web_Helper {
 		die;
 	}
 
-	public function register_query_vars( $vars ) {
-		return array_merge( $vars, [ 'cfw_app', 'cfw_asset' ] );
-	}
-
-	public function register_rewrites( $rules ) {
-		return array_merge( [
-			'__clockwork/app' => 'index.php?cfw_app=1&cfw_asset=app.html',
-			'__clockwork/assets/(.*)' => 'index.php?cfw_app=1&cfw_asset=$matches[1]',
-		], $rules );
+	/**
+	 * @hook init
+	 */
+	public function register_routes() {
+		$this->routes->add( $this->build_app_route() );
+		$this->routes->add( $this->build_assets_route() );
 	}
 
 	public function serve_web_assets() {
@@ -71,5 +74,25 @@ class Web_Helper {
 		$wp_query->set_404();
 		status_header( 404 );
 		nocache_headers();
+	}
+
+	protected function build_app_route() {
+		$route = new Route( '__clockwork/app', 'index.php?cfw_app=1&cfw_asset=app.html' );
+
+		$route->set_query_vars( [ 'cfw_app', 'cfw_asset' ] );
+
+		$route->map( 'GET', [ $this, 'serve_web_assets' ] );
+
+		return $route;
+	}
+
+	protected function build_assets_route() {
+		$route = new Route( '__clockwork/assets/(.*)', 'index.php?cfw_app=1&cfw_asset=$matches[1]' );
+
+		$route->set_query_vars( [ 'cfw_app', 'cfw_asset' ] );
+
+		$route->map( 'GET', [ $this, 'serve_web_assets' ] );
+
+		return $route;
 	}
 }
