@@ -14,24 +14,24 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 	 * @return void
 	 */
 	public function boot( Plugin $container ) {
-		// @todo Should these all run late?
-		$container
-			->on( 'option_rewrite_rules', [ 'routes', 'merge_rewrite_rules' ] )
-			->on( 'pre_update_option_rewrite_rules', [ 'routes', 'diff_rewrite_rules' ] )
-			->on( 'query_vars', [ 'routes', 'merge_query_vars' ] )
-			->on( 'rewrite_rules_array', [ 'routes', 'merge_rewrite_rules' ] )
-			->on( 'template_redirect', [ 'routes', 'call_matched_handler' ], Plugin::LATE_EVENT );
+		$this->boot_routes( $container );
 
 		if ( $container['config']->is_collecting_data() ) {
-			$this->listen_to_events( $container );
+			$this->boot_datasources( $container );
+
+			$container->on(
+				'shutdown',
+				[ 'helpers.request', 'finalize_request' ],
+				Plugin::LATE_EVENT
+			);
 		}
 
 		if ( $container['config']->is_enabled() ) {
 			$container->on( 'wp_loaded', [ 'helpers.request', 'send_headers' ] );
 		}
 
-		$this->register_api_routes( $container );
-		$this->register_web_routes( $container );
+		$this->boot_api( $container );
+		$this->boot_web_app( $container );
 	}
 
 	/**
@@ -39,8 +39,6 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 	 * @return void
 	 */
 	public function register( Container $container ) {
-		require_once $container['dir'] . '/inc/helpers.php';
-
 		$container['config'] =
 			/**
 			 * @return Config
@@ -118,6 +116,77 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 				return $storage;
 			};
 
+		$container['routes'] =
+			function( Container $c ) {
+				return new Route_Manager( $c['wp'] );
+			};
+
+		$this->register_datasources( $container );
+		$this->register_helpers( $container );
+	}
+
+	/**
+	 * @param  Plugin $container
+	 * @return void
+	 */
+	protected function boot_api( Plugin $container ) {
+		if ( $container['config']->is_enabled() ) {
+			$container
+				->on( 'init', [ 'helpers.api', 'register_routes' ] )
+				->on( 'template_redirect', [ 'helpers.api', 'serve_json' ] );
+		}
+	}
+
+	/**
+	 * @param  Plugin $container
+	 * @return void
+	 */
+	protected function boot_datasources( Plugin $container ) {
+		$container['datasource.errors']->listen_to_events();
+		$container['datasource.http']->listen_to_events();
+
+		if ( $container['config']->is_collecting_cache_data() ) {
+			$container['datasource.cache']->listen_to_events();
+		}
+
+		if ( $container['config']->is_collecting_email_data() ) {
+			$container['datasource.mail']->listen_to_events();
+		}
+
+		if ( $container['config']->is_collecting_theme_data() ) {
+			$container['datasource.theme']->listen_to_events();
+		}
+
+		$container['datasource.wp']->listen_to_events();
+
+		if ( in_array( 'xdebug', get_loaded_extensions(), true ) ) {
+			$container['datasource.xdebug']->listen_to_events();
+		}
+	}
+
+	protected function boot_routes( Plugin $container ) {
+		// @todo Should these all run late?
+		$container
+			->on( 'option_rewrite_rules', [ 'routes', 'merge_rewrite_rules' ] )
+			->on( 'pre_update_option_rewrite_rules', [ 'routes', 'diff_rewrite_rules' ] )
+			->on( 'query_vars', [ 'routes', 'merge_query_vars' ] )
+			->on( 'rewrite_rules_array', [ 'routes', 'merge_rewrite_rules' ] )
+			->on( 'template_redirect', [ 'routes', 'call_matched_handler' ], Plugin::LATE_EVENT );
+	}
+
+	protected function boot_web_app( Plugin $container ) {
+		// @todo Should ->is_web_enabled() check ->is_enabled() internally?
+		// @todo Or maybe we should we allow the web app to be served even when clockwork is disabled?
+		if ( $container['config']->is_enabled() && $container['config']->is_web_enabled() ) {
+			$container
+				->on( 'init', [ 'helpers.web', 'register_routes' ] )
+				->on( 'template_redirect', [ 'helpers.web', 'redirect_shortcut' ] )
+				->on( 'redirect_canonical', [ 'helpers.web', 'prevent_canonical_redirect' ], 10, 2 )
+				->on( 'template_redirect', [ 'helpers.web', 'serve_web_assets' ] );
+		}
+	}
+
+	protected function register_datasources( Plugin $container ) {
 		$container['datasource.cache'] =
 			/**
 			 * @return Data_Source\Cache
@@ -136,7 +205,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 
 		$container['datasource.http'] =
 			/**
-			 * @return Wp_Http_Data_Source
+			 * @return Data_Source\Wp_Http
 			 */
 			function( Container $c ) {
 				return new Data_Source\Wp_Http();
@@ -144,7 +213,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 
 		$container['datasource.mail'] =
 			/**
-			 * @return Wp_Mail_Data_Source
+			 * @return Data_Source\Wp_Mail
 			 */
 			function( Container $c ) {
 				return new Data_Source\Wp_Mail();
@@ -152,7 +221,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 
 		$container['datasource.theme'] =
 			/**
-			 * @return Theme_Data_Source
+			 * @return Data_Source\Theme
 			 */
 			function( Container $c ) {
 				$source = new Data_Source\Theme();
@@ -171,7 +240,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 
 		$container['datasource.wp'] =
 			/**
-			 * @return Wp_Data_Source
+			 * @return Data_Source\WordPress
 			 */
 			function( Container $c ) {
 				$source = new Data_Source\WordPress( $c['timestart'] );
@@ -196,7 +265,9 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 			function( Container $c ) {
 				return new Data_Source\Xdebug();
 			};
+	}
 
+	protected function register_helpers( Plugin $container ) {
 		$container['helpers.api'] =
 			/**
 			 * @return Api_Helper
@@ -220,63 +291,5 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 			function( Container $c ) {
 				return new Web_Helper( $c['routes'] );
 			};
-
-		$container['routes'] =
-			function( Container $c ) {
-				return new Route_Manager( $c['wp'] );
-			};
-	}
-
-	/**
-	 * @param  Plugin $container
-	 * @return void
-	 */
-	protected function listen_to_events( Plugin $container ) {
-		$container['datasource.errors']->listen_to_events();
-		$container['datasource.http']->listen_to_events();
-
-		if ( $container['config']->is_collecting_cache_data() ) {
-			$container['datasource.cache']->listen_to_events();
-		}
-
-		if ( $container['config']->is_collecting_email_data() ) {
-			$container['datasource.mail']->listen_to_events();
-		}
-
-		if ( $container['config']->is_collecting_theme_data() ) {
-			$container['datasource.theme']->listen_to_events();
-		}
-
-		$container['datasource.wp']->listen_to_events();
-
-		if ( in_array( 'xdebug', get_loaded_extensions(), true ) ) {
-			$container['datasource.xdebug']->listen_to_events();
-		}
-
-		$container->on( 'shutdown', [ 'helpers.request', 'finalize_request' ], Plugin::LATE_EVENT );
-	}
-
-	/**
-	 * @param  Plugin $container
-	 * @return void
-	 */
-	protected function register_api_routes( Plugin $container ) {
-		if ( $container['config']->is_enabled() ) {
-			$container
-				->on( 'init', [ 'helpers.api', 'register_routes' ] )
-				->on( 'template_redirect', [ 'helpers.api', 'serve_json' ] );
-		}
-	}
-
-	protected function register_web_routes( Plugin $container ) {
-		// @todo Should ->is_web_enabled() check ->is_enabled() internally?
-		// @todo Or maybe we should we allow the web app to be served even when clockwork is disabled?
-		if ( $container['config']->is_enabled() && $container['config']->is_web_enabled() ) {
-			$container
-				->on( 'init', [ 'helpers.web', 'register_routes' ] )
-				->on( 'template_redirect', [ 'helpers.web', 'redirect_shortcut' ] )
-				->on( 'redirect_canonical', [ 'helpers.web', 'prevent_canonical_redirect' ], 10, 2 )
-				->on( 'template_redirect', [ 'helpers.web', 'serve_web_assets' ] );
-		}
 	}
 }
