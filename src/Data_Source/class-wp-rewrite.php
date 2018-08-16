@@ -14,19 +14,38 @@ class Wp_Rewrite extends DataSource {
 	}
 
 	public function resolve( Request $request ) {
-		$request->routes = $this->collect_routes();
+		$panel = $request->userData( 'rewrites' )->title( 'Rewrites' );
+
+		$panel->table( 'Miscellaneous', $this->miscellaneous_table() );
+		$panel->table( 'Rules', $this->rules_table() );
 
 		return $request;
+	}
+
+	protected function miscellaneous_table() {
+		return [
+			[
+				'Item' => 'Permalink Structure',
+				'Value' => $this->rewrite->permalink_structure,
+			],
+			[
+				'Item' => 'Trailing Slash?',
+				'Value' => $this->rewrite->use_trailing_slashes ? 'Yes' : 'No',
+			],
+			[
+				'Item' => 'Rewrite Front',
+				'Value' => $this->rewrite->front,
+			],
+		];
 	}
 
 	/**
 	 * @return array<int, array>
 	 */
-	protected function collect_routes() {
+	protected function rules_table() {
 		// @todo What does wp_rewrite_rules() return when pretty permalinks are disabled?
 		$rules = $this->rewrite->wp_rewrite_rules();
 
-		// @todo Routes may not be the most appropriate place to put all of the WordPress rewrites...
 		return array_map(
 			/**
 			 * @param        string $regex
@@ -35,8 +54,8 @@ class Wp_Rewrite extends DataSource {
 			 */
 			function( $regex, $query ) {
 				return [
-					'uri' => $query,
-					'action' => $regex,
+					'Query' => $query,
+					'Regex' => $regex,
 				];
 			},
 			$rules,
