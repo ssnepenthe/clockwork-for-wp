@@ -34,6 +34,10 @@ class WordPress_Provider implements Provider {
 			return isset( $GLOBALS['wp_object_cache'] ) ? $GLOBALS['wp_object_cache'] : null;
 		} );
 
+		$container['wp_rest_server'] = $container->factory( function() {
+			return rest_get_server();
+		} );
+
 		$container['wp_rewrite'] = $container->factory( function() {
 			return $GLOBALS['wp_rewrite'];
 		} );

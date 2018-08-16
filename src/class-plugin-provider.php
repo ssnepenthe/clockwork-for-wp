@@ -65,6 +65,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 					// @todo Should these be conditionally added?
 					->addDataSource( $c['datasource.errors'] )
 					->addDataSource( $c['datasource.http'] )
+					->addDataSource( $c['datasource.rest'] )
 					->addDataSource( $c['datasource.wp'] );
 
 				if ( $c['config']->is_collecting_cache_data() ) {
@@ -217,6 +218,11 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 			 */
 			function( Container $c ) {
 				return new Data_Source\Wp_Mail();
+			};
+
+		$container['datasource.rest'] =
+			function( Container $c ) {
+				return new Data_Source\Rest_Api( $c['wp_rest_server'] );
 			};
 
 		$container['datasource.theme'] =
