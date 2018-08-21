@@ -81,7 +81,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 				}
 
 				if ( $c['config']->is_collecting_event_data() ) {
-					$clockwork->addDataSource( new Data_Source\Wp_Hook() );
+					$clockwork->addDataSource( $c['datasource.hook'] );
 				}
 
 				if ( $c['config']->is_collecting_rewrite_data() ) {
@@ -202,6 +202,11 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 			 */
 			function( Container $c ) {
 				return new Data_Source\Errors();
+			};
+
+		$container['datasource.hook'] =
+			function( Container $c ) {
+				return new Data_Source\Wp_Hook();
 			};
 
 		$container['datasource.http'] =
