@@ -5,7 +5,6 @@ namespace Clockwork_For_Wp;
 use Pimple\Container;
 use Clockwork\Clockwork;
 use Clockwork\Storage\FileStorage;
-use Clockwork\DataSource\PhpDataSource;
 use Pimple\ServiceProviderInterface as Provider;
 
 class Plugin_Provider implements Provider, Bootable_Provider {
@@ -61,7 +60,7 @@ class Plugin_Provider implements Provider, Bootable_Provider {
 				$clockwork = new Clockwork();
 
 				$clockwork
-					->addDataSource( new PhpDataSource() )
+					->addDataSource( new Data_Source\Php() )
 					// @todo Should these be conditionally added?
 					->addDataSource( $c['datasource.errors'] )
 					->addDataSource( $c['datasource.http'] )
