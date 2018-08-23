@@ -126,30 +126,22 @@ class Theme extends DataSource {
 	}
 
 	protected function miscellaneous_table() {
-		$is_child = is_child_theme();
-
-		$miscellaneous = [
+		return array_filter( [
 			[
 				'Item' => 'Theme',
-				'Value' => $is_child ? get_stylesheet() : get_template(),
+				'Value' => is_child_theme() ? get_stylesheet() : get_template(),
 			],
-		];
-
-		if ( $is_child ) {
-			$miscellaneous[] = [
+			[
 				'Item' => 'Parent Theme',
-				'Value' => get_template(),
-			];
-		}
-
-		if ( null !== $this->content_width ) {
-			$miscellaneous[] = [
+				'Value' => is_child_theme() ? get_template() : null,
+			],
+			[
 				'Item' => 'Content Width',
 				'Value' => $this->content_width,
-			];
-		}
-
-		return $miscellaneous;
+			],
+		], function( $row ) {
+			return null !== $row['Value'];
+		} );
 	}
 
 	protected function parent_theme_files() {

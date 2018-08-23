@@ -24,31 +24,42 @@ class Rest_Api extends DataSource {
 	protected function routes_table() {
 		$routes = $this->wp_rest_server->get_routes();
 
-		return call_user_func_array( 'array_merge', array_map( function( $path, $handlers ) {
-			return array_map( function( $handler ) use ( $path ) {
-				$methods = array_keys( array_filter( $handler['methods'] ) );
+		return call_user_func_array( 'array_merge', array_map(
+			function( $path, $handlers ) {
+				return array_map(
+					function( $handler ) use ( $path ) {
+						// $handler also holds args, accept_json, accept_raw and show_in_index.
+						$callback = '';
+						$permission_callback = '';
+						$methods = implode(
+							', ',
+							array_keys( array_filter( $handler['methods'] ) )
+						);
 
-				return [
-					'Path' => $path,
-					'Methods' => implode( ', ', $methods ),
-					// "Args" => $handler['args'],
-					// 'Accept JSON' => isset( $handler['accept_json'] ) && $handler['accept_json']
-					// 	? 'Yes'
-					// 	: 'No',
-					// 'Accept Raw' => isset( $handler['accept_raw'] ) && $handler['accept_raw']
-					// 	? 'Yes'
-					// 	: 'No',
-					// 'Show In Index' => isset( $handler['show_in_index'] ) && $handler['show_in_index']
-					// 	? 'Yes'
-					// 	: 'No',
-					'Callback' => isset( $handler['callback'] )
-						? \Clockwork_For_Wp\callable_to_display_string( $handler['callback'] )
-						: 'undefined',
-					'Permission Callback' => isset( $handler['permission_callback'] )
-						? \Clockwork_For_Wp\callable_to_display_string( $handler['permission_callback'] )
-						: 'undefined',
-				];
-			}, $handlers );
-		}, array_keys( $routes ), $routes ) );
+						if ( isset( $handler['callback'] ) ) {
+							$callback = \Clockwork_For_Wp\callable_to_display_string(
+								$handler['callback']
+							);
+						}
+
+						if ( isset( $handler['permission_callback'] ) ) {
+							$permission_callback = \Clockwork_For_Wp\callable_to_display_string(
+								$handler['permission_callback']
+							);
+						}
+
+						return [
+							'Path' => $path,
+							'Methods' => $methods,
+							'Callback' => $callback,
+							'Permission Callback' => $permission_callback,
+						];
+					},
+					$handlers
+				);
+			},
+			array_keys( $routes ),
+			$routes
+		) );
 	}
 }
