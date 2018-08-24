@@ -1,6 +1,8 @@
 # Clockwork for WP
 A basic [Clockwork](https://underground.works/clockwork/) integration for WordPress.
 
+**DO NOT, UNDER ANY CIRCUMSTANCES, RUN THIS PLUGIN ON ANYTHING BUT A DEVELOPMENT MACHINE - THE METADATA IT EXPOSES CAN BE USED TO EASILY TAKE OVER YOUR SITE.**
+
 ## Requirements
 PHP 5.5 or greater and Composer.
 
