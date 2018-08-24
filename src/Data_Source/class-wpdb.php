@@ -113,6 +113,6 @@ class Wpdb extends DataSource {
 			}
 		}
 
-		return '(unkown)';
+		return '(unknown)';
 	}
 }
