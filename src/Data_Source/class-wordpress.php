@@ -82,7 +82,6 @@ class WordPress extends DataSource {
 	 */
 	public function resolve( Request $request ) {
 		// @todo Consider options for filling the "controller" slot.
-		// @todo Consider configuring a custom error handler to save errors in the "log" slot.
 
 		$panel = $request->userData( 'wordpress' )->title( 'WordPress' );
 
