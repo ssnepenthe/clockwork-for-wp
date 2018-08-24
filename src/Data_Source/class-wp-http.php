@@ -68,7 +68,7 @@ class Wp_Http extends DataSource {
 
 	protected function add_meta_to_args( $args, $url ) {
 		$start = microtime( true );
-		$fingerprint = hash( 'md5', $start . $url . serialize( $args ) );
+		$fingerprint = hash( 'md5', (string) $start . $url . serialize( $args ) );
 
 		return array_merge( $args, [ '_cfw_meta' => compact( 'fingerprint', 'url', 'start' ) ] );
 	}
