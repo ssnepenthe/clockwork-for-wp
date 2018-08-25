@@ -24,7 +24,9 @@ class Plugin {
 		}
 
 		foreach ( $this->definitions() as $definition ) {
-			$this->attach( $definition );
+			if ( $definition->is_enabled() ) {
+				$this->attach( $definition );
+			}
 		}
 
 		$this->booted = true;
