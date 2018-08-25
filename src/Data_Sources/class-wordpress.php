@@ -1,6 +1,6 @@
 <?php
 
-namespace Clockwork_For_Wp\Data_Source;
+namespace Clockwork_For_Wp\Data_Sources;
 
 use Clockwork\Request\Request;
 use Clockwork\Request\Timeline;
@@ -83,6 +83,15 @@ class WordPress extends DataSource {
 	public function resolve( Request $request ) {
 		// @todo Consider options for filling the "controller" slot.
 
+		$this->timeline->startEvent( 'total', 'Total execution', 'start' );
+
+		$this->timeline->addEvent(
+			'core_timer',
+			'Core timer start',
+			$this->timestart,
+			$this->timestart
+		);
+
 		$panel = $request->userData( 'wordpress' )->title( 'WordPress' );
 
 		$val_counter = function( $value ) {
@@ -120,20 +129,6 @@ class WordPress extends DataSource {
 		);
 
 		return $request;
-	}
-
-	/**
-	 * @return void
-	 */
-	public function listen_to_events() {
-		$this->timeline->startEvent( 'total', 'Total execution', 'start' );
-
-		$this->timeline->addEvent(
-			'core_timer',
-			'Core timer start',
-			$this->timestart,
-			$this->timestart
-		);
 	}
 
 	public function set_timeline( Timeline $timeline ) {

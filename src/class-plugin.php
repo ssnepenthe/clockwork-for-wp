@@ -42,6 +42,7 @@ class Plugin {
 				new Definitions\Data_Sources\Php( $this ),
 				new Definitions\Data_Sources\Rest_Api( $this ),
 				new Definitions\Data_Sources\Theme( $this ),
+				new Definitions\Data_Sources\WordPress( $this ),
 			];
 		}
 
