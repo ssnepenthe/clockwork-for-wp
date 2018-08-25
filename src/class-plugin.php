@@ -47,6 +47,7 @@ class Plugin {
 				new Definitions\Data_Sources\Wp_Http( $this ),
 				new Definitions\Data_Sources\Wp_Mail( $this ),
 				new Definitions\Data_Sources\Wp_Rewrite( $this ),
+				new Definitions\Data_Sources\Wpdb( $this ),
 			];
 		}
 
