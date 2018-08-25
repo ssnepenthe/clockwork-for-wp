@@ -38,6 +38,7 @@ class Plugin {
 		if ( 0 === count( $this->definitions ) ) {
 			$this->definitions = [
 				new Definitions\Data_Sources\Cache( $this ),
+				new Definitions\Data_Sources\Errors( $this ),
 			];
 		}
 
@@ -62,7 +63,7 @@ class Plugin {
 
 	protected function attach( $definition ) {
 		// @todo instanceof check?
-		foreach ( $definition->get_subscribed_events() as $tag => $args ) {
+		foreach ( $definition->get_subscribed_events() as $args ) {
 			$this->on(
 				$args[0],
 				$definition->get_identifier(),

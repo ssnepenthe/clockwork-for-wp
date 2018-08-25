@@ -1,6 +1,6 @@
 <?php
 
-namespace Clockwork_For_Wp\Data_Source;
+namespace Clockwork_For_Wp\Data_Sources;
 
 use Psr\Log\LogLevel;
 use Clockwork\Request\Log;
@@ -29,10 +29,6 @@ class Errors extends DataSource {
 		$request->log = array_merge( $request->log, $this->log->toArray() );
 
 		return $request;
-	}
-
-	public function listen_to_events() {
-		add_action( 'shutdown', [ $this, 'print_recorded_errors' ] );
 	}
 
 	public function print_recorded_errors() {
