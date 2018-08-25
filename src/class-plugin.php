@@ -5,6 +5,7 @@ namespace Clockwork_For_Wp;
 use Pimple\Container;
 
 class Plugin {
+	const DEFAULT_EVENT = 10;
 	const EARLY_EVENT = -999;
 	const LATE_EVENT = 999;
 

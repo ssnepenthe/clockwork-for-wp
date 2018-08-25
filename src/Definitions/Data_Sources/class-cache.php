@@ -3,6 +3,7 @@
 namespace Clockwork_For_Wp\Definitions\Data_Sources;
 
 use Pimple\Container;
+use Clockwork_For_Wp\Plugin;
 use Clockwork_For_Wp\Definitions\Definition;
 use Clockwork_For_Wp\Data_Sources\Cache as Cache_Data_Source;
 
@@ -13,10 +14,10 @@ class Cache extends Definition {
 
 	public function get_subscribed_events() {
 		return [
-			[ 'setted_transient',      'on_setted_transient',      10, 3 ],
-			[ 'setted_site_transient', 'on_setted_site_transient', 10, 3 ],
-			[ 'deleted_transient',     'on_deleted_transient'            ],
-			[ 'setted_site_transient', 'on_deleted_site_transient'       ],
+			[ 'setted_transient',      'on_setted_transient',      Plugin::DEFAULT_EVENT, 3 ],
+			[ 'setted_site_transient', 'on_setted_site_transient', Plugin::DEFAULT_EVENT, 3 ],
+			[ 'deleted_transient',     'on_deleted_transient'                               ],
+			[ 'setted_site_transient', 'on_deleted_site_transient'                          ],
 		];
 	}
 
