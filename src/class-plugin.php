@@ -39,6 +39,7 @@ class Plugin {
 			$this->definitions = [
 				new Definitions\Data_Sources\Cache( $this ),
 				new Definitions\Data_Sources\Errors( $this ),
+				new Definitions\Data_Sources\Php( $this ),
 			];
 		}
 
