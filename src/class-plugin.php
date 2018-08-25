@@ -37,6 +37,7 @@ class Plugin {
 	public function definitions() {
 		if ( 0 === count( $this->definitions ) ) {
 			$this->definitions = [
+				// Data sources.
 				new Definitions\Data_Sources\Cache( $this ),
 				new Definitions\Data_Sources\Errors( $this ),
 				new Definitions\Data_Sources\Php( $this ),
@@ -49,6 +50,9 @@ class Plugin {
 				new Definitions\Data_Sources\Wp_Rewrite( $this ),
 				new Definitions\Data_Sources\Wpdb( $this ),
 				new Definitions\Data_Sources\Xdebug( $this ),
+
+				// Helpers.
+				new Definitions\Helpers\Api( $this ),
 			];
 		}
 
