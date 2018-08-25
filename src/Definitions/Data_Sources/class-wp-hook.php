@@ -3,7 +3,6 @@
 namespace Clockwork_For_Wp\Definitions\Data_Sources;
 
 use Pimple\Container;
-use Clockwork_For_Wp\Plugin;
 use Clockwork_For_Wp\Definitions\Definition;
 use Clockwork_For_Wp\Data_Sources\Wp_Hook as Wp_Hook_Data_Source;
 
@@ -24,7 +23,6 @@ class Wp_Hook extends Definition {
 	}
 
 	public function is_enabled() {
-		// @todo
-		return true;
+		return $this->plugin->service( 'config' )->is_collecting_event_data();
 	}
 }
