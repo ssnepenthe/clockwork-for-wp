@@ -1,6 +1,6 @@
 <?php
 
-namespace Clockwork_For_Wp\Data_Source;
+namespace Clockwork_For_Wp\Data_Sources;
 
 use WP_Error;
 use Clockwork\Request\Log;
@@ -22,11 +22,6 @@ class Wp_Mail extends DataSource {
 		$request->log = array_merge( $request->log, $this->log->toArray() );
 
 		return $request;
-	}
-
-	public function listen_to_events() {
-		add_filter( 'wp_mail', [ $this, 'record_email_attempt' ] );
-		add_action( 'wp_mail_failed', [ $this, 'log_email_failure' ] );
 	}
 
 	public function record_email_attempt( $args ) {

@@ -45,6 +45,7 @@ class Plugin {
 				new Definitions\Data_Sources\WordPress( $this ),
 				new Definitions\Data_Sources\Wp_Hook( $this ),
 				new Definitions\Data_Sources\Wp_Http( $this ),
+				new Definitions\Data_Sources\Wp_Mail( $this ),
 			];
 		}
 
