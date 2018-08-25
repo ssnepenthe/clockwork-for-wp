@@ -36,11 +36,11 @@ class Cache extends DataSource {
 
 		$panel->counters( $this->object_cache_counters() );
 
-		if ( 0 !== count( $this->transients['setted'] ) ) {
+		if ( 0 !== count( $this->setted_transients ) ) {
 			$panel->table( 'Setted Transients', $this->setted_transients );
 		}
 
-		if ( 0 !== count( $this->transients['deleted'] ) ) {
+		if ( 0 !== count( $this->deleted_transients ) ) {
 			$panel->table( 'Deleted Transients', $this->deleted_transients );
 		}
 

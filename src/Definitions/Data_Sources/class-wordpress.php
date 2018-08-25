@@ -19,10 +19,10 @@ class WordPress extends Definition {
 
 	public function get_value() {
 		return function( Container $container ) {
-			$source = new WordPress_Data_Source( $c['timestart'] );
-			$dep_handler = function() use ( $c, $source ) {
-				$source->set_wp( $c['wp'] );
-				$source->set_wp_query( $c['wp_query'] );
+			$source = new WordPress_Data_Source( $container['timestart'] );
+			$dep_handler = function() use ( $container, $source ) {
+				$source->set_wp( $container['wp'] );
+				$source->set_wp_query( $container['wp_query'] );
 			};
 
 			if ( did_action( 'init' ) ) {

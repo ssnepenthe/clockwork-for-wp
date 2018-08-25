@@ -18,7 +18,7 @@ class Rest_Api extends Definition {
 
 	public function get_value() {
 		return function( Container $container ) {
-			return new Rest_Api_Data_Source( $c['wp_rest_server'] );
+			return new Rest_Api_Data_Source( $container['wp_rest_server'] );
 		};
 	}
 
