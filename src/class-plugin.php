@@ -54,6 +54,7 @@ class Plugin {
 				// Helpers.
 				new Definitions\Helpers\Api( $this ),
 				new Definitions\Helpers\Request( $this ),
+				new Definitions\Helpers\Web( $this ),
 			];
 		}
 
