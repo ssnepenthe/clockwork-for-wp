@@ -20,18 +20,18 @@ class WordPress extends Definition {
 	public function get_value() {
 		return function( Container $container ) {
 			$source = new WordPress_Data_Source( $c['timestart'] );
-				$dep_handler = function() use ( $c, $source ) {
-					$source->set_wp( $c['wp'] );
-					$source->set_wp_query( $c['wp_query'] );
-				};
+			$dep_handler = function() use ( $c, $source ) {
+				$source->set_wp( $c['wp'] );
+				$source->set_wp_query( $c['wp_query'] );
+			};
 
-				if ( did_action( 'init' ) ) {
-					$dep_handler();
-				} else {
-					add_action( 'init', $dep_handler, Plugin::EARLY_EVENT );
-				}
+			if ( did_action( 'init' ) ) {
+				$dep_handler();
+			} else {
+				add_action( 'init', $dep_handler, Plugin::EARLY_EVENT );
+			}
 
-				return $source;
+			return $source;
 		};
 	}
 
