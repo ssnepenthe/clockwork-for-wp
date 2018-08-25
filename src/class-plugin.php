@@ -43,6 +43,7 @@ class Plugin {
 				new Definitions\Data_Sources\Rest_Api( $this ),
 				new Definitions\Data_Sources\Theme( $this ),
 				new Definitions\Data_Sources\WordPress( $this ),
+				new Definitions\Data_Sources\Wp_Hook( $this ),
 			];
 		}
 
