@@ -1,6 +1,6 @@
 <?php
 
-namespace Clockwork_For_Wp\Data_Source;
+namespace Clockwork_For_Wp\Data_Sources;
 
 use Clockwork_For_Wp\Plugin;
 use Clockwork\Request\Request;
@@ -37,18 +37,16 @@ class Theme extends DataSource {
 		return $request;
 	}
 
-	public function listen_to_events() {
-		add_filter( 'body_class', function( $classes ) {
-			$this->set_body_classes( $classes );
+	public function on_body_class( $classes ) {
+		$this->set_body_classes( $classes );
 
-			return $classes;
-		}, Plugin::LATE_EVENT );
+		return $classes;
+	}
 
-		add_filter( 'template_include', function( $template ) {
-			$this->set_included_template( $template );
+	public function on_template_include( $template ) {
+		$this->set_included_template( $template );
 
-			return $template;
-		}, Plugin::LATE_EVENT );
+		return $template;
 	}
 
 	public function set_body_classes( $body_classes ) {
