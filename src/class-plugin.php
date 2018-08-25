@@ -59,6 +59,7 @@ class Plugin {
 				// The rest.
 				new Definitions\Clockwork_Storage( $this ),
 				new Definitions\Clockwork( $this ),
+				new Definitions\Config( $this ),
 			];
 		}
 
