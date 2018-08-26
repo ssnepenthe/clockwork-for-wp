@@ -15,6 +15,7 @@ class Api extends Definition {
 		return [
 			[ 'init',              'register_routes' ],
 			[ 'template_redirect', 'serve_json'      ],
+			[ 'wp_loaded',         'send_headers'    ],
 		];
 	}
 

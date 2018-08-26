@@ -12,10 +12,8 @@ class Request extends Definition {
 	}
 
 	public function get_subscribed_events() {
-		// @todo First when ->is_collecting_data(), second when ->is_enabled().
 		return [
 			[ 'shutdown',  'finalize_request' ],
-			[ 'wp_loaded', 'send_headers'     ],
 		];
 	}
 
@@ -26,7 +24,6 @@ class Request extends Definition {
 	}
 
 	public function is_enabled() {
-		// @todo See note above.
-		return $this->plugin->is_collecting_data(); // or is_enabled()?
+		return $this->plugin->is_collecting_data();
 	}
 }
