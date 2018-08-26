@@ -28,7 +28,6 @@ class Wp_Http extends Definition {
 	}
 
 	public function is_enabled() {
-		// @todo
-		return true;
+		return $this->plugin->is_data_source_enabled( 'wp_http' );
 	}
 }

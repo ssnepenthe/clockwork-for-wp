@@ -5,35 +5,23 @@ namespace Clockwork_For_Wp;
 use Clockwork\Clockwork;
 
 class Request_Helper {
-	/**
-	 * @var Clockwork
-	 */
-	protected $clockwork;
+	protected $plugin;
 
-	/**
-	 * @var Config
-	 */
-	protected $config;
-
-	/**
-	 * @param Clockwork $clockwork
-	 * @param Config    $config
-	 */
-	public function __construct( Clockwork $clockwork, Config $config ) {
-		$this->clockwork = $clockwork;
-		$this->config = $config;
+	public function __construct( Plugin $plugin ) {
+		$this->plugin = $plugin;
 	}
 
 	/**
 	 * @return void
 	 */
 	public function finalize_request() {
-		if ( ! $this->config->is_collecting_data() || $this->is_request_for_filtered_uri() ) {
+		// @todo Include default for the case where request uri is not set?
+		if ( $this->plugin->is_uri_filtered( $_SERVER['REQUEST_URI'] ) ) {
 			return;
 		}
 
-		$this->clockwork->resolveRequest();
-        $this->clockwork->storeRequest();
+		$this->plugin->service( 'clockwork' )->resolveRequest();
+		$this->plugin->service( 'clockwork' )->storeRequest();
 	}
 
 	/**
@@ -41,9 +29,8 @@ class Request_Helper {
 	 */
 	public function send_headers() {
 		if (
-			! $this->config->is_collecting_data()
-			|| $this->is_request_for_filtered_uri()
-			|| ! $this->config->is_enabled()
+			$this->plugin->is_uri_filtered( $_SERVER['REQUEST_URI'] ) // @todo See above.
+			|| ! $this->plugin->is_enabled() // @todo Move to definition class.
 			|| headers_sent() // Shouldn't happen.
 		) {
 			return;
@@ -51,31 +38,17 @@ class Request_Helper {
 
 		// @todo Any reason to suppress errors?
 		// @todo Request as a direct dependency?
-		header( 'X-Clockwork-Id: ' . $this->clockwork->getRequest()->id );
+		header( 'X-Clockwork-Id: ' . $this->plugin->service( 'clockwork' )->getRequest()->id );
 		header( 'X-Clockwork-Version: ' . Clockwork::VERSION );
 
 		// @todo Set clockwork path header?
 
-		foreach ( $this->config->get_headers() as $header_name => $header_value ) {
+		$extra_headers = $this->plugin->service( 'config' )->get_headers();
+
+		foreach ( $extra_headers as $header_name => $header_value ) {
 			header( "X-Clockwork-Header-{$header_name}: {$header_value}" );
 		}
-	}
 
-	/**
-	 * @return boolean
-	 */
-	protected function is_request_for_filtered_uri() {
-		// @todo Include default for the unlikely (impossible?) case where request uri is not set?
-		$request_uri = $_SERVER['REQUEST_URI'];
-
-		foreach ( $this->config->get_filtered_uris() as $uri ) {
-			$regex = '#' . str_replace( '#', '\#', $uri ) . '#';
-
-			if ( preg_match( $regex, $request_uri ) ) {
-				return true;
-			}
-		}
-
-		return false;
+		// @todo Set subrequest headers?
 	}
 }

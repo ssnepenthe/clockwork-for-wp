@@ -24,7 +24,7 @@ class Clockwork_Storage extends Definition {
 				$container['config']->get_storage_expiration()
 			);
 
-			$storage->filter = $container['config']->get_filter();
+			$storage->filter = $container['config']->get_storage_filter();
 
 			return $storage;
 		};

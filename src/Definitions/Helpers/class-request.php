@@ -21,12 +21,12 @@ class Request extends Definition {
 
 	public function get_value() {
 		return function( Container $container ) {
-			return new Request_Helper( $container['clockwork'], $container['config'] );
+			return new Request_Helper( $this->plugin );
 		};
 	}
 
 	public function is_enabled() {
 		// @todo See note above.
-		return $this->plugin->service( 'config' )->is_collecting_data(); // or is_enabled()?
+		return $this->plugin->is_collecting_data(); // or is_enabled()?
 	}
 }

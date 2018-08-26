@@ -23,13 +23,11 @@ class Web extends Definition {
 
 	public function get_value() {
 		return function( Container $container ) {
-			return new Web_Helper( $container['routes'] );
+			return new Web_Helper( $this->plugin );
 		};
 	}
 
 	public function is_enabled() {
-		$config = $this->plugin->service( 'config' );
-
-		return $config->is_enabled() && $config->is_web_enabled();
+		return $this->plugin->is_web_enabled();
 	}
 }

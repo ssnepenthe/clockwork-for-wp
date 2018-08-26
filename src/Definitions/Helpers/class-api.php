@@ -20,15 +20,11 @@ class Api extends Definition {
 
 	public function get_value() {
 		return function( Container $container ) {
-			return new Api_Helper(
-				$container['clockwork'],
-				$container['clockwork.storage'],
-				$container['routes']
-			);
+			return new Api_Helper( $this->plugin );
 		};
 	}
 
 	public function is_enabled() {
-		return $this->plugin->service( 'config' )->is_enabled();
+		return $this->plugin->is_enabled();
 	}
 }

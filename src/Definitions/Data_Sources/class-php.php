@@ -23,7 +23,7 @@ class Php extends Definition {
 	}
 
 	public function is_enabled() {
-		// @todo
+		// Getting errors from Clockwork core when this source is disabled - need to investigate.
 		return true;
 	}
 }

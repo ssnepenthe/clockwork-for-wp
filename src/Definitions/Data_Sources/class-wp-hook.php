@@ -23,6 +23,6 @@ class Wp_Hook extends Definition {
 	}
 
 	public function is_enabled() {
-		return $this->plugin->service( 'config' )->is_collecting_event_data();
+		return $this->plugin->is_data_source_enabled( 'wp_hook' );
 	}
 }

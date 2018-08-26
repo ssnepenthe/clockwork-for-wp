@@ -117,4 +117,65 @@ class Plugin {
 				break;
 		}
 	}
+
+	public function is_enabled() {
+		return $this->service( 'config' )->is_enabled();
+	}
+
+	public function is_collecting_data_always() {
+		return $this->service( 'config' )->is_collecting_data_always();
+	}
+
+	public function is_collecting_data() {
+		return $this->is_enabled() || $this->is_collecting_data_always();
+	}
+
+	public function is_web_enabled() {
+		return $this->is_enabled() && $this->service( 'config' )->is_web_enabled();
+	}
+
+	public function is_data_source_registered( $identifier ) {
+		// @todo
+		// return $this->is_definition_registered( "datasource.{$identifier}" );
+
+		return true;
+	}
+
+	// public function is_definition_registered( $identifier ) {
+	// 	foreach ( $this->definitions() as $definition ) {
+	// 		if ( $real_identifier === $definition->get_identifier() ) {
+	// 			return true;
+	// 		}
+	// 	}
+
+	// 	return false;
+	// }
+
+	public function is_data_source_disabled( $identifier ) {
+		if ( ! $this->is_data_source_registered( $identifier ) ) {
+			return true;
+		}
+
+		return in_array(
+			$identifier,
+			$this->service( 'config' )->get_disabled_data_sources(),
+			true
+		);
+	}
+
+	public function is_data_source_enabled( $identifier ) {
+		return ! $this->is_data_source_disabled( $identifier );
+	}
+
+	public function is_uri_filtered( $uri ) {
+		foreach ( $this->service( 'config' )->get_filtered_uris() as $filtered_uri ) {
+			$regex = '#' . str_replace( '#', '\#', $filtered_uri ) . '#';
+
+			if ( preg_match( $regex, $uri ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

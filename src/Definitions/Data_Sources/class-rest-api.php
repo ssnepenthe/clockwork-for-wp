@@ -23,7 +23,6 @@ class Rest_Api extends Definition {
 	}
 
 	public function is_enabled() {
-		// @todo
-		return true;
+		return $this->plugin->is_data_source_enabled( 'rest_api' );
 	}
 }

@@ -24,7 +24,6 @@ class Xdebug extends Definition {
 	}
 
 	public function is_enabled() {
-		// @todo
-		return in_array( 'xdebug', get_loaded_extensions(), true );
+		return extension_loaded( 'xdebug' ) && $this->plugin->is_data_source_enabled( 'xdebug' );
 	}
 }

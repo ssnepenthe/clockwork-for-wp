@@ -23,6 +23,8 @@ class Wpdb extends Definition {
 	}
 
 	public function is_enabled() {
-		return $this->plugin->service( 'config' )->is_collecting_db_data();
+		return defined( 'SAVEQUERIES' )
+			&& SAVEQUERIES
+			&& $this->plugin->is_data_source_enabled( 'wpdb' );
 	}
 }
