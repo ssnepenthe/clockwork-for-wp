@@ -13,8 +13,8 @@ class Wp_Mail extends Definition {
 
 	public function get_subscribed_events() {
 		return [
-			[ 'wp_mail',        'record_email_attempt' ],
-			[ 'wp_mail_failed', 'log_email_failure'    ],
+			[ 'wp_mail',        'on_wp_mail'        ],
+			[ 'wp_mail_failed', 'on_wp_mail_failed' ],
 		];
 	}
 

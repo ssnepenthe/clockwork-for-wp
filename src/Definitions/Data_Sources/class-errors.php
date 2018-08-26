@@ -13,7 +13,7 @@ class Errors extends Definition {
 
 	public function get_subscribed_events() {
 		return [
-			[ 'shutdown', 'print_recorded_errors' ],
+			[ 'shutdown', 'on_shutdown' ],
 		];
 	}
 
