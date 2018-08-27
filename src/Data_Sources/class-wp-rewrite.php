@@ -14,15 +14,15 @@ class Wp_Rewrite extends DataSource {
 	}
 
 	public function resolve( Request $request ) {
-		$panel = $request->userData( 'Rewrites' );
+		$panel = $request->userData( 'Routing' );
 
-		$panel->table( 'Miscellaneous', $this->miscellaneous_table() );
-		$panel->table( 'Rules', $this->rules_table() );
+		$panel->table( 'Rewrite Settings', $this->settings_table() );
+		$panel->table( 'Rewrite Rules', $this->rules_table() );
 
 		return $request;
 	}
 
-	protected function miscellaneous_table() {
+	protected function settings_table() {
 		return [
 			[
 				'Item' => 'Permalink Structure',

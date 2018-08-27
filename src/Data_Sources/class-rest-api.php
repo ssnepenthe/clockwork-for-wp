@@ -14,9 +14,9 @@ class Rest_Api extends DataSource {
 	}
 
 	public function resolve( Request $request ) {
-		$panel = $request->userData( 'REST API' );
+		$panel = $request->userData( 'Routing' );
 
-		$panel->table( 'Routes', $this->routes_table() );
+		$panel->table( 'REST Routes', $this->routes_table() );
 
 		return $request;
 	}

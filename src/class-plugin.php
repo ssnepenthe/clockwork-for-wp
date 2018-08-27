@@ -25,13 +25,13 @@ class Plugin {
 			new Definitions\Data_Sources\Cache( $this ),
 			new Definitions\Data_Sources\Errors( $this ),
 			new Definitions\Data_Sources\Php( $this ),
-			new Definitions\Data_Sources\Rest_Api( $this ),
 			new Definitions\Data_Sources\Theme( $this ),
 			new Definitions\Data_Sources\WordPress( $this ),
 			new Definitions\Data_Sources\Wp_Hook( $this ),
 			new Definitions\Data_Sources\Wp_Http( $this ),
 			new Definitions\Data_Sources\Wp_Mail( $this ),
 			new Definitions\Data_Sources\Wp_Rewrite( $this ),
+			new Definitions\Data_Sources\Rest_Api( $this ), // Placement here ensures cleaner "Routing" tab.
 			new Definitions\Data_Sources\Wpdb( $this ),
 			new Definitions\Data_Sources\Xdebug( $this ),
 
