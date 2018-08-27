@@ -3,6 +3,7 @@
 namespace Clockwork_For_Wp\Definitions\Helpers;
 
 use Pimple\Container;
+use Clockwork_For_Wp\Plugin;
 use Clockwork_For_Wp\Request_Helper;
 use Clockwork_For_Wp\Definitions\Definition;
 use Clockwork_For_Wp\Definitions\Toggling_Definition_Interface as Toggling_Definition;
@@ -15,7 +16,7 @@ class Request extends Definition implements Subscribing_Definition, Toggling_Def
 
 	public function get_subscribed_events() {
 		return [
-			[ 'shutdown',  'finalize_request' ],
+			[ 'shutdown', 'finalize_request', Plugin::LATE_EVENT ],
 		];
 	}
 
