@@ -11,11 +11,6 @@ class Config extends Definition {
 		return 'config';
 	}
 
-	public function get_subscribed_events() {
-		// @todo
-		return [];
-	}
-
 	public function get_value() {
 		return function( Container $container ) {
 			$args = apply_filters( 'cfw_config_args', [] );
@@ -26,10 +21,5 @@ class Config extends Definition {
 
 			return $config;
 		};
-	}
-
-	public function is_enabled() {
-		// @todo
-		return true;
 	}
 }

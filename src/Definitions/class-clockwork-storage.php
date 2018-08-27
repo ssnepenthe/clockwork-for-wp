@@ -11,11 +11,6 @@ class Clockwork_Storage extends Definition {
 		return 'clockwork.storage';
 	}
 
-	public function get_subscribed_events() {
-		// @todo
-		return [];
-	}
-
 	public function get_value() {
 		return function( Container $container ) {
 			$storage = new FileStorage(
@@ -28,10 +23,5 @@ class Clockwork_Storage extends Definition {
 
 			return $storage;
 		};
-	}
-
-	public function is_enabled() {
-		// @todo
-		return true;
 	}
 }

@@ -11,11 +11,6 @@ class Clockwork extends Definition {
 		return 'clockwork';
 	}
 
-	public function get_subscribed_events() {
-		// @todo
-		return [];
-	}
-
 	public function get_value() {
 		return function( Container $container ) {
 			$clockwork = new Clockwork_Core();
@@ -23,8 +18,13 @@ class Clockwork extends Definition {
 			$enabled_definitions = array_filter(
 				$this->plugin->definitions(),
 				function( $definition ) {
-					return 0 === strpos( $definition->get_identifier(), 'data_sources.' )
-						&& $definition->is_enabled();
+					if ( 0 !== strpos( $definition->get_identifier(), 'data_sources.' ) ) {
+						return false;
+					}
+
+					return $definition instanceof Toggling_Definition_Interface
+						? $definition->is_enabled()
+						: true;
 				}
 			);
 
@@ -36,10 +36,5 @@ class Clockwork extends Definition {
 
 			return $clockwork;
 		};
-	}
-
-	public function is_enabled() {
-		// @todo
-		return true;
 	}
 }

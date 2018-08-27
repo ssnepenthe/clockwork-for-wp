@@ -7,7 +7,7 @@ use Clockwork_For_Wp\Plugin;
 use Clockwork_For_Wp\Route_Manager;
 use Clockwork_For_Wp\Definitions\Definition;
 
-class Routes extends Definition {
+class Routes extends Definition implements Subscribing_Definition_Interface {
 	public function get_identifier() {
 		return 'routes';
 	}
@@ -26,10 +26,5 @@ class Routes extends Definition {
 		return function( Container $container ) {
 			return new Route_Manager( $container['wp'] );
 		};
-	}
-
-	public function is_enabled() {
-		// @todo
-		return true;
 	}
 }

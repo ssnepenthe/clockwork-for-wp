@@ -4,8 +4,7 @@ namespace Clockwork_For_Wp\Definitions;
 
 use Clockwork_For_Wp\Plugin;
 
-// @todo Interface?
-abstract class Definition {
+abstract class Definition implements Definition_Interface {
 	protected $plugin;
 
 	public function __construct( Plugin $plugin ) {
@@ -13,7 +12,5 @@ abstract class Definition {
 	}
 
 	abstract public function get_identifier();
-	abstract public function get_subscribed_events();
 	abstract public function get_value();
-	abstract public function is_enabled();
 }

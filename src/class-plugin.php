@@ -3,6 +3,9 @@
 namespace Clockwork_For_Wp;
 
 use Pimple\Container;
+use Clockwork_For_Wp\Definitions\Definition_Interface;
+use Clockwork_For_Wp\Definitions\Toggling_Definition_Interface;
+use Clockwork_For_Wp\Definitions\Subscribing_Definition_Interface;
 
 class Plugin {
 	const DEFAULT_EVENT = 10;
@@ -53,7 +56,15 @@ class Plugin {
 		}
 
 		foreach ( $this->definitions() as $definition ) {
-			if ( $definition->is_enabled() ) {
+			if ( ! $definition instanceof Subscribing_Definition_Interface ) {
+				continue;
+			}
+
+			if ( $definition instanceof Toggling_Definition_Interface ) {
+				if ( $definition->is_enabled() ) {
+					$this->attach( $definition );
+				}
+			} else {
 				$this->attach( $definition );
 			}
 		}
@@ -73,8 +84,7 @@ class Plugin {
 		return $this->container[ $identifier ];
 	}
 
-	protected function attach( $definition ) {
-		// @todo instanceof check?
+	protected function attach( Subscribing_Definition_Interface $definition ) {
 		foreach ( $definition->get_subscribed_events() as $args ) {
 			$this->on(
 				$args[0],
@@ -96,7 +106,7 @@ class Plugin {
 		}, $priority, $accepted_args );
 	}
 
-	protected function register( $definition ) {
+	protected function register( Definition_Interface $definition ) {
 		$this->definitions[] = $definition;
 
 		// Maybe add ability to define registration strategy (->factory(), ->protect(), ->extend())?

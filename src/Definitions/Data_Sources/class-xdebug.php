@@ -5,8 +5,10 @@ namespace Clockwork_For_Wp\Definitions\Data_Sources;
 use Pimple\Container;
 use Clockwork_For_Wp\Definitions\Definition;
 use Clockwork_For_Wp\Data_Sources\Xdebug as Xdebug_Data_Source;
+use Clockwork_For_Wp\Definitions\Toggling_Definition_Interface as Toggling_Definition;
+use Clockwork_For_Wp\Definitions\Subscribing_Definition_Interface as Subscribing_Definition;
 
-class Xdebug extends Definition {
+class Xdebug extends Definition implements Subscribing_Definition, Toggling_Definition {
 	public function get_identifier() {
 		return 'data_sources.xdebug';
 	}

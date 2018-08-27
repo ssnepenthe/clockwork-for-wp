@@ -5,16 +5,12 @@ namespace Clockwork_For_Wp\Definitions\Data_Sources;
 use Pimple\Container;
 use Clockwork_For_Wp\Plugin;
 use Clockwork_For_Wp\Definitions\Definition;
+use Clockwork_For_Wp\Definitions\Toggling_Definition_Interface;
 use Clockwork_For_Wp\Data_Sources\WordPress as WordPress_Data_Source;
 
-class WordPress extends Definition {
+class WordPress extends Definition implements Toggling_Definition_Interface {
 	public function get_identifier() {
 		return 'data_sources.wordpress';
-	}
-
-	public function get_subscribed_events() {
-		// @todo
-		return [];
 	}
 
 	public function get_value() {

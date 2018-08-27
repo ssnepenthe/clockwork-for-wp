@@ -6,8 +6,10 @@ use Pimple\Container;
 use Clockwork_For_Wp\Plugin;
 use Clockwork_For_Wp\Definitions\Definition;
 use Clockwork_For_Wp\Data_Sources\Cache as Cache_Data_Source;
+use Clockwork_For_Wp\Definitions\Toggling_Definition_Interface as Toggling_Definition;
+use Clockwork_For_Wp\Definitions\Subscribing_Definition_Interface as Subscribing_Definition;
 
-class Cache extends Definition {
+class Cache extends Definition implements Subscribing_Definition, Toggling_Definition {
 	public function get_identifier() {
 		return 'data_sources.cache';
 	}
