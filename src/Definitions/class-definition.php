@@ -12,10 +12,6 @@ abstract class Definition {
 		$this->plugin = $plugin;
 	}
 
-	public function get_type() {
-		return 'default';
-	}
-
 	abstract public function get_identifier();
 	abstract public function get_subscribed_events();
 	abstract public function get_value();

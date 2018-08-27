@@ -110,12 +110,8 @@ class Plugin {
 	}
 
 	protected function register( $definition ) {
-		switch ( $definition->get_type() ) {
-			// @todo factory, raw, protect, etc.
-			default:
-				$this->container[ $definition->get_identifier() ] = $definition->get_value();
-				break;
-		}
+		// Maybe add ability to define registration strategy (->factory(), ->protect(), ->extend())?
+		$this->container[ $definition->get_identifier() ] = $definition->get_value();
 	}
 
 	public function is_enabled() {
