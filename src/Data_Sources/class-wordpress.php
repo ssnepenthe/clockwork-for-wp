@@ -92,7 +92,7 @@ class WordPress extends DataSource {
 			$this->timestart
 		);
 
-		$panel = $request->userData( 'wordpress' )->title( 'WordPress' );
+		$panel = $request->userData( 'WordPress' );
 
 		$val_counter = function( $value ) {
 			return count( array_filter(

@@ -32,7 +32,7 @@ class Cache extends DataSource {
 
 	public function resolve( Request $request ) {
 		// "Caching" to avoid confusion with the included "Cache" tab.
-		$panel = $request->userData( 'caching' )->title( 'Caching' );
+		$panel = $request->userData( 'Caching' );
 
 		$panel->counters( $this->object_cache_counters() );
 

@@ -14,7 +14,7 @@ class Wp_Rewrite extends DataSource {
 	}
 
 	public function resolve( Request $request ) {
-		$panel = $request->userData( 'rewrites' )->title( 'Rewrites' );
+		$panel = $request->userData( 'Rewrites' );
 
 		$panel->table( 'Miscellaneous', $this->miscellaneous_table() );
 		$panel->table( 'Rules', $this->rules_table() );

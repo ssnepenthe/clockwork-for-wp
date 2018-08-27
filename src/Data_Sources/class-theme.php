@@ -18,7 +18,7 @@ class Theme extends DataSource {
 	}
 
 	public function resolve( Request $request ) {
-		$panel = $request->userData( 'theme' )->title( 'Theme' );
+		$panel = $request->userData( 'Theme' );
 
 		$panel->table( 'Miscellaneous', $this->miscellaneous_table() );
 

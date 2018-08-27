@@ -30,7 +30,7 @@ class Wp_Hook extends DataSource {
 	}
 
 	public function resolve( Request $request ) {
-		$panel = $request->userData( 'hooks' )->title( 'Hooks' );
+		$panel = $request->userData( 'Hooks' );
 		$panel->table( 'Hooks', $this->hooks_table() );
 
 		return $request;
