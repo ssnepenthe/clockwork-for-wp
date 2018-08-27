@@ -9,14 +9,11 @@ use Clockwork\DataSource\DataSource;
 
 class Errors extends DataSource {
 	protected $display;
-	protected $errors;
-	protected $log;
+	protected $errors = [];
 	protected $original_handler;
 
-	public function __construct( Log $log = null ) {
-		$this->log = $log ?: new Log();
-		$this->original_handler = set_error_handler( [ $this, 'handle' ] );
-		$this->errors = [];
+	public function __construct() {
+		$this->original_handler = set_error_handler( [ $this, 'handler' ] );
 
 		// If display_errors is set, output can potentially prevent necessary headers
 		// from being sent. For this reason we will prevent errors from being
@@ -26,15 +23,31 @@ class Errors extends DataSource {
 	}
 
 	public function resolve( Request $request ) {
-		$request->log = array_merge( $request->log, $this->log->toArray() );
+		$request->log = array_merge( $request->log, $this->get_errors_log() );
 
 		return $request;
+	}
+
+	public function get_errors_log() {
+		$log = new Log();
+
+		foreach ( $this->errors as $error ) {
+			if ( $this->should_log( $error['type'] ) ) {
+				$log->debug( $error['message'], [
+					'type' => $this->friendly_type( $error['type'] ),
+					'file' => $error['file'],
+					'line' => $error['line'],
+				] );
+			}
+		}
+
+		return $log->toArray();
 	}
 
 	public function on_shutdown() {
 		$last_error = error_get_last();
 
-		if ( null !== $last_error && $this->should_display( $last_error['type'] ) ) {
+		if ( null !== $last_error ) {
 			$this->record_error(
 				$last_error['type'],
 				$last_error['message'],
@@ -48,22 +61,14 @@ class Errors extends DataSource {
 		}
 
 		foreach ( $this->errors as $error ) {
-			$this->display_error( $error );
+			if ( $this->should_display( $error['type'] ) ) {
+				$this->print_error( $error );
+			}
 		}
 	}
 
-	public function handle( $no, $str, $file = null, $line = null ) {
-		if ( $this->should_log( $no ) ) {
-			$this->log->error( $str, [
-				'type' => $this->friendly_type( $no ),
-				'file' => $file,
-				'line' => $line,
-			] );
-		}
-
-		if ( $this->should_display( $no ) ) {
-			$this->record_error( $no, $str, $file, $line );
-		}
+	public function handler( $no, $str, $file = null, $line = null ) {
+		$this->record_error( $no, $str, $file, $line );
 
 		if ( is_callable( $this->original_handler ) ) {
 			return call_user_func( $this->original_handler, $no, $str, $file, $line );
@@ -72,7 +77,7 @@ class Errors extends DataSource {
 		return false;
 	}
 
-	protected function display_error( $error ) {
+	protected function print_error( $error ) {
 		if ( function_exists( 'xdebug_print_function_stack' ) ) {
 			xdebug_print_function_stack( sprintf(
 				'%s: %s in %s on line %d. Output triggered',
