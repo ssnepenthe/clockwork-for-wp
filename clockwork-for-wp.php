@@ -36,6 +36,8 @@ function _cfw_instance( $id = null ) {
 			'dir' => dirname( __FILE__ ),
 		] );
 
+		// Resolve the error handler early to ensure we catch as many errors as possible.
+		$instance->service( 'data_sources.errors' );
 	}
 
 	return $instance;
