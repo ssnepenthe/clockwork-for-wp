@@ -36,12 +36,9 @@ function _cfw_instance( $id = null ) {
 			'dir' => dirname( __FILE__ ),
 		] );
 
-		$instance
-			->register( new Clockwork_For_Wp\WordPress_Provider() )
-			->register( new Clockwork_For_Wp\Plugin_Provider() );
 	}
 
-	return null === $id ? $instance : $instance[ $id ];
+	return $instance;
 }
 
 add_action( 'plugins_loaded', [ _cfw_instance(), 'boot' ] );

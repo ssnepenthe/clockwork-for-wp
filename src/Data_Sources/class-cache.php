@@ -1,20 +1,33 @@
 <?php
 
-namespace Clockwork_For_Wp\Data_Source;
+namespace Clockwork_For_Wp\Data_Sources;
 
 use Clockwork\Request\Request;
 use Clockwork\DataSource\DataSource;
 
 class Cache extends DataSource {
 	protected $object_cache;
-	protected $transients;
+	protected $setted_transients = [];
+	protected $deleted_transients = [];
 
 	public function __construct( $object_cache ) {
 		$this->set_object_cache( $object_cache );
-		$this->transients = [
-			'deleted' => [],
-			'setted' => [],
-		];
+	}
+
+	public function on_setted_transient( $transient, $value, $expiration ) {
+		$this->record_setted_transient( $transient, $value, $expiration, 'blog' );
+	}
+
+	public function on_setted_site_transient( $transient, $value, $expiration ) {
+		$this->record_setted_transient( $transient, $value, $expiration, 'site' );
+	}
+
+	public function on_deleted_transient( $transient ) {
+		$this->record_deleted_transient( $transient, 'blog' );
+	}
+
+	public function on_deleted_site_transient( $transient ) {
+		$this->record_deleted_transient( $transient, 'site' );
 	}
 
 	public function resolve( Request $request ) {
@@ -23,48 +36,23 @@ class Cache extends DataSource {
 
 		$panel->counters( $this->object_cache_counters() );
 
-		if ( 0 !== count( $this->transients['setted'] ) ) {
-			$panel->table( 'Setted Transients', $this->transients['setted'] );
+		if ( 0 !== count( $this->setted_transients ) ) {
+			$panel->table( 'Setted Transients', $this->setted_transients );
 		}
 
-		if ( 0 !== count( $this->transients['deleted'] ) ) {
-			$panel->table( 'Deleted Transients', $this->transients['deleted'] );
+		if ( 0 !== count( $this->deleted_transients ) ) {
+			$panel->table( 'Deleted Transients', $this->deleted_transients );
 		}
 
 		return $request;
-	}
-
-	public function listen_to_events() {
-		add_action( 'setted_transient', function( $transient, $value, $expiration ) {
-			$this->set_transient( $transient, $value, $expiration, 'blog' );
-		}, 10, 3 );
-
-		add_action( 'setted_site_transient', function( $transient, $value, $expiration ) {
-			$this->set_transient( $transient, $value, $expiration, 'site' );
-		}, 10, 3 );
-
-		add_action( 'deleted_transient', function( $transient ) {
-			$this->delete_transient( $transient, 'blog' );
-		} );
-
-		add_action( 'deleted_site_transient', function( $transient ) {
-			$this->delete_transient( $transient, 'site' );
-		} );
 	}
 
 	public function set_object_cache( $object_cache ) {
 		$this->object_cache = is_object( $object_cache ) ? $object_cache : null;
 	}
 
-	protected function delete_transient( $key, $type ) {
-		$this->transients['deleted'][] = [
-			'Key' => $key,
-			'Type' => $type,
-		];
-	}
-
 	protected function object_cache_counters() {
-		// @todo Would it be worth verifying props are public? I think this requires reflection.
+		// @todo Would it be worth verifying props are public? (get_object_vars())
 		// @todo Include hit percentage?
 		$hits = $misses = $writes = $deletes = 0;
 
@@ -109,8 +97,15 @@ class Cache extends DataSource {
 		] );
 	}
 
-	protected function set_transient( $key, $value, $expiration, $type ) {
-		$this->transients['setted'][] = [
+	protected function record_deleted_transient( $key, $type ) {
+		$this->deleted_transients[] = [
+			'Key' => $key,
+			'Type' => $type,
+		];
+	}
+
+	protected function record_setted_transient( $key, $value, $expiration, $type ) {
+		$this->setted_transients[] = [
 			'Key' => $key,
 			'Value' => $value,
 			'Expiration' => $expiration,

@@ -5,10 +5,10 @@ namespace Clockwork_For_Wp;
 use Clockwork\Web\Web;
 
 class Web_Helper {
-	protected $routes;
+	protected $plugin;
 
-	public function __construct( $routes ) {
-		$this->routes = $routes;
+	public function __construct( Plugin $plugin ) {
+		$this->plugin = $plugin;
 	}
 
 	// @todo Move to request helper and ensure this covers both api and web requests?
@@ -40,8 +40,8 @@ class Web_Helper {
 	 * @hook init
 	 */
 	public function register_routes() {
-		$this->routes->add( $this->build_app_route() );
-		$this->routes->add( $this->build_assets_route() );
+		$this->plugin->service( 'routes' )->add( $this->build_app_route() );
+		$this->plugin->service( 'routes' )->add( $this->build_assets_route() );
 	}
 
 	public function serve_web_assets() {

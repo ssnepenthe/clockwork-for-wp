@@ -3,26 +3,47 @@
 namespace Clockwork_For_Wp;
 
 class Config {
+	protected $collect_data_always;
+	protected $disabled_data_sources;
 	protected $enabled;
-	protected $filter;
 	protected $filtered_uris;
 	protected $headers;
 	protected $storage_expiration;
 	protected $storage_files_path;
+	protected $storage_filter;
 	protected $web_enabled;
 
 	public function __construct( array $args = [] ) {
 		$defaults = [
+			// Enable metadata collection even when everything else is disabled.
+			'collect_data_always' => false,
+
+			// Disable individual data sources.
+			'disabled_data_sources' => [ 'wp_rewrite', 'rest_api' ],
+
+			// Enable Clockwork - Ensures headers are sent, API is available, web app is available.
 			'enabled' => true,
-			'filter' => [ 'routes' ],
+
+			// URI patterns for which metadata collection should be disabled.
 			'filtered_uris' => [ '\/__clockwork(?:\/.*)?' ],
+
+			// Additional headers to be sent with responses for which metadata has been collected.
 			'headers' => [],
+
+			// Amount of time metadata should be saved.
 			'storage_expiration' => 60 * 24 * 7,
+
+			// Location in which metadata JSON files should be saved.
 			'storage_files_path' => WP_CONTENT_DIR . '/cfw-data',
+
+			// Properties to be stripped from request metadata before saving.
+			'storage_filter' => [],
+
+			// Enable/disable the Clockwork web app.
 			'web_enabled' => true,
 		];
 
-		foreach ( wp_parse_args( $args, $defaults ) as $key => $value ) {
+		foreach ( array_merge( $defaults, $args ) as $key => $value ) {
 			$method = "set_{$key}";
 
 			if ( method_exists( $this, $method ) ) {
@@ -32,54 +53,52 @@ class Config {
 	}
 
 	/**
-	 * @return boolean
+	 * @return array<integer, string>
 	 */
-	public function is_collecting_data() {
-		return $this->is_enabled(); // @todo || is_collecting_data_always?
+	public function get_disabled_data_sources() {
+		return $this->disabled_data_sources;
+	}
+
+	/**
+	 * @return array<integer, string>
+	 */
+	public function get_filtered_uris() {
+		return $this->filtered_uris;
+	}
+
+	/**
+	 * @return array<string, string>
+	 */
+	public function get_headers() {
+		return $this->headers;
+	}
+
+	/**
+	 * @return integer
+	 */
+	public function get_storage_expiration() {
+		return $this->storage_expiration;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function get_storage_files_path() {
+		return $this->storage_files_path;
+	}
+
+	/**
+	 * @return array<integer, string>
+	 */
+	public function get_storage_filter() {
+		return $this->storage_filter;
 	}
 
 	/**
 	 * @return boolean
 	 */
-	public function is_collecting_cache_data() {
-		return ! in_array( 'cache', $this->get_filter(), true );
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public function is_collecting_db_data() {
-		return defined( 'SAVEQUERIES' )
-			&& SAVEQUERIES
-			&& ! in_array( 'databaseQueries', $this->get_filter(), true );
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public function is_collecting_email_data() {
-		return ! in_array( 'emailsData', $this->get_filter(), true );
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public function is_collecting_event_data() {
-		return ! in_array( 'events', $this->get_filter(), true );
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public function is_collecting_rewrite_data() {
-		return ! in_array( 'routes', $this->get_filter(), true );
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public function is_collecting_theme_data() {
-		return ! in_array( 'viewsData', $this->get_filter(), true );
+	public function is_collecting_data_always() {
+		return $this->collect_data_always;
 	}
 
 	/**
@@ -89,12 +108,6 @@ class Config {
 		return $this->enabled;
 	}
 
-	public function set_enabled( $enabled ) {
-		$this->enabled = (bool) $enabled;
-
-		return $this;
-	}
-
 	/**
 	 * @return boolean
 	 */
@@ -102,45 +115,26 @@ class Config {
 		return $this->web_enabled;
 	}
 
-	public function set_web_enabled( $web_enabled ) {
-		$this->web_enabled = (bool) $web_enabled;
+	public function set_collect_data_always( $collect_data_always ) {
+		$this->collect_data_always = (bool) $collect_data_always;
 
 		return $this;
 	}
 
-	/**
-	 * @return array<int, string>
-	 */
-	public function get_filter() {
-		return $this->filter;
-	}
-
-	public function set_filter( array $filter ) {
-		$this->filter = array_values( array_map( function( $f ) {
-			return (string) $f;
-		}, $filter ) );
+	public function set_disabled_data_sources( array $identifiers ) {
+		$this->disabled_data_sources = array_values( array_map( 'strval', $identifiers ) );
 
 		return $this;
 	}
 
-	/**
-	 * @return array<int, string>
-	 */
-	public function get_filtered_uris() {
-		return $this->filtered_uris;
+	public function set_enabled( $enabled ) {
+		$this->enabled = (bool) $enabled;
+
+		return $this;
 	}
 
 	public function set_filtered_uris( array $filtered_uris ) {
-		$this->filtered_uris = array_values( array_map( function( $uri ) {
-			return (string) $uri;
-		}, $filtered_uris ) );
-	}
-
-	/**
-	 * @return array<string, string>
-	 */
-	public function get_headers() {
-		return $this->headers;
+		$this->filtered_uris = array_values( array_map( 'strval', $filtered_uris ) );
 	}
 
 	public function set_headers( array $headers ) {
@@ -155,28 +149,26 @@ class Config {
 		return $this;
 	}
 
-	/**
-	 * @return integer
-	 */
-	public function get_storage_expiration() {
-		return $this->storage_expiration;
-	}
-
 	public function set_storage_expiration( $storage_expiration ) {
 		$this->storage_expiration = (int) $storage_expiration;
 
 		return $this;
 	}
 
-	/**
-	 * @return string
-	 */
-	public function get_storage_files_path() {
-		return $this->storage_files_path;
-	}
-
 	public function set_storage_files_path( $storage_files_path ) {
 		$this->storage_files_path = (string) $storage_files_path;
+
+		return $this;
+	}
+
+	public function set_storage_filter( array $storage_filter ) {
+		$this->storage_filter = array_values( array_map( 'strval', $storage_filter ) );
+
+		return $this;
+	}
+
+	public function set_web_enabled( $web_enabled ) {
+		$this->web_enabled = (bool) $web_enabled;
 
 		return $this;
 	}

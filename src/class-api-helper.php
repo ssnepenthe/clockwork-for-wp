@@ -16,28 +16,40 @@ class Api_Helper {
 	const COUNT_QUERY_VAR = 'cfw_count';
 	const EXTENDED_QUERY_VAR = 'cfw_extended';
 
-	/**
-	 * @var StorageInterface
-	 */
-	protected $storage;
-	protected $clockwork;
-	protected $routes;
+	protected $plugin;
 
-	/**
-	 * @param StorageInterface $storage
-	 */
-	public function __construct( Clockwork $clockwork, StorageInterface $storage, $routes ) {
-		$this->clockwork = $clockwork;
-		$this->routes = $routes;
-		$this->storage = $storage;
+	public function __construct( Plugin $plugin ) {
+		$this->plugin = $plugin;
 	}
 
 	/**
 	 * @hook init
 	 */
 	public function register_routes() {
-		$this->routes->add( $this->build_extended_route() );
-		$this->routes->add( $this->build_standard_route() );
+		$this->plugin->service( 'routes' )->add( $this->build_extended_route() );
+		$this->plugin->service( 'routes' )->add( $this->build_standard_route() );
+	}
+
+	public function send_headers() {
+		// @todo Include default for the case where request uri is not set?
+		if ( $this->plugin->is_uri_filtered( $_SERVER['REQUEST_URI'] ) || headers_sent() ) {
+			return;
+		}
+
+		// @todo Any reason to suppress errors?
+		// @todo Request as a direct dependency?
+		header( 'X-Clockwork-Id: ' . $this->plugin->service( 'clockwork' )->getRequest()->id );
+		header( 'X-Clockwork-Version: ' . Clockwork::VERSION );
+
+		// @todo Set clockwork path header?
+
+		$extra_headers = $this->plugin->service( 'config' )->get_headers();
+
+		foreach ( $extra_headers as $header_name => $header_value ) {
+			header( "X-Clockwork-Header-{$header_name}: {$header_value}" );
+		}
+
+		// @todo Set subrequest headers?
 	}
 
 	/**
@@ -98,17 +110,17 @@ class Api_Helper {
 
 	protected function get_data( $id = null, $direction = null, $count = null, $extended = null ) {
 		if ( 'previous' === $direction ) {
-			$data = $this->storage->previous( $id, $count );
+			$data = $this->plugin->service( 'clockwork.storage' )->previous( $id, $count );
 		} elseif ( 'next' === $direction ) {
-			$data = $this->storage->next( $id, $count );
+			$data = $this->plugin->service( 'clockwork.storage' )->next( $id, $count );
 		} elseif ( 'latest' === $id ) {
-			$data = $this->storage->latest();
+			$data = $this->plugin->service( 'clockwork.storage' )->latest();
 		} else {
-			$data = $this->storage->find( $id );
+			$data = $this->plugin->service( 'clockwork.storage' )->find( $id );
 		}
 
 		if ( $extended ) {
-			$this->clockwork->extendRequest( $data );
+			$this->plugin->service( 'clockwork' )->extendRequest( $data );
 		}
 
 		return $data;

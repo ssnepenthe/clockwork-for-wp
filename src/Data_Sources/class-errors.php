@@ -1,6 +1,6 @@
 <?php
 
-namespace Clockwork_For_Wp\Data_Source;
+namespace Clockwork_For_Wp\Data_Sources;
 
 use Psr\Log\LogLevel;
 use Clockwork\Request\Log;
@@ -31,15 +31,7 @@ class Errors extends DataSource {
 		return $request;
 	}
 
-	public function listen_to_events() {
-		add_action( 'shutdown', [ $this, 'print_recorded_errors' ] );
-	}
-
-	public function print_recorded_errors() {
-		if ( $this->is_clockwork_request() ) {
-			return;
-		}
-
+	public function on_shutdown() {
 		$last_error = error_get_last();
 
 		if ( null !== $last_error && $this->should_display( $last_error['type'] ) ) {
@@ -51,7 +43,7 @@ class Errors extends DataSource {
 			);
 		}
 
-		if ( ! $this->display ) {
+		if ( $this->is_clockwork_request() || ! $this->display ) {
 			return;
 		}
 

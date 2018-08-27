@@ -1,6 +1,6 @@
 <?php
 
-namespace Clockwork_For_Wp\Data_Source;
+namespace Clockwork_For_Wp\Data_Sources;
 
 use Clockwork\DataSource\PhpDataSource;
 

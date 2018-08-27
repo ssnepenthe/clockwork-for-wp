@@ -1,6 +1,6 @@
 <?php
 
-namespace Clockwork_For_Wp\Data_Source;
+namespace Clockwork_For_Wp\Data_Sources;
 
 use Clockwork\Request\Request;
 use Clockwork\DataSource\DataSource;
@@ -36,9 +36,7 @@ class Xdebug extends DataSource {
 		return $request;
 	}
 
-	public function listen_to_events() {
-		add_action( 'init', function() {
-			$this->profiler_filename = xdebug_get_profiler_filename();
-		} );
+	public function on_init() {
+		$this->profiler_filename = xdebug_get_profiler_filename();
 	}
 }

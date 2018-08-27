@@ -1,6 +1,6 @@
 <?php
 
-namespace Clockwork_For_Wp\Data_Source;
+namespace Clockwork_For_Wp\Data_Sources;
 
 use Clockwork\Request\Log;
 use Clockwork\Request\Request;
@@ -23,47 +23,44 @@ class Wp_Http extends DataSource {
 		return $request;
 	}
 
-	public function listen_to_events() {
-		// @todo Should these trigger later than 10?
-		add_filter( 'http_request_args', function( $args, $url ) {
-			$args = $this->add_meta_to_args( $args, $url );
+	public function on_http_request_args( $args, $url ) {
+		$args = $this->add_meta_to_args( $args, $url );
 
-			$this->record_request_start( $args );
+		$this->record_request_start( $args );
 
-			return $args;
-		}, 10, 2 );
+		return $args;
+	}
 
-		add_filter( 'pre_http_request', function( $preempt, $args, $url ) {
-			if ( false === $preempt ) {
-				return $preempt;
-			}
+	public function on_pre_http_request( $preempt, $args, $url ) {
+		if ( false === $preempt ) {
+			return $preempt;
+		}
 
-			if ( ! $this->args_have_meta( $args ) ) {
-				$this->record_meta_error( $args );
-
-				return $preempt;
-			}
-
-			if ( is_wp_error( $preempt ) ) {
-				$this->record_request_failure( $args );
-			}
-
-			$this->record_request_finish( $preempt, $args );
+		if ( ! $this->args_have_meta( $args ) ) {
+			$this->record_meta_error( $args );
 
 			return $preempt;
-		}, 10, 3 );
+		}
 
-		add_action( 'http_api_debug', function( $response, $context, $class, $args, $url ) {
-			if ( ! $this->args_have_meta( $args ) ) {
-				return $this->record_meta_error( $args );
-			}
+		if ( is_wp_error( $preempt ) ) {
+			$this->record_request_failure( $args );
+		}
 
-			if ( is_wp_error( $response ) ) {
-				$this->record_request_failure( $response, $args );
-			}
+		$this->record_request_finish( $preempt, $args );
 
-			$this->record_request_finish( $response, $args );
-		}, 10, 5 );
+		return $preempt;
+	}
+
+	public function on_http_api_debug( $response, $context, $class, $args, $url ) {
+		if ( ! $this->args_have_meta( $args ) ) {
+			return $this->record_meta_error( $args );
+		}
+
+		if ( is_wp_error( $response ) ) {
+			$this->record_request_failure( $response, $args );
+		}
+
+		$this->record_request_finish( $response, $args );
 	}
 
 	protected function add_meta_to_args( $args, $url ) {
