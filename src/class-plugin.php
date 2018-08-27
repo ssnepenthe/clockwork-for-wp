@@ -12,11 +12,39 @@ class Plugin {
 	protected $booted = false;
 	protected $container;
 	protected $definitions = [];
-	protected $initialized = false;
 
 	public function __construct( array $values = [] ) {
 		$this->container = new Container( $values );
 		$this->container->register( new WordPress_Provider() );
+
+		foreach ( [
+			// Data sources.
+			new Definitions\Data_Sources\Cache( $this ),
+			new Definitions\Data_Sources\Errors( $this ),
+			new Definitions\Data_Sources\Php( $this ),
+			new Definitions\Data_Sources\Rest_Api( $this ),
+			new Definitions\Data_Sources\Theme( $this ),
+			new Definitions\Data_Sources\WordPress( $this ),
+			new Definitions\Data_Sources\Wp_Hook( $this ),
+			new Definitions\Data_Sources\Wp_Http( $this ),
+			new Definitions\Data_Sources\Wp_Mail( $this ),
+			new Definitions\Data_Sources\Wp_Rewrite( $this ),
+			new Definitions\Data_Sources\Wpdb( $this ),
+			new Definitions\Data_Sources\Xdebug( $this ),
+
+			// Helpers.
+			new Definitions\Helpers\Api( $this ),
+			new Definitions\Helpers\Request( $this ),
+			new Definitions\Helpers\Web( $this ),
+
+			// The rest.
+			new Definitions\Clockwork_Storage( $this ),
+			new Definitions\Clockwork( $this ),
+			new Definitions\Config( $this ),
+			new Definitions\Routes( $this ),
+		] as $definition ) {
+			$this->register( $definition );
+		}
 	}
 
 	public function boot() {
@@ -33,53 +61,12 @@ class Plugin {
 		$this->booted = true;
 	}
 
-	public function container( $identifier = null ) {
+	public function container() {
 		return $this->container;
 	}
 
 	public function definitions() {
-		if ( 0 === count( $this->definitions ) ) {
-			$this->definitions = [
-				// Data sources.
-				new Definitions\Data_Sources\Cache( $this ),
-				new Definitions\Data_Sources\Errors( $this ),
-				new Definitions\Data_Sources\Php( $this ),
-				new Definitions\Data_Sources\Rest_Api( $this ),
-				new Definitions\Data_Sources\Theme( $this ),
-				new Definitions\Data_Sources\WordPress( $this ),
-				new Definitions\Data_Sources\Wp_Hook( $this ),
-				new Definitions\Data_Sources\Wp_Http( $this ),
-				new Definitions\Data_Sources\Wp_Mail( $this ),
-				new Definitions\Data_Sources\Wp_Rewrite( $this ),
-				new Definitions\Data_Sources\Wpdb( $this ),
-				new Definitions\Data_Sources\Xdebug( $this ),
-
-				// Helpers.
-				new Definitions\Helpers\Api( $this ),
-				new Definitions\Helpers\Request( $this ),
-				new Definitions\Helpers\Web( $this ),
-
-				// The rest.
-				new Definitions\Clockwork_Storage( $this ),
-				new Definitions\Clockwork( $this ),
-				new Definitions\Config( $this ),
-				new Definitions\Routes( $this ),
-			];
-		}
-
 		return $this->definitions;
-	}
-
-	public function initialize() {
-		if ( $this->initialized ) {
-			return;
-		}
-
-		foreach ( $this->definitions() as $definition ) {
-			$this->register( $definition );
-		}
-
-		$this->initialized = true;
 	}
 
 	public function service( $identifier ) {
@@ -110,6 +97,8 @@ class Plugin {
 	}
 
 	protected function register( $definition ) {
+		$this->definitions[] = $definition;
+
 		// Maybe add ability to define registration strategy (->factory(), ->protect(), ->extend())?
 		$this->container[ $definition->get_identifier() ] = $definition->get_value();
 	}
@@ -130,25 +119,18 @@ class Plugin {
 		return $this->is_enabled() && $this->service( 'config' )->is_web_enabled();
 	}
 
-	public function is_data_source_registered( $identifier ) {
-		// @todo
-		// return $this->is_definition_registered( "datasource.{$identifier}" );
+	public function is_definition_registered( $identifier ) {
+		foreach ( $this->definitions() as $definition ) {
+			if ( $identifier === $definition->get_identifier() ) {
+				return true;
+			}
+		}
 
-		return true;
+		return false;
 	}
 
-	// public function is_definition_registered( $identifier ) {
-	// 	foreach ( $this->definitions() as $definition ) {
-	// 		if ( $real_identifier === $definition->get_identifier() ) {
-	// 			return true;
-	// 		}
-	// 	}
-
-	// 	return false;
-	// }
-
 	public function is_data_source_disabled( $identifier ) {
-		if ( ! $this->is_data_source_registered( $identifier ) ) {
+		if ( ! $this->is_definition_registered( "data_sources.{$identifier}" ) ) {
 			return true;
 		}
 

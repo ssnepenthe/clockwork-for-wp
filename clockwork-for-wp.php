@@ -36,7 +36,6 @@ function _cfw_instance( $id = null ) {
 			'dir' => dirname( __FILE__ ),
 		] );
 
-		$instance->initialize();
 	}
 
 	return $instance;
