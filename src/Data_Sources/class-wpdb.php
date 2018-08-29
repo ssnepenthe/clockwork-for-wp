@@ -11,8 +11,12 @@ class Wpdb extends DataSource {
 	 */
 	protected $wpdb;
 
-	public function __construct( $wpdb ) {
-		$this->wpdb = $wpdb;
+	public function __construct( $wpdb = null ) {
+		$this->set_wpdb( $wpdb );
+	}
+
+	public function get_wpdb() {
+		return $this->wpdb;
 	}
 
 	public function resolve( Request $request ) {
@@ -23,6 +27,10 @@ class Wpdb extends DataSource {
 		}
 
 		return $request;
+	}
+
+	public function set_wpdb( $wpdb ) {
+		$this->wpdb = is_object( $wpdb ) ? $wpdb : null;
 	}
 
 	protected function capitalize_keywords( $query ) {
@@ -55,9 +63,10 @@ class Wpdb extends DataSource {
 
 	protected function collect_queries() {
 		if (
-			! is_object( $this->wpdb )
+			null === $this->wpdb
 			|| ! property_exists( $this->wpdb, 'queries' )
-			|| empty( $this->wpdb->queries )
+			|| ! is_array( $this->wpdb->queries )
+			|| 0 === count( $this->wpdb->queries )
 		) {
 			return [];
 		}

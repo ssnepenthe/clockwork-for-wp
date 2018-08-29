@@ -6,8 +6,9 @@ class Route_Manager {
 	protected $cached_rules;
 	protected $cached_query_vars;
 	protected $routes = [];
+	protected $wp;
 
-	public function __construct( $wp ) {
+	public function __construct( $wp = null ) {
 		$this->set_wp( $wp );
 	}
 
@@ -83,6 +84,10 @@ class Route_Manager {
 		$this->cached_query_vars = $query_vars;
 
 		return $this->cached_query_vars;
+	}
+
+	public function get_wp() {
+		return $this->wp;
 	}
 
 	/**

@@ -14,7 +14,18 @@ class Wpdb extends Definition implements Toggling_Definition_Interface {
 
 	public function get_value() {
 		return function( Container $container ) {
-			return new Wpdb_Data_Source( $container['wpdb'] );
+			$source = new Wpdb_Data_Source();
+			$dep_handler = function() use ( $container, $source ) {
+				$source->set_wpdb( $container['wpdb'] );
+			};
+
+			if ( did_action( 'init' ) ) {
+				$dep_handler();
+			} else {
+				add_action( 'init', $dep_handler );
+			}
+
+			return $source;
 		};
 	}
 

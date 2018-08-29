@@ -14,7 +14,18 @@ class Wp_Rewrite extends Definition implements Toggling_Definition_Interface {
 
 	public function get_value() {
 		return function( Container $container ) {
-			return new Wp_Rewrite_Data_Source( $container['wp_rewrite'] );
+			$source = new Wp_Rewrite_Data_Source();
+			$dep_handler = function() use ( $container, $source ) {
+				$source->set_wp_rewrite( $container['wp_rewrite'] );
+			};
+
+			if ( did_action( 'init' ) ) {
+				$dep_handler();
+			} else {
+				add_action( 'init', $dep_handler );
+			}
+
+			return $source;
 		};
 	}
 

@@ -14,7 +14,19 @@ class Rest_Api extends Definition implements Toggling_Definition_Interface {
 
 	public function get_value() {
 		return function( Container $container ) {
-			return new Rest_Api_Data_Source( $container['wp_rest_server'] );
+			$source = new Rest_Api_Data_Source();
+			$dep_handler = function() use ( $container, $source ) {
+				$source->set_wp_rest_server( $container['wp_rest_server'] );
+			};
+
+			// REST Server is actually first initialized on 'parse_request'.
+			if ( did_action( 'init' ) ) {
+				$dep_handler();
+			} else {
+				add_action( 'init', $dep_handler );
+			}
+
+			return $source;
 		};
 	}
 
