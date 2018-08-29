@@ -22,16 +22,23 @@ class Plugin {
 
 		foreach ( [
 			// Data sources.
-			new Definitions\Data_Sources\Cache( $this ),
-			new Definitions\Data_Sources\Errors( $this ),
 			new Definitions\Data_Sources\Php( $this ),
+
+			new Definitions\Data_Sources\Conditionals( $this ),
+			new Definitions\Data_Sources\Constants( $this ),
+			new Definitions\Data_Sources\Core( $this ),
+			new Definitions\Data_Sources\Errors( $this ),
+			new Definitions\Data_Sources\Rest_Api( $this ),
 			new Definitions\Data_Sources\Theme( $this ),
-			new Definitions\Data_Sources\WordPress( $this ),
+			new Definitions\Data_Sources\Timestart( $this ),
+			new Definitions\Data_Sources\Transients( $this ),
 			new Definitions\Data_Sources\Wp_Hook( $this ),
 			new Definitions\Data_Sources\Wp_Http( $this ),
 			new Definitions\Data_Sources\Wp_Mail( $this ),
+			new Definitions\Data_Sources\Wp_Object_Cache( $this ),
+			new Definitions\Data_Sources\Wp_Query( $this ),
 			new Definitions\Data_Sources\Wp_Rewrite( $this ),
-			new Definitions\Data_Sources\Rest_Api( $this ), // Placement here ensures cleaner "Routing" tab.
+			new Definitions\Data_Sources\Wp( $this ),
 			new Definitions\Data_Sources\Wpdb( $this ),
 			new Definitions\Data_Sources\Xdebug( $this ),
 
