@@ -14,11 +14,12 @@ class Routes extends Definition implements Subscribing_Definition_Interface {
 
 	public function get_subscribed_events() {
 		return [
-			[ 'option_rewrite_rules',            'merge_rewrite_rules'                      ],
-			[ 'pre_update_option_rewrite_rules', 'diff_rewrite_rules'                       ],
-			[ 'query_vars',                      'merge_query_vars'                         ],
-			[ 'rewrite_rules_array',             'merge_rewrite_rules'                      ],
-			[ 'template_redirect',               'call_matched_handler', Plugin::LATE_EVENT ],
+			[ 'option_rewrite_rules',            'merge_rewrite_rules'                       ],
+			[ 'parse_query',                     'reset_query_flags',    Plugin::EARLY_EVENT ],
+			[ 'pre_update_option_rewrite_rules', 'diff_rewrite_rules'                        ],
+			[ 'query_vars',                      'merge_query_vars'                          ],
+			[ 'rewrite_rules_array',             'merge_rewrite_rules'                       ],
+			[ 'template_redirect',               'call_matched_handler', Plugin::LATE_EVENT  ],
 		];
 	}
 

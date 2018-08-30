@@ -20,6 +20,16 @@ class Route_Manager {
 	 * @hook template_redirect
 	 */
 	public function call_matched_handler() {
+		$handler = $this->get_matched_handler();
+
+		if ( null === $handler ) {
+			return;
+		}
+
+		call_user_func( $handler );
+	}
+
+	public function get_matched_handler() {
 		if (
 			null === $this->wp
 			|| ! property_exists( $this->wp, 'matched_rule' )
@@ -32,15 +42,9 @@ class Route_Manager {
 			return;
 		}
 
-		$handler = $this->routes[ $this->wp->matched_rule ]->get_handler_for_method(
+		return $this->routes[ $this->wp->matched_rule ]->get_handler_for_method(
 			$_SERVER['REQUEST_METHOD']
 		);
-
-		if ( null === $handler ) {
-			return;
-		}
-
-		call_user_func( $handler );
 	}
 
 	public function get_rewrite_rules_array() {
@@ -118,6 +122,21 @@ class Route_Manager {
 		}
 
 		return array_merge( $this->get_rewrite_rules_array(), $value );
+	}
+
+	public function reset_query_flags( $query ) {
+		if ( null === $this->get_matched_handler() ) {
+			return;
+		}
+
+		// @todo Should we use an explicit list here instead? Probably...
+		$flags = array_filter( array_keys( get_object_vars( $query ) ), function( $var ) {
+			return 'is_' === substr( $var, 0, 3 );
+		} );
+
+		foreach ( $flags as $flag ) {
+			$query->{$flag} = false;
+		}
 	}
 
 	public function set_wp( $wp ) {
