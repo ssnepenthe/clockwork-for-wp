@@ -48,6 +48,7 @@ class Plugin {
 			new Definitions\Helpers\Web( $this ),
 
 			// The rest.
+			new Definitions\Clockwork_Authenticator( $this ),
 			new Definitions\Clockwork_Storage( $this ),
 			new Definitions\Clockwork( $this ),
 			new Definitions\Config( $this ),

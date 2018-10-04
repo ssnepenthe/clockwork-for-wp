@@ -32,6 +32,7 @@ class Clockwork extends Definition {
 				$clockwork->addDataSource( $container[ $definition->get_identifier() ] );
 			}
 
+			$clockwork->setAuthenticator( $container['clockwork.authenticator'] );
 			$clockwork->setStorage( $container['clockwork.storage'] );
 
 			return $clockwork;

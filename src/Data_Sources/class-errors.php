@@ -160,6 +160,10 @@ class Errors extends DataSource {
 			return true;
 		}
 
+		if ( null !== get_query_var( 'cfw_auth', null ) ) {
+			return true;
+		}
+
 		return false;
 	}
 

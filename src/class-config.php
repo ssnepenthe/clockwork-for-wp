@@ -3,6 +3,8 @@
 namespace Clockwork_For_Wp;
 
 class Config {
+	protected $authentication;
+	protected $authentication_password;
 	protected $collect_data_always;
 	protected $disabled_data_sources;
 	protected $enabled;
@@ -15,6 +17,12 @@ class Config {
 
 	public function __construct( array $args = [] ) {
 		$defaults = [
+			// Require authentication to access the Clockwork API.
+			'authentication' => false,
+
+			// Shared password to use when authentication is enabled.
+			'authentication_password' => 'CHANGEMEPLEASE',
+
 			// Enable metadata collection even when everything else is disabled.
 			'collect_data_always' => false,
 
@@ -50,6 +58,13 @@ class Config {
 				$this->{$method}( $value );
 			}
 		}
+	}
+
+	/**
+	 * @return string
+	 */
+	public function get_authentication_password() {
+		return $this->authentication_password;
 	}
 
 	/**
@@ -97,6 +112,13 @@ class Config {
 	/**
 	 * @return boolean
 	 */
+	public function is_authentication_required() {
+		return $this->authentication;
+	}
+
+	/**
+	 * @return boolean
+	 */
 	public function is_collecting_data_always() {
 		return $this->collect_data_always;
 	}
@@ -113,6 +135,18 @@ class Config {
 	 */
 	public function is_web_enabled() {
 		return $this->web_enabled;
+	}
+
+	public function set_authentication( $authentication ) {
+		$this->authentication = (bool) $authentication;
+
+		return $this;
+	}
+
+	public function set_authentication_password( $authentication_password ) {
+		$this->authentication_password = (string) $authentication_password;
+
+		return $this;
 	}
 
 	public function set_collect_data_always( $collect_data_always ) {
