@@ -33,6 +33,7 @@ class Config {
 			'enabled' => true,
 
 			// URI patterns for which metadata collection should be disabled.
+			// @todo Ensure "__clockwork" URIs are always filtered no matter what the user does here?
 			'filtered_uris' => [ '\/__clockwork(?:\/.*)?' ],
 
 			// Additional headers to be sent with responses for which metadata has been collected.
@@ -169,6 +170,8 @@ class Config {
 
 	public function set_filtered_uris( array $filtered_uris ) {
 		$this->filtered_uris = array_values( array_map( 'strval', $filtered_uris ) );
+
+		return $this;
 	}
 
 	public function set_headers( array $headers ) {
