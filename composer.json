@@ -11,7 +11,13 @@
     "require-dev": {
         "vimeo/psalm": "^2.0",
         "psy/psysh": "^0.9.7",
-        "symfony/var-dumper": "^4.1"
+        "symfony/var-dumper": "^4.1",
+        "fabpot/goutte": "^4.0",
+        "phpunit/phpunit": "^8.5",
+        "symfony/process": "^5.1"
     },
-    "autoload": { "classmap": ["src/"] }
+    "autoload": { "classmap": ["src/"] },
+    "autoload-dev": { "classmap": ["tests/"] },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

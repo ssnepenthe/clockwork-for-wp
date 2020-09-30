@@ -19,6 +19,7 @@ class Transients extends Definition implements Subscribing_Definition, Toggling_
 			[ 'setted_transient',      'on_setted_transient',      Plugin::DEFAULT_EVENT, 3 ],
 			[ 'setted_site_transient', 'on_setted_site_transient', Plugin::DEFAULT_EVENT, 3 ],
 			[ 'deleted_transient',     'on_deleted_transient'                               ],
+			// @todo Deleted_site_transient?
 			[ 'setted_site_transient', 'on_deleted_site_transient'                          ],
 		];
 	}
