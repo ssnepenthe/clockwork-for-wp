@@ -10,6 +10,6 @@
  * License: MIT
  */
 
-add_action( 'cfw_config_init', function( $config ) {
-	$config->set_enabled( false );
+\add_action( 'cfw_config_init', function( $config ) {
+	$config->set( 'enable', false );
 } );

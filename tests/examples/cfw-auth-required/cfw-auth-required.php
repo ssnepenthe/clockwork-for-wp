@@ -10,8 +10,7 @@
  * License: MIT
  */
 
-add_action( 'cfw_config_init', function( $config ) {
-	$config
-		->set_authentication( true )
-		->set_authentication_password( 'nothing-to-see-here-folks' );
+\add_action( 'cfw_config_init', function( $config ) {
+	$config->set( 'authentication.enabled', true );
+	$config->set( 'authentication.drivers.simple.config.password', 'nothing-to-see-here-folks' );
 } );

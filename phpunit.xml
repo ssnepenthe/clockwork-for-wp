@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/8.0/phpunit.xsd"
-         bootstrap="vendor/autoload.php"
+         bootstrap="tests/bootstrap.php"
          executionOrder="depends,defects"
          forceCoversAnnotation="true"
          beStrictAboutCoversAnnotation="true"
@@ -12,6 +12,18 @@
     <testsuites>
         <testsuite name="browser">
             <directory suffix="-test.php">tests/Browser</directory>
+        </testsuite>
+        <testsuite name="clockwork">
+            <directory suffix="-test.php">tests/Clockwork</directory>
+        </testsuite>
+        <testsuite name="integration">
+            <directory suffix="-test.php">tests/Integration</directory>
+        </testsuite>
+        <testsuite name="unit">
+            <directory suffix="-test.php">tests/Unit</directory>
+        </testsuite>
+        <testsuite name="wp">
+            <directory suffix="-test.php">tests/Wp</directory>
         </testsuite>
     </testsuites>
 

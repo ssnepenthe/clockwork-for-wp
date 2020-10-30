@@ -10,6 +10,6 @@
  * License: MIT
  */
 
-add_action( 'cfw_config_init', function( $config ) {
-	$config->set_storage_filter( [ 'url' ] );
+\add_action( 'cfw_config_init', function( $config ) {
+	$config->set( 'storage.filter', [ 'url' ] );
 } );
