@@ -1,4 +1,8 @@
 <?php
+
+use Clockwork_For_Wp\Data_Source\Errors;
+use Clockwork_For_Wp\Event_Management\Event_Manager;
+use Clockwork_For_Wp\Plugin;
 /**
  * A basic Clockwork integration for WordPress.
  *
@@ -19,28 +23,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die;
 }
 
-if ( file_exists( dirname( __FILE__ ) . '/vendor/autoload.php' ) ) {
-    require_once dirname( __FILE__ ) . '/vendor/autoload.php';
+if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+    require_once __DIR__ . '/vendor/autoload.php';
 }
-
-require_once dirname( __FILE__ ) . '/inc/helpers.php';
 
 // @todo Verify server requirements are met.
 
-function _cfw_instance( $id = null ) {
+function _cfw_instance() {
 	static $instance = null;
 
 	if ( null === $instance ) {
-		// @todo Move to external file to prevent namespaces killing execution on 5.2?
-		$instance = new Clockwork_For_Wp\Plugin( [
-			'dir' => dirname( __FILE__ ),
-		] );
-
-		// Resolve the error handler early to ensure we catch as many errors as possible.
-		$instance->service( 'data_sources.errors' );
+		$instance = new Plugin();
 	}
 
 	return $instance;
 }
 
-add_action( 'plugins_loaded', [ _cfw_instance(), 'boot' ] );
+( function( $plugin ) {
+	require_once __DIR__ . '/src/helpers.php';
+
+	// Resolve error handler immediately so we catch as many errors as possible.
+	// @todo Check config to make sure error feature is enabled? Or probably a constant?
+	// @todo Move to plugin constructor?
+	$plugin[ Errors::class ]->register();
+
+	$plugin[ Event_Manager::class ]
+		->on( 'plugins_loaded', [ $plugin, 'boot' ], Event_Manager::EARLY_EVENT );
+} )( _cfw_instance() );

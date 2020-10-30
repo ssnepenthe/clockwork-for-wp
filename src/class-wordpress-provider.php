@@ -2,56 +2,55 @@
 
 namespace Clockwork_For_Wp;
 
-use Pimple\Container;
-use Pimple\ServiceProviderInterface as Provider;
-
-class WordPress_Provider implements Provider {
-	/**
-     * @param Container $pimple A container instance
-     */
-	public function register( Container $container ) {
-		// Typically set by theme on 'after_setup_theme'.
-		$container['content_width'] = $container->factory( function() {
-			return isset( $GLOBALS['content_width'] ) ? $GLOBALS['content_width'] : null;
+class Wordpress_Provider extends Base_Provider {
+	public function register() {
+		// @todo consider prefixing params that are not type-hintable to avoid accidental injections.
+		$this->plugin['content_width'] = $this->plugin->factory( function() {
+			return $GLOBALS['content_width'];
 		} );
 
-		// Available long before plugins ever load.
-		$container['timestart'] = $container->factory( function() {
-			return isset( $GLOBALS['timestart'] ) ? $GLOBALS['timestart'] : null;
+		$this->plugin['timestart'] = $this->plugin->factory( function() {
+			return $GLOBALS['timestart'];
 		} );
 
-		// Available after 'plugins_loaded' - between 'sanitize_comment_cookies' and 'setup_theme'.
-		$container['wp'] = $container->factory( function() {
-			return isset( $GLOBALS['wp'] ) ? $GLOBALS['wp'] : null;
+		$this->plugin['wp_actions'] = $this->plugin->factory( function() {
+			return $GLOBALS['wp_actions'];
 		} );
 
-		// Available long before plugins ever load.
-		$container['wpdb'] = $container->factory( function() {
-			return isset( $GLOBALS['wpdb'] ) ? $GLOBALS['wpdb'] : null;
+		$this->plugin['wp_filter'] = $this->plugin->factory( function() {
+			return $GLOBALS['wp_filter'];
 		} );
 
-		// Available long before plugins ever load, just after wpdb is initialized.
-		$container['wp_object_cache'] = $container->factory( function() {
+		$this->plugin['wp_version'] = $this->plugin->factory( function() {
+			return $GLOBALS['wp_version'];
+		} );
+
+		$this->plugin[ \WP::class ] = $this->plugin->factory( function() {
+			return $GLOBALS['wp'];
+		} );
+
+		$this->plugin[ \WP_Object_Cache::class ] = $this->plugin->factory( function() {
 			if ( ! isset( $GLOBALS['wp_object_cache'] ) && function_exists( 'wp_cache_init' ) ) {
 				wp_cache_init();
 			}
 
-			return isset( $GLOBALS['wp_object_cache'] ) ? $GLOBALS['wp_object_cache'] : null;
+			return $GLOBALS['wp_object_cache'];
 		} );
 
-		// First initialized on 'parse_request' via 'rest_api_loaded()'.
-		$container['wp_rest_server'] = $container->factory( function() {
+		$this->plugin[ \WP_Query::class ] = $this->plugin->factory( function() {
+			return $GLOBALS['wp_query'];
+		} );
+
+		$this->plugin[ \WP_REST_Server::class ] = $this->plugin->factory( function() {
 			return rest_get_server();
 		} );
 
-		// Available after 'plugins_loaded' - between 'sanitize_comment_cookies' and 'setup_theme'.
-		$container['wp_rewrite'] = $container->factory( function() {
-			return isset( $GLOBALS['wp_rewrite'] ) ? $GLOBALS['wp_rewrite'] : null;
+		$this->plugin[ \WP_Rewrite::class ] = $this->plugin->factory( function() {
+			return $GLOBALS['wp_rewrite'];
 		} );
 
-		// Available after 'plugins_loaded' - between 'sanitize_comment_cookies' and 'setup_theme'.
-		$container['wp_query'] = $container->factory( function() {
-			return isset( $GLOBALS['wp_query'] ) ? $GLOBALS['wp_query'] : null;
+		$this->plugin[ \wpdb::class ] = $this->plugin->factory( function() {
+			return $GLOBALS['wpdb'];
 		} );
 	}
 }

@@ -10,13 +10,13 @@
  * License: MIT
  */
 
-add_action( 'cfw_config_init', function( $config ) {
-	$config
-		->set_filtered_uris(
-			array_merge( [ 'sample-page' ], $config->get_filtered_uris() )
-		)
-		->set_headers( [
-			'Apples' => 'Bananas',
-			'Cats' => 'Dogs',
-		] );
+\add_action( 'cfw_config_init', function( $config ) {
+	$config->set(
+		'filtered_uris',
+		\array_merge( [ 'sample-page' ], $config->get( 'filtered_uris', [] ) )
+	);
+	$config->set( 'headers', [
+		'Apples' => 'Bananas',
+		'Cats' => 'Dogs',
+	] );
 } );

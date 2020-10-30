@@ -6,10 +6,10 @@
     "require": {
         "php": ">=5.5",
         "itsgoingd/clockwork": "^3.0",
-        "pimple/pimple": "^3.2"
+        "pimple/pimple": "^3.2",
+        "php-di/invoker": "^2.0"
     },
     "require-dev": {
-        "vimeo/psalm": "^2.0",
         "psy/psysh": "^0.9.7",
         "symfony/var-dumper": "^4.1",
         "fabpot/goutte": "^4.0",
