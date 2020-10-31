@@ -116,9 +116,6 @@ class Plugin_Provider extends Base_Provider {
 				$config['drivers'][ $driver ]['config'] ?? []
 			);
 
-			// @todo Move to individual factories?
-			$storage->filter = $config['filter'] ?? [];
-
 			return $storage;
 		};
 

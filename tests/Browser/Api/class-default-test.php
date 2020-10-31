@@ -26,17 +26,12 @@ class Default_Test extends Test_Case {
 
 	/** @test */
 	public function it_correctly_serves_previous_requests() {
-		// @todo There seems to be a flaw in the Clockwork FileStorage::previous() logic...
-		// 		 We are getting one fewer response than expected.
-		// 		 For now we compensate by making this third request.
 		$id1 = $this->get( '/' )
 			->header( 'x-clockwork-id' );
 		$id2 = $this->get( '/' )
 			->header( 'x-clockwork-id' );
-		$id3 = $this->get( '/' )
-			->header( 'x-clockwork-id' );
 
-		$this->get( "/__clockwork/{$id3}/previous" )
+		$this->get( "/__clockwork/{$id2}/previous" )
 			->assert_ok()
 			->assert_json( function( $decoded ) use ( $id1 ) {
 				$request = end( $decoded );
@@ -73,7 +68,7 @@ class Default_Test extends Test_Case {
 		// @todo Update route to end with latest - currently /__clockwork/latest123 also works.
 		$this->get( '/__clockwork/latest' )
 			->assert_ok()
-			->assert_json_path( 'id', $id );
+			->assert_json_path( '0.id', $id );
 	}
 
 	/** @test */

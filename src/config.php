@@ -105,8 +105,6 @@ return [
 	'storage' => [
 		'driver' => 'file',
 
-		'filter' => [],
-
 		'drivers' => [
 			'file' => [
 				'class' => FileStorage::class,
