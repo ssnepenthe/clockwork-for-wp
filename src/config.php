@@ -29,7 +29,7 @@ return [
 
 	'web' => true,
 
-	'filtered_uris' => [ '\/__clockwork(?:\/.*)?' ],
+	'filter_uris' => [],
 
 	'headers' => [
 		// 'Accept' => 'application/vnd.com.whatever.v1+json',

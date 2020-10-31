@@ -90,9 +90,11 @@ class Plugin implements ArrayAccess {
 	}
 
 	public function is_uri_filtered( $uri ) {
-		// @todo Always ensure clockwork uris are filtered.
-		foreach ( $this->config( 'filtered_uris', [] ) as $filtered_uri ) {
-			$regex = '#' . str_replace( '#', '\#', $filtered_uri ) . '#';
+		$filter_uris = $this->config( 'filter_uris', [] );
+		$filter_uris[] = '\/__clockwork(?:\/.*)?';
+
+		foreach ( $filter_uris as $filter_uri ) {
+			$regex = '#' . str_replace( '#', '\#', $filter_uri ) . '#';
 
 			if ( preg_match( $regex, $uri ) ) {
 				return true;

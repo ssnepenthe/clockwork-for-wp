@@ -64,7 +64,7 @@ class Plugin_Test extends TestCase {
 	public function it_can_check_if_a_uri_is_filtered() {
 		$plugin = new Plugin( [], [
 			Config::class => new Config( [
-				'filtered_uris' => [
+				'filter_uris' => [
 					'^clockwork',
 					'^something',
 					'^another',
