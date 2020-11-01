@@ -6,6 +6,8 @@ use Clockwork\Authentication\AuthenticatorInterface;
 use Clockwork\Authentication\NullAuthenticator;
 use Clockwork\Authentication\SimpleAuthenticator;
 use Clockwork\Clockwork;
+use Clockwork\Helpers\Serializer;
+use Clockwork\Helpers\StackFilter;
 use Clockwork\Request\Log;
 use Clockwork\Request\Request;
 use Clockwork\Storage\FileStorage;
@@ -16,6 +18,9 @@ use Clockwork_For_Wp\Data_Source\Php;
 
 class Clockwork_Provider extends Base_Provider {
 	public function boot() {
+		// @todo Is this early enough?
+		$this->configure_serializer();
+
 		// Ensures Clockwork is instantiated and all data sources are added on 'plugins_loaded'.
 		$this->plugin[ Clockwork::class ]; // @todo Move into conditional?
 
@@ -109,6 +114,26 @@ class Clockwork_Provider extends Base_Provider {
 
 		// Create request so we have id and start time available immediately.
 		$this->plugin[ Request::class ];
+	}
+
+	protected function configure_serializer() {
+		Serializer::defaults( [
+			'limit' => $this->plugin->config( 'serialization.depth', 10 ),
+			'blackbox' => $this->plugin->config( 'serialization.blackbox', [
+				\Pimple\Container::class,
+				\Pimple\Psr11\Container::class,
+			] ),
+			'traces' => $this->plugin->config( 'stack_traces.enabled', true ),
+			'tracesSkip' => StackFilter::make()
+				->isNotVendor( array_merge(
+					$this->plugin->config( 'stack_traces.skip_vendors', [] ),
+					[ 'itsgoingd' ]
+				) )
+				->isNotNamespace( $this->plugin->config( 'stack_traces.skip_namespaces', [] ) )
+				->isNotFunction( [ 'call_user_func', 'call_user_func_array' ] )
+				->isNotClass( $this->plugin->config( 'stack_traces.skip_classes', [] ) ),
+			'tracesLimit' => $this->plugin->config( 'stack_traces.limit', 10 )
+		] );
 	}
 
 	protected function subscribers() : array {

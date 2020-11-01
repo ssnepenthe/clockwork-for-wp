@@ -29,6 +29,8 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 
 // @todo Verify server requirements are met.
 
+require_once __DIR__ . '/src/helpers.php';
+
 function _cfw_instance() {
 	static $instance = null;
 
@@ -40,8 +42,6 @@ function _cfw_instance() {
 }
 
 ( function( $plugin ) {
-	require_once __DIR__ . '/src/helpers.php';
-
 	// Resolve error handler immediately so we catch as many errors as possible.
 	// @todo Check config to make sure error feature is enabled? Or probably a constant?
 	// @todo Move to plugin constructor?

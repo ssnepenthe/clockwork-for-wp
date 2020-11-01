@@ -145,4 +145,20 @@ return [
 		],
 	],
 
+	'serialization' => [
+		'depth' => 10,
+		'blackbox' => [
+			Pimple\Container::class,
+			Pimple\Psr11\Container::class,
+		],
+	],
+
+	'stack_traces' => [
+		'enabled' => true,
+		'skip_vendors' => [],
+		'skip_namespaces' => [],
+		'skip_classes' => [],
+		'limit' => 10,
+	],
+
 ];

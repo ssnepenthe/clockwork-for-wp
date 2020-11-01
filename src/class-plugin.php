@@ -18,14 +18,15 @@ class Plugin implements ArrayAccess {
 	public function __construct( array $providers = null, array $values = null ) {
 		if ( null === $providers ) {
 			$providers = [
+				Plugin_Provider::class,
+				Clockwork_Provider::class,
+				Wordpress_Provider::class,
+
 				Api_Provider::class,
 				Data_Source_Provider::class,
 				Event_Management_Provider::class,
 				Routing_Provider::class,
 				Web_App_Provider::class,
-				Clockwork_Provider::class,
-				Plugin_Provider::class,
-				Wordpress_Provider::class,
 			];
 		}
 
