@@ -31,6 +31,8 @@ return [
 
 	'filter_uris' => [],
 
+	'filter_methods' => [ 'options' ],
+
 	'headers' => [
 		// 'Accept' => 'application/vnd.com.whatever.v1+json',
 	],

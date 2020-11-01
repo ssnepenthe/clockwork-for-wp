@@ -89,6 +89,12 @@ class Plugin implements ArrayAccess {
 		return true;
 	}
 
+	public function is_method_filtered( $method ) {
+		$filter_methods = array_map( 'strtoupper', $this->config( 'filter_methods', [] ) );
+
+		return in_array( $method, $filter_methods, true );
+	}
+
 	public function is_uri_filtered( $uri ) {
 		$filter_uris = $this->config( 'filter_uris', [] );
 		$filter_uris[] = '\/__clockwork(?:\/.*)?';
@@ -105,11 +111,22 @@ class Plugin implements ArrayAccess {
 	}
 
 	public function is_collecting_data() {
-		return $this->config( 'enable', true ) || $this->config( 'collect_data_always', false );
+		return $this->is_collecting_requests();
+	}
+
+	public function is_collecting_requests() {
+		return ( $this->is_enabled() || $this->config( 'collect_data_always', false ) )
+			&& ! $this->is_running_in_console()
+			&& ! $this->is_method_filtered( $_SERVER['REQUEST_METHOD'] )
+			&& ! $this->is_uri_filtered( $_SERVER['REQUEST_URI'] );
 	}
 
 	public function is_enabled() {
 		return (bool) $this->config( 'enable', true );
+	}
+
+	public function is_running_in_console() {
+		return ( defined( 'WP_CLI' ) && WP_CLI ) || in_array( PHP_SAPI, [ 'cli', 'phpdbg' ], true );
 	}
 
 	public function is_web_enabled() {
