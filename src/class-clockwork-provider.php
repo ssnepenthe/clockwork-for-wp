@@ -6,6 +6,8 @@ use Clockwork\Authentication\AuthenticatorInterface;
 use Clockwork\Authentication\NullAuthenticator;
 use Clockwork\Authentication\SimpleAuthenticator;
 use Clockwork\Clockwork;
+use Clockwork\Request\Log;
+use Clockwork\Request\Request;
 use Clockwork\Storage\FileStorage;
 use Clockwork\Storage\SqlStorage;
 use Clockwork\Storage\StorageInterface;
@@ -28,16 +30,16 @@ class Clockwork_Provider extends Base_Provider {
 		};
 
 		$this->plugin[ Clockwork::class ] = function() {
-			$clockwork = new Clockwork();
-
-			$clockwork->addDataSource( $this->plugin[ Php::class ] );
+			$clockwork = (new Clockwork())
+				->setAuthenticator( $this->plugin[ AuthenticatorInterface::class ] )
+				->setLog( $this->plugin[ Log::class ] )
+				->setRequest( $this->plugin[ Request::class ] )
+				->setStorage( $this->plugin[ StorageInterface::class ] )
+				->addDataSource( $this->plugin[ Php::class ] );
 
 			foreach ( $this->plugin->get_enabled_data_sources() as $data_source ) {
 				$clockwork->addDataSource( $this->plugin[ $data_source['data_source_class'] ] );
 			}
-
-			$clockwork->setAuthenticator( $this->plugin[ AuthenticatorInterface::class ] );
-			$clockwork->setStorage( $this->plugin[ StorageInterface::class ] );
 
 			return $clockwork;
 		};
@@ -96,6 +98,17 @@ class Clockwork_Provider extends Base_Provider {
 
 			return new SqlStorage( $config['dsn'], $table, $username, $password, $expiration );
 		} );
+
+		$this->plugin[ Log::class ] = function() {
+			return new Log;
+		};
+
+		$this->plugin[ Request::class ] = function() {
+			return new Request;
+		};
+
+		// Create request so we have id and start time available immediately.
+		$this->plugin[ Request::class ];
 	}
 
 	protected function subscribers() : array {
