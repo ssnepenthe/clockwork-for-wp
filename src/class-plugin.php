@@ -23,6 +23,7 @@ class Plugin implements ArrayAccess {
 				Event_Management_Provider::class,
 				Routing_Provider::class,
 				Web_App_Provider::class,
+				Clockwork_Provider::class,
 				Plugin_Provider::class,
 				Wordpress_Provider::class,
 			];
