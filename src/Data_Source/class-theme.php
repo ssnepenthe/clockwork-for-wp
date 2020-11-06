@@ -21,7 +21,7 @@ class Theme extends DataSource implements Subscriber {
 	public function subscribe_to_events( Event_Manager $event_manager ) : void {
 		// @todo Record theme render time (from template_include to wp_footer?).
 		$event_manager
-			->on( 'cfw_pre_resolve_request', function( $content_width ) {
+			->on( 'cfw_pre_resolve', function( $content_width ) {
 				$this
 					// @todo Constructor?
 					->configure_theme(

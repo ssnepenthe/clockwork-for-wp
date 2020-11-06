@@ -16,7 +16,7 @@ class Wp_Rewrite extends DataSource implements Subscriber {
 	protected $rules = [];
 
 	public function subscribe_to_events( Event_Manager $event_manager ) : void {
-		$event_manager->on( 'cfw_pre_resolve_request', function( \WP_Rewrite $wp_rewrite ) {
+		$event_manager->on( 'cfw_pre_resolve', function( \WP_Rewrite $wp_rewrite ) {
 			$this
 				->set_structure( $wp_rewrite->permalink_structure )
 				->set_trailing_slash( $wp_rewrite->use_trailing_slashes )

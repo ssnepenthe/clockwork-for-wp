@@ -14,7 +14,7 @@ class Rest_Api extends DataSource implements Subscriber {
 	protected $routes = [];
 
 	public function subscribe_to_events( Event_Manager $event_manager ) : void {
-		$event_manager->on( 'cfw_pre_resolve_request', function( \WP_REST_Server $wp_rest_server ) {
+		$event_manager->on( 'cfw_pre_resolve', function( \WP_REST_Server $wp_rest_server ) {
 			// @todo Option for core rest endpoints to be filtered from list.
 			// @todo Option for what route fields get recorded.
 			foreach ( $wp_rest_server->get_routes() as $path => $handlers ) {

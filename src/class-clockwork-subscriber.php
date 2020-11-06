@@ -29,7 +29,7 @@ class Clockwork_Subscriber implements Managed_Subscriber {
 	}
 
 	public function finalize_request( Clockwork $clockwork, Event_Manager $event_manager ) {
-		$event_manager->trigger( 'cfw_pre_resolve_request' ); // @todo pass $clockwork? $container?
+		$event_manager->trigger( 'cfw_pre_resolve' ); // @todo pass $clockwork? $container?
 
 		$clockwork->resolveRequest();
 		$clockwork->storeRequest();

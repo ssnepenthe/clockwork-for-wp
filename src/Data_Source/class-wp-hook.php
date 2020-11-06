@@ -14,7 +14,7 @@ class Wp_Hook extends DataSource implements Subscriber {
 
 	public function subscribe_to_events( Event_Manager $event_manager ) : void {
 		// @todo whitelist/blacklist for hooks to ignore?
-		$event_manager->on( 'cfw_pre_resolve_request', function( $wp_filter, $wp_actions ) {
+		$event_manager->on( 'cfw_pre_resolve', function( $wp_filter, $wp_actions ) {
 			foreach ( array_keys( $wp_actions ) as $tag ) {
 				if ( isset( $wp_filter[ $tag ] ) ) {
 					foreach ( $wp_filter[ $tag ] as $priority => $callbacks ) {
