@@ -3,8 +3,11 @@
 namespace Clockwork_For_Wp\Tests\Browser\Frontend;
 
 use Clockwork_For_Wp\Tests\Browser\Test_Case;
+use Clockwork_For_Wp\Tests\Manages_Metadata;
 
 class Filtered_Uris_Test extends Test_Case {
+	use Manages_Metadata;
+
 	protected static function required_plugins() : array {
 		return [ 'cfw-filtered-uris' ];
 	}
@@ -22,7 +25,14 @@ class Filtered_Uris_Test extends Test_Case {
 
 	/** @test */
 	public function it_does_not_store_request_data_for_filtered_uris() {
-		// @todo Not sure how best to test this... List entire contents of storage dir before/after?
-		$this->markTestIncomplete( 'Not yet implemented' );
+		static::clean_metadata();
+
+		$this->get( '/sample-page/' );
+
+		$this->assertCount( 0, static::get_metadata_list() );
+
+		$this->get( '/' );
+
+		$this->assertCount( 1, static::get_metadata_list() );
 	}
 }

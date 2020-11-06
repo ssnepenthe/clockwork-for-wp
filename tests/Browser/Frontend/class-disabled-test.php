@@ -3,8 +3,12 @@
 namespace Clockwork_For_Wp\Tests\Browser\Frontend;
 
 use Clockwork_For_Wp\Tests\Browser\Test_Case;
+use Clockwork_For_Wp\Tests\Cli;
+use Clockwork_For_Wp\Tests\Manages_Metadata;
 
 class Disabled_Test extends Test_Case {
+	use Manages_Metadata;
+
 	protected static function required_plugins() : array {
 		return [ 'cfw-disabled' ];
 	}
@@ -18,7 +22,12 @@ class Disabled_Test extends Test_Case {
 
 	/** @test */
 	public function it_does_not_store_request_data() {
-		// @todo Not sure how best to test this... List entire contents of storage dir before/after?
-		$this->markTestIncomplete( 'Not yet implemented' );
+		static::clean_metadata();
+
+		$this->get( '/' );
+
+		$this->assertCount( 0, static::get_metadata_list() );
 	}
 }
+
+

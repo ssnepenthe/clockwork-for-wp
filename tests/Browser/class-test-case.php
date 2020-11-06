@@ -8,6 +8,8 @@ use Goutte\Client;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\HttpClient;
 
+// @todo Restore db to default state before each test.
+// @todo Clear cfw-data dir before each test.
 class Test_Case extends TestCase {
 	use Manages_Plugins;
 
