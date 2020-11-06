@@ -1,6 +1,6 @@
 <?php
 
-namespace Clockwork_For_Wp\Tests\Browser;
+namespace Clockwork_For_Wp\Tests;
 
 use Symfony\Component\Process\Exception\ExceptionInterface;
 use Symfony\Component\Process\Process;
@@ -33,6 +33,6 @@ class Cli {
 	}
 
 	public static function set_wp_bin_path( string $path ) : void {
-		static::$$wp_bin_path = $path;
+		static::$wp_bin_path = $path;
 	}
 }
