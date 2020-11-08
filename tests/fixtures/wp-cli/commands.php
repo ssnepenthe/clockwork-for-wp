@@ -1,6 +1,6 @@
 <?php
 
-namespace Clockwork_For_Wp\Tests\fixtures;
+namespace Clockwork_For_Wp\Tests\fixtures\wp_cli;
 
 use RuntimeException;
 use Symfony\Component\Finder\Finder;
@@ -14,12 +14,12 @@ if ( ! WP_CLI ) {
 	throw new RuntimeException( 'falsy wp cli' );
 }
 
-require_once __DIR__ . '/../bootstrap.php';
+require_once __DIR__ . '/../../bootstrap.php';
 
 function finder() {
 	return Finder::create()
 		->files()
-		->in( __DIR__ . '/../../../../cfw-data' );
+		->in( realpath( __DIR__ . '/../../../../../cfw-data' ) );
 }
 
 // @todo Consider bundling in the actual plugin.
@@ -46,3 +46,12 @@ WP_CLI::add_command( 'cfw-list', function() {
 
 	WP_CLI::log( json_encode( $files ) );
 } );
+
+// WP_CLI::add_command( 'cfw-test-exit-code', function() {
+// 	WP_CLI::error( 'Uh oh...' );
+// } );
+
+// WP_CLI::add_command( 'cfw-test-output', function() {
+// 	WP_CLI::log( 'This is good...' );
+// 	WP_CLI::warning( 'And this is bad...' );
+// } );
