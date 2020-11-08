@@ -2,15 +2,12 @@
 
 namespace Clockwork_For_Wp\Tests;
 
-trait Manages_Plugins {
-	protected static function activate_plugins( string ...$plugins ) : void {
-		Cli::wp( 'plugin', 'activate', ...$plugins )->mustRun();
-	}
+use function Clockwork_For_Wp\Tests\activate_plugins;
+use function Clockwork_For_Wp\Tests\deactivate_plugins;
 
-	protected static function deactivate_plugins( string ...$plugins ) : void {
-		Cli::wp( 'plugin', 'deactivate', ...$plugins )->mustRun();
-	}
-
+// @todo Ensure all plugins are deactivated beforeClass, activate plugins before,
+//       deactivate plugins after, deactivate all plugins afterClass
+trait Requires_Plugins {
 	protected static function required_plugins() : array {
 		return [];
 	}
@@ -18,14 +15,14 @@ trait Manages_Plugins {
 	/** @beforeClass */
 	public static function activate_required_plugins() : void {
 		if ( count( $plugins = static::required_plugins() ) > 0 ) {
-			static::activate_plugins( ...$plugins );
+			activate_plugins( ...$plugins );
 		}
 	}
 
 	/** @afterClass */
 	public static function deactivate_required_plugins() : void {
 		if ( count( $plugins = static::required_plugins() ) > 0 ) {
-			static::deactivate_plugins( ...$plugins );
+			deactivate_plugins( ...$plugins );
 		}
 	}
 }

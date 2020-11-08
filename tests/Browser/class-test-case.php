@@ -3,7 +3,7 @@
 namespace Clockwork_For_Wp\Tests\Browser;
 
 use Clockwork_For_Wp\Tests\Cli;
-use Clockwork_For_Wp\Tests\Manages_Plugins;
+use Clockwork_For_Wp\Tests\Requires_Plugins;
 use Goutte\Client;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\HttpClient;
@@ -11,7 +11,7 @@ use Symfony\Component\HttpClient\HttpClient;
 // @todo Restore db to default state before each test.
 // @todo Clear cfw-data dir before each test.
 class Test_Case extends TestCase {
-	use Manages_Plugins;
+	use Requires_Plugins;
 
 	protected static $content_url;
 
