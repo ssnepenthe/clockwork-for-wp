@@ -15,6 +15,7 @@ class Response {
 		$this->goutte = $goutte;
 	}
 
+	// @todo Replace usages with Clockwork_For_Wp\array_get().
 	protected function dot_get( array $target, string $key, $default = null ) {
 		$keys = explode( '.', $key );
 

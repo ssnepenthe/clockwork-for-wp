@@ -14,7 +14,8 @@ use Pimple\Psr11\Container;
 
 class Plugin_Provider extends Base_Provider {
 	public function register() {
-		$this->plugin[ Plugin::class ] = $this->plugin; // @todo Does this work?
+		// @todo Move to Plugin constructor?
+		$this->plugin[ Plugin::class ] = $this->plugin;
 
 		$this->plugin[ Config::class ] = function() {
 			$values = include __DIR__ . '/config.php';

@@ -66,6 +66,7 @@ class Plugin implements ArrayAccess {
 	}
 
 	public function config( $path, $default = null ) {
+		// @todo Return default when config is not registered in container?
 		return $this[ Config::class ]->get( $path, $default );
 	}
 
