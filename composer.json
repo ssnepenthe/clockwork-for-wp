@@ -14,8 +14,7 @@
         "symfony/var-dumper": "^4.1",
         "fabpot/goutte": "^4.0",
         "phpunit/phpunit": "^8.5",
-        "symfony/process": "^5.1",
-        "symfony/finder": "^5.1"
+        "symfony/process": "^5.1"
     },
     "autoload": { "classmap": ["src/"] },
     "autoload-dev": { "classmap": ["tests/"] },

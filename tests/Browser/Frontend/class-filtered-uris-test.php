@@ -3,9 +3,9 @@
 namespace Clockwork_For_Wp\Tests\Browser\Frontend;
 
 use Clockwork_For_Wp\Tests\Browser\Test_Case;
+use Clockwork_For_Wp\Tests\Metadata;
 
 use function Clockwork_For_Wp\Tests\clean_metadata_files;
-use function Clockwork_For_Wp\Tests\get_metadata_files_list;
 
 class Filtered_Uris_Test extends Test_Case {
 	protected static function required_plugins() : array {
@@ -29,10 +29,10 @@ class Filtered_Uris_Test extends Test_Case {
 
 		$this->get( '/sample-page/' );
 
-		$this->assertCount( 0, get_metadata_files_list() );
+		$this->assertCount( 0, Metadata::all() );
 
 		$this->get( '/' );
 
-		$this->assertCount( 1, get_metadata_files_list() );
+		$this->assertCount( 1, Metadata::all() );
 	}
 }
