@@ -34,7 +34,7 @@ class Response {
 	}
 
 	public function dd() : void {
-		dump($this);
+		dump( $this );
 		die;
 	}
 

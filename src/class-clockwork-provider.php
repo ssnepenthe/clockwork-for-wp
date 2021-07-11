@@ -50,7 +50,7 @@ class Clockwork_Provider extends Base_Provider {
 		};
 
 		$this->plugin[ AuthenticatorInterface::class ] = function() {
-			$config = $this->plugin[ Config::class ]->get( 'authentication' );
+			$config = $this->plugin[ Config::class ]->get( 'authentication', [] );
 
 			if ( ! $config['enabled'] ?? false ) {
 				return new NullAuthenticator();
@@ -73,7 +73,7 @@ class Clockwork_Provider extends Base_Provider {
 		);
 
 		$this->plugin[ StorageInterface::class ] = function() {
-			$config = $this->plugin[ Config::class ]->get( 'storage' );
+			$config = $this->plugin[ Config::class ]->get( 'storage', [] );
 			$driver = $config['driver'] ?? 'file';
 			$factory_id = $config['drivers'][ $driver ]['class'] ?? FileStorage::class;
 
