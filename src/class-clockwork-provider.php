@@ -33,10 +33,9 @@ class Clockwork_Provider extends Base_Provider {
 
 		$this->plugin[ Clockwork::class ] = function() {
 			$clockwork = (new Clockwork())
-				->setAuthenticator( $this->plugin[ AuthenticatorInterface::class ] )
-				->setLog( $this->plugin[ Log::class ] )
-				->setRequest( $this->plugin[ Request::class ] )
-				->setStorage( $this->plugin[ StorageInterface::class ] )
+				->authenticator( $this->plugin[ AuthenticatorInterface::class ] )
+				->request( $this->plugin[ Request::class ] )
+				->storage( $this->plugin[ StorageInterface::class ] )
 				->addDataSource( $this->plugin[ Php::class ] );
 
 			foreach ( $this->plugin->get_enabled_data_sources() as $data_source ) {
