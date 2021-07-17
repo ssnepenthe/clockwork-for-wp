@@ -19,9 +19,9 @@ If you have installed the browser extension, open developer tools and browse to 
 Otherwise, open a new browser tab and navigate to the `__clockwork/app` endpoint (e.g. https://mysite.com/__clockwork/app).
 
 ## Configuration
-Clockwork can be configured using the `cfw_config_init` action from within a plugin or must-use plugin. A must-use plugin is preferred.
+Clockwork can be configured using the `cfw_config_init` action from within a must-use plugin.
 
-Your callback should accept an instance of `\Clockwork_For_Wp\Config` which can be used to change any of the configuration options foind in `src/config.php`. Options are set using dot notation.
+Your callback should accept an instance of `\Clockwork_For_Wp\Config` which can be used to change any of the configuration options found in `src/config.php`. Options are set using dot notation.
 
 For example, consider the following must-use plugin at `wp-content/mu-plugins/cfw-config.php`:
 
