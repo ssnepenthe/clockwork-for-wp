@@ -16,11 +16,6 @@ class Web_App_Controller {
 	public function serve_assets( $cfw_asset ) {
 		// @todo No WP dependencies in here...
 		$asset = untrailingslashit( $cfw_asset );
-
-		if ( 'app.html' !== $asset ) {
-			$asset = "assets/{$asset}";
-		}
-
 		$file = $this->web_helper->asset( $asset );
 
 		if ( is_array( $file ) && isset( $file['path'] ) && is_file( $file['path'] ) ) {

@@ -22,9 +22,6 @@
         <testsuite name="unit">
             <directory suffix="-test.php">tests/Unit</directory>
         </testsuite>
-        <testsuite name="wp">
-            <directory suffix="-test.php">tests/Wp</directory>
-        </testsuite>
     </testsuites>
 
     <filter>

@@ -2,6 +2,7 @@
 
 namespace Clockwork_For_Wp;
 
+// @todo Consider supporting read-only values.
 class Config {
 	protected $values = [];
 

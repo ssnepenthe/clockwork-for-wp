@@ -3,6 +3,9 @@
 namespace Clockwork_For_Wp\Tests\Browser\Frontend;
 
 use Clockwork_For_Wp\Tests\Browser\Test_Case;
+use Clockwork_For_Wp\Tests\Metadata;
+
+use function Clockwork_For_Wp\Tests\clean_metadata_files;
 
 class Filtered_Uris_Test extends Test_Case {
 	protected static function required_plugins() : array {
@@ -10,7 +13,7 @@ class Filtered_Uris_Test extends Test_Case {
 	}
 
 	/** @test */
-	public function it_does_not_send_clockwork_headers() {
+	public function it_does_not_send_clockwork_headers_for_filtered_uris() {
 		$this->get( '/' )
 			->assert_header( 'x-clockwork-id' )
 			->assert_header( 'x-clockwork-version' );
@@ -21,8 +24,15 @@ class Filtered_Uris_Test extends Test_Case {
 	}
 
 	/** @test */
-	public function it_does_not_store_request_data() {
-		// @todo Not sure how best to test this... List entire contents of storage dir before/after?
-		$this->markTestIncomplete( 'Not yet implemented' );
+	public function it_does_not_store_request_data_for_filtered_uris() {
+		clean_metadata_files();
+
+		$this->get( '/sample-page/' );
+
+		$this->assertCount( 0, Metadata::all() );
+
+		$this->get( '/' );
+
+		$this->assertCount( 1, Metadata::all() );
 	}
 }

@@ -14,7 +14,7 @@ class Wp_Object_Cache extends DataSource implements Subscriber {
 	protected $deletes = 0;
 
 	public function subscribe_to_events( Event_Manager $event_manager ) : void {
-		$event_manager->on( 'cfw_pre_resolve_request', function( \WP_Object_Cache $wp_object_cache ) {
+		$event_manager->on( 'cfw_pre_resolve', function( \WP_Object_Cache $wp_object_cache ) {
 			// @todo Include hit percentage?
 			if ( property_exists( $wp_object_cache, 'cache_hits' ) ) {
 				$this->hit( (int) $wp_object_cache->cache_hits );

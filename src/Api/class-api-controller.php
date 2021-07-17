@@ -3,6 +3,7 @@
 namespace Clockwork_For_Wp\Api;
 
 use Clockwork\Clockwork;
+use Clockwork\Storage\Search;
 
 class Api_Controller {
 	protected $clockwork;
@@ -67,11 +68,11 @@ class Api_Controller {
 		$storage = $this->clockwork->getStorage();
 
 		if ( 'previous' === $direction ) {
-			$data = $storage->previous( $id, $count );
+			$data = $storage->previous( $id, $count, Search::fromRequest( $_GET ) );
 		} elseif ( 'next' === $direction ) {
-			$data = $storage->next( $id, $count );
+			$data = $storage->next( $id, $count, Search::fromRequest( $_GET ) );
 		} elseif ( 'latest' === $id ) {
-			$data = $storage->latest();
+			$data = $storage->latest( Search::fromRequest( $_GET ) );
 		} else {
 			$data = $storage->find( $id );
 		}

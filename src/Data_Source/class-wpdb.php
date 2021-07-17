@@ -13,7 +13,7 @@ class Wpdb extends DataSource implements Subscriber {
 	protected $queries = [];
 
 	public function subscribe_to_events( Event_Manager $event_manager ) : void {
-		$event_manager->on( 'cfw_pre_resolve_request', function( \wpdb $wpdb ) {
+		$event_manager->on( 'cfw_pre_resolve', function( \wpdb $wpdb ) {
 			if ( ! is_array( $wpdb->queries ) || count( $wpdb->queries ) < 1 ) {
 				return;
 			}

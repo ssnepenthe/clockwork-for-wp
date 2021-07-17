@@ -1,19 +1,24 @@
 <?php
 
-namespace Clockwork_For_Wp\Tests\Browser;
+namespace Clockwork_For_Wp\Tests;
 
 use Symfony\Component\Process\Exception\ExceptionInterface;
 use Symfony\Component\Process\Process;
 
 class Cli {
 	protected static $wp_bin_path;
+	protected static $requires = [];
 
 	public static function process( string ...$args ) : Process {
 		return new Process( $args );
 	}
 
 	public static function wp( string ...$args ) : Process {
-		return static::process( static::get_wp_bin_path(), ...$args );
+		return static::process(
+			static::get_wp_bin_path(),
+			...$args,
+			...static::get_requires_parameters()
+		);
 	}
 
 	public static function get_wp_bin_path() : string {
@@ -33,6 +38,20 @@ class Cli {
 	}
 
 	public static function set_wp_bin_path( string $path ) : void {
-		static::$$wp_bin_path = $path;
+		static::$wp_bin_path = $path;
+	}
+
+	public static function add_require( string $require ) : void {
+		static::$requires[] = realpath( $require );
+	}
+
+	public static function set_requires( string ...$requires ) : void {
+		static::$requires = array_map( 'realpath', $requires );
+	}
+
+	public static function get_requires_parameters() : array {
+		return array_map( function( $file ) {
+			return "--require={$file}";
+		}, static::$requires );
 	}
 }

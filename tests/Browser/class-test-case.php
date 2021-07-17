@@ -2,32 +2,19 @@
 
 namespace Clockwork_For_Wp\Tests\Browser;
 
+use Clockwork_For_Wp\Tests\Cli;
+use Clockwork_For_Wp\Tests\Requires_Plugins;
 use Goutte\Client;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\HttpClient;
 
+// @todo Restore db to default state before each test.
+// @todo Clear cfw-data dir before each test.
+// @todo Configurable base uri.
 class Test_Case extends TestCase {
+	use Requires_Plugins;
+
 	protected static $content_url;
-
-	public static function setUpBeforeClass() : void {
-		if ( count( $plugins = static::required_plugins() ) > 0 ) {
-			static::activate_plugins( ...$plugins );
-		}
-	}
-
-	public static function tearDownAfterClass() : void {
-		if ( count( $plugins = static::required_plugins() ) > 0 ) {
-			static::deactivate_plugins( ...$plugins );
-		}
-	}
-
-	protected static function activate_plugins( string ...$plugins ) : void {
-		Cli::wp( 'plugin', 'activate', ...$plugins )->mustRun();
-	}
-
-	protected static function deactivate_plugins( string ...$plugins ) : void {
-		Cli::wp( 'plugin', 'deactivate', ...$plugins )->mustRun();
-	}
 
 	protected static function base_uri() : string {
 		return 'http://local.wordpress.test';
@@ -45,13 +32,6 @@ class Test_Case extends TestCase {
 		}
 
 		return static::$content_url;
-	}
-
-	/**
-	 * @return string[]
-	 */
-	protected static function required_plugins() : array {
-		return [];
 	}
 
 	public function request(

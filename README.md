@@ -19,10 +19,21 @@ If you have installed the browser extension, open developer tools and browse to 
 Otherwise, open a new browser tab and navigate to the `__clockwork/app` endpoint (e.g. https://mysite.com/__clockwork/app).
 
 ## Configuration
-There are three options for configuring Clockwork:
+Clockwork can be configured using the `cfw_config_init` action from within a must-use plugin.
 
-`cfw_config_args` filter - This filter allows you to modify the args array before the config object is constructed.
+Your callback should accept an instance of `\Clockwork_For_Wp\Config` which can be used to change any of the configuration options found in `src/config.php`. Options are set using dot notation.
 
-`cfw_config_init` action - This action provides access to the config object after it has been constructed. You can modify all available options using their respective setter methods.
+For example, consider the following must-use plugin at `wp-content/mu-plugins/cfw-config.php`:
 
-The [Pimple `extend` method](https://pimple.symfony.com/#modifying-services-after-definition) - The core of this plugin is an instance of Pimple which can be retrieved using the `_cfw_instance` function. The config definition is stored using the `'config'` identifier.
+```php
+\add_action( 'cfw_config_init', function( \Clockwork_For_Wp\Config $config ) {
+    // Disables the Clockwork webapp.
+    $config->set( 'web', false );
+
+    // Disables the WP_Rewrite data source.
+    $config->set( 'data_sources.wp_rewrite.enabled', false );
+
+    // Sets the expiration for file-based metadata storage to one day (in minutes).
+    $config->set( 'storage.drivers.file.config.expiration', 60 * 24 );
+} );
+```

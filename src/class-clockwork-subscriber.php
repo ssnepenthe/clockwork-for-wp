@@ -5,9 +5,8 @@ namespace Clockwork_For_Wp;
 use Clockwork\Clockwork;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Managed_Subscriber;
-use Clockwork_For_Wp\Plugin;
 
-class Plugin_Subscriber implements Managed_Subscriber {
+class Clockwork_Subscriber implements Managed_Subscriber {
 	protected $plugin;
 
 	public function __construct( Plugin $plugin ) {
@@ -17,12 +16,12 @@ class Plugin_Subscriber implements Managed_Subscriber {
 	public function get_subscribed_events() : array {
 		$events = [];
 
-		if ( $this->plugin->is_enabled() ) {
+		if ( $this->plugin->is_enabled() && $this->plugin->is_collecting_requests() ) {
 			// wp_loaded fires on frontend but also login, admin, etc.
 			$events['wp_loaded'] = [ 'send_headers', Event_Manager::LATE_EVENT ];
 		}
 
-		if ( $this->plugin->is_collecting_data() ) {
+		if ( $this->plugin->is_collecting_requests() ) {
 			$events['shutdown'] = [ 'finalize_request', Event_Manager::LATE_EVENT ];
 		}
 
@@ -30,12 +29,7 @@ class Plugin_Subscriber implements Managed_Subscriber {
 	}
 
 	public function finalize_request( Clockwork $clockwork, Event_Manager $event_manager ) {
-		// @todo Include default for the case where request uri is not set?
-		if ( $this->plugin->is_uri_filtered( $_SERVER['REQUEST_URI'] ) ) {
-			return;
-		}
-
-		$event_manager->trigger( 'cfw_pre_resolve_request' ); // @todo pass $clockwork? $container?
+		$event_manager->trigger( 'cfw_pre_resolve' ); // @todo pass $clockwork? $container?
 
 		$clockwork->resolveRequest();
 		$clockwork->storeRequest();
@@ -43,7 +37,7 @@ class Plugin_Subscriber implements Managed_Subscriber {
 
 	public function send_headers( Clockwork $clockwork ) {
 		// @todo Include default for the case where request uri is not set?
-		if ( $this->plugin->is_uri_filtered( $_SERVER['REQUEST_URI'] ) || headers_sent() ) {
+		if ( headers_sent() ) {
 			return;
 		}
 

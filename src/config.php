@@ -29,7 +29,11 @@ return [
 
 	'web' => true,
 
-	'filtered_uris' => [ '\/__clockwork(?:\/.*)?' ],
+	'register_helpers' => true,
+
+	'filter_uris' => [],
+
+	'filter_methods' => [ 'options' ],
 
 	'headers' => [
 		// 'Accept' => 'application/vnd.com.whatever.v1+json',
@@ -105,8 +109,6 @@ return [
 	'storage' => [
 		'driver' => 'file',
 
-		'filter' => [],
-
 		'drivers' => [
 			'file' => [
 				'class' => FileStorage::class,
@@ -143,6 +145,22 @@ return [
 				],
 			],
 		],
+	],
+
+	'serialization' => [
+		'depth' => 10,
+		'blackbox' => [
+			Pimple\Container::class,
+			Pimple\Psr11\Container::class,
+		],
+	],
+
+	'stack_traces' => [
+		'enabled' => true,
+		'skip_vendors' => [],
+		'skip_namespaces' => [],
+		'skip_classes' => [],
+		'limit' => 10,
 	],
 
 ];

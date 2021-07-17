@@ -21,37 +21,19 @@ class Wpdb_Test extends TestCase {
 		$data_source->resolve( $request );
 
 		// @todo More thorough testing of capitalization and model guessing functionality.
-		$this->assertEquals( [
-			[
-				'query' => 'SELECT * FROM posts',
-				'bindings' => [],
-				'duration' => 500,
-				'connection' => null,
-				'file' => null,
-				'line' => null,
-				'trace' => null,
-				'model' => 'POST',
-			],
-			[
-				'query' => 'SELECT whatever FROM wherever',
-				'bindings' => [],
-				'duration' => 250,
-				'connection' => null,
-				'file' => null,
-				'line' => null,
-				'trace' => null,
-				'model' => '(unknown)',
-			],
-			[
-				'query' => 'SELECT * FROM users LIMIT 5',
-				'bindings' => [],
-				'duration' => 750,
-				'connection' => null,
-				'file' => null,
-				'line' => null,
-				'trace' => null,
-				'model' => 'USER',
-			],
-		], $request->databaseQueries );
+		$this->assertEquals( 'SELECT * FROM posts', $request->databaseQueries[0]['query'] );
+		$this->assertEquals( 500, $request->databaseQueries[0]['duration'] );
+		$this->assertEquals( 'POST', $request->databaseQueries[0]['model'] );
+
+		$this->assertEquals(
+			'SELECT whatever FROM wherever',
+			$request->databaseQueries[1]['query']
+		);
+		$this->assertEquals( 250, $request->databaseQueries[1]['duration'] );
+		$this->assertEquals( '(unknown)', $request->databaseQueries[1]['model'] );
+
+		$this->assertEquals( 'SELECT * FROM users LIMIT 5', $request->databaseQueries[2]['query'] );
+		$this->assertEquals( 750, $request->databaseQueries[2]['duration'] );
+		$this->assertEquals( 'USER', $request->databaseQueries[2]['model'] );
 	}
 }

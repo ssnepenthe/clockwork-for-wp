@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": ">=5.5",
-        "itsgoingd/clockwork": "^3.0",
+        "itsgoingd/clockwork": "^4.1",
         "pimple/pimple": "^3.2",
         "php-di/invoker": "^2.0"
     },

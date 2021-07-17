@@ -94,6 +94,7 @@ function describe_callable( $callable ) {
 }
 
 // @todo Should we be forcing string or can it be any scalar value?
+// @todo Should we skip this in favor of a simple json_encode?
 function describe_value( $value ) {
 	if ( null === $value ) {
 		return 'NULL';

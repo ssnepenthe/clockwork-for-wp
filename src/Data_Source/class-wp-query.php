@@ -11,7 +11,7 @@ class Wp_Query extends DataSource implements Subscriber {
 	protected $query_vars = [];
 
 	public function subscribe_to_events( Event_Manager $event_manager ) : void {
-		$event_manager->on( 'cfw_pre_resolve_request', function( \WP_Query $wp_query ) {
+		$event_manager->on( 'cfw_pre_resolve', function( \WP_Query $wp_query ) {
 			// @todo I think there is a flaw in this logic... It is poorly adapted from query monitor.
 			// @todo Move to event manager?
 			$plugin_vars = apply_filters( 'query_vars', [] );
