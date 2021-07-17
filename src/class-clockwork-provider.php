@@ -19,10 +19,22 @@ use Clockwork_For_Wp\Data_Source\Php;
 class Clockwork_Provider extends Base_Provider {
 	public function boot() {
 		if ( $this->plugin->is_collecting_data() ) {
-			// Ensures Clockwork is instantiated and all data sources are added on 'plugins_loaded'.
-			$this->plugin[ Clockwork::class ];
+			// Clockwork instance is resolved even when we are not collecting data in order to take
+			// advantage of helper methods like shouldCollect and shouldRecord.
+			// This ensures data sources are only registered on plugins_loaded when enabled.
+			$this->add_data_sources();
 
 			parent::boot();
+		}
+	}
+
+	protected function add_data_sources() {
+		$clockwork = $this->plugin[ Clockwork::class ];
+
+		$clockwork->addDataSource( $this->plugin[ Php::class ] );
+
+		foreach ( $this->plugin->get_enabled_data_sources() as $data_source ) {
+			$clockwork->addDataSource( $this->plugin[ $data_source['data_source_class'] ] );
 		}
 	}
 
@@ -35,12 +47,7 @@ class Clockwork_Provider extends Base_Provider {
 			$clockwork = (new Clockwork())
 				->authenticator( $this->plugin[ AuthenticatorInterface::class ] )
 				->request( $this->plugin[ Request::class ] )
-				->storage( $this->plugin[ StorageInterface::class ] )
-				->addDataSource( $this->plugin[ Php::class ] );
-
-			foreach ( $this->plugin->get_enabled_data_sources() as $data_source ) {
-				$clockwork->addDataSource( $this->plugin[ $data_source['data_source_class'] ] );
-			}
+				->storage( $this->plugin[ StorageInterface::class ] );
 
 			return $clockwork;
 		};
