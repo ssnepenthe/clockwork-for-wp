@@ -18,10 +18,10 @@ use Clockwork_For_Wp\Data_Source\Php;
 
 class Clockwork_Provider extends Base_Provider {
 	public function boot() {
-		// Ensures Clockwork is instantiated and all data sources are added on 'plugins_loaded'.
-		$this->plugin[ Clockwork::class ]; // @todo Move into conditional?
-
 		if ( $this->plugin->is_collecting_data() ) {
+			// Ensures Clockwork is instantiated and all data sources are added on 'plugins_loaded'.
+			$this->plugin[ Clockwork::class ];
+
 			parent::boot();
 		}
 	}
