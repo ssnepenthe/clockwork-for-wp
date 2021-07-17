@@ -29,13 +29,11 @@ class Wp_Http_Test extends TestCase {
 
 		$data_source->resolve( $request );
 
-		$key = "http_{$args['_cfw_meta']['fingerprint']}";
-
-		$this->assertArrayHasKey( $key, $request->timelineData );
 		$this->assertEquals(
 			'HTTP request for https://example.com',
-			$request->timelineData[ $key ]['description']
+			$request->timelineData[0]['description']
 		);
+		$this->assertGreaterThan( 0, $request->timelineData[0]['duration'] );
 	}
 
 	/** @test */
@@ -95,10 +93,11 @@ class Wp_Http_Test extends TestCase {
 
 		$data_source->resolve( $request );
 
-		$this->assertArrayHasKey(
-			"http_{$args['_cfw_meta']['fingerprint']}",
-			$request->timelineData
+		$this->assertEquals(
+			'HTTP request for https://example.com',
+			$request->timelineData[0]['description']
 		);
+		$this->assertGreaterThan( 0, $request->timelineData[0]['duration'] );
 		$this->assertEquals(
 			'HTTP request for https://example.com succeeded',
 			$request->log[0]['message']

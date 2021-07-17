@@ -19,13 +19,18 @@ class Wp_Mail_Test extends TestCase {
 		$data_source->record_send( $args = [
 			'to' => 'fake@notreal.com',
 			'subject' => 'Just another email',
-			'headers' => [ 'irellevant' ],
+			'headers' => [ 'irrelevant' ],
 		] );
-		$event_key = 'email_' . hash( 'md5', serialize( $args ) );
 
 		$data_source->resolve( $request );
 
 		$this->assertEquals( 'Failed to send an email', $request->log[0]['message'] );
-		$this->assertArrayHasKey( $event_key, $request->emailsData );
+		$this->assertEquals( 'Sending an email', $request->emailsData[0]['description'] );
+		$this->assertSame( 0.0, $request->emailsData[0]['duration'] );
+		$this->assertEquals( [
+			'to' => 'fake@notreal.com',
+			'subject' => 'Just another email',
+			'headers' => [ 'irrelevant' ],
+		], $request->emailsData[0]['data'] );
 	}
 }

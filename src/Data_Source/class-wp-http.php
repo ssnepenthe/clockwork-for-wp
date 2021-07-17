@@ -5,7 +5,7 @@ namespace Clockwork_For_Wp\Data_Source;
 use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Log;
 use Clockwork\Request\Request;
-use Clockwork\Request\Timeline;
+use Clockwork\Request\Timeline\Timeline;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
@@ -93,16 +93,15 @@ class Wp_Http extends DataSource implements Subscriber {
 	}
 
 	protected function start_event( $args ) {
-		$this->timeline->startEvent(
-			"http_{$args['_cfw_meta']['fingerprint']}",
-			"HTTP request for {$args['_cfw_meta']['url']}",
-			$args['_cfw_meta']['start'],
-			$args
-		);
+		$this->timeline->event( "HTTP request for {$args['_cfw_meta']['url']}", [
+			'name' => "http_{$args['_cfw_meta']['fingerprint']}",
+			'start' => $args['_cfw_meta']['start'],
+			'data' => $args,
+		] );
 	}
 
 	protected function end_event( $args ) {
-		$this->timeline->endEvent( "http_{$args['_cfw_meta']['fingerprint']}" );
+		$this->timeline->event( "http_{$args['_cfw_meta']['fingerprint']}" )->end();
 	}
 
 	public function ensure_args_have_meta( $args, $url ) {
