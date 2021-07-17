@@ -112,6 +112,10 @@ class Clockwork_Provider extends Base_Provider {
 		// Create request so we have id and start time available immediately.
 		$this->plugin[ Request::class ];
 		$this->configure_serializer();
+
+		if ( $this->plugin->config( 'register_helpers', true ) ) {
+			require_once __DIR__ . '/clock.php';
+		}
 	}
 
 	protected function configure_serializer() {

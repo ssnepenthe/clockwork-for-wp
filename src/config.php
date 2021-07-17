@@ -29,6 +29,8 @@ return [
 
 	'web' => true,
 
+	'register_helpers' => true,
+
 	'filter_uris' => [],
 
 	'filter_methods' => [ 'options' ],
