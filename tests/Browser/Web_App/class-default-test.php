@@ -25,14 +25,16 @@ class Default_Test extends Test_Case {
 
 	/** @test */
 	public function it_correctly_serves_web_app_index() {
-		$this->get( '/__clockwork/app' )
+		$response = $this->get( '/__clockwork/app' )
 			->assert_ok()
 			->assert_present( '[id="app"]' )
-			->assert_header_starts_with( 'content-type', 'text/html' )
-			->assert_header( 'content-length', function( $value ) {
-				$this->assertIsString( $value );
-				$this->assertIsNumeric( $value );
-			} );
+			->assert_header_starts_with( 'content-type', 'text/html' );
+
+		// Content-length will be removed if transfer-encoding is set.
+		// @todo This eventually needs to be tested unconditionally.
+		if ( null !== $content_length = $response->header( 'content-length' ) ) {
+			$this->assertIsNumeric( $content_length );
+		}
 	}
 
 	/** @test */
@@ -51,13 +53,15 @@ class Default_Test extends Test_Case {
 			->last()
 			->attr( 'src' );
 
-		$this->get( "/__clockwork/{$path}" )
+		$response = $this->get( "/__clockwork/{$path}" )
 			->assert_ok()
-			->assert_header_starts_with( 'content-type', 'application/javascript' )
-			->assert_header( 'content-length', function( $value ) {
-				$this->assertIsString( $value );
-				$this->assertIsNumeric( $value );
-			} );
+			->assert_header_starts_with( 'content-type', 'application/javascript' );
+
+		// Content-length will be removed if transfer-encoding is set.
+		// @todo This eventually needs to be tested unconditionally.
+		if ( null !== $content_length = $response->header( 'content-length' ) ) {
+			$this->assertIsNumeric( $content_length );
+		}
 	}
 
 	/** @test */
@@ -69,13 +73,15 @@ class Default_Test extends Test_Case {
 			->first()
 			->attr( 'href' );
 
-		$this->get( "/__clockwork/{$path}" )
+		$response = $this->get( "/__clockwork/{$path}" )
 			->assert_ok()
-			->assert_header_starts_with( 'content-type', 'text/css' )
-			->assert_header( 'content-length', function( $value ) {
-				$this->assertIsString( $value );
-				$this->assertIsNumeric( $value );
-			} );
+			->assert_header_starts_with( 'content-type', 'text/css' );
+
+		// Content-length will be removed if transfer-encoding is set.
+		// @todo This eventually needs to be tested unconditionally.
+		if ( null !== $content_length = $response->header( 'content-length' ) ) {
+			$this->assertIsNumeric( $content_length );
+		}
 	}
 
 	/** @test */
@@ -87,13 +93,15 @@ class Default_Test extends Test_Case {
 			->first()
 			->attr( 'src' );
 
-		$this->get( "/__clockwork/{$path}" )
+		$response = $this->get( "/__clockwork/{$path}" )
 			->assert_ok()
-			->assert_header_starts_with( 'content-type', 'application/javascript' )
-			->assert_header( 'content-length', function( $value ) {
-				$this->assertIsString( $value );
-				$this->assertIsNumeric( $value );
-			} );
+			->assert_header_starts_with( 'content-type', 'application/javascript' );
+
+		// Content-length will be removed if transfer-encoding is set.
+		// @todo This eventually needs to be tested unconditionally.
+		if ( null !== $content_length = $response->header( 'content-length' ) ) {
+			$this->assertIsNumeric( $content_length );
+		}
 	}
 
 	/** @test */
