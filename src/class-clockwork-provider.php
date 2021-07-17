@@ -18,9 +18,6 @@ use Clockwork_For_Wp\Data_Source\Php;
 
 class Clockwork_Provider extends Base_Provider {
 	public function boot() {
-		// @todo Is this early enough?
-		$this->configure_serializer();
-
 		// Ensures Clockwork is instantiated and all data sources are added on 'plugins_loaded'.
 		$this->plugin[ Clockwork::class ]; // @todo Move into conditional?
 
@@ -114,6 +111,7 @@ class Clockwork_Provider extends Base_Provider {
 
 		// Create request so we have id and start time available immediately.
 		$this->plugin[ Request::class ];
+		$this->configure_serializer();
 	}
 
 	protected function configure_serializer() {

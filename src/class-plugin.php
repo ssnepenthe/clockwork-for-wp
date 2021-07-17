@@ -19,7 +19,6 @@ class Plugin implements ArrayAccess {
 		if ( null === $providers ) {
 			$providers = [
 				Plugin_Provider::class,
-				Clockwork_Provider::class,
 				Wordpress_Provider::class,
 
 				Api_Provider::class,
@@ -27,6 +26,11 @@ class Plugin implements ArrayAccess {
 				Event_Management_Provider::class,
 				Routing_Provider::class,
 				Web_App_Provider::class,
+
+				// We are doing something we realistically shouldn't and resolving some services
+				// from within the register method. For this reason the clockwork provider
+				// must always be last to ensure all services are already registered.
+				Clockwork_Provider::class,
 			];
 		}
 
