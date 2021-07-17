@@ -10,6 +10,7 @@ use Symfony\Component\HttpClient\HttpClient;
 
 // @todo Restore db to default state before each test.
 // @todo Clear cfw-data dir before each test.
+// @todo Configurable base uri.
 class Test_Case extends TestCase {
 	use Requires_Plugins;
 
