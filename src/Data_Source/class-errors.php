@@ -29,7 +29,7 @@ class Errors extends DataSource implements Subscriber {
 	}
 
 	public function resolve( Request $request ) {
-		$request->log = array_merge( $request->log, $this->get_errors_log() );
+		$request->log()->merge( $this->get_errors_log() );
 
 		return $request;
 	}
@@ -92,7 +92,7 @@ class Errors extends DataSource implements Subscriber {
 			}
 		}
 
-		return $log->toArray();
+		return $log;
 	}
 
 	protected function flush_errors() {

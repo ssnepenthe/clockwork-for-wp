@@ -39,7 +39,7 @@ class Wp_Mail extends DataSource implements Subscriber {
 
 	public function resolve( Request $request ) {
 		$request->emailsData = array_merge( $request->emailsData, $this->emails->finalize() );
-		$request->log = array_merge( $request->log, $this->log->toArray() );
+		$request->log()->merge( $this->log );
 
 		return $request;
 	}

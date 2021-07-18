@@ -44,8 +44,8 @@ class Wp_Http extends DataSource implements Subscriber {
 	}
 
 	public function resolve( Request $request ) {
-		$request->log = array_merge( $request->log, $this->log->toArray() );
-		$request->timelineData = array_merge( $request->timelineData, $this->timeline->finalize() );
+		$request->log()->merge( $this->log );
+		$request->timeline()->merge( $this->timeline );
 
 		return $request;
 	}

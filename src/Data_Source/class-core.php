@@ -33,15 +33,12 @@ class Core extends DataSource {
 			'WP Version' => $this->version,
 		] );
 
-		$request->timelineData = array_merge(
-			$request->timelineData,
-			$this->build_timeline( $request )
-		);
+		$request->timeline()->merge( $this->build_timeline() );
 
 		return $request;
 	}
 
-	protected function build_timeline( Request $request ) {
+	protected function build_timeline() {
 		$timeline = new Timeline();
 
 		$timeline->event( 'Total Execution', [
@@ -53,6 +50,6 @@ class Core extends DataSource {
 			'end' => $this->timestart,
 		] );
 
-		return $timeline->finalize( $request->time );
+		return $timeline;
 	}
 }
