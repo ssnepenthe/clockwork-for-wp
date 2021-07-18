@@ -16,12 +16,21 @@ class Clockwork_Subscriber implements Managed_Subscriber {
 	public function get_subscribed_events() : array {
 		$events = [];
 
-		if ( $this->plugin->is_enabled() && $this->plugin->is_collecting_requests() ) {
+		if (
+			(
+				$this->plugin->is_enabled()
+				&& $this->plugin->is_recording( $this->plugin[ Clockwork::class ]->request() )
+			)
+			&& $this->plugin->is_collecting_requests()
+		) {
 			// wp_loaded fires on frontend but also login, admin, etc.
 			$events['wp_loaded'] = [ 'send_headers', Event_Manager::LATE_EVENT ];
 		}
 
-		if ( $this->plugin->is_collecting_requests() ) {
+		if (
+			$this->plugin->is_collecting_requests()
+			&& $this->plugin->is_recording( $this->plugin[ Clockwork::class ]->request() )
+		) {
 			$events['shutdown'] = [ 'finalize_request', Event_Manager::LATE_EVENT ];
 		}
 

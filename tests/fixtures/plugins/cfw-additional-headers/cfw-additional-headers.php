@@ -12,8 +12,8 @@
 
 \add_action( 'cfw_config_init', function( $config ) {
 	$config->set(
-		'filter_uris',
-		\array_merge( [ 'sample-page' ], $config->get( 'filter_uris', [] ) )
+		'requests.except',
+		\array_merge( [ 'sample-page' ], $config->get( 'requests.except', [] ) )
 	);
 	$config->set( 'headers', [
 		'Apples' => 'Bananas',

@@ -3,6 +3,9 @@
 namespace Clockwork_For_Wp;
 
 use ArrayAccess;
+use Clockwork\Clockwork;
+use Clockwork\Request\IncomingRequest;
+use Clockwork\Request\Request;
 use Clockwork_For_Wp\Api\Api_Provider;
 use Clockwork_For_Wp\Data_Source\Data_Source_Provider;
 use Clockwork_For_Wp\Event_Management\Event_Management_Provider;
@@ -96,27 +99,6 @@ class Plugin implements ArrayAccess {
 		return true;
 	}
 
-	public function is_method_filtered( $method ) {
-		$filter_methods = array_map( 'strtoupper', $this->config( 'filter_methods', [] ) );
-
-		return in_array( $method, $filter_methods, true );
-	}
-
-	public function is_uri_filtered( $uri ) {
-		$filter_uris = $this->config( 'filter_uris', [] );
-		$filter_uris[] = '\/__clockwork(?:\/.*)?';
-
-		foreach ( $filter_uris as $filter_uri ) {
-			$regex = '#' . str_replace( '#', '\#', $filter_uri ) . '#';
-
-			if ( preg_match( $regex, $uri ) ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	public function is_collecting_data() {
 		return $this->is_collecting_requests();
 	}
@@ -124,8 +106,12 @@ class Plugin implements ArrayAccess {
 	public function is_collecting_requests() {
 		return ( $this->is_enabled() || $this->config( 'collect_data_always', false ) )
 			&& ! $this->is_running_in_console()
-			&& ! $this->is_method_filtered( $_SERVER['REQUEST_METHOD'] )
-			&& ! $this->is_uri_filtered( $_SERVER['REQUEST_URI'] );
+			&& $this[ Clockwork::class ]->shouldCollect()->filter( $this[ IncomingRequest::class ] );
+	}
+
+	public function is_recording( Request $request ) {
+		return ( $this->is_enabled() || $this->config( 'collect_data_always', false ) )
+			&& $this[ Clockwork::class ]->shouldRecord()->filter( $request );
 	}
 
 	public function is_enabled() {

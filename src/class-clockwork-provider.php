@@ -8,6 +8,7 @@ use Clockwork\Authentication\SimpleAuthenticator;
 use Clockwork\Clockwork;
 use Clockwork\Helpers\Serializer;
 use Clockwork\Helpers\StackFilter;
+use Clockwork\Request\IncomingRequest;
 use Clockwork\Request\Log;
 use Clockwork\Request\Request;
 use Clockwork\Storage\FileStorage;
@@ -55,7 +56,7 @@ class Clockwork_Provider extends Base_Provider {
 		$this->plugin[ AuthenticatorInterface::class ] = function() {
 			$config = $this->plugin[ Config::class ]->get( 'authentication', [] );
 
-			if ( ! $config['enabled'] ?? false ) {
+			if ( ! ( $config['enabled'] ?? false ) ) {
 				return new NullAuthenticator();
 			}
 
@@ -115,9 +116,21 @@ class Clockwork_Provider extends Base_Provider {
 			return new Request;
 		};
 
+		$this->plugin[ IncomingRequest::class ] = function() {
+			return new IncomingRequest( [
+				'method' => $_SERVER['REQUEST_METHOD'],
+				'uri' => $_SERVER['REQUEST_URI'],
+				'input' => $_REQUEST,
+				'cookies' => $_COOKIE,
+			] );
+		};
+
 		// Create request so we have id and start time available immediately.
 		$this->plugin[ Request::class ];
+
 		$this->configure_serializer();
+		$this->configure_should_collect();
+		$this->configure_should_record();
 
 		if ( $this->plugin->config( 'register_helpers', true ) ) {
 			require_once __DIR__ . '/clock.php';
@@ -141,6 +154,29 @@ class Clockwork_Provider extends Base_Provider {
 				->isNotFunction( [ 'call_user_func', 'call_user_func_array' ] )
 				->isNotClass( $this->plugin->config( 'stack_traces.skip_classes', [] ) ),
 			'tracesLimit' => $this->plugin->config( 'stack_traces.limit', 10 )
+		] );
+	}
+
+	protected function configure_should_collect() {
+		$should_collect = $this->plugin[ Clockwork::class ]->shouldCollect();
+
+		$should_collect->merge( [
+			'onDemand' => $this->plugin->config( 'requests.on_demand', false ),
+			'sample' => $this->plugin->config( 'requests.sample', false ),
+			'except' => $this->plugin->config( 'requests.except', [] ),
+			'only' => $this->plugin->config( 'requests.only', [] ),
+			'exceptPreflight' => $this->plugin->config( 'requests.except_preflight', true ),
+		] );
+
+		$should_collect->except( [ '/__clockwork(?:/.*)?' ] );
+	}
+
+	protected function configure_should_record() {
+		$this->plugin[ Clockwork::class ]->shouldRecord( [
+			'errorsOnly' => $this->plugin->config( 'requests.errors_only', false ),
+			'slowOnly' => $this->plugin->config( 'requests.slow_only', false )
+				? $this->plugin->config( 'requests.slow_threshold', 1000 )
+				: false,
 		] );
 	}
 

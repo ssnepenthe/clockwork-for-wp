@@ -40,4 +40,11 @@ class Default_Test extends Test_Case {
 
 		// @todo Consider comparing contents of cfw-data dir before and after test?
 	}
+
+	/** @test */
+	public function it_is_disabled_by_default_for_options_requests() {
+		$this->request( 'OPTIONS', '/' )
+			->assert_header_missing( 'x-clockwork-id' )
+			->assert_header_missing( 'x-clockwork-version' );
+	}
 }
