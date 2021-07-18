@@ -3,13 +3,16 @@
 namespace Clockwork_For_Wp\Api;
 
 use Clockwork\Clockwork;
+use Clockwork\Request\IncomingRequest;
 use Clockwork\Storage\Search;
 
 class Api_Controller {
 	protected $clockwork;
+	protected $request;
 
-	public function __construct( Clockwork $clockwork ) {
+	public function __construct( Clockwork $clockwork, IncomingRequest $request ) {
 		$this->clockwork = $clockwork;
+		$this->request = $request;
 	}
 
 	// @todo Authenticator directly?
@@ -59,12 +62,22 @@ class Api_Controller {
 			$cfw_extended = true;
 		}
 
-		$data = $this->get_data( $cfw_id, $cfw_direction, $cfw_count, $cfw_extended );
+		$filter = array_filter( $this->request->input, function( $key ) {
+			return 'only' === $key || 'except' === $key;
+		}, ARRAY_FILTER_USE_KEY );
+
+		$data = $this->get_data( $cfw_id, $cfw_direction, $cfw_count, $filter, $cfw_extended );
 
 		wp_send_json( $data ); // @todo
 	}
 
-	protected function get_data( $id = null, $direction = null, $count = null, $extended = null ) {
+	protected function get_data(
+		$id = null,
+		$direction = null,
+		$count = null,
+		$filter = [],
+		$extended = null
+	) {
 		$storage = $this->clockwork->getStorage();
 
 		if ( 'previous' === $direction ) {
@@ -79,6 +92,21 @@ class Api_Controller {
 
 		if ( $extended ) {
 			$this->clockwork->extendRequest( $data );
+		}
+
+		$except = isset( $filter['except'] ) ? explode( ',', $filter['except'] ) : [];
+		$only = isset( $filter['only'] ) ? explode( ',', $filter['only'] ) : null;
+
+		$transformer = function ( $request ) use ( $except, $only ) {
+			return $only
+				? $request->only( $only )
+				: $request->except( array_merge( $except, [ 'updateToken' ] ) );
+		};
+
+		if ( is_array( $data ) ) {
+			$data = array_map( $transformer, $data );
+		} elseif ( $data ) {
+			$data = $transformer( $data );
 		}
 
 		return $data;

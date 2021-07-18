@@ -3,6 +3,7 @@
 namespace Clockwork_For_Wp\Api;;
 
 use Clockwork\Clockwork;
+use Clockwork\Request\IncomingRequest;
 use Clockwork_For_Wp\Base_Provider;
 
 class Api_Provider extends Base_Provider {
@@ -14,7 +15,10 @@ class Api_Provider extends Base_Provider {
 
 	public function register() {
 		$this->plugin[ Api_Controller::class ] = function() {
-			return new Api_Controller( $this->plugin[ Clockwork::class ] );
+			return new Api_Controller(
+				$this->plugin[ Clockwork::class ],
+				$this->plugin[ IncomingRequest::class ]
+			);
 		};
 
 		$this->plugin[ Api_Subscriber::class ] = function() {
