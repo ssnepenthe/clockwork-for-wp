@@ -24,7 +24,7 @@ class Wp_Mail_Test extends TestCase {
 
 		$data_source->resolve( $request );
 
-		$this->assertEquals( 'Failed to send an email', $request->log[0]['message'] );
+		$this->assertEquals( 'Failed to send an email', $request->log()->messages[0]['message'] );
 		$this->assertEquals( 'Sending an email', $request->emailsData[0]['description'] );
 		$this->assertSame( 0.0, $request->emailsData[0]['duration'] );
 		$this->assertEquals( [

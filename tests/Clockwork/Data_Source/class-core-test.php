@@ -24,8 +24,11 @@ class Core_Test extends TestCase {
 			],
 		], $request->userData( 'WordPress' )->toArray()[0] );
 
-		$this->assertEquals( 'Total Execution', $request->timelineData[0]['description'] );
-		$this->assertEquals( 'Core Timer Start', $request->timelineData[1]['description'] );
-		$this->assertSame( 0.0, $request->timelineData[1]['duration'] );
+		$this->assertEquals( 'Total Execution', $request->timeline()->find('total')->description );
+
+		$core_timer_event = $request->timeline()->find('core_timer');
+
+		$this->assertEquals( 'Core Timer Start', $core_timer_event->description );
+		$this->assertSame( 0.0, $core_timer_event->duration() );
 	}
 }

@@ -43,7 +43,7 @@ class Errors_Test extends TestCase {
 
 		$this->resolve_request();
 
-		$entry = $this->request->log[0];
+		$entry = $this->request->log()->messages[0];
 
 		$this->assertEquals( 'it_correctly_records_error_data', $entry['message'] );
 		$this->assertEquals( [
@@ -66,7 +66,7 @@ class Errors_Test extends TestCase {
 
 		$this->resolve_request();
 
-		$this->assertCount( 1, $this->request->log );
+		$this->assertCount( 1, $this->request->log()->messages );
 	}
 
 	/** @test */
@@ -98,8 +98,8 @@ class Errors_Test extends TestCase {
 
 		$data_source->resolve( $this->request );
 
-		$this->assertCount( 2, $this->request->log );
-		$this->assertEquals( 'E_ERROR', $this->request->log[0]['context']['type'] );
-		$this->assertEquals( 'E_WARNING', $this->request->log[1]['context']['type'] );
+		$this->assertCount( 2, $this->request->log()->messages );
+		$this->assertEquals( 'E_ERROR', $this->request->log()->messages[0]['context']['type'] );
+		$this->assertEquals( 'E_WARNING', $this->request->log()->messages[1]['context']['type'] );
 	}
 }
