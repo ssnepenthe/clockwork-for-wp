@@ -8,6 +8,7 @@ use Clockwork\Authentication\SimpleAuthenticator;
 use Clockwork\Clockwork;
 use Clockwork\Helpers\Serializer;
 use Clockwork\Helpers\StackFilter;
+use Clockwork\Request\IncomingRequest;
 use Clockwork\Request\Log;
 use Clockwork\Request\Request;
 use Clockwork\Storage\FileStorage;
@@ -18,11 +19,23 @@ use Clockwork_For_Wp\Data_Source\Php;
 
 class Clockwork_Provider extends Base_Provider {
 	public function boot() {
-		// Ensures Clockwork is instantiated and all data sources are added on 'plugins_loaded'.
-		$this->plugin[ Clockwork::class ]; // @todo Move into conditional?
-
 		if ( $this->plugin->is_collecting_data() ) {
+			// Clockwork instance is resolved even when we are not collecting data in order to take
+			// advantage of helper methods like shouldCollect and shouldRecord.
+			// This ensures data sources are only registered on plugins_loaded when enabled.
+			$this->add_data_sources();
+
 			parent::boot();
+		}
+	}
+
+	protected function add_data_sources() {
+		$clockwork = $this->plugin[ Clockwork::class ];
+
+		$clockwork->addDataSource( $this->plugin[ Php::class ] );
+
+		foreach ( $this->plugin->get_enabled_data_sources() as $data_source ) {
+			$clockwork->addDataSource( $this->plugin[ $data_source['data_source_class'] ] );
 		}
 	}
 
@@ -33,15 +46,9 @@ class Clockwork_Provider extends Base_Provider {
 
 		$this->plugin[ Clockwork::class ] = function() {
 			$clockwork = (new Clockwork())
-				->setAuthenticator( $this->plugin[ AuthenticatorInterface::class ] )
-				->setLog( $this->plugin[ Log::class ] )
-				->setRequest( $this->plugin[ Request::class ] )
-				->setStorage( $this->plugin[ StorageInterface::class ] )
-				->addDataSource( $this->plugin[ Php::class ] );
-
-			foreach ( $this->plugin->get_enabled_data_sources() as $data_source ) {
-				$clockwork->addDataSource( $this->plugin[ $data_source['data_source_class'] ] );
-			}
+				->authenticator( $this->plugin[ AuthenticatorInterface::class ] )
+				->request( $this->plugin[ Request::class ] )
+				->storage( $this->plugin[ StorageInterface::class ] );
 
 			return $clockwork;
 		};
@@ -49,7 +56,7 @@ class Clockwork_Provider extends Base_Provider {
 		$this->plugin[ AuthenticatorInterface::class ] = function() {
 			$config = $this->plugin[ Config::class ]->get( 'authentication', [] );
 
-			if ( ! $config['enabled'] ?? false ) {
+			if ( ! ( $config['enabled'] ?? false ) ) {
 				return new NullAuthenticator();
 			}
 
@@ -109,9 +116,21 @@ class Clockwork_Provider extends Base_Provider {
 			return new Request;
 		};
 
+		$this->plugin[ IncomingRequest::class ] = function() {
+			return new IncomingRequest( [
+				'method' => $_SERVER['REQUEST_METHOD'],
+				'uri' => $_SERVER['REQUEST_URI'],
+				'input' => $_REQUEST,
+				'cookies' => $_COOKIE,
+			] );
+		};
+
 		// Create request so we have id and start time available immediately.
 		$this->plugin[ Request::class ];
+
 		$this->configure_serializer();
+		$this->configure_should_collect();
+		$this->configure_should_record();
 
 		if ( $this->plugin->config( 'register_helpers', true ) ) {
 			require_once __DIR__ . '/clock.php';
@@ -135,6 +154,29 @@ class Clockwork_Provider extends Base_Provider {
 				->isNotFunction( [ 'call_user_func', 'call_user_func_array' ] )
 				->isNotClass( $this->plugin->config( 'stack_traces.skip_classes', [] ) ),
 			'tracesLimit' => $this->plugin->config( 'stack_traces.limit', 10 )
+		] );
+	}
+
+	protected function configure_should_collect() {
+		$should_collect = $this->plugin[ Clockwork::class ]->shouldCollect();
+
+		$should_collect->merge( [
+			'onDemand' => $this->plugin->config( 'requests.on_demand', false ),
+			'sample' => $this->plugin->config( 'requests.sample', false ),
+			'except' => $this->plugin->config( 'requests.except', [] ),
+			'only' => $this->plugin->config( 'requests.only', [] ),
+			'exceptPreflight' => $this->plugin->config( 'requests.except_preflight', true ),
+		] );
+
+		$should_collect->except( [ '/__clockwork(?:/.*)?' ] );
+	}
+
+	protected function configure_should_record() {
+		$this->plugin[ Clockwork::class ]->shouldRecord( [
+			'errorsOnly' => $this->plugin->config( 'requests.errors_only', false ),
+			'slowOnly' => $this->plugin->config( 'requests.slow_only', false )
+				? $this->plugin->config( 'requests.slow_threshold', 1000 )
+				: false,
 		] );
 	}
 

@@ -2,8 +2,13 @@
 
 namespace Clockwork_For_Wp\Tests\Integration;
 
+use Clockwork\Clockwork;
+use Clockwork\Request\IncomingRequest;
+use Clockwork\Request\Request;
+use Clockwork_For_Wp\Clockwork_Provider;
 use Clockwork_For_Wp\Config;
 use Clockwork_For_Wp\Plugin;
+use Null_Storage_For_Tests;
 use PHPUnit\Framework\TestCase;
 
 class Plugin_Test extends TestCase {
@@ -58,30 +63,6 @@ class Plugin_Test extends TestCase {
 
 		// False for features that are not registered.
 		$this->assertFalse( $plugin->is_feature_enabled( 'three' ) );
-	}
-
-	/** @test */
-	public function it_can_check_if_a_uri_is_filtered() {
-		$plugin = new Plugin( [], [
-			Config::class => new Config( [
-				'filter_uris' => [
-					'^clockwork',
-					'^something',
-					'^another',
-					'a-specific-slug#with_hash'
-				],
-			] ),
-		] );
-
-		$this->assertFalse( $plugin->is_uri_filtered( 'blog/some-post-slug' ) );
-		$this->assertFalse( $plugin->is_uri_filtered( 'blog/clockwork-rocks' ) );
-		$this->assertFalse( $plugin->is_uri_filtered( 'blog/something-strange-happened' ) );
-		$this->assertFalse( $plugin->is_uri_filtered( 'blog/another-list-post' ) );
-
-		$this->assertTrue( $plugin->is_uri_filtered( 'clockwork/app' ) );
-		$this->assertTrue( $plugin->is_uri_filtered( 'something-entirely-different' ) );
-		$this->assertTrue( $plugin->is_uri_filtered( 'another-one-bites-the-dust' ) );
-		$this->assertTrue( $plugin->is_uri_filtered( 'a-specific-slug#with_hash' ) );
 	}
 
 	/** @test */
@@ -167,5 +148,212 @@ class Plugin_Test extends TestCase {
 		$plugin = new Plugin( [], [ Config::class => $config ] );
 
 		$this->assertFalse( $plugin->is_web_enabled() );
+	}
+
+	/** @test */
+	public function it_can_filter_data_collection_using_except_uri_list() {
+		$plugin = new Plugin( [], [
+			Config::class => new Config( [
+				'requests' => [
+					'except' => [
+						'^clockwork',
+						'^something',
+						'^another',
+						'a-specific-slug#with_hash'
+					],
+				],
+				'storage' => [
+					'driver' => 'null',
+					'drivers' => [
+						'null' => [
+							'class' => Null_Storage_For_Tests::class,
+						],
+					],
+				],
+			] ),
+		] );
+		$plugin[ Null_Storage_For_Tests::class ] = $plugin->protect( function() {
+			return new Null_Storage_For_Tests();
+		} );
+		$plugin->register( new Clockwork_Provider( $plugin ) );
+
+		$request = function( $uri ) {
+			return new IncomingRequest( [
+				'method' => 'GET',
+				'uri' => $uri,
+			] );
+		};
+
+		$should_collect = $plugin[ Clockwork::class ]->shouldCollect();
+
+		$this->assertTrue( $should_collect->filter( $request( 'blog/some-post-slug' ) ) );
+		$this->assertTrue( $should_collect->filter( $request( 'blog/clockwork-rocks' ) ) );
+		$this->assertTrue( $should_collect->filter( $request( 'blog/something-strange-happened' ) ) );
+		$this->assertTrue( $should_collect->filter( $request( 'blog/another-list-post' ) ) );
+
+		$this->assertFalse( $should_collect->filter( $request( 'clockwork/app' ) ) );
+		$this->assertFalse( $should_collect->filter( $request( 'something-entirely-different' ) ) );
+		$this->assertFalse( $should_collect->filter( $request( 'another-one-bites-the-dust' ) ) );
+		$this->assertFalse( $should_collect->filter( $request( 'a-specific-slug#with_hash' ) ) );
+	}
+
+	/** @test */
+	public function it_can_filter_data_collection_using_only_uri_list() {
+		$plugin = new Plugin( [], [
+			Config::class => new Config( [
+				'requests' => [
+					'only' => [
+						'^blog',
+						'^a-specific-slug$',
+						'#with_hash'
+					],
+				],
+				'storage' => [
+					'driver' => 'null',
+					'drivers' => [
+						'null' => [
+							'class' => Null_Storage_For_Tests::class,
+						],
+					],
+				],
+			] ),
+		] );
+		$plugin[ Null_Storage_For_Tests::class ] = $plugin->protect( function() {
+			return new Null_Storage_For_Tests();
+		} );
+		$plugin->register( new Clockwork_Provider( $plugin ) );
+
+		$request = function( $uri ) {
+			return new IncomingRequest( [
+				'method' => 'GET',
+				'uri' => $uri,
+			] );
+		};
+
+		$should_collect = $plugin[ Clockwork::class ]->shouldCollect();
+
+		$this->assertTrue( $should_collect->filter( $request( 'blog/some-post-slug' ) ) );
+		$this->assertTrue( $should_collect->filter( $request( 'a-specific-slug' ) ) );
+		$this->assertTrue( $should_collect->filter( $request( 'something#with_hash' ) ) );
+
+		$this->assertFalse( $should_collect->filter( $request( 'clockwork/app' ) ) );
+		$this->assertFalse( $should_collect->filter( $request( 'something-entirely-different' ) ) );
+		$this->assertFalse( $should_collect->filter( $request( 'another-one-bites-the-dust' ) ) );
+	}
+
+	/** @test */
+	public function it_can_filter_data_collection_for_preflight_requests() {
+		$should_collect = function( $except_preflight ) {
+			$plugin = new Plugin( [], [
+				Config::class => new Config( [
+					'requests' => [
+						'except_preflight' => $except_preflight,
+					],
+					'storage' => [
+						'driver' => 'null',
+						'drivers' => [
+							'null' => [
+								'class' => Null_Storage_For_Tests::class,
+							],
+						],
+					],
+				] ),
+			] );
+			$plugin[ Null_Storage_For_Tests::class ] = $plugin->protect( function() {
+				return new Null_Storage_For_Tests();
+			} );
+			$plugin->register( new Clockwork_Provider( $plugin ) );
+
+			return $plugin[ Clockwork::class ]->shouldCollect();
+		};
+
+		$request = function( $uri ) {
+			return new IncomingRequest( [
+				'method' => 'OPTIONS',
+				'uri' => $uri,
+			] );
+		};
+
+		$this->assertFalse( $should_collect( true )->filter( $request( '/' ) ) );
+		$this->assertTrue( $should_collect( false )->filter( $request( '/' ) ) );
+	}
+
+	/** @test */
+	public function it_can_filter_data_recording_using_response_status() {
+		$should_record = function( $errors_only ) {
+			$plugin = new Plugin( [], [
+				Config::class => new Config( [
+					'requests' => [
+						'errors_only' => $errors_only,
+					],
+					'storage' => [
+						'driver' => 'null',
+						'drivers' => [
+							'null' => [
+								'class' => Null_Storage_For_Tests::class,
+							],
+						],
+					],
+				] ),
+			] );
+			$plugin[ Null_Storage_For_Tests::class ] = $plugin->protect( function() {
+				return new Null_Storage_For_Tests();
+			} );
+			$plugin->register( new Clockwork_Provider( $plugin ) );
+
+			return $plugin[ Clockwork::class ]->shouldRecord();
+		};
+
+		$only_errors = $should_record( true );
+
+		$this->assertFalse( $only_errors->filter( new Request( [ 'responseStatus' => 200 ] ) ) );
+		$this->assertTrue( $only_errors->filter( new Request( [ 'responseStatus' => 404 ] ) ) );
+
+		$all_requests = $should_record( false );
+
+		$this->assertTrue( $all_requests->filter( new Request( [ 'responseStatus' => 200 ] ) ) );
+		$this->assertTrue( $all_requests->filter( new Request( [ 'responseStatus' => 500 ] ) ) );
+	}
+
+	/** @test */
+	public function it_can_filter_data_recording_using_response_duration() {
+		$should_record = function( $slow_only ) {
+			$plugin = new Plugin( [], [
+				Config::class => new Config( [
+					'requests' => [
+						'slow_only' => $slow_only,
+						'slow_threshold' => 1000, // arbitrary.
+					],
+					'storage' => [
+						'driver' => 'null',
+						'drivers' => [
+							'null' => [
+								'class' => Null_Storage_For_Tests::class,
+							],
+						],
+					],
+				] ),
+			] );
+			$plugin[ Null_Storage_For_Tests::class ] = $plugin->protect( function() {
+				return new Null_Storage_For_Tests();
+			} );
+			$plugin->register( new Clockwork_Provider( $plugin ) );
+
+			return $plugin[ Clockwork::class ]->shouldRecord();
+		};
+
+		$time = microtime( true );
+		$fast_response = new Request( [ 'time' => $time, 'responseTime' => $time + 0.5 ] );
+		$slow_response = new Request( [ 'time' => $time, 'responseTime' => $time + 1.5 ] );
+
+		$slow_only = $should_record( true );
+
+		$this->assertFalse( $slow_only->filter( $fast_response ) );
+		$this->assertTrue( $slow_only->filter( $slow_response ) );
+
+		$all_requests = $should_record( false );
+
+		$this->assertTrue( $all_requests->filter( $fast_response ) );
+		$this->assertTrue( $all_requests->filter( $slow_response ) );
 	}
 }

@@ -31,12 +31,27 @@ return [
 
 	'register_helpers' => true,
 
-	'filter_uris' => [],
-
-	'filter_methods' => [ 'options' ],
-
 	'headers' => [
 		// 'Accept' => 'application/vnd.com.whatever.v1+json',
+	],
+
+	'requests' => [
+		'on_demand' => false,
+
+		'errors_only' => false,
+
+		// @todo Determine a good number to use for slow WordPress requests.
+		'slow_threshold' => 1000,
+
+		'slow_only' => false,
+
+		'sample' => false,
+
+		'except' => [],
+
+		'only' => [],
+
+		'except_preflight' => true,
 	],
 
 	'data_sources' => [

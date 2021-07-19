@@ -2,9 +2,9 @@
 
 namespace Clockwork_For_Wp\Data_Source;
 
-use Clockwork\Request\Request;
-use Clockwork\Request\Timeline;
 use Clockwork\DataSource\DataSource;
+use Clockwork\Request\Request;
+use Clockwork\Request\Timeline\Timeline;
 
 class Core extends DataSource {
 	protected $version;
@@ -33,20 +33,23 @@ class Core extends DataSource {
 			'WP Version' => $this->version,
 		] );
 
-		$request->timelineData = array_merge(
-			$request->timelineData,
-			$this->build_timeline( $request )
-		);
+		$request->timeline()->merge( $this->build_timeline() );
 
 		return $request;
 	}
 
-	protected function build_timeline( Request $request ) {
+	protected function build_timeline() {
 		$timeline = new Timeline();
 
-		$timeline->startEvent( 'total', 'Total Execution', 'start' );
-		$timeline->addEvent( 'core_timer', 'Core Timer Start', $this->timestart, $this->timestart );
+		$timeline->event( 'Total Execution', [
+			'name' => 'total',
+		] );
+		$timeline->event( 'Core Timer Start', [
+			'name' => 'core_timer',
+			'start' => $this->timestart,
+			'end' => $this->timestart,
+		] );
 
-		return $timeline->finalize( $request->time );
+		return $timeline;
 	}
 }

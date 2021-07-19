@@ -17,20 +17,18 @@ class Core_Test extends TestCase {
 
 		$data_source->resolve( $request );
 
-		$data = $request->userData( 'WordPress' )->toArray()[0];
-		$timeline = $request->timelineData;
-
 		$this->assertEquals( [
 			'WP Version' => '4.7',
 			'__meta' => [
 				'showAs' => 'counters',
 			],
-		], $data );
+		], $request->userData( 'WordPress' )->toArray()[0] );
 
-		$this->assertArrayHasKey( 'total', $timeline );
-		$this->assertEquals( 'Total Execution', $timeline['total']['description'] );
+		$this->assertEquals( 'Total Execution', $request->timeline()->find('total')->description );
 
-		$this->assertArrayHasKey( 'core_timer', $timeline );
-		$this->assertEquals( 'Core Timer Start', $timeline['core_timer']['description'] );
+		$core_timer_event = $request->timeline()->find('core_timer');
+
+		$this->assertEquals( 'Core Timer Start', $core_timer_event->description );
+		$this->assertSame( 0.0, $core_timer_event->duration() );
 	}
 }

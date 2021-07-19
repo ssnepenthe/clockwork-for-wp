@@ -29,13 +29,11 @@ class Wp_Http_Test extends TestCase {
 
 		$data_source->resolve( $request );
 
-		$key = "http_{$args['_cfw_meta']['fingerprint']}";
-
-		$this->assertArrayHasKey( $key, $request->timelineData );
 		$this->assertEquals(
 			'HTTP request for https://example.com',
-			$request->timelineData[ $key ]['description']
+			$request->timeline()->events[0]->description
 		);
+		$this->assertGreaterThan( 0, $request->timeline()->events[0]->end()->duration() );
 	}
 
 	/** @test */
@@ -49,7 +47,7 @@ class Wp_Http_Test extends TestCase {
 
 		$this->assertEquals(
 			'Error in HTTP data source - meta is not set in provided args',
-			$request->log[0]['message']
+			$request->log()->messages[0]['message']
 		);
 	}
 
@@ -72,7 +70,7 @@ class Wp_Http_Test extends TestCase {
 
 		$this->assertEquals(
 			'HTTP request for https://example.com failed',
-			$request->log[0]['message']
+			$request->log()->messages[0]['message']
 		);
 	}
 
@@ -95,13 +93,14 @@ class Wp_Http_Test extends TestCase {
 
 		$data_source->resolve( $request );
 
-		$this->assertArrayHasKey(
-			"http_{$args['_cfw_meta']['fingerprint']}",
-			$request->timelineData
+		$this->assertEquals(
+			'HTTP request for https://example.com',
+			$request->timeline()->events[0]->description
 		);
+		$this->assertGreaterThan( 0, $request->timeline()->events[0]->duration() );
 		$this->assertEquals(
 			'HTTP request for https://example.com succeeded',
-			$request->log[0]['message']
+			$request->log()->messages[0]['message']
 		);
 	}
 }

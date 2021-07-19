@@ -5,7 +5,7 @@ namespace Clockwork_For_Wp\Data_Source;
 use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Log;
 use Clockwork\Request\Request;
-use Clockwork\Request\Timeline;
+use Clockwork\Request\Timeline\Timeline;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
@@ -39,7 +39,7 @@ class Wp_Mail extends DataSource implements Subscriber {
 
 	public function resolve( Request $request ) {
 		$request->emailsData = array_merge( $request->emailsData, $this->emails->finalize() );
-		$request->log = array_merge( $request->log, $this->log->toArray() );
+		$request->log()->merge( $this->log );
 
 		return $request;
 	}
@@ -52,13 +52,13 @@ class Wp_Mail extends DataSource implements Subscriber {
 		$to = isset( $args['to'] ) ? $args['to'] : '';
 		$subject = isset( $args['subject'] ) ? $args['subject'] : '';
 		$headers = isset( $args['headers'] ) ? $args['headers'] : [];
+		$time = microtime( true );
 
-		$this->emails->addEvent(
-			'email_' . hash( 'md5', serialize( $args ) ),
-			'Sending an email',
-			null,
-			null,
-			compact( 'to', 'subject', 'headers' )
-		);
+		$this->emails->event( 'Sending an email', [
+			'name' => 'email_' . hash( 'md5', serialize( $args ) ),
+			'data' => compact( 'to', 'subject', 'headers' ),
+			'start' => $time,
+			'end' => $time,
+		] );
 	}
 }
