@@ -4,7 +4,6 @@ namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Request;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
 use function Clockwork_For_Wp\describe_callable;
@@ -12,26 +11,28 @@ use function Clockwork_For_Wp\describe_callable;
 class Wp_Hook extends DataSource implements Subscriber {
 	protected $hooks = [];
 
-	public function subscribe_to_events( Event_Manager $event_manager ) : void {
-		// @todo whitelist/blacklist for hooks to ignore?
-		$event_manager->on( 'cfw_pre_resolve', function( $wp_filter, $wp_actions ) {
-			foreach ( array_keys( $wp_actions ) as $tag ) {
-				if ( isset( $wp_filter[ $tag ] ) ) {
-					foreach ( $wp_filter[ $tag ] as $priority => $callbacks ) {
-						foreach ( $callbacks as $callback ) {
-							$this->add_hook(
-								$tag,
-								$priority,
-								$callback['function'],
-								$callback['accepted_args']
-							);
+	public function get_subscribed_events() : array {
+		return [
+			'cfw_pre_resolve' => function( $wp_filter, $wp_actions ) {
+				// @todo whitelist/blacklist for hooks to ignore?
+				foreach ( array_keys( $wp_actions ) as $tag ) {
+					if ( isset( $wp_filter[ $tag ] ) ) {
+						foreach ( $wp_filter[ $tag ] as $priority => $callbacks ) {
+							foreach ( $callbacks as $callback ) {
+								$this->add_hook(
+									$tag,
+									$priority,
+									$callback['function'],
+									$callback['accepted_args']
+								);
+							}
 						}
+					} else {
+						$this->add_hook( $tag );
 					}
-				} else {
-					$this->add_hook( $tag );
 				}
-			}
-		} );
+			},
+		];
 	}
 
 	public function resolve( Request $request ) {

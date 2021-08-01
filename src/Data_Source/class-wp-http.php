@@ -6,7 +6,6 @@ use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Log;
 use Clockwork\Request\Request;
 use Clockwork\Request\Timeline\Timeline;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
 use function Clockwork_For_Wp\prepare_http_response;
@@ -20,19 +19,19 @@ class Wp_Http extends DataSource implements Subscriber {
 		$this->timeline = $timeline ?: new Timeline();
 	}
 
-	public function subscribe_to_events( Event_Manager $event_manager ) : void {
-		$event_manager
-			->on( 'http_api_debug', function( $response, $_, $_2, $args ) {
+	public function get_subscribed_events() : array {
+		return [
+			'http_api_debug' => function( $response, $_, $_2, $args ) {
 				$this->finish_request( prepare_http_response( $response ), $args );
-			} )
-			->on( 'http_request_args', function( $args, $url ) {
+			},
+			'http_request_args' => function( $args, $url ) {
 				$args = $this->ensure_args_have_meta( $args, $url );
 
 				$this->start_request( $args );
 
 				return $args;
-			} )
-			->on( 'pre_http_request', function( $preempt, $args ) {
+			},
+			'pre_http_request' => function( $preempt, $args ) {
 				if ( false === $preempt ) {
 					return $preempt;
 				}
@@ -40,7 +39,8 @@ class Wp_Http extends DataSource implements Subscriber {
 				$this->finish_request( prepare_http_response( $preempt ), $args );
 
 				return $preempt;
-			} );
+			},
+		];
 	}
 
 	public function resolve( Request $request ) {

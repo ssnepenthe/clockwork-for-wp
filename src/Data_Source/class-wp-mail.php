@@ -6,7 +6,6 @@ use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Log;
 use Clockwork\Request\Request;
 use Clockwork\Request\Timeline\Timeline;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
 use function Clockwork_For_Wp\wp_error_to_array;
@@ -21,20 +20,21 @@ class Wp_Mail extends DataSource implements Subscriber {
 		$this->log = $log ?: new Log();
 	}
 
-	public function subscribe_to_events( Event_Manager $event_manager ) : void {
-		$event_manager
-			->on( 'wp_mail_failed', function( \WP_Error $error ) {
+	public function get_subscribed_events() : array {
+		return [
+			'wp_mail_failed' => function( \WP_Error $error ) {
 				// @todo Truncate field within error_data.
 				$data = wp_error_to_array( $error );
 
 				$this->record_failure( $data );
-			} )
-			->on( 'wp_mail', function( $args ) {
+			},
+			'wp_mail' => function( $args ) {
 				// @todo Prepare mail args helper?
 				$this->record_send( $args );
 
 				return $args;
-			} );
+			},
+		];
 	}
 
 	public function resolve( Request $request ) {

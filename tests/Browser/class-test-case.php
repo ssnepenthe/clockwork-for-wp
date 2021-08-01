@@ -17,7 +17,7 @@ class Test_Case extends TestCase {
 	protected static $content_url;
 
 	protected static function base_uri() : string {
-		return 'http://local.wordpress.test';
+		return 'http://one.wordpress.test';
 	}
 
 	protected static function content_url( string $content_url = null ) : string {

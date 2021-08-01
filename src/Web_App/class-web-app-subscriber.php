@@ -2,10 +2,10 @@
 
 namespace Clockwork_For_Wp\Web_App;
 
-use Clockwork_For_Wp\Event_Management\Managed_Subscriber;
+use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Routing\Route_Collection;
 
-class Web_App_Subscriber implements Managed_Subscriber {
+class Web_App_Subscriber implements Subscriber {
 	public function get_subscribed_events() : array {
 		return [
 			'init' => 'register_routes',
