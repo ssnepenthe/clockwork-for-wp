@@ -4,7 +4,6 @@ namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Request;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
 use function Clockwork_For_Wp\describe_callable;
@@ -13,18 +12,20 @@ use function Clockwork_For_Wp\prepare_rest_route;
 class Rest_Api extends DataSource implements Subscriber {
 	protected $routes = [];
 
-	public function subscribe_to_events( Event_Manager $event_manager ) : void {
-		$event_manager->on( 'cfw_pre_resolve', function( \WP_REST_Server $wp_rest_server ) {
-			// @todo Option for core rest endpoints to be filtered from list.
-			// @todo Option for what route fields get recorded.
-			foreach ( $wp_rest_server->get_routes() as $path => $handlers ) {
-				foreach ( $handlers as $handler ) {
-					[ $methods, $callback, $permission_callback ] = prepare_rest_route( $handler );
+	public function get_subscribed_events() : array {
+		return [
+			'cfw_pre_resolve' => function( \WP_REST_Server $wp_rest_server ) {
+				// @todo Option for core rest endpoints to be filtered from list.
+				// @todo Option for what route fields get recorded.
+				foreach ( $wp_rest_server->get_routes() as $path => $handlers ) {
+					foreach ( $handlers as $handler ) {
+						[ $methods, $callback, $permission_callback ] = prepare_rest_route( $handler );
 
-					$this->add_route( $path, $methods, $callback, $permission_callback );
+						$this->add_route( $path, $methods, $callback, $permission_callback );
+					}
 				}
-			}
-		} );
+			},
+		];
 	}
 
 	public function resolve( Request $request ) {

@@ -18,10 +18,9 @@ class Theme extends DataSource implements Subscriber {
 	protected $template;
 	protected $theme_root;
 
-	public function subscribe_to_events( Event_Manager $event_manager ) : void {
-		// @todo Record theme render time (from template_include to wp_footer?).
-		$event_manager
-			->on( 'cfw_pre_resolve', function( $content_width ) {
+	public function get_subscribed_events() : array {
+		return [
+			'cfw_pre_resolve' => function( $content_width ) {
 				$this
 					// @todo Constructor?
 					->configure_theme(
@@ -37,17 +36,18 @@ class Theme extends DataSource implements Subscriber {
 							Included_Files::template_parts_from_child_theme()
 						)
 					);
-			} )
-			->on( 'body_class', function( $classes ) {
+			},
+			'body_class' => [ function( $classes ) {
 				$this->set_body_classes( is_array( $classes ) ? $classes : [] );
 
 				return $classes;
-			}, Event_Manager::LATE_EVENT )
-			->on( 'template_include', function( $template ) {
+			}, Event_Manager::LATE_EVENT ],
+			'template_include' => [ function( $template ) {
 				$this->set_included_template( $template );
 
 				return $template;
-			}, Event_Manager::LATE_EVENT );
+			}, Event_Manager::LATE_EVENT ],
+		];
 	}
 
 	public function resolve( Request $request ) {

@@ -2,12 +2,12 @@
 
 namespace Clockwork_For_Wp\Routing;
 
-use Clockwork_For_Wp\Event_Management\Managed_Subscriber;
+use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Routing\Route_Collection;
 use Invoker\Invoker;
 use WP;
 
-class Routing_Subscriber implements Managed_Subscriber {
+class Routing_Subscriber implements Subscriber {
 	// @todo route collection via constructor?
 	public function get_subscribed_events() : array {
 		return [

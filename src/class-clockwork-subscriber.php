@@ -4,9 +4,9 @@ namespace Clockwork_For_Wp;
 
 use Clockwork\Clockwork;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
-use Clockwork_For_Wp\Event_Management\Managed_Subscriber;
+use Clockwork_For_Wp\Event_Management\Subscriber;
 
-class Clockwork_Subscriber implements Managed_Subscriber {
+class Clockwork_Subscriber implements Subscriber {
 	protected $plugin;
 
 	public function __construct( Plugin $plugin ) {

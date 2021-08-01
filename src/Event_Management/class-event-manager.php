@@ -3,6 +3,7 @@
 namespace Clockwork_For_Wp\Event_Management;
 
 use Closure;
+use InvalidArgumentException;
 use Invoker\Invoker;
 
 class Event_Manager {
@@ -17,23 +18,23 @@ class Event_Manager {
 		$this->invoker = $invoker;
 	}
 
-	public function attach( $subscriber ) {
-		if ( $subscriber instanceof Subscriber ) {
-			$subscriber->subscribe_to_events( $this );
-		} else if ( $subscriber instanceof Managed_Subscriber ) {
-			foreach ( $subscriber->get_subscribed_events() as $tag => $sub ) {
-				if ( is_string( $sub ) ) {
-					$callable = [ $subscriber, $sub ];
-					$priority = static::DEFAULT_EVENT;
-				} else {
-					$callable = [ $subscriber, $sub[0] ];
-					$priority = $sub[1];
-				}
-
-				$this->on( $tag, $callable, $priority );
+	public function attach( Subscriber $subscriber ) {
+		foreach ( $subscriber->get_subscribed_events() as $tag => $args ) {
+			if ( is_string( $args ) || $args instanceof Closure ) {
+				$args = [ $args ];
 			}
-		} else {
-			throw new \InvalidArgumentException( '@todo' );
+
+			if ( ! is_array( $args ) ) {
+				throw new InvalidArgumentException( '@todo' );
+			}
+
+			if ( isset( $args[0] ) && ( is_string( $args[0] ) || $args[0] instanceof Closure ) ) {
+				$args = [ $args ];
+			}
+
+			foreach ( $args as $arg ) {
+				$this->attach_subscriber_callback( $subscriber, $tag, $arg );
+			}
 		}
 
 		return $this;
@@ -55,5 +56,25 @@ class Event_Manager {
 
 	public function filter( $tag, ...$args ) {
 		return \apply_filters( $tag, ...$args );
+	}
+
+	protected function attach_subscriber_callback(
+		Subscriber $subscriber,
+		string $tag,
+		array $args
+	) {
+		if ( ! isset( $args[0] ) ) {
+			throw new InvalidArgumentException( '@todo' );
+		}
+
+		if ( is_string( $args[0] ) ) {
+			$callable = [ $subscriber, $args[0] ];
+		} else if ( $args[0] instanceof Closure ) {
+			$callable = $args[0];
+		} else {
+			throw new InvalidArgumentException( '@todo' );
+		}
+
+		return $this->on( $tag, $callable, $args[1] ?? self::DEFAULT_EVENT );
 	}
 }

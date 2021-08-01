@@ -4,27 +4,27 @@ namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Request;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
 class Transients extends DataSource implements Subscriber {
 	protected $setted = [];
 	protected $deleted = [];
 
-	public function subscribe_to_events( Event_Manager $event_manager ) : void {
-		$event_manager
-			->on( 'setted_transient', function( $transient, $value, $expiration ) {
+	public function get_subscribed_events() : array {
+		return [
+			'setted_transient' => function( $transient, $value, $expiration ) {
 				$this->setted( $transient, $value, $expiration );
-			} )
-			->on( 'setted_site_transient', function( $transient, $value, $expiration ) {
+			},
+			'setted_site_transient' => function( $transient, $value, $expiration ) {
 				$this->setted( $transient, $value, $expiration, $is_site = true );
-			} )
-			->on( 'deleted_transient', function( $transient ) {
+			},
+			'deleted_transient' => function( $transient ) {
 				$this->deleted( $transient );
-			} )
-			->on( 'deleted_site_transient', function( $transient ) {
+			},
+			'deleted_site_transient' => function( $transient ) {
 				$this->deleted( $transient, $is_site = true );
-			} );
+			},
+		];
 	}
 
 	public function resolve( Request $request ) {

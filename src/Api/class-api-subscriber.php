@@ -2,10 +2,10 @@
 
 namespace Clockwork_For_Wp\Api;
 
-use Clockwork_For_Wp\Event_Management\Managed_Subscriber;
+use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Routing\Route_Collection;
 
-class Api_Subscriber implements Managed_Subscriber {
+class Api_Subscriber implements Subscriber {
 	public function get_subscribed_events() : array {
 		return [
 			'init' => 'register_routes',

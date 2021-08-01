@@ -4,7 +4,6 @@ namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\XdebugDataSource;
 use Clockwork\Request\Request;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
 /**
@@ -21,10 +20,12 @@ use Clockwork_For_Wp\Event_Management\Subscriber;
 class Xdebug extends XdebugDataSource implements Subscriber {
 	protected $profiler_filename;
 
-	public function subscribe_to_events( Event_Manager $event_manager ) : void {
-		$event_manager->on( 'init', function() {
-			$this->set_profiler_filename( xdebug_get_profiler_filename() );
-		} );
+	public function get_subscribed_events() : array {
+		return [
+			'init' => function() {
+				$this->set_profiler_filename( xdebug_get_profiler_filename() );
+			},
+		];
 	}
 
 	public function resolve( Request $request ) {

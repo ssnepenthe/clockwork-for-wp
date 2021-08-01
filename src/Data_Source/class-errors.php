@@ -21,11 +21,16 @@ class Errors extends DataSource implements Subscriber {
 		$this->error_reporting = $error_reporting;
 	}
 
-	public function subscribe_to_events( Event_Manager $event_manager ) : void {
-		$event_manager->on( 'cfw_pre_resolve', function() {
-			$this->record_final_error();
-			$this->flush_errors();
-		}, Event_Manager::LATE_EVENT );
+	public function get_subscribed_events() : array {
+		return [
+			'cfw_pre_resolve' => [
+				function() {
+					$this->record_final_error();
+					$this->flush_errors();
+				},
+				Event_Manager::LATE_EVENT,
+			],
+		];
 	}
 
 	public function resolve( Request $request ) {

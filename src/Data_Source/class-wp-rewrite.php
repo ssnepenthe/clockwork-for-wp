@@ -4,7 +4,6 @@ namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Request;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
 use function Clockwork_For_Wp\describe_value;
@@ -15,14 +14,16 @@ class Wp_Rewrite extends DataSource implements Subscriber {
 	protected $front = '';
 	protected $rules = [];
 
-	public function subscribe_to_events( Event_Manager $event_manager ) : void {
-		$event_manager->on( 'cfw_pre_resolve', function( \WP_Rewrite $wp_rewrite ) {
-			$this
-				->set_structure( $wp_rewrite->permalink_structure )
-				->set_trailing_slash( $wp_rewrite->use_trailing_slashes )
-				->set_front( $wp_rewrite->front )
-				->set_rules( $wp_rewrite->wp_rewrite_rules() );
-		} );
+	public function get_subscribed_events() : array {
+		return [
+			'cfw_pre_resolve' => function( \WP_Rewrite $wp_rewrite ) {
+				$this
+					->set_structure( $wp_rewrite->permalink_structure )
+					->set_trailing_slash( $wp_rewrite->use_trailing_slashes )
+					->set_front( $wp_rewrite->front )
+					->set_rules( $wp_rewrite->wp_rewrite_rules() );
+			},
+		];
 	}
 
 	public function resolve( Request $request ) {

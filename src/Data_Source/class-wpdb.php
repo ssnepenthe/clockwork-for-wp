@@ -4,7 +4,6 @@ namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Request;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
 use function Clockwork_For_Wp\prepare_wpdb_query;
@@ -12,18 +11,20 @@ use function Clockwork_For_Wp\prepare_wpdb_query;
 class Wpdb extends DataSource implements Subscriber {
 	protected $queries = [];
 
-	public function subscribe_to_events( Event_Manager $event_manager ) : void {
-		$event_manager->on( 'cfw_pre_resolve', function( \wpdb $wpdb ) {
-			if ( ! is_array( $wpdb->queries ) || count( $wpdb->queries ) < 1 ) {
-				return;
-			}
+	public function get_subscribed_events() : array {
+		return [
+			'cfw_pre_resolve' => function( \wpdb $wpdb ) {
+				if ( ! is_array( $wpdb->queries ) || count( $wpdb->queries ) < 1 ) {
+					return;
+				}
 
-			foreach ( $wpdb->queries as $query_array ) {
-				$query = prepare_wpdb_query( $query_array );
+				foreach ( $wpdb->queries as $query_array ) {
+					$query = prepare_wpdb_query( $query_array );
 
-				$this->add_query( $query[0], $query[1] );
-			}
-		} );
+					$this->add_query( $query[0], $query[1] );
+				}
+			},
+		];
 	}
 
 	public function resolve( Request $request ) {
