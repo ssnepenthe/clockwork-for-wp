@@ -13,9 +13,9 @@ class Web_App_Controller {
 		$this->wp_query = $wp_query;
 	}
 
-	public function serve_assets( $cfw_asset ) {
+	public function serve_assets( $asset ) {
 		// @todo No WP dependencies in here...
-		$asset = untrailingslashit( $cfw_asset );
+		$asset = untrailingslashit( $asset );
 		$file = $this->web_helper->asset( $asset );
 
 		if ( is_array( $file ) && isset( $file['path'] ) && is_file( $file['path'] ) ) {

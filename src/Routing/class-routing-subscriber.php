@@ -4,7 +4,6 @@ namespace Clockwork_For_Wp\Routing;
 
 use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Routing\Route_Collection;
-use Invoker\Invoker;
 use WP;
 
 class Routing_Subscriber implements Subscriber {
@@ -45,23 +44,18 @@ class Routing_Subscriber implements Subscriber {
 		// @todo
 	}
 
-	public function call_matched_handler( Route_Collection $routes, WP $wp, Invoker $invoker ) {
+	public function call_matched_handler(
+		Route_Collection $routes,
+		WP $wp,
+		Route_Handler_Invoker $invoker
+	) {
 		$route = $routes->match( $_SERVER['REQUEST_METHOD'], $wp->matched_rule );
 
 		if ( null === $route ) {
 			return;
 		}
 
-		// @todo Allow for default qv values?
-		// @todo Type juggling on qv values as well? e.g. "1" to true.
-		// @todo Consider stripping "cfw" prefix?
-		$params = [];
-
-		foreach ( $route->get_query_vars() as $var ) {
-			$params[ $var ] = get_query_var( $var );
-		}
-
-		$invoker->call( $route->get_handler(), $params );
+		$invoker->invoke_handler( $route );
 	}
 
 	protected function should_modify_rules( $rules ) {

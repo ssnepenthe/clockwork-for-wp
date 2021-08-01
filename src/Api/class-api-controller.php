@@ -24,20 +24,16 @@ class Api_Controller {
 		wp_send_json( [ 'token' => $token ], $token ? 200 : 403 );
 	}
 
-	public function serve_json(
-		$cfw_id,
-		$cfw_direction = null,
-		$cfw_count = null,
-		$cfw_extended = null
-	) {
+	public function serve_json( $id, $direction = null, $count = null, $extended = null ) {
 		// @todo Handle 404s.
 		// @todo Is this really necessary?
-		if ( null === $cfw_id ) {
+		if ( null === $id ) {
 			return; // @todo
 		}
 
 		$authenticator = $this->clockwork->getAuthenticator();
 		$authenticated = $authenticator->check(
+			// @todo Move to route handler invoker?
 			isset( $_SERVER['HTTP_X_CLOCKWORK_AUTH'] ) ? $_SERVER['HTTP_X_CLOCKWORK_AUTH'] : ''
 		);
 
@@ -50,23 +46,23 @@ class Api_Controller {
 			] );
 		}
 
-		if ( 'previous' !== $cfw_direction && 'next' !== $cfw_direction ) {
-			$cfw_direction = null;
+		if ( 'previous' !== $direction && 'next' !== $direction ) {
+			$direction = null;
 		}
 
-		if ( null !== $cfw_count ) {
-			$cfw_count = (int) $cfw_count;
+		if ( null !== $count ) {
+			$count = (int) $count;
 		}
 
-		if ( null !== $cfw_extended ) {
-			$cfw_extended = true;
+		if ( null !== $extended ) {
+			$extended = true;
 		}
 
 		$filter = array_filter( $this->request->input, function( $key ) {
 			return 'only' === $key || 'except' === $key;
 		}, ARRAY_FILTER_USE_KEY );
 
-		$data = $this->get_data( $cfw_id, $cfw_direction, $cfw_count, $filter, $cfw_extended );
+		$data = $this->get_data( $id, $direction, $count, $filter, $extended );
 
 		wp_send_json( $data ); // @todo
 	}
@@ -124,6 +120,7 @@ class Api_Controller {
 		return 0 === strpos( $content_type, 'application/json' );
 	}
 
+	// @todo Move to route handler invoker?
 	protected function extract_credentials() {
 		if ( ! $this->is_json_request() ) {
 			// Clockwork as browser extension sends POST request as multipart/form-data.
