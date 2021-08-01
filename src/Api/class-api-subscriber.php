@@ -15,17 +15,17 @@ class Api_Subscriber implements Subscriber {
 	public function register_routes( Route_Collection $routes ) {
 		$routes->post(
 			'__clockwork\/auth',
-			'index.php?cfw_auth=1',
+			'index.php?auth=1',
 			[ Api_Controller::class, 'authenticate' ]
 		);
 		$routes->get(
 			'__clockwork\/([0-9-]+|latest)\/extended',
-			'index.php?cfw_id=$matches[1]&cfw_extended=1',
+			'index.php?id=$matches[1]&extended=1',
 			[ Api_Controller::class, 'serve_json' ]
 		);
 		$routes->get(
 			'__clockwork\/([0-9-]+|latest)(?:\/(next|previous))?(?(2)\/(\d+))?',
-			'index.php?cfw_id=$matches[1]&cfw_direction=$matches[2]&cfw_count=$matches[3]',
+			'index.php?id=$matches[1]&direction=$matches[2]&count=$matches[3]',
 			[ Api_Controller::class, 'serve_json' ]
 		);
 	}

@@ -8,7 +8,8 @@ use Invoker\Invoker;
 class Routing_Provider extends Base_Provider {
 	public function register() {
 		$this->plugin[ Route_Collection::class ] = function() {
-			return new Route_Collection();
+			// @todo Configurable prefix?
+			return new Route_Collection( 'cfw_' );
 		};
 
 		$this->plugin[ Route_Handler_Invoker::class ] = function() {

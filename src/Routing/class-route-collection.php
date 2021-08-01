@@ -4,12 +4,15 @@ namespace Clockwork_For_Wp\Routing;
 
 class Route_Collection {
 	protected $routes = [];
+	protected $prefix;
 
-	public function __construct( Route ...$routes ) {
-		$this->routes = $routes;
+	public function __construct( string $prefix = '' ) {
+		$this->prefix = $prefix;
 	}
 
 	public function add( Route $route ) {
+		$route->set_prefix( $this->prefix );
+
 		$this->routes[ $route->get_method() . ':' . $route->get_regex() ] = $route;
 
 		return $this;
