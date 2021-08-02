@@ -3,17 +3,25 @@
 namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
+use Clockwork\Request\Log;
 use Clockwork\Request\Request;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
 use function Clockwork_For_Wp\prepare_wpdb_query;
 
 class Wpdb extends DataSource implements Subscriber {
+	protected $duplicates = [];
 	protected $queries = [];
 
+	protected $detect_duplicate_queries;
 	protected $slow_threshold;
 
-	public function __construct( bool $slow_only, $slow_threshold ) {
+	public function __construct(
+		bool $detect_duplicate_queries,
+		bool $slow_only,
+		float $slow_threshold
+	) {
+		$this->detect_duplicate_queries = $detect_duplicate_queries;
 		$this->slow_threshold = $slow_threshold;
 
 		if ( $slow_only ) {
@@ -40,6 +48,10 @@ class Wpdb extends DataSource implements Subscriber {
 	}
 
 	public function resolve( Request $request ) {
+		if ( $this->detect_duplicate_queries ) {
+			$this->append_duplicate_queries_warnings( $request );
+		}
+
 		foreach ( $this->queries as $query ) {
 			// @todo
 			$request->addDatabaseQuery( $query['query'], [], $query['duration'], [
@@ -61,6 +73,16 @@ class Wpdb extends DataSource implements Subscriber {
 	}
 
 	public function add_query( $query, $duration ) {
+		if ( $this->detect_duplicate_queries ) {
+			$normalized = $this->normalize_query( $query );
+
+			if ( ! isset( $this->duplicates[ $normalized ] ) ) {
+				$this->duplicates[ $normalized ] = 0;
+			}
+
+			$this->duplicates[ $normalized ]++;
+		}
+
 		if ( $this->passesFilters( [ $duration ] ) ) {
 			$this->queries[] = [
 				'query' => $this->capitalize_keywords( $query ),
@@ -125,5 +147,40 @@ class Wpdb extends DataSource implements Subscriber {
 			},
 			$query
 		);
+	}
+
+	protected function normalize_query( $query ) {
+		// Yoinked from query monitor.
+
+		// newline to space.
+		$query = str_replace( [ "\r\n", "\r", "\n" ], ' ', $query );
+
+		// remove tab and backtick.
+		$query = str_replace( [ "\t", '`' ], '', $query );
+
+		// collapse whitespace.
+		$query = preg_replace( '/[[:space:]]+/', ' ', $query );
+
+		// trim.
+		$query = trim( $query );
+
+		// remove trailing semicolon.
+		$query = rtrim( $query, ';' );
+
+		return $query;
+	}
+
+	protected function append_duplicate_queries_warnings( $request ) {
+		$log = new Log;
+
+		foreach ( $this->duplicates as $sql => $count ) {
+			if ( $count <= 1 ) {
+				continue;
+			}
+
+			$log->warning( "Duplicate query: \"{$sql}\" run {$count} times" );
+		}
+
+		$request->log()->merge( $log );
 	}
 }

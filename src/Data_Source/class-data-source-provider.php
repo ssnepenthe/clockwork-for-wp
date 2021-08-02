@@ -141,7 +141,11 @@ class Data_Source_Provider extends Base_Provider {
 		$this->plugin[ Wpdb::class ] = function() {
 			$config = $this->plugin[ Config::class ]->get( 'data_sources.wpdb.config', [] );
 
-			return new Wpdb( $config['slow_only'] ?? false, $config['slow_threshold'] ?? 50 );
+			return new Wpdb(
+				$config['detect_duplicate_queries'] ?? false,
+				$config['slow_only'] ?? false,
+				$config['slow_threshold'] ?? 50
+			);
 		};
 
 		$this->plugin[ Xdebug::class ] = function() {
