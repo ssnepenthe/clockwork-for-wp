@@ -41,7 +41,7 @@ class Wpdb extends DataSource implements Subscriber {
 				foreach ( $wpdb->queries as $query_array ) {
 					$query = prepare_wpdb_query( $query_array );
 
-					$this->add_query( $query[0], $query[1] );
+					$this->add_query( $query[0], $query[1], $query[2] );
 				}
 			},
 		];
@@ -56,6 +56,7 @@ class Wpdb extends DataSource implements Subscriber {
 			// @todo
 			$request->addDatabaseQuery( $query['query'], [], $query['duration'], [
 				'model' => $query['model'],
+				'time' => $query['start'],
 			] );
 		}
 
@@ -72,7 +73,7 @@ class Wpdb extends DataSource implements Subscriber {
 		return $this;
 	}
 
-	public function add_query( $query, $duration ) {
+	public function add_query( $query, $duration, $start ) {
 		if ( $this->detect_duplicate_queries ) {
 			$normalized = $this->normalize_query( $query );
 
@@ -88,6 +89,7 @@ class Wpdb extends DataSource implements Subscriber {
 				'query' => $this->capitalize_keywords( $query ),
 				'duration' => $duration,
 				'model' => $this->guess_model( $query ),
+				'start' => $start,
 			];
 		}
 
