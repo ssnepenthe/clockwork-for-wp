@@ -11,6 +11,18 @@ use function Clockwork_For_Wp\prepare_wpdb_query;
 class Wpdb extends DataSource implements Subscriber {
 	protected $queries = [];
 
+	protected $slow_threshold;
+
+	public function __construct( bool $slow_only, $slow_threshold ) {
+		$this->slow_threshold = $slow_threshold;
+
+		if ( $slow_only ) {
+			$this->addFilter( function( $duration ) {
+				return $duration > $this->slow_threshold;
+			} );
+		}
+	}
+
 	public function get_subscribed_events() : array {
 		return [
 			'cfw_pre_resolve' => function( \wpdb $wpdb ) {
@@ -49,11 +61,13 @@ class Wpdb extends DataSource implements Subscriber {
 	}
 
 	public function add_query( $query, $duration ) {
-		$this->queries[] = [
-			'query' => $this->capitalize_keywords( $query ),
-			'duration' => $duration,
-			'model' => $this->guess_model( $query ),
-		];
+		if ( $this->passesFilters( [ $duration ] ) ) {
+			$this->queries[] = [
+				'query' => $this->capitalize_keywords( $query ),
+				'duration' => $duration,
+				'model' => $this->guess_model( $query ),
+			];
+		}
 
 		return $this;
 	}
