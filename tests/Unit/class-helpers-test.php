@@ -171,10 +171,11 @@ class Helpers_Test extends TestCase {
 
 	/** @test */
 	public function test_prepare_wpdb_query() {
-		$query_array = [ 'select * from wherever', 0.2 ];
+		$time = microtime( true );
+		$query_array = [ 'select * from wherever', 0.2, 'irrelevant-callstack', $time ];
 
 		$this->assertEquals(
-			[ 'select * from wherever', 200 ],
+			[ 'select * from wherever', 200, $time ],
 			prepare_wpdb_query( $query_array )
 		);
 	}
