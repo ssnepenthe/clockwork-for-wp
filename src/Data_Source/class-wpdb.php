@@ -26,6 +26,7 @@ class Wpdb extends DataSource implements Subscriber {
 
 		if ( $slow_only ) {
 			$this->addFilter( function( $duration ) {
+				// @todo Should this be inclusive (i.e. >=) instead?
 				return $duration > $this->slow_threshold;
 			} );
 		}
