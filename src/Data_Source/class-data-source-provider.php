@@ -3,6 +3,7 @@
 namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork_For_Wp\Base_Provider;
+use Clockwork_For_Wp\Config;
 
 class Data_Source_Provider extends Base_Provider {
 	public function register() {
@@ -138,7 +139,13 @@ class Data_Source_Provider extends Base_Provider {
 		};
 
 		$this->plugin[ Wpdb::class ] = function() {
-			return new Wpdb();
+			$config = $this->plugin[ Config::class ]->get( 'data_sources.wpdb.config', [] );
+
+			return new Wpdb(
+				$config['detect_duplicate_queries'] ?? false,
+				$config['slow_only'] ?? false,
+				$config['slow_threshold'] ?? 50
+			);
 		};
 
 		$this->plugin[ Xdebug::class ] = function() {

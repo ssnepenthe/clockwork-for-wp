@@ -3,13 +3,33 @@
 namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
+use Clockwork\Request\Log;
 use Clockwork\Request\Request;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
 use function Clockwork_For_Wp\prepare_wpdb_query;
 
 class Wpdb extends DataSource implements Subscriber {
+	protected $duplicates = [];
 	protected $queries = [];
+
+	protected $detect_duplicate_queries;
+	protected $slow_threshold;
+
+	public function __construct(
+		bool $detect_duplicate_queries,
+		bool $slow_only,
+		float $slow_threshold
+	) {
+		$this->detect_duplicate_queries = $detect_duplicate_queries;
+		$this->slow_threshold = $slow_threshold;
+
+		if ( $slow_only ) {
+			$this->addFilter( function( $duration ) {
+				return $duration > $this->slow_threshold;
+			} );
+		}
+	}
 
 	public function get_subscribed_events() : array {
 		return [
@@ -21,17 +41,22 @@ class Wpdb extends DataSource implements Subscriber {
 				foreach ( $wpdb->queries as $query_array ) {
 					$query = prepare_wpdb_query( $query_array );
 
-					$this->add_query( $query[0], $query[1] );
+					$this->add_query( $query[0], $query[1], $query[2] );
 				}
 			},
 		];
 	}
 
 	public function resolve( Request $request ) {
+		if ( $this->detect_duplicate_queries ) {
+			$this->append_duplicate_queries_warnings( $request );
+		}
+
 		foreach ( $this->queries as $query ) {
 			// @todo
 			$request->addDatabaseQuery( $query['query'], [], $query['duration'], [
 				'model' => $query['model'],
+				'time' => $query['start'],
 			] );
 		}
 
@@ -48,12 +73,25 @@ class Wpdb extends DataSource implements Subscriber {
 		return $this;
 	}
 
-	public function add_query( $query, $duration ) {
-		$this->queries[] = [
-			'query' => $this->capitalize_keywords( $query ),
-			'duration' => $duration,
-			'model' => $this->guess_model( $query ),
-		];
+	public function add_query( $query, $duration, $start ) {
+		if ( $this->detect_duplicate_queries ) {
+			$normalized = $this->normalize_query( $query );
+
+			if ( ! isset( $this->duplicates[ $normalized ] ) ) {
+				$this->duplicates[ $normalized ] = 0;
+			}
+
+			$this->duplicates[ $normalized ]++;
+		}
+
+		if ( $this->passesFilters( [ $duration ] ) ) {
+			$this->queries[] = [
+				'query' => $this->capitalize_keywords( $query ),
+				'duration' => $duration,
+				'model' => $this->guess_model( $query ),
+				'start' => $start,
+			];
+		}
 
 		return $this;
 	}
@@ -111,5 +149,40 @@ class Wpdb extends DataSource implements Subscriber {
 			},
 			$query
 		);
+	}
+
+	protected function normalize_query( $query ) {
+		// Yoinked from query monitor.
+
+		// newline to space.
+		$query = str_replace( [ "\r\n", "\r", "\n" ], ' ', $query );
+
+		// remove tab and backtick.
+		$query = str_replace( [ "\t", '`' ], '', $query );
+
+		// collapse whitespace.
+		$query = preg_replace( '/[[:space:]]+/', ' ', $query );
+
+		// trim.
+		$query = trim( $query );
+
+		// remove trailing semicolon.
+		$query = rtrim( $query, ';' );
+
+		return $query;
+	}
+
+	protected function append_duplicate_queries_warnings( $request ) {
+		$log = new Log;
+
+		foreach ( $this->duplicates as $sql => $count ) {
+			if ( $count <= 1 ) {
+				continue;
+			}
+
+			$log->warning( "Duplicate query: \"{$sql}\" run {$count} times" );
+		}
+
+		$request->log()->merge( $log );
 	}
 }

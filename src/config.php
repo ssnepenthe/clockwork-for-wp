@@ -114,6 +114,11 @@ return [
 		'wpdb' => [
 			'enabled' => false,
 			'data_source_class' => Wpdb::class,
+			'config' => [
+				'detect_duplicate_queries' => false,
+				'slow_only' => false,
+				'slow_threshold' => 50, // Default query monitor value... Is this reasonable?
+			],
 		],
 		'xdebug' => [
 			'enabled' => false,

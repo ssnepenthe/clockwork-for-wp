@@ -156,9 +156,10 @@ function prepare_http_response( $response ) {
 
 function prepare_wpdb_query( array $query_array ) : array {
 	$query = isset( $query_array[0] ) ? $query_array[0] : '';
-	$duration = isset( $query_array[1] ) ? (int) ( $query_array[1] * 1000 ) : 0;
+	$duration = isset( $query_array[1] ) ? ( $query_array[1] * 1000 ) : 0;
+	$start = isset( $query_array[3] ) ? $query_array[3] : microtime( true ) - ( $duration / 1000 );
 
-	return [ $query, $duration ];
+	return [ $query, $duration, $start ];
 }
 
 function wp_error_to_array( \WP_Error $error ) : array {
