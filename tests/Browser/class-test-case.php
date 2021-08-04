@@ -10,7 +10,7 @@ use function Clockwork_For_Wp\Tests\clean_metadata_files;
 // @todo Clear cfw-data dir before each test.
 // @todo Configurable base uri.
 class Test_Case extends TestCase {
-	protected $config;
+	const PASSWORD = 'nothing-to-see-here-folks';
 
 	protected static $ajax_url;
 	protected static $content_url;
@@ -18,21 +18,19 @@ class Test_Case extends TestCase {
 
 	public static function setUpBeforeClass(): void {
 		static::$test_plugin_active = '' !== static::ajax_url();
+
+		clean_metadata_files();
 	}
 
 	public function setUp(): void {
 		if ( ! static::$test_plugin_active ) {
 			$this->markTestSkipped( 'The test plugin does not appear to be active' );
-		} else {
-			// @todo Move to test helper plugin.
-			clean_metadata_files();
 		}
-
-		$this->config = null;
 	}
 
 	public function tearDown(): void {
-		$this->config = null;
+		// @todo Move to test helper plugin.
+		clean_metadata_files();
 	}
 
 	protected static function base_uri() : string {
@@ -44,10 +42,10 @@ class Test_Case extends TestCase {
 			return static::$ajax_url;
 		}
 
-		$client = new Client;
-
 		static::$ajax_url = trim(
-			$client->request( 'GET', static::base_uri() )->filter( '#cfw-coh-ajaxurl' )->text( '' )
+			( new Client )->request( 'GET', static::base_uri() )
+				->filter( '#cfw-coh-ajaxurl' )
+				->text( '' )
 		);
 
 		return static::$ajax_url;
@@ -69,16 +67,8 @@ class Test_Case extends TestCase {
 		return static::$content_url;
 	}
 
-	protected function with_config( array $config ) {
-		$this->config = http_build_query( $config );
-
-		return $this;
-	}
-
-	protected function without_config() {
-		$this->config = null;
-
-		return $this;
+	protected function test_config(): array {
+		return [];
 	}
 
 	public function request(
@@ -103,8 +93,8 @@ class Test_Case extends TestCase {
 			$uri = rtrim( static::base_uri(), '/' ) . '/' . ltrim( $uri, '/' );
 		}
 
-		if ( $this->config ) {
-			$uri .= "?{$this->config}";
+		if ( ! empty( $config = $this->test_config() ) ) {
+			$uri .= '?' . http_build_query( $config );
 		}
 
 		$client->request(

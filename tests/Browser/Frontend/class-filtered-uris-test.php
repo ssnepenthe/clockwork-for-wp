@@ -6,16 +6,14 @@ use Clockwork_For_Wp\Tests\Browser\Test_Case;
 use Clockwork_For_Wp\Tests\Metadata;
 
 class Filtered_Uris_Test extends Test_Case {
-	public function setUp(): void {
-		parent::setUp();
-
-		$this->with_config( [
+	protected function test_config(): array {
+		return [
 			'requests' => [
 				'except' => [
 					\Base64Url\Base64Url::encode( 'sample-page' ),
 				],
 			],
-		] );
+		];
 	}
 
 	/** @test */

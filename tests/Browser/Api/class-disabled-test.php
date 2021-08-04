@@ -5,12 +5,10 @@ namespace Clockwork_For_Wp\Tests\Browser\Api;
 use Clockwork_For_Wp\Tests\Browser\Test_Case;
 
 class Disabled_Test extends Test_Case {
-	public function setUp(): void {
-		parent::setUp();
-
-		$this->with_config( [
+	protected function test_config(): array {
+		return [
 			'enable' => false,
-		] );
+		];
 	}
 
 	/** @test */

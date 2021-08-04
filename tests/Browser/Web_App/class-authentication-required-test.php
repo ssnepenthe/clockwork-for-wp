@@ -5,12 +5,8 @@ namespace Clockwork_For_Wp\Tests\Browser\Web_App;
 use Clockwork_For_Wp\Tests\Browser\Test_Case;
 
 class Authentication_Required_Test extends Test_Case {
-	const PASSWORD = 'nothing-to-see-here-folks';
-
-	public function setUp(): void {
-		parent::setUp();
-
-		$this->with_config( [
+	protected function test_config(): array {
+		return [
 			'authentication' => [
 				'enabled' => true,
 				'drivers' => [
@@ -21,7 +17,7 @@ class Authentication_Required_Test extends Test_Case {
 					],
 				],
 			],
-		] );
+		];
 	}
 
 	/** @test */
