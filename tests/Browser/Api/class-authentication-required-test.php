@@ -7,8 +7,21 @@ use Clockwork_For_Wp\Tests\Browser\Test_Case;
 class Authentication_Required_Test extends Test_Case {
 	const PASSWORD = 'nothing-to-see-here-folks';
 
-	protected static function required_plugins() : array {
-		return [ 'cfw-auth-required' ];
+	public function setUp(): void {
+		parent::setUp();
+
+		$this->with_config( [
+			'authentication' => [
+				'enabled' => true,
+				'drivers' => [
+					'simple' => [
+						'config' => [
+							'password' => static::PASSWORD,
+						],
+					],
+				],
+			],
+		] );
 	}
 
 	/** @test */

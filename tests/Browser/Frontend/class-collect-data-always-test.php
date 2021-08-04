@@ -5,18 +5,18 @@ namespace Clockwork_For_Wp\Tests\Browser\Frontend;
 use Clockwork_For_Wp\Tests\Browser\Test_Case;
 
 class Collect_Data_Always_Test extends Test_Case {
-	protected static function required_plugins() : array {
-		return [ 'cfw-collect-data-always' ];
-	}
-
 	/** @test */
 	public function it_can_store_request_data_even_when_clockwork_is_disabled() {
-		$id = $this->get( '/' )
+		$id = $this->with_config( [
+				'enable' => false,
+				'collect_data_always' => true,
+			] )
+			->get( '/' )
 			// Headers should not be sent.
 			->assert_header_missing( 'X-Clockwork-Id' )
 			->assert_header_missing( 'X-Clockwork-Version' )
 			->crawler()
-			->filter( '.testing-clockwork-id' )
+			->filter( '#cfw-coh-clockwork-id' )
 			->text();
 
 		// API should not be accessible.

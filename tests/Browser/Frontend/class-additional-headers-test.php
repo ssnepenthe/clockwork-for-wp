@@ -5,8 +5,18 @@ namespace Clockwork_For_Wp\Tests\Browser\Frontend;
 use Clockwork_For_Wp\Tests\Browser\Test_Case;
 
 class Additional_Headers_Test extends Test_Case {
-	protected static function required_plugins() : array {
-		return [ 'cfw-additional-headers' ];
+	public function setUp(): void {
+		parent::setUp();
+
+		$this->with_config( [
+			'requests' => [
+				'except' => [ \Base64Url\Base64Url::encode( 'sample-page' ) ],
+			],
+			'headers' => [
+				'Apples' => 'Bananas',
+				'Cats' => 'Dogs',
+			],
+		] );
 	}
 
 	/** @test */

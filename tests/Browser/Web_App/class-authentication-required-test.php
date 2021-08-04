@@ -5,8 +5,23 @@ namespace Clockwork_For_Wp\Tests\Browser\Web_App;
 use Clockwork_For_Wp\Tests\Browser\Test_Case;
 
 class Authentication_Required_Test extends Test_Case {
-	protected static function required_plugins() : array {
-		return [ 'cfw-auth-required' ];
+	const PASSWORD = 'nothing-to-see-here-folks';
+
+	public function setUp(): void {
+		parent::setUp();
+
+		$this->with_config( [
+			'authentication' => [
+				'enabled' => true,
+				'drivers' => [
+					'simple' => [
+						'config' => [
+							'password' => static::PASSWORD,
+						],
+					],
+				],
+			],
+		] );
 	}
 
 	/** @test */
