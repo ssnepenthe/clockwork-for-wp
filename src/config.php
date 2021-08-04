@@ -86,6 +86,12 @@ return [
 		'wp_hook' => [
 			'enabled' => false,
 			'data_source_class' => Wp_Hook::class,
+			'config' => [
+				'except_tags' => [],
+				'only_tags' => [],
+				'except_callbacks' => [],
+				'only_callbacks' => [],
+			],
 		],
 		'wp_http' => [
 			'enabled' => false,

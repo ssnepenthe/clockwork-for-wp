@@ -10,6 +10,22 @@ use function Clockwork_For_Wp\describe_callable;
 
 class Wp_Hook extends DataSource implements Subscriber {
 	protected $hooks = [];
+	protected $except_tags;
+	protected $only_tags;
+	protected $except_callbacks;
+	protected $only_callbacks;
+
+	public function __construct(
+		array $except_tags,
+		array $only_tags,
+		array $except_callbacks,
+		array $only_callbacks
+	) {
+		$this->except_tags = $except_tags;
+		$this->only_tags = $only_tags;
+		$this->except_callbacks = $except_callbacks;
+		$this->only_callbacks = $only_callbacks;
+	}
 
 	public function get_subscribed_events() : array {
 		return [
@@ -49,12 +65,46 @@ class Wp_Hook extends DataSource implements Subscriber {
 		callable $callback = null,
 		int $accepted_args = null
 	) {
+		if ( ! $this->should_collect( 'tag', $tag ) ) {
+			return;
+		}
+
+		$callback = null !== $callback ? describe_callable( $callback ) : '';
+
+		if ( ! $this->should_collect( 'callback', $callback ) ) {
+			return;
+		}
+
 		// @todo Should empty values be filtered out?
+		// @todo $this->applyFilters()?
 		$this->hooks[] = [
-			'Tag' => (string) $tag,
+			'Tag' => $tag,
 			'Priority' => null !== $priority ? (string) $priority : '',
-			'Callback' => null !== $callback ? describe_callable( $callback ) : '',
+			'Callback' => $callback,
 			'Accepted Args' => null !== $accepted_args ? (string) $accepted_args : '',
 		];
+	}
+
+	protected function should_collect( $type, $value ) {
+		if ( ! in_array( $type, [ 'callback', 'tag' ], true ) ) {
+			throw new \InvalidArgumentException( '@todo' );
+		}
+
+		$only = "only_{$type}s";
+		$except = "except_{$type}s";
+
+		if ( count( $this->{$only} ) > 0 ) {
+			$pattern = implode( '|', $this->{$only} );
+
+			return 1 === preg_match( "/{$pattern}/", $value );
+		}
+
+		if ( count( $this->{$except} ) > 0 ) {
+			$pattern = implode( '|', $this->{$except} );
+
+			return 1 !== preg_match( "/{$pattern}/", $value );
+		}
+
+		return true;
 	}
 }
