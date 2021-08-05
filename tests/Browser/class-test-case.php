@@ -33,8 +33,18 @@ class Test_Case extends TestCase {
 		clean_metadata_files();
 	}
 
-	protected static function base_uri() : string {
-		return 'http://one.wordpress.test';
+	protected static function goutte(): Client {
+		$client = new Client;
+		// @todo Set https as well?
+		$client->setServerParameter( 'HTTP_HOST', static::http_host() );
+		$client->followRedirects( false );
+
+		return $client;
+	}
+
+	protected static function http_host(): string {
+		// @todo Use .env or similar to define this on the machine running the tests
+		return 'one.wordpress.test';
 	}
 
 	protected static function ajax_url() : string {
@@ -43,9 +53,7 @@ class Test_Case extends TestCase {
 		}
 
 		static::$ajax_url = trim(
-			( new Client )->request( 'GET', static::base_uri() )
-				->filter( '#cfw-coh-ajaxurl' )
-				->text( '' )
+			static::goutte()->request( 'GET', '/' )->filter( '#cfw-coh-ajaxurl' )->text( '' )
 		);
 
 		return static::$ajax_url;
@@ -56,7 +64,7 @@ class Test_Case extends TestCase {
 			return static::$content_url;
 		}
 
-		$client = new Client;
+		$client = static::goutte();
 		$ajax_url = static::ajax_url();
 
 		$client->request( 'GET', "{$ajax_url}?action=cfw_coh_content_url" );
@@ -80,22 +88,11 @@ class Test_Case extends TestCase {
 		string $content = null,
 		bool $changeHistory = true
 	) : Response {
-		$client = new Client(
-			// @todo Doesn't currently work - we will prepend base uri below.
-			// @see https://github.com/FriendsOfPHP/Goutte/issues/427
-			// HttpClient::create( [
-			// 	'base_uri' => static::base_uri(),
-			// ] );
-		);
-		$client->followRedirects( false );
-
-		if ( ! ( 0 === strpos( $uri, 'http://' ) || 0 === strpos( $uri, 'https://' ) ) ) {
-			$uri = rtrim( static::base_uri(), '/' ) . '/' . ltrim( $uri, '/' );
-		}
-
 		if ( ! empty( $config = $this->test_config() ) ) {
 			$uri .= '?' . http_build_query( $config );
 		}
+
+		$client = static::goutte();
 
 		$client->request(
 			$method,
