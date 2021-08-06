@@ -5,10 +5,19 @@ namespace Clockwork_For_Wp\Tests\Browser\Api;
 use Clockwork_For_Wp\Tests\Browser\Test_Case;
 
 class Authentication_Required_Test extends Test_Case {
-	const PASSWORD = 'nothing-to-see-here-folks';
-
-	protected static function required_plugins() : array {
-		return [ 'cfw-auth-required' ];
+	protected function test_config(): array {
+		return [
+			'authentication' => [
+				'enabled' => true,
+				'drivers' => [
+					'simple' => [
+						'config' => [
+							'password' => static::PASSWORD,
+						],
+					],
+				],
+			],
+		];
 	}
 
 	/** @test */

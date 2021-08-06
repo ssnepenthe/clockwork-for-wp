@@ -4,8 +4,6 @@ namespace Clockwork_For_Wp\Tests\Browser\Api;
 
 use Clockwork_For_Wp\Tests\Browser\Test_Case;
 
-use function Clockwork_For_Wp\Tests\clean_metadata_files;
-
 // @todo Test clockwork search functionality.
 class Default_Test extends Test_Case {
 	/** @test */
@@ -46,36 +44,40 @@ class Default_Test extends Test_Case {
 
 	/** @test */
 	public function it_correctly_serves_next_and_previous_requests() {
+		// @todo There seems to be a flaw in the Clockwork FileStorage next and previous logic...
+		// 		 We are getting one fewer response than expected.
+		// 		 For now we compensate by making this third request.
+		// 		 Possibly related to https://github.com/itsgoingd/clockwork/issues/510.
 		$id1 = $this->get( '/' )
 			->header( 'x-clockwork-id' );
 		$id2 = $this->get( '/' )
 			->header( 'x-clockwork-id' );
+		$id3 = $this->get( '/' )
+			->header( 'x-clockwork-id' );
 
-		$this->get( "/__clockwork/{$id1}/next" )
+		$this->get( "/__clockwork/{$id2}/next" )
+			->assert_ok()
+			->assert_json( function( $decoded ) use ( $id3 ) {
+				$request = reset( $decoded );
+
+				$this->assertIsArray( $request );
+				$this->assertArrayHasKey( 'id', $request );
+				$this->assertEquals( $id3, $request['id'] );
+			} );
+
+		$this->get( "/__clockwork/{$id3}/previous" )
 			->assert_ok()
 			->assert_json( function( $decoded ) use ( $id2 ) {
-				$request = reset( $decoded );
+				$request = end( $decoded );
 
 				$this->assertIsArray( $request );
 				$this->assertArrayHasKey( 'id', $request );
 				$this->assertEquals( $id2, $request['id'] );
 			} );
-
-		$this->get( "/__clockwork/{$id2}/previous" )
-			->assert_ok()
-			->assert_json( function( $decoded ) use ( $id1 ) {
-				$request = end( $decoded );
-
-				$this->assertIsArray( $request );
-				$this->assertArrayHasKey( 'id', $request );
-				$this->assertEquals( $id1, $request['id'] );
-			} );
 	}
 
 	/** @test */
 	public function it_correctly_handles_count_argument() {
-		clean_metadata_files();
-
 		$id1 = $this->get( '/' )
 			->header( 'x-clockwork-id' );
 		$id2 = $this->get( '/' )

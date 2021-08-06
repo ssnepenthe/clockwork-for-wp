@@ -2,36 +2,110 @@
 
 namespace Clockwork_For_Wp\Tests\Browser;
 
-use Clockwork_For_Wp\Tests\Cli;
-use Clockwork_For_Wp\Tests\Requires_Plugins;
 use Goutte\Client;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpClient\HttpClient;
 
-// @todo Restore db to default state before each test.
-// @todo Clear cfw-data dir before each test.
-// @todo Configurable base uri.
 class Test_Case extends TestCase {
-	use Requires_Plugins;
+	const PASSWORD = 'nothing-to-see-here-folks';
 
-	protected static $content_url;
+	protected static $api;
+	protected static $http_host;
+	protected static $https;
 
-	protected static function base_uri() : string {
-		return 'http://one.wordpress.test';
+	public static function setUpBeforeClass(): void {
+		static::api()->clean_metadata();
 	}
 
-	protected static function content_url( string $content_url = null ) : string {
-		if ( is_string( $content_url ) ) {
-			static::$content_url = $content_url;
+	public function setUp(): void {
+		if ( ! static::api()->is_available() ) {
+			$this->markTestSkipped( 'The test plugin does not appear to be active' );
+		}
+	}
+
+	public function tearDown(): void {
+		static::api()->clean_metadata();
+	}
+
+	protected static function api() {
+		if ( null === static::$api ) {
+			static::$api = new \Clockwork_For_Wp\Tests\Api( static::goutte() );
 		}
 
-		if ( ! is_string( static::$content_url ) ) {
-			static::$content_url = trim(
-				Cli::wp( 'eval', 'echo WP_CONTENT_URL;' )->mustRun()->getOutput()
-			);
+		return static::$api;
+	}
+
+	protected static function goutte(): Client {
+		$client = new Client;
+
+		$client->setServerParameter( 'HTTP_HOST', static::http_host() );
+		$client->setServerParameter( 'HTTPS', static::https() );
+		$client->followRedirects( false );
+
+		return $client;
+	}
+
+	protected static function http_host(): string {
+		if ( \is_string( static::$http_host ) ) {
+			return static::$http_host;
 		}
 
-		return static::$content_url;
+		static::maybe_load_base_uri();
+
+		if ( ! \is_string( static::$http_host ) ) {
+			static::$http_host = 'one.wordpress.test';
+		}
+
+		return static::$http_host;
+	}
+
+	protected static function https(): bool {
+		if ( \is_bool( static::$https ) ) {
+			return static::$https;
+		}
+
+		static::maybe_load_base_uri();
+
+		if ( ! \is_bool( static::$https ) ) {
+			static::$https = false;
+		}
+
+		return static::$https;
+	}
+
+	protected static function maybe_load_base_uri() {
+		$has_host = \is_string( static::$http_host );
+		$has_https = \is_bool( static::$https );
+
+		if ( $has_host && $has_https ) {
+			return;
+		}
+
+		if ( ! \is_readable( __DIR__ . '/../baseuri' ) ) {
+			return;
+		}
+
+		$base_uri = \trim( \file_get_contents( __DIR__ . '/../baseuri' ) );
+		$parsed = \parse_url( $base_uri );
+
+		if ( ! $has_host ) {
+			if ( ! array_key_exists( 'host', $parsed ) ) {
+				throw new \InvalidArgumentException( '@todo' );
+			}
+
+			static::$http_host = $parsed['host'];
+		}
+
+		if ( ! $has_https ) {
+			if ( ! $has_https && ! array_key_exists( 'scheme', $parsed ) ) {
+				throw new \InvalidArgumentException( '@todo' );
+			}
+
+			static::$https = 'https' === $parsed['scheme'] ? true : false;
+		}
+	}
+
+	protected function test_config(): array {
+		return [];
 	}
 
 	public function request(
@@ -43,18 +117,11 @@ class Test_Case extends TestCase {
 		string $content = null,
 		bool $changeHistory = true
 	) : Response {
-		$client = new Client(
-			// @todo Doesn't currently work - we will prepend base uri below.
-			// @see https://github.com/FriendsOfPHP/Goutte/issues/427
-			// HttpClient::create( [
-			// 	'base_uri' => static::base_uri(),
-			// ] );
-		);
-		$client->followRedirects( false );
-
-		if ( ! ( 0 === strpos( $uri, 'http://' ) || 0 === strpos( $uri, 'https://' ) ) ) {
-			$uri = rtrim( static::base_uri(), '/' ) . '/' . ltrim( $uri, '/' );
+		if ( ! empty( $config = $this->test_config() ) ) {
+			$uri .= '?' . http_build_query( $config );
 		}
+
+		$client = static::goutte();
 
 		$client->request(
 			$method,

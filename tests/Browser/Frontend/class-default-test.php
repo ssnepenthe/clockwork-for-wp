@@ -25,11 +25,10 @@ class Default_Test extends Test_Case {
 		$id = $this->get( '/' )
 			->header( 'x-clockwork-id' );
 
-		// Note that if you plan to use this plugin in production, the cfw data dir should be moved above the web root.
-		$this->get( static::content_url() . "/cfw-data/{$id}.json" )
-			->assert_ok()
-			->assert_json_path( 'id', $id )
-			->assert_json_path( 'uri', '/' );
+		$metadata = static::api()->metadata_by_id( $id );
+
+		$this->assertSame( $id, $metadata['id'] );
+		$this->assertSame( '/', $metadata['uri'] );
 	}
 
 	/** @test */
