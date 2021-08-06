@@ -5,12 +5,12 @@ namespace Clockwork_For_Wp\Tests\Browser;
 use Goutte\Client;
 use PHPUnit\Framework\TestCase;
 
-// @todo Restore db to default state before each test.
-// @todo Configurable base uri.
 class Test_Case extends TestCase {
 	const PASSWORD = 'nothing-to-see-here-folks';
 
 	protected static $api;
+	protected static $http_host;
+	protected static $https;
 
 	public static function setUpBeforeClass(): void {
 		static::api()->clean_metadata();
@@ -36,16 +36,72 @@ class Test_Case extends TestCase {
 
 	protected static function goutte(): Client {
 		$client = new Client;
-		// @todo Set https as well?
+
 		$client->setServerParameter( 'HTTP_HOST', static::http_host() );
+		$client->setServerParameter( 'HTTPS', static::https() );
 		$client->followRedirects( false );
 
 		return $client;
 	}
 
 	protected static function http_host(): string {
-		// @todo Use .env or similar to define this on the machine running the tests
-		return 'one.wordpress.test';
+		if ( \is_string( static::$http_host ) ) {
+			return static::$http_host;
+		}
+
+		static::maybe_load_base_uri();
+
+		if ( ! \is_string( static::$http_host ) ) {
+			static::$http_host = 'one.wordpress.test';
+		}
+
+		return static::$http_host;
+	}
+
+	protected static function https(): bool {
+		if ( \is_bool( static::$https ) ) {
+			return static::$https;
+		}
+
+		static::maybe_load_base_uri();
+
+		if ( ! \is_bool( static::$https ) ) {
+			static::$https = false;
+		}
+
+		return static::$https;
+	}
+
+	protected static function maybe_load_base_uri() {
+		$has_host = \is_string( static::$http_host );
+		$has_https = \is_bool( static::$https );
+
+		if ( $has_host && $has_https ) {
+			return;
+		}
+
+		if ( ! \is_readable( __DIR__ . '/../baseuri' ) ) {
+			return;
+		}
+
+		$base_uri = \trim( \file_get_contents( __DIR__ . '/../baseuri' ) );
+		$parsed = \parse_url( $base_uri );
+
+		if ( ! $has_host ) {
+			if ( ! array_key_exists( 'host', $parsed ) ) {
+				throw new \InvalidArgumentException( '@todo' );
+			}
+
+			static::$http_host = $parsed['host'];
+		}
+
+		if ( ! $has_https ) {
+			if ( ! $has_https && ! array_key_exists( 'scheme', $parsed ) ) {
+				throw new \InvalidArgumentException( '@todo' );
+			}
+
+			static::$https = 'https' === $parsed['scheme'] ? true : false;
+		}
 	}
 
 	protected function test_config(): array {
