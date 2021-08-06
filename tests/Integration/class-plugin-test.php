@@ -170,6 +170,7 @@ class Plugin_Test extends TestCase {
 						],
 					],
 				],
+				'register_helpers' => false,
 			] ),
 		] );
 		$plugin[ Null_Storage_For_Tests::class ] = $plugin->protect( function() {
@@ -216,6 +217,7 @@ class Plugin_Test extends TestCase {
 						],
 					],
 				],
+				'register_helpers' => false,
 			] ),
 		] );
 		$plugin[ Null_Storage_For_Tests::class ] = $plugin->protect( function() {
@@ -257,6 +259,7 @@ class Plugin_Test extends TestCase {
 							],
 						],
 					],
+					'register_helpers' => false,
 				] ),
 			] );
 			$plugin[ Null_Storage_For_Tests::class ] = $plugin->protect( function() {
@@ -294,6 +297,7 @@ class Plugin_Test extends TestCase {
 							],
 						],
 					],
+					'register_helpers' => false,
 				] ),
 			] );
 			$plugin[ Null_Storage_For_Tests::class ] = $plugin->protect( function() {
@@ -332,6 +336,7 @@ class Plugin_Test extends TestCase {
 							],
 						],
 					],
+					'register_helpers' => false,
 				] ),
 			] );
 			$plugin[ Null_Storage_For_Tests::class ] = $plugin->protect( function() {

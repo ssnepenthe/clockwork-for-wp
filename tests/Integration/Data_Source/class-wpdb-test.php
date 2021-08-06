@@ -1,6 +1,6 @@
 <?php
 
-namespace Clockwork_For_Wp\Tests\Clockwork\Data_Source;
+namespace Clockwork_For_Wp\Tests\Integration\Data_Source;
 
 use Clockwork\Request\Request;
 use Clockwork_For_Wp\Data_Source\Wpdb;

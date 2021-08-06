@@ -13,9 +13,6 @@
         <testsuite name="browser">
             <directory suffix="-test.php">tests/Browser</directory>
         </testsuite>
-        <testsuite name="clockwork">
-            <directory suffix="-test.php">tests/Clockwork</directory>
-        </testsuite>
         <testsuite name="integration">
             <directory suffix="-test.php">tests/Integration</directory>
         </testsuite>
