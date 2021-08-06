@@ -4,33 +4,34 @@ namespace Clockwork_For_Wp\Tests\Browser;
 
 use Goutte\Client;
 use PHPUnit\Framework\TestCase;
-use function Clockwork_For_Wp\Tests\clean_metadata_files;
 
 // @todo Restore db to default state before each test.
-// @todo Clear cfw-data dir before each test.
 // @todo Configurable base uri.
 class Test_Case extends TestCase {
 	const PASSWORD = 'nothing-to-see-here-folks';
 
-	protected static $ajax_url;
-	protected static $content_url;
-	protected static $test_plugin_active = false;
+	protected static $api;
 
 	public static function setUpBeforeClass(): void {
-		static::$test_plugin_active = '' !== static::ajax_url();
-
-		clean_metadata_files();
+		static::api()->clean_metadata();
 	}
 
 	public function setUp(): void {
-		if ( ! static::$test_plugin_active ) {
+		if ( ! static::api()->is_available() ) {
 			$this->markTestSkipped( 'The test plugin does not appear to be active' );
 		}
 	}
 
 	public function tearDown(): void {
-		// @todo Move to test helper plugin.
-		clean_metadata_files();
+		static::api()->clean_metadata();
+	}
+
+	protected static function api() {
+		if ( null === static::$api ) {
+			static::$api = new \Clockwork_For_Wp\Tests\Api( static::goutte() );
+		}
+
+		return static::$api;
 	}
 
 	protected static function goutte(): Client {
@@ -45,34 +46,6 @@ class Test_Case extends TestCase {
 	protected static function http_host(): string {
 		// @todo Use .env or similar to define this on the machine running the tests
 		return 'one.wordpress.test';
-	}
-
-	protected static function ajax_url() : string {
-		if ( is_string( static::$ajax_url ) ) {
-			return static::$ajax_url;
-		}
-
-		static::$ajax_url = trim(
-			static::goutte()->request( 'GET', '/' )->filter( '#cfw-coh-ajaxurl' )->text( '' )
-		);
-
-		return static::$ajax_url;
-	}
-
-	protected static function content_url() : string {
-		if ( is_string( static::$content_url ) ) {
-			return static::$content_url;
-		}
-
-		$client = static::goutte();
-		$ajax_url = static::ajax_url();
-
-		$client->request( 'GET', "{$ajax_url}?action=cfw_coh_content_url" );
-		$response = json_decode( $client->getResponse()->getContent(), true );
-
-		static::$content_url = trim( $response['data'] );
-
-		return static::$content_url;
 	}
 
 	protected function test_config(): array {

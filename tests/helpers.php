@@ -6,13 +6,53 @@ function fixture_path( $file ) {
 	return __DIR__ . "/fixtures/{$file}";
 }
 
-function clean_metadata_files() {
-	// @todo Having an issue with FileStorage::cleanup( true ) where one file always remains.
-	//       Use a manual implementation for now and revisit later when I have some more time.
-	//       https://github.com/itsgoingd/clockwork/issues/510
-	foreach ( Metadata::all_with_index() as $file ) {
-		unlink( $file );
+class Api {
+	protected $ajax_url;
+	protected $client;
+
+	public function __construct( $client ) {
+		$this->client = $client;
 	}
 
-	// @todo Return value???
+	public function ajax_url() {
+		if ( ! is_string( $this->ajax_url ) ) {
+			$this->ajax_url = trim(
+				$this->client
+					->request( 'GET', '/?enable=0' )
+					->filter( '#cfw-coh-ajaxurl' )
+					->text( '' )
+			);
+		}
+
+		return $this->ajax_url;
+	}
+
+	public function clean_metadata() {
+		$this->client->request(
+			'GET',
+			"{$this->ajax_url}?action=cfw_coh_clean_metadata"
+		);
+	}
+
+	public function is_available() {
+		return '' !== $this->ajax_url();
+	}
+
+	public function metadata_count() {
+		$this->client->request(
+			'GET',
+			"{$this->ajax_url}?action=cfw_coh_metadata_count"
+		);
+
+		return json_decode( $this->client->getResponse()->getContent(), true )['data'];
+	}
+
+	public function metadata_by_id( $id ) {
+		$this->client->request(
+			'GET',
+			"{$this->ajax_url}?action=cfw_coh_metadata_by_id&id={$id}"
+		);
+
+		return json_decode( $this->client->getResponse()->getContent(), true )['data'];
+	}
 }

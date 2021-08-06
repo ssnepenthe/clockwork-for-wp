@@ -27,10 +27,6 @@ class Collect_Data_Always_Test extends Test_Case {
 			->assert_not_found();
 
 		// But data should be stored.
-		// By default data is stored in wp-content dir so let's just grab the actual json file...
-		// Note that if you planned to use this plugin in production, the cfw data dir should be moved above the web root.
-		$this->get( static::content_url() . "/cfw-data/{$id}.json" )
-			->assert_ok()
-			->assert_json_path( 'id', $id, true );
+		$this->assertSame( $id, static::api()->metadata_by_id( $id )['id'] );
 	}
 }

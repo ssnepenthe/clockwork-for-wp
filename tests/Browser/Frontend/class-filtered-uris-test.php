@@ -31,10 +31,10 @@ class Filtered_Uris_Test extends Test_Case {
 	public function it_does_not_store_request_data_for_filtered_uris() {
 		$this->get( '/sample-page/' );
 
-		$this->assertCount( 0, Metadata::all() );
+		$this->assertSame( 0, static::api()->metadata_count() );
 
 		$this->get( '/' );
 
-		$this->assertCount( 1, Metadata::all() );
+		$this->assertSame( 1, static::api()->metadata_count() );
 	}
 }

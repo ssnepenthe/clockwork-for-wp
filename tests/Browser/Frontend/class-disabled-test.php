@@ -23,8 +23,7 @@ class Disabled_Test extends Test_Case {
 	public function it_does_not_store_request_data() {
 		$this->get( '/' );
 
-		$this->assertCount( 0, Metadata::all() );
+		// Current metadata count should be 0.
+		$this->assertSame( 0, static::api()->metadata_count() );
 	}
 }
-
-
