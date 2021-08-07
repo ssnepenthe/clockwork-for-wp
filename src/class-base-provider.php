@@ -25,6 +25,10 @@ class Base_Provider implements Provider {
 		//
 	}
 
+	public function registered() {
+		//
+	}
+
 	protected function subscribers() : array {
 		return [];
 	}

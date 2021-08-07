@@ -6,4 +6,6 @@ interface Provider {
 	public function boot();
 
 	public function register();
+
+	public function registered();
 }

@@ -34,6 +34,7 @@ class Clockwork_Provider_Test extends TestCase {
 			return new Null_Storage_For_Tests();
 		} );
 		$plugin->register( new Clockwork_Provider( $plugin ) );
+		$plugin->lock();
 
 		$this->assertFalse( \function_exists( 'clock' ) );
 	}
@@ -59,6 +60,7 @@ class Clockwork_Provider_Test extends TestCase {
 			return new Null_Storage_For_Tests();
 		} );
 		$plugin->register( new Clockwork_Provider( $plugin ) );
+		$plugin->lock();
 
 		$this->assertTrue( \function_exists( 'clock' ) );
 	}

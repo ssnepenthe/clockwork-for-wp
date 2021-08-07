@@ -116,6 +116,10 @@ class Clockwork_Provider extends Base_Provider {
 			return new Request;
 		};
 
+		// Create request so we have id and start time available immediately.
+		// Could probably even create it within Plugin::__construct() and save it to container.
+		$this->plugin[ Request::class ];
+
 		$this->plugin[ IncomingRequest::class ] = function() {
 			return new IncomingRequest( [
 				'method' => $_SERVER['REQUEST_METHOD'],
@@ -124,10 +128,9 @@ class Clockwork_Provider extends Base_Provider {
 				'cookies' => $_COOKIE,
 			] );
 		};
+	}
 
-		// Create request so we have id and start time available immediately.
-		$this->plugin[ Request::class ];
-
+	public function registered() {
 		$this->configure_serializer();
 		$this->configure_should_collect();
 		$this->configure_should_record();

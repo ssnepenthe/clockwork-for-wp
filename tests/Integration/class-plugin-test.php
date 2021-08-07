@@ -177,6 +177,7 @@ class Plugin_Test extends TestCase {
 			return new Null_Storage_For_Tests();
 		} );
 		$plugin->register( new Clockwork_Provider( $plugin ) );
+		$plugin->lock();
 
 		$request = function( $uri ) {
 			return new IncomingRequest( [
@@ -224,6 +225,7 @@ class Plugin_Test extends TestCase {
 			return new Null_Storage_For_Tests();
 		} );
 		$plugin->register( new Clockwork_Provider( $plugin ) );
+		$plugin->lock();
 
 		$request = function( $uri ) {
 			return new IncomingRequest( [
@@ -266,6 +268,7 @@ class Plugin_Test extends TestCase {
 				return new Null_Storage_For_Tests();
 			} );
 			$plugin->register( new Clockwork_Provider( $plugin ) );
+			$plugin->lock();
 
 			return $plugin[ Clockwork::class ]->shouldCollect();
 		};
@@ -304,6 +307,7 @@ class Plugin_Test extends TestCase {
 				return new Null_Storage_For_Tests();
 			} );
 			$plugin->register( new Clockwork_Provider( $plugin ) );
+			$plugin->lock();
 
 			return $plugin[ Clockwork::class ]->shouldRecord();
 		};
@@ -343,6 +347,7 @@ class Plugin_Test extends TestCase {
 				return new Null_Storage_For_Tests();
 			} );
 			$plugin->register( new Clockwork_Provider( $plugin ) );
+			$plugin->lock();
 
 			return $plugin[ Clockwork::class ]->shouldRecord();
 		};

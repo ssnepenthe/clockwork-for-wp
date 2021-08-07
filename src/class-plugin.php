@@ -17,10 +17,12 @@ class Plugin implements ArrayAccess {
 	protected $container;
 	protected $providers = [];
 	protected $booted = false;
+	protected $locked = false;
 
 	public function __construct( array $providers = null, array $values = null ) {
 		if ( null === $providers ) {
 			$providers = [
+				Clockwork_Provider::class,
 				Plugin_Provider::class,
 				Wordpress_Provider::class,
 
@@ -29,11 +31,6 @@ class Plugin implements ArrayAccess {
 				Event_Management_Provider::class,
 				Routing_Provider::class,
 				Web_App_Provider::class,
-
-				// We are doing something we realistically shouldn't and resolving some services
-				// from within the register method. For this reason the clockwork provider
-				// must always be last to ensure all services are already registered.
-				Clockwork_Provider::class,
 			];
 		}
 
@@ -64,7 +61,24 @@ class Plugin implements ArrayAccess {
 		$this->booted = true;
 	}
 
+	// @todo Method name?
+	public function lock() {
+		if ( $this->locked ) {
+			return;
+		}
+
+		foreach ( $this->providers as $provider ) {
+			$provider->registered();
+		}
+
+		$this->locked = true;
+	}
+
 	public function register( Provider $provider ) {
+		if ( $this->locked ) {
+			throw new \RuntimeException( '@todo' );
+		}
+
 		$provider->register();
 
 		$this->providers[ get_class( $provider ) ] = $provider;

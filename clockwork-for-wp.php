@@ -48,5 +48,12 @@ function _cfw_instance() {
 	$plugin[ Errors::class ]->register();
 
 	$plugin[ Event_Manager::class ]
+		->on( 'plugin_loaded', function( $file ) use ( $plugin ) {
+			if ( __FILE__ !== $file ) {
+				return;
+			}
+
+			$plugin->lock();
+		}, Event_Manager::EARLY_EVENT )
 		->on( 'plugins_loaded', [ $plugin, 'boot' ], Event_Manager::EARLY_EVENT );
 } )( _cfw_instance() );
