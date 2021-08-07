@@ -4,12 +4,14 @@ A basic [Clockwork](https://underground.works/clockwork/) integration for WordPr
 **DO NOT, UNDER ANY CIRCUMSTANCES, RUN THIS PLUGIN ON ANYTHING BUT A DEVELOPMENT MACHINE - THE METADATA IT EXPOSES CAN BE USED TO EASILY TAKE OVER YOUR SITE.**
 
 ## Requirements
-PHP 5.5 or greater and Composer.
+PHP 5.5 or greater, WP 5.5 or greater and Composer.
 
 Optionally install one of the Clockwork browser extensions ([Chrome](https://chrome.google.com/webstore/detail/clockwork/dmggabnehkmmfmdffgajcflpdjlnoemp), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/clockwork-dev-tools/)).
 
 ## Installation
 For now either [require dev-master via Composer using a vcs repository](https://getcomposer.org/doc/05-repositories.md#vcs) or clone this repo into your plugins directory and manually run `composer install`.
+
+This plugin is not meant to run on production - make sure you have configured your [environment type](https://developer.wordpress.org/reference/functions/wp_get_environment_type/) to something other than 'production'.
 
 ## Usage
 Once the plugin has been activated, there are two primary options for usage:

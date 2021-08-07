@@ -23,11 +23,51 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die;
 }
 
+function _cfw_deactivate_self() {
+	if ( isset( $_GET['activate'] ) ) {
+		unset( $_GET['activate'] );
+	}
+
+	deactivate_plugins( __FILE__ );
+}
+
+function _cfw_admin_error_notice( $message ) {
+	$notice = <<<EOD
+<div class="notice notice-error">
+	<p>Clockwork for WP deactivated: %s</p>
+</div>
+EOD;
+
+	printf( $notice, esc_html( $message ) );
+}
+
+if ( ! function_exists( 'wp_get_environment_type' ) ) {
+	add_action( 'admin_init', '_cfw_deactivate_self' );
+	add_action( 'admin_notices', function() {
+		_cfw_admin_error_notice( 'This plugin requires WordPress version 5.5.0 or greater.' );
+	} );
+
+	return;
+}
+
+if (
+	'production' === wp_get_environment_type()
+	&& ! ( defined( 'CFW_RUN_ON_PROD' ) && CFW_RUN_ON_PROD )
+) {
+	add_action( 'admin_init', '_cfw_deactivate_self' );
+	add_action( 'admin_notices', function() {
+		_cfw_admin_error_notice( 'This plugin can only run on non-production environments.' );
+	} );
+
+	return;
+}
+
 if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
     require_once __DIR__ . '/vendor/autoload.php';
 }
 
-// @todo Verify server requirements are met.
+// @todo Check for minimum php version.
+// @todo Check that dependencies have been installed.
 
 require_once __DIR__ . '/src/helpers.php';
 
