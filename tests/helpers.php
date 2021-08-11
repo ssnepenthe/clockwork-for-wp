@@ -2,6 +2,8 @@
 
 namespace Clockwork_For_Wp\Tests;
 
+use Symfony\Component\HttpClient\Exception\TransportException;
+
 function fixture_path( $file ) {
 	return __DIR__ . "/fixtures/{$file}";
 }
@@ -16,12 +18,16 @@ class Api {
 
 	public function ajax_url() {
 		if ( ! is_string( $this->ajax_url ) ) {
-			$this->ajax_url = trim(
-				$this->client
-					->request( 'GET', '/?enable=0' )
-					->filter( '#cfw-coh-ajaxurl' )
-					->text( '' )
-			);
+			try {
+				$this->ajax_url = trim(
+					$this->client
+						->request( 'GET', '/?enable=0' )
+						->filter( '#cfw-coh-ajaxurl' )
+						->text( '' )
+				);
+			} catch ( TransportException $e ) {
+				$this->ajax_url = '';
+			}
 		}
 
 		return $this->ajax_url;
@@ -30,7 +36,7 @@ class Api {
 	public function clean_metadata() {
 		$this->client->request(
 			'GET',
-			"{$this->ajax_url}?action=cfw_coh_clean_metadata"
+			"{$this->ajax_url()}?action=cfw_coh_clean_metadata"
 		);
 	}
 
@@ -41,7 +47,7 @@ class Api {
 	public function metadata_count() {
 		$this->client->request(
 			'GET',
-			"{$this->ajax_url}?action=cfw_coh_metadata_count"
+			"{$this->ajax_url()}?action=cfw_coh_metadata_count"
 		);
 
 		return json_decode( $this->client->getResponse()->getContent(), true )['data'];
@@ -50,7 +56,7 @@ class Api {
 	public function metadata_by_id( $id ) {
 		$this->client->request(
 			'GET',
-			"{$this->ajax_url}?action=cfw_coh_metadata_by_id&id={$id}"
+			"{$this->ajax_url()}?action=cfw_coh_metadata_by_id&id={$id}"
 		);
 
 		return json_decode( $this->client->getResponse()->getContent(), true )['data'];

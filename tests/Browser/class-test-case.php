@@ -13,7 +13,9 @@ class Test_Case extends TestCase {
 	protected static $https;
 
 	public static function setUpBeforeClass(): void {
-		static::api()->clean_metadata();
+		if ( static::api()->is_available() ) {
+			static::api()->clean_metadata();
+		}
 	}
 
 	public function setUp(): void {
@@ -23,7 +25,9 @@ class Test_Case extends TestCase {
 	}
 
 	public function tearDown(): void {
-		static::api()->clean_metadata();
+		if ( static::api()->is_available() ) {
+			static::api()->clean_metadata();
+		}
 	}
 
 	protected static function api() {
