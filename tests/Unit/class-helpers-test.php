@@ -7,6 +7,7 @@ use function Clockwork_For_Wp\array_get;
 use function Clockwork_For_Wp\array_has;
 use function Clockwork_For_Wp\array_set;
 use function Clockwork_For_Wp\describe_callable;
+use function Clockwork_For_Wp\describe_unavailable_callable;
 use function Clockwork_For_Wp\describe_value;
 use function Clockwork_For_Wp\prepare_rest_route;
 use function Clockwork_For_Wp\prepare_wpdb_query;
@@ -94,6 +95,26 @@ class Helpers_Test extends TestCase {
 	}
 
 	/** @test */
+	public function test_describe_unavailable_callable() {
+		// Strings.
+		$this->assertSame( 'pfx_some_func()', describe_unavailable_callable( 'pfx_some_func' ) );
+		$this->assertSame( 'Pfx::some_func()', describe_unavailable_callable( 'Pfx::some_func' ) );
+
+		// Arrays.
+		$this->assertSame(
+			'Pfx::some_func()',
+			describe_unavailable_callable( [ 'Pfx', 'some_func' ] )
+		);
+
+		// Unknowns.
+		$this->assertSame( '(Unknown)', describe_unavailable_callable( ' ' ) );
+		$this->assertSame( '(Unknown)', describe_unavailable_callable( 3 ) );
+		$this->assertSame( '(Unknown)', describe_unavailable_callable( [] ) );
+		$this->assertSame( '(Unknown)', describe_unavailable_callable( [ '', ' ' ] ) );
+		$this->assertSame( '(Unknown)', describe_unavailable_callable( [ 3, 4 ] ) );
+	}
+
+	/** @test */
 	public function test_describe_callable() {
 		$namespace = __NAMESPACE__;
 
@@ -114,6 +135,10 @@ class Helpers_Test extends TestCase {
 		$this->assertEquals(
 			"{$namespace}\\Describe_Callable_Tester::static_method()",
 			describe_callable( [ Describe_Callable_Tester::class, 'static_method' ] )
+		);
+		$this->assertEquals(
+			"{$namespace}\\Describe_Callable_Tester::static_method()",
+			describe_callable( __NAMESPACE__ . '\\Describe_Callable_Tester::static_method' )
 		);
 
 		// Closure.

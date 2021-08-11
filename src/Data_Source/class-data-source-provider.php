@@ -117,7 +117,8 @@ class Data_Source_Provider extends Base_Provider {
 				$config['except_tags'] ?? [],
 				$config['only_tags'] ?? [],
 				$config['except_callbacks'] ?? [],
-				$config['only_callbacks'] ?? []
+				$config['only_callbacks'] ?? [],
+				$config['all_hooks'] ?? false
 			);
 		};
 

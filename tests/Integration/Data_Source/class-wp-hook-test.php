@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 class Wp_Hook_Test extends TestCase {
 	/** @test */
 	public function it_correctly_records_hook_data() {
-		$data_source = new Wp_Hook( [], [], [], [] );
+		$data_source = new Wp_Hook();
 		$request = new Request();
 
 		$data_source->add_hook( 'tag1' );
@@ -50,7 +50,7 @@ class Wp_Hook_Test extends TestCase {
 
 	/** @test */
 	public function it_can_be_configured_to_collect_all_hook_tags_except_a_subset() {
-		$data_source = new Wp_Hook( [ 'tag2', 'tag3_[\w]', '^tag4', '5$' ], [], [], [] );
+		$data_source = new Wp_Hook( [ 'tag2', 'tag3_[\w]', '^tag4', '5$' ] );
 		$request = new Request();
 
 		$data_source->add_hook( 'tag1' ); // yes
@@ -78,7 +78,7 @@ class Wp_Hook_Test extends TestCase {
 
 	/** @test */
 	public function it_can_be_configured_to_only_collect_a_subset_of_hook_tags() {
-		$data_source = new Wp_Hook( [], [ 'tag2', 'tag3_[\w]', '^tag4', '5$' ], [], [] );
+		$data_source = new Wp_Hook( [], [ 'tag2', 'tag3_[\w]', '^tag4', '5$' ] );
 		$request = new Request();
 
 		$data_source->add_hook( 'tag1' ); // no
@@ -109,7 +109,7 @@ class Wp_Hook_Test extends TestCase {
 
 	/** @test */
 	public function it_favors_the_only_tags_configuration_over_the_except_tags_configuration() {
-		$data_source = new Wp_Hook( [ 'tag2' ], [ 'tag2' ], [], [] );
+		$data_source = new Wp_Hook( [ 'tag2' ], [ 'tag2' ] );
 		$request = new Request();
 
 		$data_source->add_hook( 'tag1' ); // no
@@ -140,7 +140,7 @@ class Wp_Hook_Test extends TestCase {
 
 	/** @test */
 	public function it_can_be_configured_to_collect_all_hooks_by_callback_except_a_subset() {
-		$data_source = new Wp_Hook( [], [], [ '^array_' ], [] );
+		$data_source = new Wp_Hook( [], [], [ '^array_' ] );
 		$request = new Request();
 
 		$data_source->add_hook( 'tag1', null, 'array_map' ); // no
@@ -206,7 +206,7 @@ class Wp_Hook_Test extends TestCase {
 
 	/** @test */
 	public function it_doesnt_create_the_userdata_entry_when_there_are_no_hooks() {
-		$data_source = new Wp_Hook( [], [], [], [] );
+		$data_source = new Wp_Hook();
 		$request = new Request();
 
 		$data_source->resolve( $request );

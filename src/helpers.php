@@ -58,6 +58,32 @@ function array_set( array &$array, string $path, $value ) {
 	return $array;
 }
 
+// @todo Name? Or maybe just merge into describe_callable()?
+function describe_unavailable_callable( $unavailable_callable ) {
+	// WordPress doesn't always load all files for all requests.
+	// For this reason we will often be working with callables that haven't been loaded...
+	// I.e. is_callable( $unavailable_callable ) === false.
+	if ( is_string( $unavailable_callable ) && '' !== trim( $unavailable_callable ) ) {
+		return "{$unavailable_callable}()";
+	}
+
+	if ( is_array( $unavailable_callable ) ) {
+		$class = $unavailable_callable[0] ?? '';
+		$method = $unavailable_callable[1] ?? '';
+
+		if (
+			is_string( $class )
+			&& '' !== trim( $class )
+			&& is_string( $method )
+			&& '' !== trim( $method )
+		) {
+			return "{$class}::{$method}()";
+		}
+	}
+
+	return '(Unknown)';
+}
+
 function describe_callable( $callable ) {
 	if ( ! is_callable( $callable ) ) {
 		return '(Non-callable value)';

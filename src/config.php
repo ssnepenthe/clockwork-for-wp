@@ -91,6 +91,7 @@ return [
 				'only_tags' => [],
 				'except_callbacks' => [],
 				'only_callbacks' => [],
+				'all_hooks' => false,
 			],
 		],
 		'wp_http' => [

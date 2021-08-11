@@ -6,6 +6,7 @@ use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Request;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
+use function Clockwork_For_Wp\describe_unavailable_callable;
 use function Clockwork_For_Wp\describe_callable;
 
 class Wp_Hook extends DataSource implements Subscriber {
@@ -14,24 +15,28 @@ class Wp_Hook extends DataSource implements Subscriber {
 	protected $only_tags;
 	protected $except_callbacks;
 	protected $only_callbacks;
+	protected $all_hooks;
 
 	public function __construct(
-		array $except_tags,
-		array $only_tags,
-		array $except_callbacks,
-		array $only_callbacks
+		array $except_tags = [],
+		array $only_tags = [],
+		array $except_callbacks = [],
+		array $only_callbacks = [],
+		bool $all_hooks = false
 	) {
 		$this->except_tags = $except_tags;
 		$this->only_tags = $only_tags;
 		$this->except_callbacks = $except_callbacks;
 		$this->only_callbacks = $only_callbacks;
+		$this->all_hooks = $all_hooks;
 	}
 
 	public function get_subscribed_events() : array {
 		return [
 			'cfw_pre_resolve' => function( $wp_filter, $wp_actions ) {
-				// @todo whitelist/blacklist for hooks to ignore?
-				foreach ( array_keys( $wp_actions ) as $tag ) {
+				$tags = $this->all_hooks ? array_keys( $wp_filter ) : array_keys( $wp_actions );
+
+				foreach ( $tags as $tag ) {
 					if ( isset( $wp_filter[ $tag ] ) ) {
 						foreach ( $wp_filter[ $tag ] as $priority => $callbacks ) {
 							foreach ( $callbacks as $callback ) {
@@ -62,16 +67,22 @@ class Wp_Hook extends DataSource implements Subscriber {
 	public function add_hook(
 		string $tag,
 		int $priority = null,
-		callable $callback = null,
+		$callback = null,
 		int $accepted_args = null
 	) {
 		if ( ! $this->should_collect( 'tag', $tag ) ) {
 			return;
 		}
 
-		$callback = null !== $callback ? describe_callable( $callback ) : '';
+		if ( null === $callback ) {
+			$callback_description = '';
+		} else {
+			$callback_description = is_callable( $callback )
+				? describe_callable( $callback )
+				: describe_unavailable_callable( $callback );
+		}
 
-		if ( ! $this->should_collect( 'callback', $callback ) ) {
+		if ( ! $this->should_collect( 'callback', $callback_description ) ) {
 			return;
 		}
 
@@ -80,7 +91,7 @@ class Wp_Hook extends DataSource implements Subscriber {
 		$this->hooks[] = [
 			'Tag' => $tag,
 			'Priority' => null !== $priority ? (string) $priority : '',
-			'Callback' => $callback,
+			'Callback' => $callback_description,
 			'Accepted Args' => null !== $accepted_args ? (string) $accepted_args : '',
 		];
 	}
