@@ -89,7 +89,7 @@ return [
 			'config' => [
 				'except_tags' => [],
 				'only_tags' => [],
-				'except_callbacks' => [],
+				'except_callbacks' => [ 'clockwork-for-wp' ],
 				'only_callbacks' => [],
 				'all_hooks' => false,
 			],
