@@ -1,7 +1,8 @@
 <?php
 
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../src/helpers.php';
+require_once __DIR__ . '/../src/plugin-helpers.php';
+require_once __DIR__ . '/../src/wordpress-helpers.php';
 require_once __DIR__ . '/helpers.php';
 
 class Null_Storage_For_Tests extends \Clockwork\Storage\Storage {

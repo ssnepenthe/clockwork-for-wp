@@ -14,8 +14,7 @@ class Web_App_Controller {
 	}
 
 	public function serve_assets( $asset ) {
-		// @todo No WP dependencies in here...
-		$asset = untrailingslashit( $asset );
+		$asset = rtrim( $asset, '/\\' );
 		$file = $this->web_helper->asset( $asset );
 
 		if ( is_array( $file ) && isset( $file['path'] ) && is_file( $file['path'] ) ) {

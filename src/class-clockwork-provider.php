@@ -95,8 +95,9 @@ class Clockwork_Provider extends Base_Provider {
 
 			$dir_permissions = $config['dir_permissions'] ?? 0700;
 			$expiration = $config['expiration'] ?? null;
+			$compress = $config['compress'] ?? false;
 
-			return new FileStorage( $config['path'], $dir_permissions, $expiration );
+			return new FileStorage( $config['path'], $dir_permissions, $expiration, $compress );
 		} );
 
 		$this->plugin[ SqlStorage::class ] = $this->plugin->protect( function( array $config ) {

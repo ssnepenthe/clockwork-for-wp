@@ -69,7 +69,8 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 // @todo Check for minimum php version.
 // @todo Check that dependencies have been installed.
 
-require_once __DIR__ . '/src/helpers.php';
+require_once __DIR__ . '/src/plugin-helpers.php';
+require_once __DIR__ . '/src/wordpress-helpers.php';
 
 function _cfw_instance() {
 	static $instance = null;

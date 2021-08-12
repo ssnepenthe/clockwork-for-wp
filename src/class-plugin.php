@@ -36,6 +36,8 @@ class Plugin implements ArrayAccess {
 
 		$this->container = new Container( $values ?: [] );
 
+		$this[ Plugin::class ] = $this;
+
 		foreach ( $providers as $provider ) {
 			if ( ! $provider instanceof Provider ) {
 				$provider = new $provider( $this );
@@ -87,7 +89,10 @@ class Plugin implements ArrayAccess {
 	}
 
 	public function config( $path, $default = null ) {
-		// @todo Return default when config is not registered in container?
+		if ( ! isset( $this[ Config::class ] ) ) {
+			return $default;
+		}
+
 		return $this[ Config::class ]->get( $path, $default );
 	}
 

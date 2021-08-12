@@ -269,7 +269,7 @@ return [
 					// string. Path where metadata is stored. By default it is stored in the wp-content directory, but ideally should be moved somewhere that is not web accessible.
 					'path' => WP_CONTENT_DIR . '/cfw-data',
 
-					// @todo Add compress option.
+					'compress' => false,
 
 				],
 
