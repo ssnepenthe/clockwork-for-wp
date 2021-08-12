@@ -44,6 +44,14 @@ if ( 'production' === \wp_get_environment_type() ) {
 	return;
 }
 
+if ( ! function_exists( '_cfw_instance' ) ) {
+	\add_action( 'admin_init', __NAMESPACE__ . '\\deactivate' );
+	\add_action( 'admin_notices', function() {
+		notify( 'This plugin requires Clockwork for WP to be installed and active' );
+	} );
+	return;
+}
+
 class Config_Fetcher {
 	protected $input;
 
