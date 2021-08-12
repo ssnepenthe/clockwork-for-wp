@@ -44,7 +44,11 @@ if ( 'production' === \wp_get_environment_type() ) {
 	return;
 }
 
-if ( ! function_exists( '_cfw_instance' ) ) {
+if ( ! \function_exists( 'is_plugin_active' ) ) {
+	require_once ABSPATH . 'wp-admin/includes/plugin.php';
+}
+
+if ( ! \is_plugin_active( 'clockwork-for-wp/clockwork-for-wp.php' ) ) {
 	\add_action( 'admin_init', __NAMESPACE__ . '\\deactivate' );
 	\add_action( 'admin_notices', function() {
 		notify( 'This plugin requires Clockwork for WP to be installed and active' );
