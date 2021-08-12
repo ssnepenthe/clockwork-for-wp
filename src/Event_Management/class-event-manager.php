@@ -13,7 +13,6 @@ class Event_Manager {
 
 	protected $invoker;
 
-	// @todo Set up invoker.
 	public function __construct( Invoker $invoker ) {
 		$this->invoker = $invoker;
 	}

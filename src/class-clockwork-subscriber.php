@@ -46,13 +46,11 @@ class Clockwork_Subscriber implements Subscriber {
 	}
 
 	public function send_headers( Request $request ) {
-		// @todo Include default for the case where request uri is not set?
 		if ( headers_sent() ) {
 			return;
 		}
 
 		// @todo Any reason to suppress errors?
-		// @todo Request as a direct dependency?
 		// @todo Use wp_headers filter of send_headers action? See WP::send_headers().
 		header( 'X-Clockwork-Id: ' . $request->id );
 		header( 'X-Clockwork-Version: ' . Clockwork::VERSION );
