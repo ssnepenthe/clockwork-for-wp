@@ -25,7 +25,13 @@ class Event_Manager {
 			}
 
 			if ( ! is_array( $args ) ) {
-				throw new InvalidArgumentException( '@todo' );
+				$subscriber_class = get_class( $subscriber );
+				$args_type = gettype( $args );
+
+				throw new InvalidArgumentException(
+					"Invalid args provided by {$subscriber_class} for tag {$tag} - "
+						. "Expected string, closure or array, got {$args_type}"
+				);
 			}
 
 			if ( isset( $args[0] ) && ( is_string( $args[0] ) || $args[0] instanceof Closure ) ) {
@@ -64,7 +70,12 @@ class Event_Manager {
 		array $args
 	) {
 		if ( ! isset( $args[0] ) ) {
-			throw new InvalidArgumentException( '@todo' );
+			$subscriber_class = get_class( $subscriber );
+
+			throw new InvalidArgumentException(
+				"Incorrect array shape provided by {$subscriber_class} for tag {$tag} - "
+					. "callback expected at index 0"
+			);
 		}
 
 		if ( is_string( $args[0] ) ) {
@@ -72,7 +83,13 @@ class Event_Manager {
 		} else if ( $args[0] instanceof Closure ) {
 			$callable = $args[0];
 		} else {
-			throw new InvalidArgumentException( '@todo' );
+			$subscriber_class = get_class( $subscriber );
+			$callback_type = gettype( $args[0] );
+
+			throw new InvalidArgumentException(
+				"Invalid args provided by {$subscriber_class} for tag {$tag} - "
+					. "callback must be a string or closure, got {$callback_type}"
+			);
 		}
 
 		return $this->on( $tag, $callable, $args[1] ?? self::DEFAULT_EVENT );

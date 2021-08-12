@@ -197,7 +197,9 @@ class Metadata {
 		$config = \_cfw_instance()[ \Clockwork_For_Wp\Config::class ];
 
 		if ( 'file' !== $config->get( 'storage.driver' ) ) {
-			throw new \RuntimeException( '@todo' );
+			throw new \RuntimeException(
+				'Clockwork storage driver must be set to "file" for tests'
+			);
 		}
 
 		return rtrim( $config->get( 'storage.drivers.file.config.path' ), '/\\' );
@@ -224,16 +226,16 @@ class Metadata {
 
 		if ( ! \is_readable( $file ) ) {
 			if ( ! \file_exists( $file ) ) {
-				throw new \InvalidArgumentException( '@todo' );
+				throw new \InvalidArgumentException( "Metadata with ID {$id} does not exist" );
 			} else {
-				throw new \RuntimeException( '@todo' );
+				throw new \RuntimeException( "Metadata with ID {$id} not readable" );
 			}
 		}
 
 		$request = \json_decode( \file_get_contents( $file ), true );
 
 		if ( null === $request || \JSON_ERROR_NONE !== \json_last_error() ) {
-			throw new \RuntimeException( '@todo' );
+			throw new \RuntimeException( "Metadata with ID {$id} contains invalid JSON" );
 		}
 
 		return $request;

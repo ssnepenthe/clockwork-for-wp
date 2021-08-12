@@ -69,7 +69,9 @@ class Clockwork_Provider extends Base_Provider {
 		$this->plugin[ SimpleAuthenticator::class ] = $this->plugin->protect(
 			function( array $config ) {
 				if ( ! array_key_exists( 'password', $config ) ) {
-					throw new \InvalidArgumentException( '@todo' );
+					throw new \InvalidArgumentException(
+						'Missing "password" key from simple authenticator config array'
+					);
 				}
 
 				return new SimpleAuthenticator( $config['password'] );
@@ -86,7 +88,9 @@ class Clockwork_Provider extends Base_Provider {
 
 		$this->plugin[ FileStorage::class ] = $this->plugin->protect( function( array $config ) {
 			if ( ! array_key_exists( 'path', $config ) ) {
-				throw new \InvalidArgumentException( '@todo' );
+				throw new \InvalidArgumentException(
+					'Missing "path" key from file storage config array'
+				);
 			}
 
 			$dir_permissions = $config['dir_permissions'] ?? 0700;
@@ -97,7 +101,9 @@ class Clockwork_Provider extends Base_Provider {
 
 		$this->plugin[ SqlStorage::class ] = $this->plugin->protect( function( array $config ) {
 			if ( ! array_key_exists( 'dsn', $config ) ) {
-				throw new \InvalidArgumentException( '@todo' );
+				throw new \InvalidArgumentException(
+					'Missing "dns" key from sql storage config array'
+				);
 			}
 
 			$table = $config['table'] ?? 'clockwork';

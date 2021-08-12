@@ -93,15 +93,19 @@ class Test_Case extends TestCase {
 
 		if ( ! $has_host ) {
 			if ( ! array_key_exists( 'host', $parsed ) ) {
-				throw new \InvalidArgumentException( '@todo' );
+				throw new \InvalidArgumentException(
+					'Unable to parse host from URI in tests/baseuri file'
+				);
 			}
 
 			static::$http_host = $parsed['host'];
 		}
 
 		if ( ! $has_https ) {
-			if ( ! $has_https && ! array_key_exists( 'scheme', $parsed ) ) {
-				throw new \InvalidArgumentException( '@todo' );
+			if ( ! array_key_exists( 'scheme', $parsed ) ) {
+				throw new \InvalidArgumentException(
+					'Unable to parse scheme from URI in tests/baseuri file'
+				);
 			}
 
 			static::$https = 'https' === $parsed['scheme'] ? true : false;

@@ -54,7 +54,9 @@ class Transients extends DataSource implements Subscriber {
 	// @todo External helper function?
 	protected function prepare( $type, $key, $value = null, $expiration = null, $is_site = false ) {
 		if ( ! in_array( $type, [ 'setted', 'deleted' ], true ) ) {
-			throw new \InvalidArgumentException( '@todo' );
+			throw new \InvalidArgumentException(
+				"Invalid type {$type} - must be one of 'setted', 'deleted'"
+			);
 		}
 
 		$for_size = $value;

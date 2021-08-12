@@ -76,7 +76,7 @@ class Plugin implements ArrayAccess {
 
 	public function register( Provider $provider ) {
 		if ( $this->locked ) {
-			throw new \RuntimeException( '@todo' );
+			throw new \RuntimeException( 'Cannot register providers after plugin has been locked' );
 		}
 
 		$provider->register();
