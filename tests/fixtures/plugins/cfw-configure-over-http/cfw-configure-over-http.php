@@ -269,7 +269,7 @@ class Metadata {
 	printf(
 		'<span id="cfw-coh-ajaxurl">%s</span><span id="cfw-coh-clockwork-id">%s</span>',
 		\esc_html( \admin_url( 'admin-ajax.php' ) ),
-		\esc_html( \_cfw_instance()[ \Clockwork\Clockwork::class ]->getRequest()->id )
+		\esc_html( \_cfw_instance()[ \Clockwork\Request\Request::class ]->id )
 	);
 } );
 
