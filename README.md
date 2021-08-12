@@ -4,7 +4,7 @@ A basic [Clockwork](https://underground.works/clockwork/) integration for WordPr
 **DO NOT, UNDER ANY CIRCUMSTANCES, RUN THIS PLUGIN ON ANYTHING BUT A DEVELOPMENT MACHINE - THE METADATA IT EXPOSES CAN BE USED TO EASILY TAKE OVER YOUR SITE.**
 
 ## Requirements
-PHP 5.5 or greater, WP 5.5 or greater and Composer.
+PHP 7.1 or greater, WP 5.5 or greater and Composer.
 
 Optionally install one of the Clockwork browser extensions ([Chrome](https://chrome.google.com/webstore/detail/clockwork/dmggabnehkmmfmdffgajcflpdjlnoemp), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/clockwork-dev-tools/)).
 

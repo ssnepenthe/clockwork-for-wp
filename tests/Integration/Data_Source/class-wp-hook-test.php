@@ -3,6 +3,7 @@
 namespace Clockwork_For_Wp\Tests\Integration\Data_Source;
 
 use Clockwork\Request\Request;
+use Clockwork_For_Wp\Data_Source\Except_Only_Filter;
 use Clockwork_For_Wp\Data_Source\Wp_Hook;
 use PHPUnit\Framework\TestCase;
 
@@ -50,7 +51,10 @@ class Wp_Hook_Test extends TestCase {
 
 	/** @test */
 	public function it_can_be_configured_to_collect_all_hook_tags_except_a_subset() {
-		$data_source = new Wp_Hook( [ 'tag2', 'tag3_[\w]', '^tag4', '5$' ] );
+		$data_source = new Wp_Hook(
+			false,
+			new Except_Only_Filter( [ 'tag2', 'tag3_[\w]', '^tag4', '5$' ], [] )
+		);
 		$request = new Request();
 
 		$data_source->add_hook( 'tag1' ); // yes
@@ -78,7 +82,10 @@ class Wp_Hook_Test extends TestCase {
 
 	/** @test */
 	public function it_can_be_configured_to_only_collect_a_subset_of_hook_tags() {
-		$data_source = new Wp_Hook( [], [ 'tag2', 'tag3_[\w]', '^tag4', '5$' ] );
+		$data_source = new Wp_Hook(
+			false,
+			new Except_Only_Filter( [], [ 'tag2', 'tag3_[\w]', '^tag4', '5$' ] )
+		);
 		$request = new Request();
 
 		$data_source->add_hook( 'tag1' ); // no
@@ -109,7 +116,7 @@ class Wp_Hook_Test extends TestCase {
 
 	/** @test */
 	public function it_favors_the_only_tags_configuration_over_the_except_tags_configuration() {
-		$data_source = new Wp_Hook( [ 'tag2' ], [ 'tag2' ] );
+		$data_source = new Wp_Hook( false, new Except_Only_Filter( [ 'tag2' ], [ 'tag2' ] ) );
 		$request = new Request();
 
 		$data_source->add_hook( 'tag1' ); // no
@@ -140,7 +147,7 @@ class Wp_Hook_Test extends TestCase {
 
 	/** @test */
 	public function it_can_be_configured_to_collect_all_hooks_by_callback_except_a_subset() {
-		$data_source = new Wp_Hook( [], [], [ '^array_' ] );
+		$data_source = new Wp_Hook( false, null, new Except_Only_Filter( [ '^array_' ], [] ) );
 		$request = new Request();
 
 		$data_source->add_hook( 'tag1', null, 'array_map' ); // no
@@ -162,7 +169,7 @@ class Wp_Hook_Test extends TestCase {
 
 	/** @test */
 	public function it_can_be_configured_to_only_collect_a_subset_of_hooks_by_callback() {
-		$data_source = new Wp_Hook( [], [], [], [ '^array_' ] );
+		$data_source = new Wp_Hook( false, null, new Except_Only_Filter( [], [ '^array_' ] ) );
 		$request = new Request();
 
 		$data_source->add_hook( 'tag1', null, 'array_map' ); // yes
@@ -184,7 +191,11 @@ class Wp_Hook_Test extends TestCase {
 
 	/** @test */
 	public function it_favors_the_only_callbacks_configuration_over_the_except_callbacks_configuration() {
-		$data_source = new Wp_Hook( [], [], [ '^array_' ], [ '^array_' ] );
+		$data_source = new Wp_Hook(
+			false,
+			null,
+			new Except_Only_Filter( [ '^array_' ], [ '^array_' ] )
+		);
 		$request = new Request();
 
 		$data_source->add_hook( 'tag1', null, 'array_map' ); // yes

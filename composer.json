@@ -4,7 +4,7 @@
     "type": "wordpress-plugin",
     "license": "MIT",
     "require": {
-        "php": ">=5.5",
+        "php": ">=7.1",
         "itsgoingd/clockwork": "^5.0",
         "pimple/pimple": "^3.2",
         "php-di/invoker": "^2.0"

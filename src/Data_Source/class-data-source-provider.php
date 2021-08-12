@@ -111,15 +111,18 @@ class Data_Source_Provider extends Base_Provider {
 		};
 
 		$this->plugin[ Wp_Hook::class ] = function() {
-			$config = $this->plugin[ Config::class ]->get( 'data_sources.wp_hook.config', [] );
+			$config = $this->plugin->config( 'data_sources.wp_hook.config', [] );
 
-			return new Wp_Hook(
+			$tag_filter = new Except_Only_Filter(
 				$config['except_tags'] ?? [],
-				$config['only_tags'] ?? [],
-				$config['except_callbacks'] ?? [],
-				$config['only_callbacks'] ?? [],
-				$config['all_hooks'] ?? false
+				$config['only_tags'] ?? []
 			);
+			$callback_filter = new Except_Only_Filter(
+				$config['except_callbacks'] ?? [],
+				$config['only_callbacks'] ?? []
+			);
+
+			return new Wp_Hook( $config['all_hooks'] ?? false, $tag_filter, $callback_filter );
 		};
 
 		$this->plugin[ Wp_Http::class ] = function() {
