@@ -1,10 +1,11 @@
 <?php
 
-namespace Clockwork_For_Wp\Api;;
+namespace Clockwork_For_Wp\Api;
 
-use Clockwork\Clockwork;
+use Clockwork\Authentication\AuthenticatorInterface;
 use Clockwork\Request\IncomingRequest;
 use Clockwork_For_Wp\Base_Provider;
+use Clockwork_For_Wp\Metadata;
 
 class Api_Provider extends Base_Provider {
 	public function boot() {
@@ -16,7 +17,8 @@ class Api_Provider extends Base_Provider {
 	public function register() {
 		$this->plugin[ Api_Controller::class ] = function() {
 			return new Api_Controller(
-				$this->plugin[ Clockwork::class ],
+				$this->plugin[ AuthenticatorInterface::class ],
+				$this->plugin[ Metadata::class ],
 				$this->plugin[ IncomingRequest::class ]
 			);
 		};

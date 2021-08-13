@@ -2,6 +2,8 @@
 
 namespace Clockwork_For_Wp;
 
+use Clockwork\Clockwork;
+use Clockwork\Storage\StorageInterface;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Invoker\Invoker;
 use Invoker\ParameterResolver\AssociativeArrayResolver;
@@ -35,6 +37,13 @@ class Plugin_Provider extends Base_Provider {
 					new DefaultValueResolver(),
 				] ),
 				$psr_container
+			);
+		};
+
+		$this->plugin[ Metadata::class ] = function() {
+			return new Metadata(
+				$this->plugin[ Clockwork::class ],
+				$this->plugin[ StorageInterface::class ]
 			);
 		};
 	}

@@ -2,24 +2,29 @@
 
 namespace Clockwork_For_Wp\Api;
 
-use Clockwork\Clockwork;
+use Clockwork\Authentication\AuthenticatorInterface;
 use Clockwork\Request\IncomingRequest;
-use Clockwork\Storage\Search;
+use Clockwork_For_Wp\Metadata;
 
 class Api_Controller {
-	protected $clockwork;
+	protected $authenticator;
+	protected $metadata;
 	protected $request;
 
-	public function __construct( Clockwork $clockwork, IncomingRequest $request ) {
-		$this->clockwork = $clockwork;
+	public function __construct(
+		AuthenticatorInterface $authenticator,
+		Metadata $metadata,
+		IncomingRequest $request
+	) {
+		$this->authenticator = $authenticator;
+		$this->metadata = $metadata;
 		$this->request = $request;
 	}
 
-	// @todo Authenticator directly?
 	public function authenticate() {
-		$token = $this->clockwork
-			->getAuthenticator()
-			->attempt( array_filter( $this->extract_credentials() ) ); // @todo Filter necessary?
+		$token = $this->authenticator->attempt(
+			array_filter( $this->extract_credentials() ) // @todo Filter necessary?
+		);
 
 		wp_send_json( [ 'token' => $token ], $token ? 200 : 403 );
 	}
@@ -31,67 +36,36 @@ class Api_Controller {
 			return; // @todo
 		}
 
-		$authenticator = $this->clockwork->getAuthenticator();
-		$authenticated = $authenticator->check(
+		$authenticated = $this->authenticator->check(
 			// @todo Move to route handler invoker?
 			isset( $_SERVER['HTTP_X_CLOCKWORK_AUTH'] ) ? $_SERVER['HTTP_X_CLOCKWORK_AUTH'] : ''
 		);
 
 		if ( $authenticated !== true ) {
-			status_header( 403 );
-
 			wp_send_json( [
 				'message' => $authenticated,
-				'requires' => $authenticator->requires(),
-			] );
-		}
-
-		if ( 'previous' !== $direction && 'next' !== $direction ) {
-			$direction = null;
-		}
-
-		if ( null !== $count ) {
-			$count = (int) $count;
+				'requires' => $this->authenticator->requires(),
+			], 403 );
 		}
 
 		if ( null !== $extended ) {
-			$extended = true;
+			$data = $this->metadata->get_extended( $id, $direction, $count );
+		} else {
+			$data = $this->metadata->get( $id, $direction, $count );
 		}
 
-		$filter = array_filter( $this->request->input, function( $key ) {
-			return 'only' === $key || 'except' === $key;
-		}, ARRAY_FILTER_USE_KEY );
-
-		$data = $this->get_data( $id, $direction, $count, $filter, $extended );
+		$data = $this->apply_filters( $data );
 
 		wp_send_json( $data ); // @todo
 	}
 
-	protected function get_data(
-		$id = null,
-		$direction = null,
-		$count = null,
-		$filter = [],
-		$extended = null
-	) {
-		$storage = $this->clockwork->getStorage();
-
-		if ( 'previous' === $direction ) {
-			$data = $storage->previous( $id, $count, Search::fromRequest( $_GET ) );
-		} elseif ( 'next' === $direction ) {
-			$data = $storage->next( $id, $count, Search::fromRequest( $_GET ) );
-		} elseif ( 'latest' === $id ) {
-			$data = $storage->latest( Search::fromRequest( $_GET ) );
-		} else {
-			$data = $storage->find( $id );
-		}
-
-		if ( $extended ) {
-			$this->clockwork->extendRequest( $data );
-		}
-
-		$except = isset( $filter['except'] ) ? explode( ',', $filter['except'] ) : [];
-		$only = isset( $filter['only'] ) ? explode( ',', $filter['only'] ) : null;
+	protected function apply_filters( $data ) {
+		$except = isset( $this->request->input['except'] )
+			? explode( ',', $this->request->input['except'] )
+			: [];
+		$only = isset( $this->request->input['only'] )
+			? explode( ',', $this->request->input['only'] )
+			: null;
 
 		$transformer = function ( $request ) use ( $except, $only ) {
 			return $only
