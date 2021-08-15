@@ -4,6 +4,7 @@ namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork_For_Wp\Base_Provider;
 use Clockwork_For_Wp\Config;
+use Clockwork_For_Wp\Event_Management\Event_Manager;
 
 class Data_Source_Provider extends Base_Provider {
 	public function register() {
@@ -152,11 +153,19 @@ class Data_Source_Provider extends Base_Provider {
 		$this->plugin[ Wpdb::class ] = function() {
 			$config = $this->plugin[ Config::class ]->get( 'data_sources.wpdb.config', [] );
 
-			return new Wpdb(
+			$data_source = new Wpdb(
 				$config['detect_duplicate_queries'] ?? false,
 				$config['slow_only'] ?? false,
-				$config['slow_threshold'] ?? 50
+				$config['slow_threshold'] ?? 50,
+				$config['pattern_model_map'] ?? []
 			);
+
+			$this->plugin[ Event_Manager::class ]->trigger(
+				'cfw_data_sources_wpdb_init',
+				$data_source
+			);
+
+			return $data_source;
 		};
 
 		$this->plugin[ Xdebug::class ] = function() {

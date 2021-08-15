@@ -7,9 +7,34 @@ use Clockwork_For_Wp\Data_Source\Wpdb;
 use PHPUnit\Framework\TestCase;
 
 class Wpdb_Test extends TestCase {
+	protected function pattern_model_map() {
+		// @todo Can we pull this from the bundled config? Would require a method for removing WP constants as dependencies of the config.php file.
+		return [
+			// @todo Should we include "old tables"?
+			'/blog(?:_version)?s$/' => 'BLOG',
+			'/comment(?:s|meta)$/' => 'COMMENT',
+			'/links$/' => 'LINK',
+			'/options$/' => 'OPTION',
+			'/post(?:s|meta)$/' => 'POST',
+			'/registration_log$/' => 'REGISTRATION',
+			'/signups$/' => 'SIGNUP',
+			'/site(?:categories|meta)?$/' => 'SITE',
+			'/term(?:s|_relationships|_taxonomy|meta)$/' => 'TERM',
+			'/user(?:s|meta)$/' => 'USER',
+		];
+	}
+
 	/** @test */
 	public function it_correctly_records_wpdb_data() {
-		$data_source = new Wpdb( $detect_dupes = false, $slow_only = false, $slow_threshold = 50 );
+		$pattern_model_map = $this->pattern_model_map();
+		$pattern_model_map['/somewhere/'] = 'TESTMODEL';
+
+		$data_source = new Wpdb(
+			$detect_dupes = false,
+			$slow_only = false,
+			$slow_threshold = 50,
+			$pattern_model_map
+		);
 		$request = new Request();
 		$time = microtime( true );
 
@@ -21,6 +46,9 @@ class Wpdb_Test extends TestCase {
 
 		// Duplicate query detection is disabled.
 		$data_source->add_query( 'select * from posts', 500, $time );
+
+		// Custom model patterns work.
+		$data_source->add_query( 'select something from somewhere', 250, $time );
 
 		$data_source->resolve( $request );
 
@@ -43,13 +71,24 @@ class Wpdb_Test extends TestCase {
 		$this->assertEquals( $time, $request->databaseQueries[2]['time'] );
 		$this->assertEquals( 'USER', $request->databaseQueries[2]['model'] );
 
-		// Ensure duplicate queries are not logged.
+		// Duplicate queries are recorded...
+		$this->assertEquals( 'SELECT * FROM posts', $request->databaseQueries[3]['query'] );
+
+		// But not logged...
 		$this->assertEmpty( $request->log()->toArray() );
+
+		// Custom model patterns are used.
+		$this->assertEquals( 'TESTMODEL', $request->databaseQueries[4]['model'] );
 	}
 
 	/** @test */
 	public function it_can_detect_duplicate_queries() {
-		$data_source = new Wpdb( $detect_dupes = true, $slow_only = false, $slow_threshold = 50 );
+		$data_source = new Wpdb(
+			$detect_dupes = true,
+			$slow_only = false,
+			$slow_threshold = 50,
+			$this->pattern_model_map()
+		);
 		$request = new Request();
 		$untested_duration = 50;
 		$untested_time = microtime( true );
@@ -97,7 +136,12 @@ class Wpdb_Test extends TestCase {
 			[ 'select * from tags', 150, $untested_time ],
 		];
 
-		$data_source = new Wpdb( $detect_dupes = false, $slow_only = true, $slow_threshold = 75 );
+		$data_source = new Wpdb(
+			$detect_dupes = false,
+			$slow_only = true,
+			$slow_threshold = 75,
+			$this->pattern_model_map()
+		);
 		$request = new Request();
 
 		$data_source->set_queries( $queries );
@@ -107,7 +151,12 @@ class Wpdb_Test extends TestCase {
 		$this->assertEquals( 'SELECT * FROM users', $request->databaseQueries[0]['query'] );
 		$this->assertEquals( 'SELECT * FROM tags', $request->databaseQueries[1]['query'] );
 
-		$data_source = new Wpdb( $detect_dupes = false, $slow_only = true, $slow_threshold = 100 );
+		$data_source = new Wpdb(
+			$detect_dupes = false,
+			$slow_only = true,
+			$slow_threshold = 100,
+			$this->pattern_model_map()
+		);
 		$request = new Request();
 
 		$data_source->set_queries( $queries );
@@ -115,5 +164,35 @@ class Wpdb_Test extends TestCase {
 
 		$this->assertCount( 1, $request->databaseQueries );
 		$this->assertEquals( 'SELECT * FROM tags', $request->databaseQueries[0]['query'] );
+	}
+
+	/** @test */
+	public function it_can_identify_models_with_custom_identifier_callbacks() {
+		$data_source = new Wpdb(
+			$detect_dupes = false,
+			$slow_only = false,
+			$slow_threshold = 50,
+			$this->pattern_model_map()
+		);
+
+		// It should use the first callback to return a string value.
+		$data_source->add_custom_model_identifier( function( $query ) {
+			return null;
+		} );
+		$data_source->add_custom_model_identifier( function( $query ) {
+			return 'TESTMODEL';
+		} );
+		$data_source->add_custom_model_identifier( function( $query ) {
+			return 'TESTMODEL2';
+		} );
+
+		$data_source->add_query( 'select * from posts', 500, microtime( true ) );
+
+		$request = new Request();
+
+		$data_source->resolve( $request );
+
+		$this->assertEquals( 'SELECT * FROM posts', $request->databaseQueries[0]['query'] );
+		$this->assertEquals( 'TESTMODEL', $request->databaseQueries[0]['model'] );
 	}
 }

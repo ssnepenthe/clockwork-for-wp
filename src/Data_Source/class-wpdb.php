@@ -13,16 +13,20 @@ class Wpdb extends DataSource implements Subscriber {
 	protected $duplicates = [];
 	protected $queries = [];
 
+	protected $custom_model_identifiers = [];
 	protected $detect_duplicate_queries;
+	protected $pattern_model_map;
 	protected $slow_threshold;
 
 	public function __construct(
 		bool $detect_duplicate_queries,
 		bool $slow_only,
-		float $slow_threshold
+		float $slow_threshold,
+		array $pattern_model_map
 	) {
 		$this->detect_duplicate_queries = $detect_duplicate_queries;
 		$this->slow_threshold = $slow_threshold;
+		$this->pattern_model_map = $pattern_model_map;
 
 		if ( $slow_only ) {
 			$this->addFilter( function( $duration ) {
@@ -89,7 +93,7 @@ class Wpdb extends DataSource implements Subscriber {
 			$this->queries[] = [
 				'query' => $this->capitalize_keywords( $query ),
 				'duration' => $duration,
-				'model' => $this->guess_model( $query ),
+				'model' => $this->identify_model( $query ),
 				'start' => $start,
 			];
 		}
@@ -97,24 +101,21 @@ class Wpdb extends DataSource implements Subscriber {
 		return $this;
 	}
 
-	protected function guess_model( $query ) {
-		// @todo Allow registration of custom pattern/model pairs
+	public function add_custom_model_identifier( callable $identifier ) {
+		$this->custom_model_identifiers[] = $identifier;
+	}
+
+	protected function identify_model( $query ) {
+		$model = $this->call_custom_model_identifiers( $query );
+
+		if ( is_string( $model ) ) {
+			return $model;
+		}
+
 		$pattern = '/(?:from|into|update)\s+(`)?(?<table>[^\s`]+)(?(1)`)/i';
 
 		if ( 1 === preg_match( $pattern, $query, $matches ) ) {
-			// @todo Should we include "old tables"?
-			foreach ( [
-				'/blog(?:_version)?s$/' => 'BLOG',
-				'/comment(?:s|meta)$/' => 'COMMENT',
-				'/links$/' => 'LINK',
-				'/options$/' => 'OPTION',
-				'/post(?:s|meta)$/' => 'POST',
-				'/registration_log$/' => 'REGISTRATION',
-				'/signups$/' => 'SIGNUP',
-				'/site(?:categories|meta)?$/' => 'SITE',
-				'/term(?:s|_relationships|_taxonomy|meta)$/' => 'TERM',
-				'/user(?:s|meta)$/' => 'USER',
-			] as $pattern => $model ) {
+			foreach ( $this->pattern_model_map as $pattern => $model ) {
 				if ( 1 === preg_match( $pattern, $matches['table'] ) ) {
 					return $model;
 				}
@@ -122,6 +123,18 @@ class Wpdb extends DataSource implements Subscriber {
 		}
 
 		return '(unknown)';
+	}
+
+	protected function call_custom_model_identifiers( $query ) {
+		foreach ( $this->custom_model_identifiers as $identifier ) {
+			$model = $identifier( $query );
+
+			if ( is_string( $model ) ) {
+				return $model;
+			}
+		}
+
+		return null;
 	}
 
 	protected function capitalize_keywords( $query ) {

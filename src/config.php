@@ -231,6 +231,21 @@ return [
 				// int. Time in milliseconds after which a query will be marked as slow. Disregarded unless "slow_only" is true.
 				'slow_threshold' => 50, // Default query monitor value... Is this reasonable?
 
+				// array<string, string>. A map of regular expressions to "models". Used to assign a model to a query in the database tab. If you need more than a simple regular expression to determine a query model, use the "cfw_data_sources_wpdb_init" hook.
+				'pattern_model_map' => [
+					// @todo Should we include "old tables"?
+					'/blog(?:_version)?s$/' => 'BLOG',
+					'/comment(?:s|meta)$/' => 'COMMENT',
+					'/links$/' => 'LINK',
+					'/options$/' => 'OPTION',
+					'/post(?:s|meta)$/' => 'POST',
+					'/registration_log$/' => 'REGISTRATION',
+					'/signups$/' => 'SIGNUP',
+					'/site(?:categories|meta)?$/' => 'SITE',
+					'/term(?:s|_relationships|_taxonomy|meta)$/' => 'TERM',
+					'/user(?:s|meta)$/' => 'USER',
+				],
+
 			],
 
 		],
