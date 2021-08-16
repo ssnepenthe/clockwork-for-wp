@@ -89,7 +89,7 @@ function _cfw_instance() {
 	$plugin[ Errors::class ]->register();
 
 	$plugin[ Event_Manager::class ]
-		->on( 'plugin_loaded', function( $file ) use ( $plugin ) {
+		->on( 'plugin_loaded', function( $file, Plugin $plugin ) {
 			if ( __FILE__ !== $file ) {
 				return;
 			}
