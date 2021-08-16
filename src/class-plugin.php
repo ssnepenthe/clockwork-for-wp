@@ -97,9 +97,14 @@ class Plugin implements ArrayAccess {
 	}
 
 	public function get_enabled_data_sources() {
-		return array_filter( $this->config( 'data_sources', [] ), function( $data_source ) {
-			return (bool) $data_source['enabled'];
-		} );
+		return array_filter(
+			$this->config( 'data_sources', [] ),
+			function( $data_source, $feature ) {
+				return ( $data_source['enabled'] ?? false )
+					&& $this->is_feature_available( $feature );
+			},
+			ARRAY_FILTER_USE_BOTH
+		);
 	}
 
 	public function is_feature_enabled( $feature ) {
