@@ -16,6 +16,7 @@ use Clockwork_For_Wp\Data_Source\Wp_Http;
 use Clockwork_For_Wp\Data_Source\Wp_Mail;
 use Clockwork_For_Wp\Data_Source\Wp_Object_Cache;
 use Clockwork_For_Wp\Data_Source\Wp_Query;
+use Clockwork_For_Wp\Data_Source\Wp_Redirect;
 use Clockwork_For_Wp\Data_Source\Wp_Rewrite;
 use Clockwork_For_Wp\Data_Source\Wpdb;
 use Clockwork_For_Wp\Data_Source\Xdebug;
@@ -192,6 +193,15 @@ return [
 			'enabled' => false,
 
 			'data_source_class' => Wp_Query::class,
+
+		],
+
+		// The wp_redirect data source adds some redirect context to the clockwork log.
+		'wp_redirect' => [
+
+			'enabled' => false,
+
+			'data_source_class' => Wp_Redirect::class,
 
 		],
 

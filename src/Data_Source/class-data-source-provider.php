@@ -142,6 +142,10 @@ class Data_Source_Provider extends Base_Provider {
 			return new Wp_Query();
 		};
 
+		$this->plugin[ Wp_Redirect::class ] = function() {
+			return new Wp_Redirect();
+		};
+
 		$this->plugin[ Wp_Rewrite::class ] = function() {
 			return new Wp_Rewrite();
 		};
@@ -210,6 +214,10 @@ class Data_Source_Provider extends Base_Provider {
 
 		if ( $this->plugin->is_feature_enabled( 'wp_query' ) ) {
 			$subscribers[] = Wp_Query::class;
+		}
+
+		if ( $this->plugin->is_feature_enabled( 'wp_redirect' ) ) {
+			$subscribers[] = Wp_Redirect::class;
 		}
 
 		if ( $this->plugin->is_feature_enabled( 'wp_rewrite' ) ) {
