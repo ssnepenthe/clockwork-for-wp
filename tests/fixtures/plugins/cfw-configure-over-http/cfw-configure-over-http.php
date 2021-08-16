@@ -5,7 +5,7 @@ namespace Cfw_Configure_Over_Http;
 /**
  * Plugin Name: CFW Configure Over HTTP
  * Plugin URI: https://github.com/ssnepenthe/clockwork-for-wp
- * Description: An plugin for configuring Clockwork on the fly from our browser test suite.
+ * Description: A plugin for configuring Clockwork on the fly from our browser test suite.
  * Version: 0.1.0
  * Author: Ryan McLaughlin
  * Author URI: https://github.com/ssnepenthe
