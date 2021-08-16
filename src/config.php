@@ -44,13 +44,6 @@ return [
 		// bool|string. Only collect data when clockwork extension is open or a request includes a "clockwork-profile" cookie or get/post data key. If set to a string this will be used as a "secret" that must be passed as the "clockwork-profile" value
 		'on_demand' => false,
 
-		// bool. Only collect data when the response has a 4xx or 5xx status.
-		'errors_only' => false,
-
-		// @todo This feature is likely going to be removed soon. See https://github.com/ssnepenthe/clockwork-for-wp/issues/41.
-		'slow_threshold' => 1000,
-		'slow_only' => false,
-
 		// bool|int. Sample the collected requests (e.g. set to 100 to only collect 1 in 100 requests).
 		'sample' => false,
 

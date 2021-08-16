@@ -133,9 +133,8 @@ class Plugin implements ArrayAccess {
 			&& $this[ Clockwork::class ]->shouldCollect()->filter( $this[ IncomingRequest::class ] );
 	}
 
-	public function is_recording( Request $request ) {
-		return ( $this->is_enabled() || $this->config( 'collect_data_always', false ) )
-			&& $this[ Clockwork::class ]->shouldRecord()->filter( $request );
+	public function is_recording() {
+		return $this->is_enabled() || $this->config( 'collect_data_always', false );
 	}
 
 	public function is_enabled() {

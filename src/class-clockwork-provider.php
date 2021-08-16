@@ -21,7 +21,7 @@ class Clockwork_Provider extends Base_Provider {
 	public function boot() {
 		if ( $this->plugin->is_collecting_data() ) {
 			// Clockwork instance is resolved even when we are not collecting data in order to take
-			// advantage of helper methods like shouldCollect and shouldRecord.
+			// advantage of helper methods like shouldCollect.
 			// This ensures data sources are only registered on plugins_loaded when enabled.
 			$this->add_data_sources();
 
@@ -140,7 +140,6 @@ class Clockwork_Provider extends Base_Provider {
 	public function registered() {
 		$this->configure_serializer();
 		$this->configure_should_collect();
-		$this->configure_should_record();
 
 		if ( $this->plugin->config( 'register_helpers', true ) ) {
 			require_once __DIR__ . '/clock.php';
@@ -179,15 +178,6 @@ class Clockwork_Provider extends Base_Provider {
 		] );
 
 		$should_collect->except( [ '/__clockwork(?:/.*)?' ] );
-	}
-
-	protected function configure_should_record() {
-		$this->plugin[ Clockwork::class ]->shouldRecord( [
-			'errorsOnly' => $this->plugin->config( 'requests.errors_only', false ),
-			'slowOnly' => $this->plugin->config( 'requests.slow_only', false )
-				? $this->plugin->config( 'requests.slow_threshold', 1000 )
-				: false,
-		] );
 	}
 
 	protected function subscribers() : array {

@@ -18,20 +18,14 @@ class Clockwork_Subscriber implements Subscriber {
 		$events = [];
 
 		if (
-			(
-				$this->plugin->is_enabled()
-				&& $this->plugin->is_recording( $this->plugin[ Clockwork::class ]->request() )
-			)
+			( $this->plugin->is_enabled() && $this->plugin->is_recording() )
 			&& $this->plugin->is_collecting_requests()
 		) {
 			// wp_loaded fires on frontend but also login, admin, etc.
 			$events['wp_loaded'] = [ 'send_headers', Event_Manager::LATE_EVENT ];
 		}
 
-		if (
-			$this->plugin->is_collecting_requests()
-			&& $this->plugin->is_recording( $this->plugin[ Clockwork::class ]->request() )
-		) {
+		if ( $this->plugin->is_collecting_requests() && $this->plugin->is_recording() ) {
 			$events['shutdown'] = [ 'finalize_request', Event_Manager::LATE_EVENT ];
 		}
 
