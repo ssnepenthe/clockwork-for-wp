@@ -270,6 +270,9 @@ return [
 		// string. Storage driver name. Must match one of the keys in the drivers array below.
 		'driver' => 'file',
 
+		// int|false. Maximum metadata lifetime in minutes. Set to false to disable metadata expiration.
+		'expiration' => 60 * 24 * 7,
+
 		'drivers' => [
 
 			'file' => [
@@ -280,9 +283,6 @@ return [
 
 					// int. Directory permissions to use if the driver has to create the storage directory. Should be specified as an octal number.
 					'dir_permissions' => 0700,
-
-					// int|false. Maximum metadata lifetime in minutes. Set to false to disable metadata expiration.
-					'expiration' => 60 * 24 * 7,
 
 					// string. Path where metadata is stored. By default it is stored in the wp-content directory, but ideally should be moved somewhere that is not web accessible.
 					'path' => WP_CONTENT_DIR . '/cfw-data',
@@ -310,9 +310,6 @@ return [
 
 					// string. Password used to connect to the database.
 					'password' => null,
-
-					// int|false. Maximum metadata lifetime in minutes. Set to false to disable metadata expiration.
-					'expiration' => 60 * 24 * 7,
 
 				],
 

@@ -2,3 +2,4 @@ tests/baseuri
 vendor/
 .phpunit.result.cache
 composer.lock
+wp-cli.local.yml
