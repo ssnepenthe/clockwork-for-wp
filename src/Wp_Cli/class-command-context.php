@@ -110,7 +110,7 @@ class Command_Context {
 
 	public function output() {
 		$logger = logger();
-		// This is being called in "shutdown" @ priority 999... WP already flushes all buffers in "shutdown" @ priority 1 so this would be unnecessary.
+		// We are flushing buffers in the "wp_loaded" hook at priority 999.
 		// $logger->ob_end();
 
 		// @todo Need to look in to coloring in clockwork UI.

@@ -117,4 +117,11 @@ function set_wp_cli_logger() {
 
 	WP_CLI::set_logger( $new_logger );
 }
+
+// Replace the logger immediately.
 set_wp_cli_logger();
+
+// And flush on the latest non-shutdown hook.
+\add_action( 'wp_loaded', function() {
+	logger()->ob_end();
+}, 999 );
