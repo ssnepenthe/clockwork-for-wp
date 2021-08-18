@@ -264,6 +264,29 @@ return [
 
 	],
 
+	'wp_cli' => [
+
+		// bool. Enable or disable data collection for WP-CLI commands.
+		'collect' => false,
+
+		// string[]. List of commands for which data should not be collected.
+		'except' => [
+			// 'cache get',
+		],
+
+		// string[]. List of commands for which data should be collected.
+		'only' => [
+			// 'cache get',
+		],
+
+		// bool. Enable or disable collection of WP-CLI command output.
+		'collect_output' => false,
+
+		// bool. Enable or disable collection of data for built-in WP-CLI commands.
+		'except_built_in_commands' => true,
+
+	],
+
 	// Configure how metadata is stored.
 	'storage' => [
 

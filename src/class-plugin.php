@@ -11,6 +11,7 @@ use Clockwork_For_Wp\Data_Source\Data_Source_Provider;
 use Clockwork_For_Wp\Event_Management\Event_Management_Provider;
 use Clockwork_For_Wp\Routing\Routing_Provider;
 use Clockwork_For_Wp\Web_App\Web_App_Provider;
+use Clockwork_For_Wp\Wp_Cli\Command_Context;
 use Pimple\Container;
 
 class Plugin implements ArrayAccess {
@@ -124,7 +125,31 @@ class Plugin implements ArrayAccess {
 	}
 
 	public function is_collecting_data() {
-		return $this->is_collecting_requests();
+		return $this->is_collecting_commands() || $this->is_collecting_requests();
+	}
+
+	public function is_collecting_commands() {
+		return ( $this->is_enabled() || $this->config( 'collect_data_always', false ) )
+			&& $this->is_running_in_console()
+			&& $this->config( 'wp_cli.collect', false );
+	}
+
+	public function is_command_filtered( $command ) {
+		$only = $this->config( 'wp_cli.only', [] );
+
+		if ( count( $only ) > 0 ) {
+			return ! in_array( $command, $only, true );
+		}
+
+		$except = $this->config( 'wp_cli.except', [] );
+
+		if ( $this->config( 'wp_cli.except_built_in_commands', true ) ) {
+			$except = array_merge( $except, Command_Context::get_core_command_list() );
+		}
+
+		$except = array_merge( $except, Command_Context::get_clockwork_command_list() );
+
+		return in_array( $command, $except, true );
 	}
 
 	public function is_collecting_requests() {
@@ -142,6 +167,7 @@ class Plugin implements ArrayAccess {
 	}
 
 	public function is_running_in_console() {
+		// @todo Do we actually care if it is in console but not WP-CLI?
 		return ( defined( 'WP_CLI' ) && WP_CLI ) || in_array( PHP_SAPI, [ 'cli', 'phpdbg' ], true );
 	}
 
