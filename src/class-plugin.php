@@ -11,7 +11,7 @@ use Clockwork_For_Wp\Data_Source\Data_Source_Provider;
 use Clockwork_For_Wp\Event_Management\Event_Management_Provider;
 use Clockwork_For_Wp\Routing\Routing_Provider;
 use Clockwork_For_Wp\Web_App\Web_App_Provider;
-use Clockwork_For_Wp\Wp_Cli\Command_Context;
+use Clockwork_For_Wp\Wp_Cli\Cli_Collection_Helper;
 use Pimple\Container;
 
 class Plugin implements ArrayAccess {
@@ -144,10 +144,10 @@ class Plugin implements ArrayAccess {
 		$except = $this->config( 'wp_cli.except', [] );
 
 		if ( $this->config( 'wp_cli.except_built_in_commands', true ) ) {
-			$except = array_merge( $except, Command_Context::get_core_command_list() );
+			$except = array_merge( $except, Cli_Collection_Helper::get_core_command_list() );
 		}
 
-		$except = array_merge( $except, Command_Context::get_clockwork_command_list() );
+		$except = array_merge( $except, Cli_Collection_Helper::get_clockwork_command_list() );
 
 		return in_array( $command, $except, true );
 	}

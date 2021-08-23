@@ -4,12 +4,10 @@ namespace Clockwork_For_Wp;
 
 use Clockwork\Storage\StorageInterface;
 use Clockwork_For_Wp\Config;
-use Clockwork_For_Wp\Wp_Cli\Logger_Chain;
-use ReflectionProperty;
+use Clockwork_For_Wp\Event_Management\Event_Manager;
+use Clockwork_For_Wp\Wp_Cli\Cli_Collection_Helper;
 use WP_CLI;
-use WP_CLI\Loggers\Execution;
 use WP_CLI_Command;
-
 use function WP_CLI\Utils\get_flag_value;
 
 // @todo Seems like a pretty fragile implementation for collecting commands... Likely going to need a lot of work.
@@ -87,41 +85,5 @@ WP_CLI::add_command( 'clockwork:generate-command-lists', new class extends WP_CL
 	}
 } );
 
-function logger() {
-	static $logger;
-
-	if ( null === $logger ) {
-		$logger = new Execution( WP_CLI::get_runner()->in_color() );
-		$logger->ob_start();
-	}
-
-	return $logger;
-}
-
-function set_wp_cli_logger() {
-	// Method doesn't exist before https://github.com/wp-cli/wp-cli/commit/f854c9678604a405a38e26948344e0a5e75ec1c7.
-	if ( \method_exists( WP_CLI::class, 'get_logger' ) ) {
-		$current_logger = WP_CLI::get_logger();
-	} else {
-		$ref = new ReflectionProperty( WP_CLI::class, 'logger' );
-		$ref->setAccessible( true );
-
-		$current_logger = $ref->getValue();
-	}
-
-	if ( $current_logger instanceof Execution || $current_logger instanceof Logger_Chain ) {
-		return;
-	}
-
-	$new_logger = new Logger_Chain( $current_logger, logger() );
-
-	WP_CLI::set_logger( $new_logger );
-}
-
-// Replace the logger immediately.
-set_wp_cli_logger();
-
-// And flush on the latest non-shutdown hook.
-\add_action( 'wp_loaded', function() {
-	logger()->ob_end();
-}, 999 );
+$cli = new Cli_Collection_Helper( _cfw_instance()[ Event_Manager::class ] );
+$cli->initialize_logger();

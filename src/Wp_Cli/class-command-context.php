@@ -2,10 +2,11 @@
 
 namespace Clockwork_For_Wp\Wp_Cli;
 
+use ReflectionProperty;
 use WP_CLI;
 use WP_CLI\DocParser;
+use WP_CLI\Loggers\Execution;
 use WP_CLI\SynopsisParser;
-
 use function Clockwork_For_Wp\logger;
 
 class Command_Context {
@@ -15,7 +16,6 @@ class Command_Context {
 
 	protected $synopsis;
 	protected $parser;
-
 
 	public function __construct( $command, $args, $command_path ) {
 		$this->command = $command;
@@ -30,18 +30,6 @@ class Command_Context {
 		$runner = WP_CLI::get_runner();
 
 		return new static( ...$runner->find_command_to_run( $runner->arguments ) );
-	}
-
-	public static function get_core_command_list() {
-		$commands = include __DIR__ . '/core-command-list.php';
-
-		return $commands;
-	}
-
-	public static function get_clockwork_command_list() {
-		$commands = include __DIR__ . '/clockwork-command-list.php';
-
-		return $commands;
 	}
 
 	public function get_params( $types ) {
@@ -109,7 +97,7 @@ class Command_Context {
 	}
 
 	public function output() {
-		$logger = logger();
+		$logger = _cfw_instance()[ Cli_Collection_Helper::class ]->get_logger();
 		// We are flushing buffers in the "wp_loaded" hook at priority 999.
 		// $logger->ob_end();
 
