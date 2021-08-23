@@ -51,7 +51,10 @@ class Clockwork_Subscriber implements Subscriber {
 	public function finalize_command(  Clockwork $clockwork, Event_Manager $event_manager ) {
 		$command = Command_Context::current();
 
-		if ( $this->plugin->is_command_filtered( $command->name() ) ) {
+		if (
+			! $command instanceof Command_Context
+			|| $this->plugin->is_command_filtered( $command->name() )
+		) {
 			return;
 		}
 

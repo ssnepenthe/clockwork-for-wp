@@ -29,7 +29,13 @@ class Command_Context {
 	public static function current() {
 		$runner = WP_CLI::get_runner();
 
-		return new static( ...$runner->find_command_to_run( $runner->arguments ) );
+		$command = $runner->find_command_to_run( $runner->arguments );
+
+		if ( ! is_array( $command ) ) {
+			return null;
+		}
+
+		return new static( ...$command );
 	}
 
 	public function get_params( $types ) {
