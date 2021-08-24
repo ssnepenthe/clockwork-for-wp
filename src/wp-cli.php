@@ -87,3 +87,5 @@ WP_CLI::add_command( 'clockwork:generate-command-lists', new class extends WP_CL
 
 $cli = new Cli_Collection_Helper( _cfw_instance()[ Event_Manager::class ] );
 $cli->initialize_logger();
+
+_cfw_instance()[ Cli_Collection_Helper::class ] = $cli;
