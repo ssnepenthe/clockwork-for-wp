@@ -71,6 +71,7 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 
 require_once __DIR__ . '/src/plugin-helpers.php';
 require_once __DIR__ . '/src/wordpress-helpers.php';
+require_once __DIR__ . '/src/Wp_Cli/helpers.php';
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once __DIR__ . '/src/wp-cli.php';
