@@ -148,7 +148,7 @@ class Clockwork_Provider extends Base_Provider {
 		$this->configure_should_collect();
 
 		if ( $this->plugin->config( 'register_helpers', true ) ) {
-			require_once __DIR__ . '/clock.php';
+			require_once $this->plugin['dir'] . '/src/clock.php';
 		}
 	}
 

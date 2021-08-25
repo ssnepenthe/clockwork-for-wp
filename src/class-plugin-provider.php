@@ -19,7 +19,7 @@ class Plugin_Provider extends Base_Provider {
 		require_once $this->plugin['dir'] . '/src/plugin-helpers.php';
 
 		$this->plugin[ Config::class ] = function() {
-			$values = include __DIR__ . '/config.php';
+			$values = include $this->plugin['dir'] . '/src/config.php';
 			$config = new Config( $values );
 
 			$this->plugin[ Event_Manager::class ]->trigger( 'cfw_config_init', $config );

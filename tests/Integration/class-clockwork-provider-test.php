@@ -2,7 +2,6 @@
 
 namespace Clockwork_For_Wp\Tests\Integration;
 
-use Clockwork\Storage\StorageInterface;
 use Clockwork_For_Wp\Clockwork_Provider;
 use Clockwork_For_Wp\Config;
 use Clockwork_For_Wp\Plugin;
@@ -44,6 +43,7 @@ class Clockwork_Provider_Test extends TestCase {
 		$this->assertFalse( function_exists( 'clock' ) );
 
 		$plugin = new Plugin( [], [
+			'dir' => __DIR__ . '/../../',
 			Config::class => new Config( [
 				'register_helpers' => true,
 				'storage' => [
