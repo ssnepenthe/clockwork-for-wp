@@ -18,10 +18,12 @@ Once the plugin has been activated, there are two primary options for usage:
 
 If you have installed the browser extension, open developer tools and browse to the Clockwork tab.
 
-Otherwise, open a new browser tab and navigate to the `__clockwork/app` endpoint (e.g. https://mysite.com/__clockwork/app).
+Otherwise, open a new browser tab and navigate to the `__clockwork/app` endpoint (e.g. https://example.com/__clockwork/app).
+
+If you are trying to debug outside of an HTML context (e.g. wp-cron, rest api, admin-ajax, wp-cli), you must to use the webapp instead of the browser extension.
 
 ## Configuration
-Clockwork can be configured using the `cfw_config_init` action from within a must-use plugin.
+By default, all data sources are disabled. You can configure data sources and various other Clockwork settings using the `cfw_config_init` action from within a must-use plugin.
 
 Your callback should accept an instance of `\Clockwork_For_Wp\Config` which can be used to change any of the configuration options found in `src/config.php`. Options are set using dot notation.
 
@@ -32,11 +34,11 @@ For example, consider the following must-use plugin at `wp-content/mu-plugins/cf
     // Disables the Clockwork webapp.
     $config->set( 'web', false );
 
-    // Disables the WP_Rewrite data source.
-    $config->set( 'data_sources.wp_rewrite.enabled', false );
+    // Enables the WP_Rewrite data source.
+    $config->set( 'data_sources.wp_rewrite.enabled', true );
 
-    // Sets the expiration for file-based metadata storage to one day (in minutes).
-    $config->set( 'storage.drivers.file.config.expiration', 60 * 24 );
+    // Sets the metadata expiration to one day (in minutes).
+    $config->set( 'storage.expiration', 60 * 24 );
 } );
 ```
 
