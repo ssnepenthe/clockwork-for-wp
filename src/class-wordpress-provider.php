@@ -4,6 +4,8 @@ namespace Clockwork_For_Wp;
 
 class Wordpress_Provider extends Base_Provider {
 	public function register() {
+		require_once $this->plugin['dir'] . '/src/wordpress-helpers.php';
+
 		// @todo consider prefixing params that are not type-hintable to avoid accidental injections.
 		$this->plugin['content_width'] = $this->plugin->factory( function() {
 			return $GLOBALS['content_width'];

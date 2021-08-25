@@ -69,19 +69,13 @@ if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 // @todo Check for minimum php version.
 // @todo Check that dependencies have been installed.
 
-require_once __DIR__ . '/src/plugin-helpers.php';
-require_once __DIR__ . '/src/wordpress-helpers.php';
-require_once __DIR__ . '/src/Wp_Cli/helpers.php';
-
-if ( defined( 'WP_CLI' ) && WP_CLI ) {
-	require_once __DIR__ . '/src/wp-cli.php';
-}
-
 function _cfw_instance() {
 	static $instance = null;
 
 	if ( null === $instance ) {
-		$instance = new Plugin();
+		$instance = new Plugin( null, [
+			'dir' => __DIR__,
+		] );
 	}
 
 	return $instance;

@@ -12,6 +12,7 @@ use Clockwork_For_Wp\Event_Management\Event_Management_Provider;
 use Clockwork_For_Wp\Routing\Routing_Provider;
 use Clockwork_For_Wp\Web_App\Web_App_Provider;
 use Clockwork_For_Wp\Wp_Cli\Cli_Collection_Helper;
+use Clockwork_For_Wp\Wp_Cli\Wp_Cli_Provider;
 use Pimple\Container;
 
 class Plugin implements ArrayAccess {
@@ -32,6 +33,7 @@ class Plugin implements ArrayAccess {
 				Event_Management_Provider::class,
 				Routing_Provider::class,
 				Web_App_Provider::class,
+				Wp_Cli_Provider::class,
 			];
 		}
 

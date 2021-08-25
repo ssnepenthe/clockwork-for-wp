@@ -16,6 +16,8 @@ use Pimple\Psr11\Container;
 
 class Plugin_Provider extends Base_Provider {
 	public function register() {
+		require_once $this->plugin['dir'] . '/src/plugin-helpers.php';
+
 		$this->plugin[ Config::class ] = function() {
 			$values = include __DIR__ . '/config.php';
 			$config = new Config( $values );
