@@ -269,6 +269,12 @@ return [
 		// bool. Enable or disable data collection for WP-CLI commands.
 		'collect' => false,
 
+		// bool. Enable or disable recording of all global parameters. This refers to all global parameters defined via command line arguments, yml config and some WP-CLI defaults.
+		'record_global_parameters' => false,
+
+		// bool. Enable or disable recording of runtime global parameters. This refers to global parameters defined via command line arguments only. Ignored if "record_global_parameters" is also true.
+		'record_global_runtime_parameters' => true,
+
 		// string[]. List of commands for which data should not be collected.
 		'except' => [
 			// 'cache get',

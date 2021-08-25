@@ -9,14 +9,16 @@ use WP_CLI\SynopsisParser;
 class Command_Context {
 	protected $command;
 	protected $args;
+	protected $options;
 	protected $command_path;
 
 	protected $synopsis;
 	protected $parser;
 
-	public function __construct( $command, $args, $command_path ) {
+	public function __construct( $command, $args, $options, $command_path ) {
 		$this->command = $command;
 		$this->args = $args;
+		$this->options = $options;
 		$this->command_path = $command_path;
 
 		$this->synopsis = SynopsisParser::parse( $this->command->get_synopsis() );
@@ -32,7 +34,27 @@ class Command_Context {
 			return null;
 		}
 
-		return new static( ...$command );
+		$global = _cfw_instance()->config( 'wp_cli.record_global_parameters', false );
+		$global_runtime = _cfw_instance()->config(
+			'wp_cli.record_global_runtime_parameters',
+			true
+		);
+		$global_filter = static function( $option ) {
+			return null !== $option && '' !== $option && [] !== $option;
+		};
+
+		$options = $runner->assoc_args;
+
+		if ( $global ) {
+			$options = array_merge( array_filter( $runner->config, $global_filter ), $options );
+		} else if ( $global_runtime ) {
+			$options = array_merge(
+				array_filter( $runner->runtime_config, $global_filter ),
+				$options
+			);
+		}
+
+		return new static( $command[0], $command[1], $options, $command[2] );
 	}
 
 	public function get_params( $types ) {
@@ -60,7 +82,7 @@ class Command_Context {
 
 	// @todo Verify how "generic" options are handled... I think it should be fine.
 	public function options() {
-		return WP_CLI::get_runner()->assoc_args;
+		return $this->options;
 	}
 
 	public function default_arguments() {
@@ -80,6 +102,8 @@ class Command_Context {
 	}
 
 	public function default_options() {
+		// @todo Should we also get WP-CLI global defaults? i.e. Runner::$config or Runner::$runtime_config.
+		// If added, we should unset any from our options that came from defaults.
 		$options_with_defaults = [];
 
 		foreach ( $this->get_params( ['assoc', 'flag'] ) as $param ) {
