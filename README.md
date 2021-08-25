@@ -39,3 +39,5 @@ For example, consider the following must-use plugin at `wp-content/mu-plugins/cf
     $config->set( 'storage.drivers.file.config.expiration', 60 * 24 );
 } );
 ```
+
+If you would like to collect WP-CLI output, it can be beneficial to add the "initialize-wp-cli-logger.php" file to the list of requires in your [WP-CLI config](https://make.wordpress.org/cli/handbook/references/config/) to ensure we are capturing as much output as possible.

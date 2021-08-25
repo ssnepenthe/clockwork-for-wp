@@ -7,10 +7,6 @@ use Clockwork_For_Wp\Base_Provider;
 class Wp_Cli_Provider extends Base_Provider {
 	public function register() {
 		require_once $this->plugin['dir'] . '/src/Wp_Cli/helpers.php';
-
-		$this->plugin[ Cli_Collection_Helper::class ] = function() {
-			return new Cli_Collection_Helper();
-		};
 	}
 
 	public function registered() {
@@ -19,7 +15,7 @@ class Wp_Cli_Provider extends Base_Provider {
 			return;
 		}
 
-		$this->plugin[ Cli_Collection_Helper::class ]->initialize_logger();
+		Cli_Collection_Helper::initialize_logger();
 
 		add_command( new Clean_Command() );
 		add_command( new Generate_Command_Lists_Command() );

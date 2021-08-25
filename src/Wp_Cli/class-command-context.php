@@ -2,12 +2,9 @@
 
 namespace Clockwork_For_Wp\Wp_Cli;
 
-use ReflectionProperty;
 use WP_CLI;
 use WP_CLI\DocParser;
-use WP_CLI\Loggers\Execution;
 use WP_CLI\SynopsisParser;
-use function Clockwork_For_Wp\logger;
 
 class Command_Context {
 	protected $command;
@@ -103,7 +100,7 @@ class Command_Context {
 	}
 
 	public function output() {
-		$logger = _cfw_instance()[ Cli_Collection_Helper::class ]->get_logger();
+		$logger = Cli_Collection_Helper::get_plugin_logger();
 		// We are flushing buffers in the "wp_loaded" hook at priority 999.
 		// $logger->ob_end();
 
