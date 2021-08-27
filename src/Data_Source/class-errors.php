@@ -120,10 +120,12 @@ class Errors extends DataSource implements Subscriber {
 			return;
 		}
 
+		if ( ! $this->display ) {
+			return;
+		}
+
 		foreach ( $this->errors as $error ) {
-			if ( $this->should_display( $error['type'] ) ) {
-				$this->print_error( $error );
-			}
+			$this->print_error( $error );
 		}
 	}
 
@@ -197,10 +199,6 @@ class Errors extends DataSource implements Subscriber {
 		}
 
 		return (string) $type;
-	}
-
-	protected function should_display( $type ) {
-		return $this->display && $this->should_log( $type );
 	}
 
 	protected function should_log( $type ) {
