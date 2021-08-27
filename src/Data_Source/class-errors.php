@@ -25,7 +25,6 @@ class Errors extends DataSource implements Subscriber {
 		return [
 			'cfw_pre_resolve' => [
 				function() {
-					$this->record_final_error();
 					$this->flush_errors();
 				},
 				Event_Manager::LATE_EVENT,
@@ -68,19 +67,6 @@ class Errors extends DataSource implements Subscriber {
 			'file' => $file,
 			'line' => $line,
 		];
-	}
-
-	protected function record_final_error() {
-		$last_error = error_get_last();
-
-		if ( null !== $last_error ) {
-			$this->record_error(
-				$last_error['type'],
-				$last_error['message'],
-				$last_error['file'],
-				$last_error['line']
-			);
-		}
 	}
 
 	protected function get_errors_log() {
