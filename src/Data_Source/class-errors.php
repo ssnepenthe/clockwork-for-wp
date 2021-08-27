@@ -13,8 +13,8 @@ class Errors extends DataSource {
 	protected $original_handler;
 	protected $registered = false;
 
-	public function __construct( $error_reporting = E_ALL ) {
-		$this->error_reporting = $error_reporting;
+	public function __construct() {
+		$this->error_reporting = error_reporting();
 	}
 
 	public function resolve( Request $request ) {
@@ -51,17 +51,28 @@ class Errors extends DataSource {
 	}
 
 	public function record_error( $no, $str, $file = null, $line = null ) {
-		if ( ! $this->should_log( $no ) ) {
+		$probably_suppressed = error_reporting() !== $this->error_reporting;
+
+		if ( $probably_suppressed ) {
+			$should_log = $this->error_reporting & $no;
+		} else {
+			$should_log = error_reporting() & $no;
+		}
+
+		if ( ! (bool) $should_log ) {
 			return;
 		}
 
-		// MD5 is used in an attempt to prevent duplicates when recording last error on shutdown.
-		$this->errors[ hash( 'md5', serialize( [ $no, $str, $file, $line ] ) ) ] = [
+		$error_array = [
 			'type' => $no,
 			'message' => $str,
 			'file' => $file,
 			'line' => $line,
+			'suppressed' => $probably_suppressed,
 		];
+
+		// MD5 is used in an attempt to prevent duplicates when recording last error on shutdown.
+		$this->errors[ hash( 'md5', serialize( [ $no, $str, $file, $line ] ) ) ] = $error_array;
 	}
 
 	protected function append_errors_log( $request ) {
@@ -69,7 +80,13 @@ class Errors extends DataSource {
 
 		foreach ( $this->errors as $error ) {
 			// @todo Logging by actual type instead of debug?
-			$log->debug( $error['message'], [
+			$message = $error['message'];
+
+			if ( $error['suppressed'] ) {
+				$message .= ' (@-suppressed)';
+			}
+
+			$log->debug( $message, [
 				'type' => $this->friendly_type( $error['type'] ),
 				'file' => $error['file'],
 				'line' => $error['line'],
@@ -129,9 +146,5 @@ class Errors extends DataSource {
 		}
 
 		return (string) $type;
-	}
-
-	protected function should_log( $type ) {
-		return (bool) ( $this->error_reporting & $type );
 	}
 }

@@ -80,7 +80,7 @@ class Data_Source_Provider extends Base_Provider {
 		};
 
 		$this->plugin[ Errors::class ] = function() {
-			return new Errors( \error_reporting() );
+			return new Errors();
 		};
 
 		$this->plugin[ Php::class ] = function() {
