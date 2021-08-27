@@ -90,14 +90,15 @@ class Errors extends DataSource {
 		$log = new Log();
 
 		foreach ( $this->errors as $error ) {
-			// @todo Logging by actual type instead of debug?
 			$message = $error['message'];
 
 			if ( $error['suppressed'] ) {
 				$message .= ' (@-suppressed)';
 			}
 
-			$log->debug( $message, [
+			$log_method = $this->log_method( $error['type'] );
+
+			call_user_func( [ $log, $log_method ], $message, [
 				'type' => $this->friendly_type( $error['type'] ),
 				'file' => $error['file'],
 				'line' => $error['line'],
@@ -105,6 +106,31 @@ class Errors extends DataSource {
 		}
 
 		$request->log()->merge( $log );
+	}
+
+	protected function log_method( $type ) {
+		// Best guess based on rough cross reference of predefined constants docs and PSR abstract
+		// logger docs. May want to revisit eventually.
+		switch ( $type ) {
+			case E_ERROR:
+			case E_PARSE:
+			case E_CORE_ERROR:
+			case E_COMPILE_ERROR:
+			case E_USER_ERROR:
+			case E_RECOVERABLE_ERROR:
+				return 'error';
+
+			case E_WARNING:
+			case E_CORE_WARNING:
+			case E_COMPILE_WARNING:
+			case E_USER_WARNING:
+			case E_DEPRECATED:
+			case E_USER_DEPRECATED:
+				return 'warning';
+
+			default:
+				return 'notice';
+		}
 	}
 
 	protected function friendly_label( $type ) {
