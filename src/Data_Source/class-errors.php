@@ -32,7 +32,7 @@ class Errors extends DataSource {
 		$error = error_get_last();
 
 		if ( $error ) {
-			$this->handler( $error['type'], $error['message'], $error['file'], $error['line'] );
+			$this->record_error( $error['type'], $error['message'], $error['file'], $error['line'] );
 		}
 
 		$this->original_handler = set_error_handler( [ $this, 'handler' ] );
