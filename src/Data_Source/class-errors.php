@@ -5,31 +5,16 @@ namespace Clockwork_For_Wp\Data_Source;
 use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Log;
 use Clockwork\Request\Request;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
-use Clockwork_For_Wp\Event_Management\Subscriber;
 
 // @todo Also handle exceptions?
-class Errors extends DataSource implements Subscriber {
-	protected $display;
+class Errors extends DataSource {
 	protected $error_reporting;
 	protected $errors = [];
 	protected $original_handler;
 	protected $registered = false;
 
 	public function __construct( $display = false, $error_reporting = E_ALL ) {
-		$this->display = $display;
 		$this->error_reporting = $error_reporting;
-	}
-
-	public function get_subscribed_events() : array {
-		return [
-			'cfw_pre_resolve' => [
-				function() {
-					$this->flush_errors();
-				},
-				Event_Manager::LATE_EVENT,
-			],
-		];
 	}
 
 	public function resolve( Request $request ) {
@@ -70,7 +55,6 @@ class Errors extends DataSource implements Subscriber {
 			return;
 		}
 
-		// @todo Consider only recording errors when true === $this->display?
 		// MD5 is used in an attempt to prevent duplicates when recording last error on shutdown.
 		$this->errors[ hash( 'md5', serialize( [ $no, $str, $file, $line ] ) ) ] = [
 			'type' => $no,
@@ -93,60 +77,6 @@ class Errors extends DataSource implements Subscriber {
 		}
 
 		$request->log()->merge( $log );
-	}
-
-	protected function flush_errors() {
-		// MAJOR @todo!!!
-		$guard = function() {
-			// Because we want to avoid printing errors for clockwork requests...
-			// @todo Cleaner handling.
-			if ( '1' === get_query_var( 'cfw_app', null ) ) {
-				return true;
-			}
-
-			if ( null !== get_query_var( 'cfw_id', null ) ) {
-				return true;
-			}
-
-			if ( null !== get_query_var( 'cfw_auth', null ) ) {
-				return true;
-			}
-
-			return false;
-		};
-
-		// @todo May be better to include special handling for json requests?
-		if ( $guard() ) {
-			return;
-		}
-
-		if ( ! $this->display ) {
-			return;
-		}
-
-		foreach ( $this->errors as $error ) {
-			$this->print_error( $error );
-		}
-	}
-
-	protected function print_error( $error ) {
-		if ( function_exists( 'xdebug_print_function_stack' ) ) {
-			xdebug_print_function_stack( sprintf(
-				'%s: %s in %s on line %d. Output triggered',
-				$this->friendly_label( $error['type'] ),
-				$error['message'],
-				$error['file'],
-				$error['line']
-			) );
-		} else {
-			printf(
-				'<br /><b>%s</b>: %s in <b>%s</b> on line <b>%d</b><br />',
-				htmlentities( $this->friendly_label( $error['type'] ) ),
-				htmlentities( $error['message'] ),
-				htmlentities( $error['file'] ),
-				$error['line']
-			);
-		}
 	}
 
 	protected function friendly_label( $type ) {

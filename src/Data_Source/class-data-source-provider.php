@@ -80,16 +80,7 @@ class Data_Source_Provider extends Base_Provider {
 		};
 
 		$this->plugin[ Errors::class ] = function() {
-			// If display_errors is set, output can potentially prevent necessary headers
-			// from being sent. For this reason we will prevent errors from being
-			// displayed immediately, outputting them manually on shutdown.
-			$display = (bool) ini_get( 'display_errors' );
-
-			if ( $display ) {
-				ini_set( 'display_errors', 0 );
-			}
-
-			return new Errors( $display, \error_reporting() );
+			return new Errors( \error_reporting() );
 		};
 
 		$this->plugin[ Php::class ] = function() {
@@ -179,10 +170,6 @@ class Data_Source_Provider extends Base_Provider {
 
 	protected function subscribers() : array {
 		$subscribers = [];
-
-		if ( $this->plugin->is_feature_enabled( 'errors' ) ) {
-			$subscribers[] = Errors::class;
-		}
 
 		if ( $this->plugin->is_feature_enabled( 'rest_api' ) ) {
 			$subscribers[] = Rest_Api::class;
