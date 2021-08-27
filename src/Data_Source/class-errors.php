@@ -66,6 +66,10 @@ class Errors extends DataSource implements Subscriber {
 	}
 
 	public function record_error( $no, $str, $file = null, $line = null ) {
+		if ( ! $this->should_log( $no ) ) {
+			return;
+		}
+
 		// @todo Consider only recording errors when true === $this->display?
 		// MD5 is used in an attempt to prevent duplicates when recording last error on shutdown.
 		$this->errors[ hash( 'md5', serialize( [ $no, $str, $file, $line ] ) ) ] = [
@@ -80,17 +84,15 @@ class Errors extends DataSource implements Subscriber {
 		$log = new Log();
 
 		foreach ( $this->errors as $error ) {
-			if ( $this->should_log( $error['type'] ) ) {
-				// @todo Logging by actual type instead of debug?
-				$log->debug( $error['message'], [
-					'type' => $this->friendly_type( $error['type'] ),
-					'file' => $error['file'],
-					'line' => $error['line'],
-				] );
-			}
+			// @todo Logging by actual type instead of debug?
+			$log->debug( $error['message'], [
+				'type' => $this->friendly_type( $error['type'] ),
+				'file' => $error['file'],
+				'line' => $error['line'],
+			] );
 		}
 
-		$request->log()->merge( $this->get_errors_log() );
+		$request->log()->merge( $log );
 	}
 
 	protected function flush_errors() {
