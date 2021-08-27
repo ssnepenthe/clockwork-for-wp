@@ -168,6 +168,12 @@ class Data_Source_Provider extends Base_Provider {
 		};
 	}
 
+	public function registered() {
+		if ( ! $this->plugin->is_feature_enabled( 'errors' ) ) {
+			$this->plugin[ Errors::class ]->unregister();
+		}
+	}
+
 	protected function subscribers() : array {
 		$subscribers = [];
 
