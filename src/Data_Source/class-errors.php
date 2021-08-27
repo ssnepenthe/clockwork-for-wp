@@ -13,7 +13,7 @@ class Errors extends DataSource {
 	protected $original_handler;
 	protected $registered = false;
 
-	public function __construct( $display = false, $error_reporting = E_ALL ) {
+	public function __construct( $error_reporting = E_ALL ) {
 		$this->error_reporting = $error_reporting;
 	}
 
