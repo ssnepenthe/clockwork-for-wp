@@ -40,6 +40,17 @@ class Errors extends DataSource {
 		$this->registered = true;
 	}
 
+	public function unregister() {
+		if ( ! $this->registered ) {
+			return;
+		}
+
+		restore_error_handler();
+		$this->errors = [];
+		$this->original_handler = null;
+		$this->registered = false;
+	}
+
 	public function handler( $no, $str, $file = null, $line = null ) {
 		$this->record_error( $no, $str, $file, $line );
 
