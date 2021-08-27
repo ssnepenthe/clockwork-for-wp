@@ -43,6 +43,13 @@ class Errors extends DataSource implements Subscriber {
 			return;
 		}
 
+		// If there was an error before this plugin is loaded we will record it.
+		$error = error_get_last();
+
+		if ( $error ) {
+			$this->handler( $error['type'], $error['message'], $error['file'], $error['line'] );
+		}
+
 		$this->original_handler = set_error_handler( [ $this, 'handler' ] );
 
 		$this->registered = true;
