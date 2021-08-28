@@ -102,7 +102,10 @@ class Errors extends DataSource {
 			'suppressed' => $probably_suppressed,
 		];
 
-		// MD5 is used in an attempt to prevent duplicates when recording last error on shutdown.
+		if ( ! $this->passesFilters( [ $error_array ] ) ) {
+			return;
+		}
+
 		$this->errors[ hash( 'md5', serialize( [ $no, $str, $file, $line ] ) ) ] = $error_array;
 	}
 
