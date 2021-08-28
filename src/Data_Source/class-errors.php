@@ -32,7 +32,7 @@ class Errors extends DataSource {
 	}
 
 	public function resolve( Request $request ) {
-		$this->append_errors_log( $request );
+		$this->append_log( $request );
 
 		return $request;
 	}
@@ -52,10 +52,10 @@ class Errors extends DataSource {
 		$error = error_get_last();
 
 		if ( $error ) {
-			$this->record_error( $error['type'], $error['message'], $error['file'], $error['line'] );
+			$this->record( $error['type'], $error['message'], $error['file'], $error['line'] );
 		}
 
-		$this->original_handler = set_error_handler( [ $this, 'handler' ] );
+		$this->original_handler = set_error_handler( [ $this, 'handle' ] );
 
 		$this->registered = true;
 	}
@@ -66,13 +66,14 @@ class Errors extends DataSource {
 		}
 
 		restore_error_handler();
+
 		$this->errors = [];
 		$this->original_handler = null;
 		$this->registered = false;
 	}
 
-	public function handler( $no, $str, $file = null, $line = null ) {
-		$this->record_error( $no, $str, $file, $line );
+	public function handle( $no, $str, $file = null, $line = null ) {
+		$this->record( $no, $str, $file, $line );
 
 		if ( is_callable( $this->original_handler ) ) {
 			return call_user_func( $this->original_handler, $no, $str, $file, $line );
@@ -81,7 +82,7 @@ class Errors extends DataSource {
 		return false;
 	}
 
-	public function record_error( $no, $str, $file = null, $line = null ) {
+	public function record( $no, $str, $file = null, $line = null ) {
 		$probably_suppressed = error_reporting() !== $this->error_reporting;
 
 		if ( $probably_suppressed ) {
@@ -109,7 +110,7 @@ class Errors extends DataSource {
 		$this->errors[ hash( 'md5', serialize( [ $no, $str, $file, $line ] ) ) ] = $error_array;
 	}
 
-	protected function append_errors_log( $request ) {
+	protected function append_log( $request ) {
 		$log = new Log();
 
 		foreach ( $this->errors as $error ) {
@@ -157,7 +158,7 @@ class Errors extends DataSource {
 	}
 
 	protected function friendly_label( $type ) {
-		// @todo Need to verify if this is thorough enough...
+		// Is this thorough enough?
 		switch ( $type ) {
 			case E_COMPILE_WARNING:
 			case E_CORE_WARNING:
