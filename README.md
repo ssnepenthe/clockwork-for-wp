@@ -45,6 +45,14 @@ For example, consider the following must-use plugin at `wp-content/mu-plugins/cf
 ## Data source requirements
 Some data sources have special requirements for use:
 
+### wpdb
+In order to use the wpdb data source the SAVEQUERIES constant must be defined and truthy.
+
+https://wordpress.org/support/article/debugging-in-wordpress/#savequeries
+
+### xdebug
+In order to use the xdebug data source the xdebug extension must be loaded.
+
 ### errors
 By default the errors data source will log all errors that occur after the plugin has loaded as well as the last error that occurred before the plugin loaded. If you want to capture earlier errors, you can manually register the error handler used by the data source:
 
