@@ -213,6 +213,13 @@ class Data_Source_Provider extends Base_Provider {
 				return $file_filter( $error['file'] );
 			} );
 
+			// Filter suppressed errors.
+			$include_suppressed = $config['include_suppressed_errors'] ?? false;
+
+			$errors->addFilter( function( $error ) use ( $include_suppressed ) {
+				return ! $error['suppressed'] || $include_suppressed;
+			} );
+
 			$errors->reapply_filters();
 		} else {
 			$errors->unregister();

@@ -116,6 +116,9 @@ return [
 				// string[]. A list of file patterns indicating an error should be recorded.
 				'only_files' => [],
 
+				// bool. Enable or disable collection of @-suppressed errors.
+				'include_suppressed_errors' => false,
+
 			],
 
 		],
