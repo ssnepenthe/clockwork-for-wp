@@ -79,9 +79,9 @@ class Data_Source_Provider extends Base_Provider {
 			return new Core( $this->plugin['wp_version'], $this->plugin['timestart'] );
 		};
 
-		$this->plugin[ Errors::class ] = function() {
-			return new Errors();
-		};
+		$this->plugin[ Errors::class ] = $this->plugin->factory( function() {
+			return Errors::get_instance();
+		} );
 
 		$this->plugin[ Php::class ] = function() {
 			$cookies = implode( '|', [ AUTH_COOKIE, SECURE_AUTH_COOKIE, LOGGED_IN_COOKIE ] );

@@ -42,4 +42,23 @@ For example, consider the following must-use plugin at `wp-content/mu-plugins/cf
 } );
 ```
 
+## Data source requirements
+Some data sources have special requirements for use:
+
+### errors
+By default the errors data source will log all errors that occur after the plugin has loaded as well as the last error that occurred before the plugin loaded. If you want to capture earlier errors, you can manually register the error handler used by the data source:
+
+```php
+// It may or may not be necessary to include the autoloader depending on how you use composer for your site.
+if ( file_exists( WP_PLUGIN_DIR . '/clockwork-for-wp/vendor/autoload.php' ) ) {
+    require_once WP_PLUGIN_DIR . '/clockwork-for-wp/vendor/autoload.php';
+}
+
+if ( class_exists( 'Clockwork_For_Wp\\Data_Source\\Errors' ) ) {
+    \Clockwork_For_Wp\Data_Source\Errors::get_instance()->register();
+}
+```
+
+## WP-CLI
 If you would like to collect WP-CLI output, it can be beneficial to add the "initialize-wp-cli-logger.php" file to the list of requires in your [WP-CLI config](https://make.wordpress.org/cli/handbook/references/config/) to ensure we are capturing as much output as possible.
+

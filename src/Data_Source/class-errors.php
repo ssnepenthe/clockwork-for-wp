@@ -13,8 +13,22 @@ class Errors extends DataSource {
 	protected $original_handler;
 	protected $registered = false;
 
+	protected static $instance;
+
 	public function __construct() {
 		$this->error_reporting = error_reporting();
+	}
+
+	public static function get_instance(){
+		if ( ! static::$instance instanceof Errors ) {
+			static::$instance = new Errors();
+		}
+
+		return static::$instance;
+	}
+
+	public static function set_instance( Errors $instance ) {
+		static::$instance = $instance;
 	}
 
 	public function resolve( Request $request ) {
