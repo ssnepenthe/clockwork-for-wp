@@ -169,8 +169,53 @@ class Data_Source_Provider extends Base_Provider {
 	}
 
 	public function registered() {
-		if ( ! $this->plugin->is_feature_enabled( 'errors' ) ) {
-			$this->plugin[ Errors::class ]->unregister();
+		// We have registered our error handler as early as possible in order to collect as many
+		// errors as possible. However our config is not available that early so let's apply our
+		// configuration now.
+		$errors = $this->plugin[ Errors::class ];
+
+		if ( $this->plugin->is_feature_enabled( 'errors' ) ) {
+			$config = $this->plugin->config( 'data_sources.errors.config', [] );
+
+			$except_types = $config['except_types'] ?? false;
+			$only_types = $config['only_types'] ?? false;
+
+			// Filter errors by type.
+			$errors->addFilter( function( $error ) use ( $except_types, $only_types ) {
+				if ( is_int( $only_types ) ) {
+					return ( $error['type'] & $only_types ) > 0;
+				}
+
+				if ( is_int( $except_types ) ) {
+					return ( $error['type'] & $except_types ) < 1;
+				}
+
+				return true;
+			} );
+
+			// Filter errors by message pattern.
+			$message_filter = new Except_Only_Filter(
+				$config['except_messages'] ?? [],
+				$config['only_messages'] ?? []
+			);
+
+			$errors->addFilter( function( $error ) use ( $message_filter ) {
+				return $message_filter( $error['message'] );
+			} );
+
+			// Filter errors by file pattern.
+			$file_filter = new Except_Only_Filter(
+				$config['except_files'] ?? [],
+				$config['only_files'] ?? []
+			);
+
+			$errors->addFilter( function( $error ) use ( $file_filter ) {
+				return $file_filter( $error['file'] );
+			} );
+
+			$errors->reapply_filters();
+		} else {
+			$errors->unregister();
 		}
 	}
 

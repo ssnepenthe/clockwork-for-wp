@@ -37,6 +37,12 @@ class Errors extends DataSource {
 		return $request;
 	}
 
+	public function reapply_filters() {
+		$this->errors = array_filter( $this->errors, function( $error ) {
+			return $this->passesFilters( [ $error ] );
+		} );
+	}
+
 	public function register() {
 		if ( $this->registered ) {
 			return;

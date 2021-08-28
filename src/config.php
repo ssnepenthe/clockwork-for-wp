@@ -96,6 +96,28 @@ return [
 
 			'data_source_class' => Errors::class,
 
+			'config' => [
+
+				// int|false. Bitmask indicating error types that should not be recorded. False to disable.
+				'except_types' => false,
+
+				// int|false. Bitmask indicating error types that should be recorded. False to disable.
+				'only_types' => false,
+
+				// string[]. A list of message patterns indicating an error should not be recorded.
+				'except_messages' => [],
+
+				// string[]. A list of message patterns indicating an error should be recorded.
+				'only_messages' => [],
+
+				// string[]. A list of file patterns indicating an error should not be recorded.
+				'except_files' => [],
+
+				// string[]. A list of file patterns indicating an error should be recorded.
+				'only_files' => [],
+
+			],
+
 		],
 
 		// The rest api data source records data about all registered rest routes.
