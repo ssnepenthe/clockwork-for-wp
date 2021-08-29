@@ -109,4 +109,36 @@ class Errors_Test extends TestCase {
 		$this->assertEquals( 'E_ERROR', $this->request->log()->messages[0]['context']['type'] );
 		$this->assertEquals( 'E_WARNING', $this->request->log()->messages[1]['context']['type'] );
 	}
+
+	/** @test */
+	public function it_correctly_guesses_when_error_has_been_suppressed() {
+		$message = __FUNCTION__;
+		$file = '/' . str_replace( '_', '/', __FUNCTION__ );
+		$line = 42;
+
+		$this->data_source->record( E_ERROR, $message, $file, $line );
+
+		$this->resolve_request();
+
+		$this->assertStringNotContainsString(
+			'@-suppressed',
+			$this->request->log()->messages[0]['message']
+		);
+
+		$error_reporting = error_reporting();
+		error_reporting( E_ERROR );
+
+		$this->setUp();
+
+		error_reporting( $error_reporting );
+
+		$this->data_source->record( E_ERROR, $message, $file, $line );
+
+		$this->resolve_request();
+
+		$this->assertStringContainsString(
+			'@-suppressed',
+			$this->request->log()->messages[0]['message']
+		);
+	}
 }
