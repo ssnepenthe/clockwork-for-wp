@@ -39,7 +39,7 @@ class Errors_Test extends TestCase {
 		$file = '/' . str_replace( '_', '/', __FUNCTION__ );
 		$line = 42;
 
-		$this->data_source->record_error( E_ERROR, $message, $file, $line );
+		$this->data_source->record( E_ERROR, $message, $file, $line );
 
 		$this->resolve_request();
 
@@ -52,7 +52,7 @@ class Errors_Test extends TestCase {
 			'file' => '/it/correctly/records/error/data',
 			'line' => 42,
 		], $entry['context'] );
-		$this->assertEquals( 'debug', $entry['level'] ); // @todo
+		$this->assertEquals( 'error', $entry['level'] ); // @todo
 	}
 
 	/** @test */
@@ -61,8 +61,8 @@ class Errors_Test extends TestCase {
 		$file = '/' . str_replace( '_', '/', __FUNCTION__ );
 		$line = 42;
 
-		$this->data_source->record_error( E_ERROR, $message, $file, $line );
-		$this->data_source->record_error( E_ERROR, $message, $file, $line );
+		$this->data_source->record( E_ERROR, $message, $file, $line );
+		$this->data_source->record( E_ERROR, $message, $file, $line );
 
 		$this->resolve_request();
 
@@ -71,32 +71,39 @@ class Errors_Test extends TestCase {
 
 	/** @test */
 	public function it_only_logs_configured_error_levels() {
-		$data_source = new Errors( false, E_ERROR | E_WARNING );
+		// Adjust error reporting.
+		$error_reporting = error_reporting();
+		error_reporting( E_ERROR | E_WARNING );
+
+		$data_source = new Errors();
 
 		$message = __FUNCTION__;
 		$file = '/' . str_replace( '_', '/', __FUNCTION__ );
 		$line = 42;
 
 		// Should be recorded.
-		$data_source->record_error( E_ERROR, $message, $file, $line );
-		$data_source->record_error( E_WARNING, $message, $file, $line );
+		$data_source->record( E_ERROR, $message, $file, $line );
+		$data_source->record( E_WARNING, $message, $file, $line );
 
 		// Should not be recorded.
-		$data_source->record_error( E_PARSE, $message, $file, $line );
-		$data_source->record_error( E_NOTICE, $message, $file, $line );
-		$data_source->record_error( E_CORE_ERROR, $message, $file, $line );
-		$data_source->record_error( E_CORE_WARNING, $message, $file, $line );
-		$data_source->record_error( E_COMPILE_ERROR, $message, $file, $line );
-		$data_source->record_error( E_COMPILE_WARNING, $message, $file, $line );
-		$data_source->record_error( E_USER_ERROR, $message, $file, $line );
-		$data_source->record_error( E_USER_WARNING, $message, $file, $line );
-		$data_source->record_error( E_USER_NOTICE, $message, $file, $line );
-		$data_source->record_error( E_STRICT, $message, $file, $line );
-		$data_source->record_error( E_RECOVERABLE_ERROR, $message, $file, $line );
-		$data_source->record_error( E_DEPRECATED, $message, $file, $line );
-		$data_source->record_error( E_USER_DEPRECATED, $message, $file, $line );
+		$data_source->record( E_PARSE, $message, $file, $line );
+		$data_source->record( E_NOTICE, $message, $file, $line );
+		$data_source->record( E_CORE_ERROR, $message, $file, $line );
+		$data_source->record( E_CORE_WARNING, $message, $file, $line );
+		$data_source->record( E_COMPILE_ERROR, $message, $file, $line );
+		$data_source->record( E_COMPILE_WARNING, $message, $file, $line );
+		$data_source->record( E_USER_ERROR, $message, $file, $line );
+		$data_source->record( E_USER_WARNING, $message, $file, $line );
+		$data_source->record( E_USER_NOTICE, $message, $file, $line );
+		$data_source->record( E_STRICT, $message, $file, $line );
+		$data_source->record( E_RECOVERABLE_ERROR, $message, $file, $line );
+		$data_source->record( E_DEPRECATED, $message, $file, $line );
+		$data_source->record( E_USER_DEPRECATED, $message, $file, $line );
 
 		$data_source->resolve( $this->request );
+
+		// Restore error reporting.
+		error_reporting( $error_reporting );
 
 		$this->assertCount( 2, $this->request->log()->messages );
 		$this->assertEquals( 'E_ERROR', $this->request->log()->messages[0]['context']['type'] );
