@@ -141,4 +141,41 @@ class Errors_Test extends TestCase {
 			$this->request->log()->messages[0]['message']
 		);
 	}
+
+	/** @test */
+	public function it_correctly_chooses_log_level_based_on_error_type() {
+		$message = __FUNCTION__;
+		$file = '/' . str_replace( '_', '/', __FUNCTION__ );
+		$line = 42;
+
+		// @todo Data provider?
+		$levels = [
+			[ E_ERROR, 'error' ],
+			[ E_PARSE, 'error' ],
+			[ E_CORE_ERROR, 'error' ],
+			[ E_COMPILE_ERROR, 'error' ],
+			[ E_USER_ERROR, 'error' ],
+			[ E_RECOVERABLE_ERROR, 'error' ],
+			[ E_WARNING, 'warning' ],
+			[ E_CORE_WARNING, 'warning' ],
+			[ E_COMPILE_WARNING, 'warning' ],
+			[ E_USER_WARNING, 'warning' ],
+			[ E_DEPRECATED, 'warning' ],
+			[ E_USER_DEPRECATED, 'warning' ],
+			[ E_NOTICE, 'notice' ],
+			[ E_USER_NOTICE, 'notice' ],
+			[ E_STRICT, 'notice' ],
+		];
+
+		foreach ( $levels as [ $contant, $_ ] ) {
+			$this->data_source->record( $contant, $message, $file, $line );
+		}
+
+		$this->resolve_request();
+		$messages = $this->request->log()->messages;
+
+		foreach ( $levels as $i => [ $_, $level ] ) {
+			$this->assertSame( $level, $messages[ $i ]['level'] );
+		}
+	}
 }
