@@ -2,7 +2,6 @@
 
 namespace Clockwork_For_Wp\Wp_Cli;
 
-use WP_CLI;
 use WP_CLI\Loggers\Execution;
 
 class Recorder extends Execution {

@@ -33,7 +33,6 @@ class Clockwork_Subscriber implements Subscriber {
 				$events['shutdown'] = [ 'finalize_command', Event_Manager::LATE_EVENT ];
 			} else if ( $this->plugin->is_collecting_requests() ) {
 				$events['shutdown'] = [ 'finalize_request', Event_Manager::LATE_EVENT ];
-
 			}
 		}
 

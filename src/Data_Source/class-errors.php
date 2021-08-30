@@ -6,7 +6,6 @@ use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Log;
 use Clockwork\Request\Request;
 
-// @todo Also handle exceptions?
 class Errors extends DataSource {
 	protected $error_reporting;
 	protected $errors = [];
