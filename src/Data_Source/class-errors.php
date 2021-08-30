@@ -83,7 +83,7 @@ class Errors extends DataSource {
 	}
 
 	public function record( $no, $str, $file = null, $line = null ) {
-		$probably_suppressed = error_reporting() !== $this->error_reporting;
+		$probably_suppressed = 0 === error_reporting() && 0 !== $this->error_reporting;
 
 		if ( $probably_suppressed ) {
 			$should_log = $this->error_reporting & $no;
