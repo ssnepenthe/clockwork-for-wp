@@ -16,24 +16,10 @@ class Wpdb extends DataSource implements Subscriber {
 	protected $custom_model_identifiers = [];
 	protected $detect_duplicate_queries;
 	protected $pattern_model_map;
-	protected $slow_threshold;
 
-	public function __construct(
-		bool $detect_duplicate_queries,
-		bool $slow_only,
-		float $slow_threshold,
-		array $pattern_model_map
-	) {
+	public function __construct( bool $detect_duplicate_queries, array $pattern_model_map ) {
 		$this->detect_duplicate_queries = $detect_duplicate_queries;
-		$this->slow_threshold = $slow_threshold;
 		$this->pattern_model_map = $pattern_model_map;
-
-		if ( $slow_only ) {
-			$this->addFilter( function( $duration ) {
-				// @todo Should this be inclusive (i.e. >=) instead?
-				return $duration > $this->slow_threshold;
-			} );
-		}
 	}
 
 	public function get_subscribed_events() : array {

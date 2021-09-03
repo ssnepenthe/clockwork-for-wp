@@ -5,6 +5,7 @@ namespace Clockwork_For_Wp\Data_Source;
 use Clockwork_For_Wp\Base_Provider;
 use Clockwork_For_Wp\Config;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
+use Closure;
 
 class Data_Source_Provider extends Base_Provider {
 	public function register() {
@@ -105,16 +106,22 @@ class Data_Source_Provider extends Base_Provider {
 		$this->plugin[ Wp_Hook::class ] = function() {
 			$config = $this->plugin->config( 'data_sources.wp_hook.config', [] );
 
-			$tag_filter = new Except_Only_Filter(
+			$data_source = new Wp_Hook( $config['all_hooks'] ?? false );
+
+			$data_source->addFilter( Closure::fromCallable( new Except_Only_Filter(
 				$config['except_tags'] ?? [],
 				$config['only_tags'] ?? []
-			);
-			$callback_filter = new Except_Only_Filter(
-				$config['except_callbacks'] ?? [],
-				$config['only_callbacks'] ?? []
+			) ), Wp_Hook::FILTER_TYPE_TAG );
+
+			$data_source->addFilter(
+				Closure::fromCallable( new Except_Only_Filter(
+					$config['except_callbacks'] ?? [],
+					$config['only_callbacks'] ?? []
+				) ),
+				Wp_Hook::FILTER_TYPE_CALLBACK
 			);
 
-			return new Wp_Hook( $config['all_hooks'] ?? false, $tag_filter, $callback_filter );
+			return $data_source;
 		};
 
 		$this->plugin[ Wp_Http::class ] = function() {
@@ -150,10 +157,17 @@ class Data_Source_Provider extends Base_Provider {
 
 			$data_source = new Wpdb(
 				$config['detect_duplicate_queries'] ?? false,
-				$config['slow_only'] ?? false,
-				$config['slow_threshold'] ?? 50,
 				$config['pattern_model_map'] ?? []
 			);
+
+			if ( $config['slow_only'] ?? false ) {
+				$slow_threshold = $config['slow_threshold'] ?? 50;
+
+				$data_source->addFilter( function( $duration ) use ( $slow_threshold ) {
+					// @todo Should this be inclusive (i.e. >=) instead?
+					return $duration > $slow_threshold;
+				} );
+			}
 
 			$this->plugin[ Event_Manager::class ]->trigger(
 				'cfw_data_sources_wpdb_init',

@@ -17,23 +17,8 @@ class Wp_Hook extends DataSource implements Subscriber {
 	protected $hooks = [];
 	protected $all_hooks;
 
-	public function __construct(
-		bool $all_hooks = false,
-		callable $tag_filter = null,
-		callable $callback_filter = null
-	) {
+	public function __construct( bool $all_hooks = false ) {
 		$this->all_hooks = $all_hooks;
-
-		if ( null !== $tag_filter ) {
-			$this->addFilter( Closure::fromCallable( $tag_filter ), self::FILTER_TYPE_TAG );
-		}
-
-		if ( null !== $callback_filter ) {
-			$this->addFilter(
-				Closure::fromCallable( $callback_filter ),
-				self::FILTER_TYPE_CALLBACK
-			);
-		}
 	}
 
 	public function get_subscribed_events() : array {
