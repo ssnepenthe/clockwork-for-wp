@@ -32,6 +32,9 @@ return [
 	// bool. Enable or disable collection of client metrics.
 	'collect_client_metrics' => true,
 
+	// bool. Enable or disable collection of admin-ajax "heartbeat" requests.
+	'collect_heartbeat' => true,
+
 	// bool. Enable or disable the the web UI at http://yoursite.test/__clockwork/app.
 	'web' => true,
 

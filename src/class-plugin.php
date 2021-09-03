@@ -158,10 +158,18 @@ class Plugin implements ArrayAccess {
 		return (bool) $this->config( 'collect_client_metrics', true );
 	}
 
+	public function is_collecting_heartbeat_requests() {
+		return (bool) $this->config( 'collect_heartbeat', true );
+	}
+
 	public function is_collecting_requests() {
 		return ( $this->is_enabled() || $this->config( 'collect_data_always', false ) )
 			&& ! $this->is_running_in_console()
-			&& $this[ Clockwork::class ]->shouldCollect()->filter( $this[ IncomingRequest::class ] );
+			&& $this[ Clockwork::class ]->shouldCollect()->filter( $this[ IncomingRequest::class ] )
+			&& (
+				! $this[ Incoming_Request::class ]->is_heartbeat()
+				|| $this->is_collecting_heartbeat_requests()
+			);
 	}
 
 	public function is_recording() {

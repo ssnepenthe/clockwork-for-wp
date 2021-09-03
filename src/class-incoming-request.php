@@ -5,6 +5,7 @@ namespace Clockwork_For_Wp;
 use Clockwork\Request\IncomingRequest;
 
 class Incoming_Request extends IncomingRequest {
+	protected $ajax_uri;
 	protected $content;
 	protected $headers = [];
 	protected $json;
@@ -27,6 +28,13 @@ class Incoming_Request extends IncomingRequest {
 	public function intended_method() {
 		// Placeholder in case we ever need to support other methods.
 		return $this->is_put() ? 'PUT' : $this->method;
+	}
+
+	public function is_heartbeat() {
+		return 'POST' === $this->method
+			&& $this->ajax_uri === $this->uri
+			&& array_key_exists( 'action', $this->input )
+			&& 'heartbeat' === $this->input['action'];
 	}
 
 	public function is_put() {
@@ -78,7 +86,9 @@ class Incoming_Request extends IncomingRequest {
 	}
 
 	public static function from_globals() {
+
 		return new static( [
+			'ajax_uri' => parse_url( admin_url( 'admin-ajax.php' ), PHP_URL_PATH ),
 			'cookies' => $_COOKIE,
 			'headers' => static::extract_headers( $_SERVER ),
 			'input' => $_REQUEST,
