@@ -3,8 +3,10 @@
 namespace Clockwork_For_Wp\Api;
 
 use Clockwork\Authentication\AuthenticatorInterface;
-use Clockwork\Request\IncomingRequest;
+use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Metadata;
+
+use function Clockwork_For_Wp\array_only;
 
 class Api_Controller {
 	protected $authenticator;
@@ -14,7 +16,7 @@ class Api_Controller {
 	public function __construct(
 		AuthenticatorInterface $authenticator,
 		Metadata $metadata,
-		IncomingRequest $request
+		Incoming_Request $request
 	) {
 		$this->authenticator = $authenticator;
 		$this->metadata = $metadata;
@@ -57,6 +59,27 @@ class Api_Controller {
 		$data = $this->apply_filters( $data );
 
 		wp_send_json( $data ); // @todo
+	}
+
+	public function update_data( $id ) {
+		$request = $this->metadata->get( $id );
+
+		if ( ! $request ) {
+			wp_send_json( [ 'message' => 'Request not found.' ], 404 );
+		}
+
+		$content = $this->request->json();
+		$token = $content['_token'] ?? '';
+
+		if ( ! $request->updateToken || ! hash_equals( $request->updateToken, $token ) ) {
+			wp_send_json( [ 'message' => 'Invalid update token.' ], 403 );
+		}
+
+		foreach ( array_only( $content, [ 'clientMetrics', 'webVitals' ] ) as $key => $value ) {
+			$request->{$key} = $value;
+		}
+
+		$this->metadata->update( $request );
 	}
 
 	protected function apply_filters( $data ) {

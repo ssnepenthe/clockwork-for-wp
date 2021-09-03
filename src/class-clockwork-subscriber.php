@@ -16,7 +16,9 @@ class Clockwork_Subscriber implements Subscriber {
 	}
 
 	public function get_subscribed_events() : array {
-		$events = [];
+		$events = [
+			'wp_enqueue_scripts' => 'enqueue_scripts',
+		];
 
 		if (
 			// @todo Redundant conditions?
@@ -24,7 +26,7 @@ class Clockwork_Subscriber implements Subscriber {
 			&& $this->plugin->is_collecting_requests()
 		) {
 			// wp_loaded fires on frontend but also login, admin, etc.
-			$events['wp_loaded'] = [ 'send_headers', Event_Manager::LATE_EVENT ];
+			$events['wp_loaded'] = [ 'initialize_request', Event_Manager::LATE_EVENT ];
 		}
 
 		// @todo Redundant conditions?
@@ -37,6 +39,33 @@ class Clockwork_Subscriber implements Subscriber {
 		}
 
 		return $events;
+	}
+
+	public function enqueue_scripts() {
+		// @todo Should this be implemented as a separate plugin?
+		wp_register_script(
+			'clockwork-metrics',
+			'https://cdn.jsdelivr.net/gh/underground-works/clockwork-browser@1/dist/metrics.js',
+			[],
+			false,
+			true
+		);
+
+		wp_register_script(
+			'clockwork-toolbar',
+			'https://cdn.jsdelivr.net/gh/underground-works/clockwork-browser@1/dist/toolbar.js',
+			[],
+			false,
+			true
+		);
+
+		if ( $this->plugin->is_collecting_client_metrics() ) {
+			wp_enqueue_script( 'clockwork-metrics' );
+		}
+
+		if ( $this->plugin->is_toolbar_enabled() ) {
+			wp_enqueue_script( 'clockwork-toolbar' );
+		}
 	}
 
 	public function finalize_request( Clockwork $clockwork, Event_Manager $event_manager ) {
@@ -72,7 +101,7 @@ class Clockwork_Subscriber implements Subscriber {
 			->storeRequest();
 	}
 
-	public function send_headers( Request $request ) {
+	public function initialize_request( Request $request ) {
 		if ( headers_sent() ) {
 			return;
 		}
@@ -91,5 +120,30 @@ class Clockwork_Subscriber implements Subscriber {
 		}
 
 		// @todo Set subrequest headers?
+
+		if (
+			$this->plugin->is_collecting_client_metrics()
+			|| $this->plugin->is_toolbar_enabled()
+		) {
+			$cookie = json_encode( [
+				'requestId' => $request->id,
+				'version' => Clockwork::VERSION,
+				'path' => '/__clockwork/',
+				'webPath' => '/__clockwork/app',
+				'token' => $request->updateToken,
+				'metrics' => $this->plugin->is_collecting_client_metrics(),
+				'toolbar' => $this->plugin->is_toolbar_enabled(),
+			] );
+
+			setcookie(
+				'x-clockwork',
+				$cookie,
+				time() + 60,
+				COOKIEPATH,
+				COOKIE_DOMAIN,
+				is_ssl() && 'https' === parse_url( home_url(), PHP_URL_SCHEME ),
+				false
+			);
+		}
 	}
 }

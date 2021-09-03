@@ -3,6 +3,7 @@
 namespace Clockwork_For_Wp\Routing;
 
 use Clockwork_For_Wp\Event_Management\Subscriber;
+use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Routing\Route_Collection;
 use WP;
 
@@ -20,12 +21,15 @@ class Routing_Subscriber implements Subscriber {
 		];
 	}
 
-	public function merge_rules( $rules, Route_Collection $routes ) {
+	public function merge_rules( $rules, Route_Collection $routes, Incoming_Request $request ) {
 		if ( ! $this->should_modify_rules( $rules ) ) {
 			return $rules;
 		}
 
-		return array_merge( $routes->get_rewrite_array(), $rules );
+		return array_merge(
+			$routes->get_rewrite_array_for_method( $request->intended_method() ),
+			$rules
+		);
 	}
 
 	public function diff_rules( $rules, Route_Collection $routes ) {
@@ -47,9 +51,11 @@ class Routing_Subscriber implements Subscriber {
 	public function call_matched_handler(
 		Route_Collection $routes,
 		WP $wp,
-		Route_Handler_Invoker $invoker
+		Route_Handler_Invoker $invoker,
+		Incoming_Request $request
 	) {
-		$route = $routes->match( $_SERVER['REQUEST_METHOD'], $wp->matched_rule );
+		// @todo $route = $routes->match( $request );?
+		$route = $routes->match( $request->intended_method(), $wp->matched_rule );
 
 		if ( null === $route ) {
 			return;

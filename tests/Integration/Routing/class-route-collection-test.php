@@ -14,6 +14,7 @@ class Route_Collection_Test extends TestCase {
 		);
 		$route_collection->get( 'get_method_regex', 'index.php?get_method=query', [] );
 		$route_collection->post( 'post_method_regex', 'index.php?post_method=query', [] );
+		$route_collection->put( 'put_method_regex', 'index.php?put_method=query', [] );
 
 		return $route_collection;
 	}
@@ -31,7 +32,7 @@ class Route_Collection_Test extends TestCase {
 		$prefixed_query_vars = $this->get_route_collection( 'pfx_' )->get_query_vars();
 
 		$this->assertSame(
-			[ 'pfx_add_method', 'pfx_get_method', 'pfx_post_method' ],
+			[ 'pfx_add_method', 'pfx_get_method', 'pfx_post_method', 'pfx_put_method' ],
 			$prefixed_query_vars
 		);
 	}
@@ -50,6 +51,14 @@ class Route_Collection_Test extends TestCase {
 
 		$this->assertEquals( 'POST', $route->get_method() );
 		$this->assertEquals( 'post_method_regex', $route->get_regex() );
+	}
+
+	/** @test */
+	public function it_provides_shorthand_for_adding_put_routes() {
+		$route = $this->get_route_collection()->match( 'PUT', 'put_method_regex' );
+
+		$this->assertEquals( 'PUT', $route->get_method() );
+		$this->assertEquals( 'put_method_regex', $route->get_regex() );
 	}
 
 	/** @test */
@@ -74,6 +83,7 @@ class Route_Collection_Test extends TestCase {
 			'add_method_regex' => 'index.php?add_method=query',
 			'get_method_regex' => 'index.php?get_method=query',
 			'post_method_regex' => 'index.php?post_method=query',
+			'put_method_regex' => 'index.php?put_method=query',
 		], $rules );
 
 		$prefixed_rules = $this->get_route_collection( 'pfx_' )->get_rewrite_array();
@@ -82,6 +92,24 @@ class Route_Collection_Test extends TestCase {
 			'add_method_regex' => 'index.php?pfx_add_method=query',
 			'get_method_regex' => 'index.php?pfx_get_method=query',
 			'post_method_regex' => 'index.php?pfx_post_method=query',
+			'put_method_regex' => 'index.php?pfx_put_method=query',
+		], $prefixed_rules );
+	}
+
+	/** @test */
+	public function it_provides_rewrite_rules_for_a_given_request_method() {
+		$rules = $this->get_route_collection()->get_rewrite_array_for_method( 'GET' );
+
+		$this->assertEquals( [
+			'add_method_regex' => 'index.php?add_method=query',
+			'get_method_regex' => 'index.php?get_method=query',
+		], $rules );
+
+		$prefixed_rules = $this->get_route_collection( 'pfx_' )
+			->get_rewrite_array_for_method( 'POST' );
+
+		$this->assertEquals( [
+			'post_method_regex' => 'index.php?pfx_post_method=query',
 		], $prefixed_rules );
 	}
 
@@ -89,12 +117,12 @@ class Route_Collection_Test extends TestCase {
 	public function it_provides_query_vars_for_all_registered_routes() {
 		$vars = $this->get_route_collection()->get_query_vars();
 
-		$this->assertEquals( [ 'add_method', 'get_method', 'post_method' ], $vars );
+		$this->assertEquals( [ 'add_method', 'get_method', 'post_method', 'put_method' ], $vars );
 
 		$prefixed_vars = $this->get_route_collection( 'pfx_' )->get_query_vars();
 
 		$this->assertEquals(
-			[ 'pfx_add_method', 'pfx_get_method', 'pfx_post_method' ],
+			[ 'pfx_add_method', 'pfx_get_method', 'pfx_post_method', 'pfx_put_method' ],
 			$prefixed_vars
 		);
 	}

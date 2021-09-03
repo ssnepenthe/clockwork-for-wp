@@ -154,6 +154,10 @@ class Plugin implements ArrayAccess {
 		return in_array( $command, $except, true );
 	}
 
+	public function is_collecting_client_metrics() {
+		return (bool) $this->config( 'collect_client_metrics', true );
+	}
+
 	public function is_collecting_requests() {
 		return ( $this->is_enabled() || $this->config( 'collect_data_always', false ) )
 			&& ! $this->is_running_in_console()
@@ -171,6 +175,10 @@ class Plugin implements ArrayAccess {
 	public function is_running_in_console() {
 		// @todo Do we actually care if it is in console but not WP-CLI?
 		return ( defined( 'WP_CLI' ) && WP_CLI ) || in_array( PHP_SAPI, [ 'cli', 'phpdbg' ], true );
+	}
+
+	public function is_toolbar_enabled() {
+		return (bool) $this->config( 'toolbar', true );
 	}
 
 	public function is_web_enabled() {

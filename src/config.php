@@ -29,8 +29,14 @@ return [
 	// bool. Collect data even when clockwork is disabled.
 	'collect_data_always' => false,
 
+	// bool. Enable or disable collection of client metrics.
+	'collect_client_metrics' => true,
+
 	// bool. Enable or disable the the web UI at http://yoursite.test/__clockwork/app.
 	'web' => true,
+
+	// bool. Enable or disable the Clockwork browser toolbar.
+	'toolbar' => true,
 
 	// bool. Load the clock() global function.
 	'register_helpers' => true,

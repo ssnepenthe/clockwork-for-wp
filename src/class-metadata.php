@@ -3,6 +3,7 @@
 namespace Clockwork_For_Wp;
 
 use Clockwork\Clockwork;
+use Clockwork\Request\Request;
 use Clockwork\Storage\Search;
 use Clockwork\Storage\StorageInterface;
 
@@ -35,6 +36,10 @@ class Metadata {
 		$data = $this->get( $id, $direction, $count );
 
 		return $this->clockwork->extendRequest( $data );
+	}
+
+	public function update( Request $request ) {
+		return $this->storage->update( $request );
 	}
 
 	protected function apply_defaults( $direction, $count ) {

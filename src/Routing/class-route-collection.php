@@ -26,6 +26,10 @@ class Route_Collection {
 		return $this->add( new Route( 'POST', $regex, $query, $handler ) );
 	}
 
+	public function put( string $regex, string $query, $handler ) {
+		return $this->add( new Route( 'PUT', $regex, $query, $handler ) );
+	}
+
 	// @todo Method name.
 	public function match( $method, $matched_pattern ) {
 		$key = $method . ':' . $matched_pattern;
@@ -41,6 +45,20 @@ class Route_Collection {
 		$rewrite_array = [];
 
 		foreach ( $this->routes as $route ) {
+			$rewrite_array[ $route->get_regex() ] = $route->get_query();
+		}
+
+		return $rewrite_array;
+	}
+
+	public function get_rewrite_array_for_method( string $method ) {
+		$rewrite_array = [];
+
+		foreach ( $this->routes as $route ) {
+			if ( $method !== $route->get_method() ) {
+				continue;
+			}
+
 			$rewrite_array[ $route->get_regex() ] = $route->get_query();
 		}
 

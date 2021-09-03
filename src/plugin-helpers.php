@@ -31,6 +31,10 @@ function array_has( array $array, string $path ) {
 	return $default !== array_get( $array, $path, $default );
 }
 
+function array_only( $array, $keys ) {
+	return array_intersect_key( $array, array_flip( $keys ) );
+}
+
 /**
  * Adapted from Illuminate\Support\Arr.
  */

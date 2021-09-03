@@ -133,13 +133,12 @@ class Clockwork_Provider extends Base_Provider {
 		// Could probably even create it within Plugin::__construct() and save it to container.
 		$this->plugin[ Request::class ];
 
-		$this->plugin[ IncomingRequest::class ] = function() {
-			return new IncomingRequest( [
-				'method' => $_SERVER['REQUEST_METHOD'],
-				'uri' => $_SERVER['REQUEST_URI'],
-				'input' => $_REQUEST,
-				'cookies' => $_COOKIE,
-			] );
+		$this->plugin[ IncomingRequest::class ] = $this->plugin->factory( function() {
+			return $this->plugin[ Incoming_Request::class ];
+		} );
+
+		$this->plugin[ Incoming_Request::class ] = function() {
+			return Incoming_Request::from_globals();
 		};
 	}
 

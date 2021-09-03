@@ -3,8 +3,10 @@
 namespace Clockwork_For_Wp\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
+
 use function Clockwork_For_Wp\array_get;
 use function Clockwork_For_Wp\array_has;
+use function Clockwork_For_Wp\array_only;
 use function Clockwork_For_Wp\array_set;
 use function Clockwork_For_Wp\describe_callable;
 use function Clockwork_For_Wp\describe_unavailable_callable;
@@ -69,6 +71,14 @@ class Helpers_Test extends TestCase {
 
 		$this->assertFalse( array_has( $array, 'b' ) );
 		$this->assertFalse( array_has( $array, 'd.c' ) );
+	}
+
+	/** @test */
+	public function test_array_only() {
+		$array = [ 'a' => 'b', 'c' => 'd', 'e' => 'f' ];
+
+		$this->assertSame( [ 'a' => 'b', 'c' => 'd' ], array_only( $array, [ 'a', 'c' ] ) );
+		$this->assertEmpty( array_only( $array, [ 'g' ] ) );
 	}
 
 	/** @test */
