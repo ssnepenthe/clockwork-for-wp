@@ -2,8 +2,12 @@
 
 namespace Clockwork_For_Wp\Tests\Integration\Data_Source;
 
-use Clockwork\Request\Request;
+use Clockwork_For_Wp\Config;
+use Clockwork_For_Wp\Data_Source\Data_Source_Provider;
 use Clockwork_For_Wp\Data_Source\Wpdb;
+use Clockwork_For_Wp\Event_Management\Event_Manager;
+use Clockwork_For_Wp\Plugin;
+use Clockwork\Request\Request;
 use PHPUnit\Framework\TestCase;
 
 class Wpdb_Test extends TestCase {
@@ -29,12 +33,7 @@ class Wpdb_Test extends TestCase {
 		$pattern_model_map = $this->pattern_model_map();
 		$pattern_model_map['/somewhere/'] = 'TESTMODEL';
 
-		$data_source = new Wpdb(
-			$detect_dupes = false,
-			$slow_only = false,
-			$slow_threshold = 50,
-			$pattern_model_map
-		);
+		$data_source = new Wpdb( $detect_dupes = false, $pattern_model_map );
 		$request = new Request();
 		$time = microtime( true );
 
@@ -83,12 +82,7 @@ class Wpdb_Test extends TestCase {
 
 	/** @test */
 	public function it_can_detect_duplicate_queries() {
-		$data_source = new Wpdb(
-			$detect_dupes = true,
-			$slow_only = false,
-			$slow_threshold = 50,
-			$this->pattern_model_map()
-		);
+		$data_source = new Wpdb( $detect_dupes = true, [] );
 		$request = new Request();
 		$untested_duration = 50;
 		$untested_time = microtime( true );
@@ -136,12 +130,10 @@ class Wpdb_Test extends TestCase {
 			[ 'select * from tags', 150, $untested_time ],
 		];
 
-		$data_source = new Wpdb(
-			$detect_dupes = false,
-			$slow_only = true,
-			$slow_threshold = 75,
-			$this->pattern_model_map()
-		);
+		$data_source = $this->create_data_source_via_plugin( [
+			'slow_only' => true,
+			'slow_threshold' => 75,
+		] );
 		$request = new Request();
 
 		$data_source->set_queries( $queries );
@@ -151,12 +143,10 @@ class Wpdb_Test extends TestCase {
 		$this->assertEquals( 'SELECT * FROM users', $request->databaseQueries[0]['query'] );
 		$this->assertEquals( 'SELECT * FROM tags', $request->databaseQueries[1]['query'] );
 
-		$data_source = new Wpdb(
-			$detect_dupes = false,
-			$slow_only = true,
-			$slow_threshold = 100,
-			$this->pattern_model_map()
-		);
+		$data_source = $this->create_data_source_via_plugin( [
+			'slow_only' => true,
+			'slow_threshold' => 100,
+		] );
 		$request = new Request();
 
 		$data_source->set_queries( $queries );
@@ -168,12 +158,7 @@ class Wpdb_Test extends TestCase {
 
 	/** @test */
 	public function it_can_identify_models_with_custom_identifier_callbacks() {
-		$data_source = new Wpdb(
-			$detect_dupes = false,
-			$slow_only = false,
-			$slow_threshold = 50,
-			$this->pattern_model_map()
-		);
+		$data_source = new Wpdb( $detect_dupes = false, $this->pattern_model_map() );
 
 		// It should use the first callback to return a string value.
 		$data_source->add_custom_model_identifier( function( $query ) {
@@ -194,5 +179,30 @@ class Wpdb_Test extends TestCase {
 
 		$this->assertEquals( 'SELECT * FROM posts', $request->databaseQueries[0]['query'] );
 		$this->assertEquals( 'TESTMODEL', $request->databaseQueries[0]['model'] );
+	}
+
+	protected function create_data_source_via_plugin( $config = [] ) {
+		$plugin = new Plugin( [ Data_Source_Provider::class ], [
+			Config::class => new Config( [
+				'data_sources' => [
+					'wpdb' => [
+						'config' => [
+							'pattern_model_map' => $config['pattern_model_map'] ?? $this->pattern_model_map(),
+							'slow_only' => $config['slow_only'] ?? false,
+							'slow_threshold' => $config['slow_threshold'] ?? 50
+						],
+					],
+				],
+			] ),
+			Event_Manager::class => new class {
+				public function trigger( ...$args ) {
+					// Not important.
+				}
+			},
+			'dir' => 'irrelevant',
+		] );
+		$plugin->boot();
+
+		return $plugin[ Wpdb::class ];
 	}
 }

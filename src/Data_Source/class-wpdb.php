@@ -75,13 +75,16 @@ class Wpdb extends DataSource implements Subscriber {
 			$this->duplicates[ $normalized ]++;
 		}
 
-		if ( $this->passesFilters( [ $duration ] ) ) {
-			$this->queries[] = [
-				'query' => $this->capitalize_keywords( $query ),
-				'duration' => $duration,
-				'model' => $this->identify_model( $query ),
-				'start' => $start,
-			];
+		$query = [
+			// @todo Consider trimming query (or maybe just pass through normalize_query()).
+			'query' => $this->capitalize_keywords( $query ),
+			'duration' => $duration,
+			'model' => $this->identify_model( $query ),
+			'start' => $start,
+		];
+
+		if ( $this->passesFilters( [ $query ] ) ) {
+			$this->queries[] = $query;
 		}
 
 		return $this;

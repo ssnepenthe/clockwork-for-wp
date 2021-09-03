@@ -5,7 +5,6 @@ namespace Clockwork_For_Wp\Data_Source;
 use Clockwork_For_Wp\Base_Provider;
 use Clockwork_For_Wp\Config;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
-use Closure;
 
 class Data_Source_Provider extends Base_Provider {
 	public function register() {
@@ -108,18 +107,23 @@ class Data_Source_Provider extends Base_Provider {
 
 			$data_source = new Wp_Hook( $config['all_hooks'] ?? false );
 
-			$data_source->addFilter( Closure::fromCallable( new Except_Only_Filter(
+			$tag_filter = new Except_Only_Filter(
 				$config['except_tags'] ?? [],
 				$config['only_tags'] ?? []
-			) ), Wp_Hook::FILTER_TYPE_TAG );
-
-			$data_source->addFilter(
-				Closure::fromCallable( new Except_Only_Filter(
-					$config['except_callbacks'] ?? [],
-					$config['only_callbacks'] ?? []
-				) ),
-				Wp_Hook::FILTER_TYPE_CALLBACK
 			);
+
+			$data_source->addFilter( function( $hook ) use ( $tag_filter ) {
+				return $tag_filter( $hook['Tag'] );
+			} );
+
+			$callback_filter = new Except_Only_Filter(
+				$config['except_callbacks'] ?? [],
+				$config['only_callbacks'] ?? []
+			);
+
+			$data_source->addFilter( function( $hook ) use ( $callback_filter ) {
+				return $callback_filter( $hook['Callback'] );
+			} );
 
 			return $data_source;
 		};
@@ -163,9 +167,9 @@ class Data_Source_Provider extends Base_Provider {
 			if ( $config['slow_only'] ?? false ) {
 				$slow_threshold = $config['slow_threshold'] ?? 50;
 
-				$data_source->addFilter( function( $duration ) use ( $slow_threshold ) {
+				$data_source->addFilter( function( $query ) use ( $slow_threshold ) {
 					// @todo Should this be inclusive (i.e. >=) instead?
-					return $duration > $slow_threshold;
+					return $query['duration'] > $slow_threshold;
 				} );
 			}
 

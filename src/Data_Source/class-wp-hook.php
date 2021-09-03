@@ -11,9 +11,6 @@ use function Clockwork_For_Wp\describe_callable;
 use function Clockwork_For_Wp\describe_unavailable_callable;
 
 class Wp_Hook extends DataSource implements Subscriber {
-	const FILTER_TYPE_TAG = 'tag';
-	const FILTER_TYPE_CALLBACK = 'callback';
-
 	protected $hooks = [];
 	protected $all_hooks;
 
@@ -60,10 +57,6 @@ class Wp_Hook extends DataSource implements Subscriber {
 		$callback = null,
 		int $accepted_args = null
 	) {
-		if ( ! $this->passesFilters( [ $tag ], self::FILTER_TYPE_TAG ) ) {
-			return;
-		}
-
 		if ( null === $callback ) {
 			$callback_description = '';
 		} else {
@@ -72,17 +65,18 @@ class Wp_Hook extends DataSource implements Subscriber {
 				: describe_unavailable_callable( $callback );
 		}
 
-		if ( ! $this->passesFilters( [ $callback_description ], self::FILTER_TYPE_CALLBACK ) ) {
-			return;
-		}
-
-		// @todo Should empty values be filtered out?
-		// @todo Generic $this->passesFilters() so users can add their own?
-		$this->hooks[] = [
+		$hook = [
 			'Tag' => $tag,
 			'Priority' => null !== $priority ? (string) $priority : '',
 			'Callback' => $callback_description,
 			'Accepted Args' => null !== $accepted_args ? (string) $accepted_args : '',
 		];
+
+		if ( ! $this->passesFilters( [ $hook ] ) ) {
+			return;
+		}
+
+		// @todo Should empty values be filtered out?
+		$this->hooks[] = $hook;
 	}
 }
