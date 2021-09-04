@@ -20,9 +20,9 @@ use Clockwork_For_Wp\Event_Management\Subscriber;
 class Xdebug extends XdebugDataSource implements Subscriber {
 	protected $profiler_filename;
 
-	public function get_subscribed_events() : array {
+	public function get_subscribed_events(): array {
 		return [
-			'init' => function() {
+			'init' => function () {
 				$this->set_profiler_filename( xdebug_get_profiler_filename() );
 			},
 		];
@@ -33,7 +33,7 @@ class Xdebug extends XdebugDataSource implements Subscriber {
 			$request->xdebug = [
 				'profile' => $this->profiler_filename,
 			];
-		};
+		}
 
 		return $request;
 	}

@@ -7,7 +7,7 @@ use Invoker\Invoker;
 
 class Event_Management_Provider extends Base_Provider {
 	public function register() {
-		$this->plugin[ Event_Manager::class ] = function() {
+		$this->plugin[ Event_Manager::class ] = function () {
 			return new Event_Manager( $this->plugin[ Invoker::class ] );
 		};
 	}

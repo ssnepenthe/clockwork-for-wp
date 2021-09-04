@@ -9,16 +9,16 @@ class Cli_Collection_Helper {
 	protected static $logger;
 	protected static $logger_initialized = false;
 
-	public static function initialize_logger() {
-		if ( static::$logger_initialized ) {
-			return;
-		}
+	public static function get_clockwork_command_list() {
+		$commands = include __DIR__ . '/clockwork-command-list.php';
 
-		WP_CLI::set_logger(
-			new Logger_Chain( static::get_wp_cli_logger(), static::get_plugin_logger() )
-		);
+		return $commands;
+	}
 
-		static::$logger_initialized = true;
+	public static function get_core_command_list() {
+		$commands = include __DIR__ . '/core-command-list.php';
+
+		return $commands;
 	}
 
 	public static function get_plugin_logger() {
@@ -44,15 +44,15 @@ class Cli_Collection_Helper {
 		return $logger;
 	}
 
-	public static function get_core_command_list() {
-		$commands = include __DIR__ . '/core-command-list.php';
+	public static function initialize_logger() {
+		if ( static::$logger_initialized ) {
+			return;
+		}
 
-		return $commands;
-	}
+		WP_CLI::set_logger(
+			new Logger_Chain( static::get_wp_cli_logger(), static::get_plugin_logger() )
+		);
 
-	public static function get_clockwork_command_list() {
-		$commands = include __DIR__ . '/clockwork-command-list.php';
-
-		return $commands;
+		static::$logger_initialized = true;
 	}
 }

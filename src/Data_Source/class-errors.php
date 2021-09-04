@@ -11,64 +11,10 @@ class Errors extends DataSource {
 	protected $errors = [];
 	protected $original_handler;
 	protected $registered = false;
-
 	protected static $instance;
 
 	public function __construct() {
 		$this->error_reporting = error_reporting();
-	}
-
-	public static function get_instance(){
-		if ( ! static::$instance instanceof Errors ) {
-			static::$instance = new Errors();
-		}
-
-		return static::$instance;
-	}
-
-	public static function set_instance( Errors $instance ) {
-		static::$instance = $instance;
-	}
-
-	public function resolve( Request $request ) {
-		$this->append_log( $request );
-
-		return $request;
-	}
-
-	public function reapply_filters() {
-		$this->errors = array_filter( $this->errors, function( $error ) {
-			return $this->passesFilters( [ $error ] );
-		} );
-	}
-
-	public function register() {
-		if ( $this->registered ) {
-			return;
-		}
-
-		// If there was an error before this plugin is loaded we will record it.
-		$error = error_get_last();
-
-		if ( $error ) {
-			$this->record( $error['type'], $error['message'], $error['file'], $error['line'] );
-		}
-
-		$this->original_handler = set_error_handler( [ $this, 'handle' ] );
-
-		$this->registered = true;
-	}
-
-	public function unregister() {
-		if ( ! $this->registered ) {
-			return;
-		}
-
-		restore_error_handler();
-
-		$this->errors = [];
-		$this->original_handler = null;
-		$this->registered = false;
 	}
 
 	public function handle( $no, $str, $file = null, $line = null ) {
@@ -79,6 +25,12 @@ class Errors extends DataSource {
 		}
 
 		return false;
+	}
+
+	public function reapply_filters() {
+		$this->errors = array_filter( $this->errors, function ( $error ) {
+			return $this->passesFilters( [ $error ] );
+		} );
 	}
 
 	public function record( $no, $str, $file = null, $line = null ) {
@@ -109,6 +61,41 @@ class Errors extends DataSource {
 		$this->errors[ hash( 'md5', serialize( [ $no, $str, $file, $line ] ) ) ] = $error_array;
 	}
 
+	public function register() {
+		if ( $this->registered ) {
+			return;
+		}
+
+		// If there was an error before this plugin is loaded we will record it.
+		$error = error_get_last();
+
+		if ( $error ) {
+			$this->record( $error['type'], $error['message'], $error['file'], $error['line'] );
+		}
+
+		$this->original_handler = set_error_handler( [ $this, 'handle' ] );
+
+		$this->registered = true;
+	}
+
+	public function resolve( Request $request ) {
+		$this->append_log( $request );
+
+		return $request;
+	}
+
+	public function unregister() {
+		if ( ! $this->registered ) {
+			return;
+		}
+
+		restore_error_handler();
+
+		$this->errors = [];
+		$this->original_handler = null;
+		$this->registered = false;
+	}
+
 	protected function append_log( $request ) {
 		$log = new Log();
 
@@ -129,31 +116,6 @@ class Errors extends DataSource {
 		}
 
 		$request->log()->merge( $log );
-	}
-
-	protected function log_method( $type ) {
-		// Best guess based on rough cross reference of predefined constants docs and PSR abstract
-		// logger docs. May want to revisit eventually.
-		switch ( $type ) {
-			case E_ERROR:
-			case E_PARSE:
-			case E_CORE_ERROR:
-			case E_COMPILE_ERROR:
-			case E_USER_ERROR:
-			case E_RECOVERABLE_ERROR:
-				return 'error';
-
-			case E_WARNING:
-			case E_CORE_WARNING:
-			case E_COMPILE_WARNING:
-			case E_USER_WARNING:
-			case E_DEPRECATED:
-			case E_USER_DEPRECATED:
-				return 'warning';
-
-			default:
-				return 'notice';
-		}
 	}
 
 	protected function friendly_label( $type ) {
@@ -206,5 +168,42 @@ class Errors extends DataSource {
 		}
 
 		return (string) $type;
+	}
+
+	protected function log_method( $type ) {
+		// Best guess based on rough cross reference of predefined constants docs and PSR abstract
+		// logger docs. May want to revisit eventually.
+		switch ( $type ) {
+			case E_ERROR:
+			case E_PARSE:
+			case E_CORE_ERROR:
+			case E_COMPILE_ERROR:
+			case E_USER_ERROR:
+			case E_RECOVERABLE_ERROR:
+				return 'error';
+
+			case E_WARNING:
+			case E_CORE_WARNING:
+			case E_COMPILE_WARNING:
+			case E_USER_WARNING:
+			case E_DEPRECATED:
+			case E_USER_DEPRECATED:
+				return 'warning';
+
+			default:
+				return 'notice';
+		}
+	}
+
+	public static function get_instance() {
+		if ( ! static::$instance instanceof Errors ) {
+			static::$instance = new Errors();
+		}
+
+		return static::$instance;
+	}
+
+	public static function set_instance( Errors $instance ) {
+		static::$instance = $instance;
 	}
 }

@@ -6,7 +6,7 @@ use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Routing\Route_Collection;
 
 class Web_App_Subscriber implements Subscriber {
-	public function get_subscribed_events() : array {
+	public function get_subscribed_events(): array {
 		return [
 			'init' => 'register_routes',
 			// @todo Move to redirect canonical?
@@ -15,17 +15,14 @@ class Web_App_Subscriber implements Subscriber {
 		];
 	}
 
-	public function register_routes( Route_Collection $routes ) {
-		$routes->get(
-			'__clockwork/app',
-			'index.php?app=1&asset=index.html',
-			[ Web_App_Controller::class, 'serve_assets' ]
-		);
-		$routes->get(
-			'__clockwork/(.*)',
-			'index.php?app=1&asset=$matches[1]',
-			[ Web_App_Controller::class, 'serve_assets' ]
-		);
+	public function prevent_canonical_redirect( $redirect, $requested ) {
+		$clockwork = home_url( '__clockwork' );
+
+		if ( $clockwork === substr( $requested, 0, strlen( $clockwork ) ) ) {
+			return $requested;
+		}
+
+		return $redirect;
 	}
 
 	public function redirect_shortcut() {
@@ -39,16 +36,19 @@ class Web_App_Subscriber implements Subscriber {
 		}
 
 		wp_safe_redirect( home_url( '__clockwork/app' ) );
-		die;
+		exit;
 	}
 
-	public function prevent_canonical_redirect( $redirect, $requested ) {
-		$clockwork = home_url( '__clockwork' );
-
-		if ( $clockwork === substr( $requested, 0, strlen( $clockwork ) ) ) {
-			return $requested;
-		}
-
-		return $redirect;
+	public function register_routes( Route_Collection $routes ) {
+		$routes->get(
+			'__clockwork/app',
+			'index.php?app=1&asset=index.html',
+			[ Web_App_Controller::class, 'serve_assets' ]
+		);
+		$routes->get(
+			'__clockwork/(.*)',
+			'index.php?app=1&asset=$matches[1]',
+			[ Web_App_Controller::class, 'serve_assets' ]
+		);
 	}
 }

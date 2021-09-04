@@ -8,49 +8,54 @@ use Clockwork\Helpers\StackTrace;
 use Clockwork\Request\Request;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
+use InvalidArgumentException;
 
 // @todo Would be nice to get this tested by our browser tests.
 class Wp_Redirect extends DataSource implements Subscriber {
-	protected $initial =  [
+	protected $filtered = [
+		'location' => null,
+		'status' => null,
+		'x-redirect-by' => null,
+	];
+	protected $finalized = false;
+	protected $initial = [
 		'location' => null,
 		'status' => 302,
 		'x-redirect-by' => 'WordPress',
 	];
-	protected $filtered = [
-		'location' => null,
-		'status' => null,
-		'x-redirect-by' => null
-	];
-	protected $finalized = false;
 	protected $trace;
 
-	public function get_subscribed_events() : array {
+	public function finalize_wp_redirect_call() {
+		$this->finalized = true;
+	}
+
+	public function get_subscribed_events(): array {
 		return [
 			'wp_redirect' => [
-				function( $location ) {
+				function ( $location ) {
 					$this->record_wp_redirect_call();
 					$this->set_filtered( 'location', $location );
 
 					return $location;
 				},
-				Event_Manager::LATE_EVENT
+				Event_Manager::LATE_EVENT,
 			],
 			'wp_redirect_status' => [
-				function( $status ) {
+				function ( $status ) {
 					$this->set_filtered( 'status', $status );
 
 					return $status;
 				},
-				Event_Manager::LATE_EVENT
+				Event_Manager::LATE_EVENT,
 			],
 			'x_redirect_by' => [
-				function( $x_redirect_by ) {
+				function ( $x_redirect_by ) {
 					$this->set_filtered( 'x-redirect-by', $x_redirect_by );
 					$this->finalize_wp_redirect_call();
 
 					return $x_redirect_by;
 				},
-				Event_Manager::LATE_EVENT
+				Event_Manager::LATE_EVENT,
 			],
 		];
 	}
@@ -76,13 +81,9 @@ class Wp_Redirect extends DataSource implements Subscriber {
 		return $request;
 	}
 
-	public function finalize_wp_redirect_call() {
-		$this->finalized = true;
-	}
-
 	public function set_filtered( $key, $value ) {
 		if ( ! array_key_exists( $key, $this->filtered ) ) {
-			throw new \InvalidArgumentException(
+			throw new InvalidArgumentException(
 				"Cannot set invalid key {$key} on filtered args array"
 			);
 		}
@@ -92,7 +93,7 @@ class Wp_Redirect extends DataSource implements Subscriber {
 
 	public function set_initial( $key, $value ) {
 		if ( ! array_key_exists( $key, $this->initial ) ) {
-			throw new \InvalidArgumentException(
+			throw new InvalidArgumentException(
 				"Cannot set invalid key {$key} on initial args array"
 			);
 		}
@@ -106,7 +107,7 @@ class Wp_Redirect extends DataSource implements Subscriber {
 		if ( ! $this->finalized ) {
 			if ( ! $this->filtered['location'] ) {
 				$message .= ' returned without redirecting user: "wp_redirect" filter returned a falsey value';
-			} else if ( $this->filtered['status'] < 300 || 399 < $this->filtered['status'] ) {
+			} elseif ( $this->filtered['status'] < 300 || 399 < $this->filtered['status'] ) {
 				$message .= ' caused call to "wp_die": "wp_redirect_status" filter returned an invalid status code';
 			} else {
 				$message .= ' appears to have bailed early: Reason unknown';

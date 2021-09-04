@@ -22,14 +22,14 @@ class Base_Provider implements Provider {
 	}
 
 	public function register() {
-		//
+
 	}
 
 	public function registered() {
-		//
+
 	}
 
-	protected function subscribers() : array {
+	protected function subscribers(): array {
 		return [];
 	}
 }

@@ -20,7 +20,9 @@ class Route_Handler_Invoker {
 
 		$this->param_resolver = $param_resolver
 			? $param_resolver->bindTo( $this )
-			: static function () { return []; };
+			: static function () {
+				return [];
+			};
 	}
 
 	public function invoke_handler( Route $route ) {

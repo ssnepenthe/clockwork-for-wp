@@ -69,7 +69,7 @@ class Incoming_Request extends IncomingRequest {
 		foreach ( $server as $key => $value ) {
 			if ( 0 === strpos( $key, 'HTTP_' ) ) {
 				$key = substr( $key, 5 );
-			} else if (
+			} elseif (
 				in_array( $key, [ 'CONTENT_TYPE', 'CONTENT_LENGTH', 'CONTENT_MD5' ], true )
 			) {
 				// $key = $key;
@@ -86,7 +86,6 @@ class Incoming_Request extends IncomingRequest {
 	}
 
 	public static function from_globals() {
-
 		return new static( [
 			'ajax_uri' => parse_url( admin_url( 'admin-ajax.php' ), PHP_URL_PATH ),
 			'cookies' => $_COOKIE,

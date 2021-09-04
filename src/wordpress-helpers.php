@@ -2,6 +2,9 @@
 
 namespace Clockwork_For_Wp;
 
+use Requests_Utility_CaseInsensitiveDictionary;
+use WP_Error;
+
 function prepare_rest_route( array $handlers_array ) {
 	// @todo Filter necessary?
 	$methods = array_keys( array_filter( $handlers_array['methods'] ) );
@@ -21,7 +24,7 @@ function prepare_http_response( $response ) {
 
 	$headers = \wp_remote_retrieve_headers( $response );
 
-	if ( $headers instanceof \Requests_Utility_CaseInsensitiveDictionary ) {
+	if ( $headers instanceof Requests_Utility_CaseInsensitiveDictionary ) {
 		$headers = $headers->getAll();
 	} else {
 		$headers = [];
@@ -39,15 +42,15 @@ function prepare_http_response( $response ) {
 	];
 }
 
-function prepare_wpdb_query( array $query_array ) : array {
-	$query = isset( $query_array[0] ) ? $query_array[0] : '';
+function prepare_wpdb_query( array $query_array ): array {
+	$query = $query_array[0] ?? '';
 	$duration = isset( $query_array[1] ) ? ( $query_array[1] * 1000 ) : 0;
-	$start = isset( $query_array[3] ) ? $query_array[3] : microtime( true ) - ( $duration / 1000 );
+	$start = $query_array[3] ?? microtime( true ) - ( $duration / 1000 );
 
 	return [ $query, $duration, $start ];
 }
 
-function wp_error_to_array( \WP_Error $error ) : array {
+function wp_error_to_array( WP_Error $error ): array {
 	return [
 		'errors' => $error->errors,
 		'error_data' => $error->error_data,

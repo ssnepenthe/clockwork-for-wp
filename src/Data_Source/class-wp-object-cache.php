@@ -7,14 +7,20 @@ use Clockwork\Request\Request;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
 class Wp_Object_Cache extends DataSource implements Subscriber {
+	protected $deletes = 0;
 	protected $hits = 0;
 	protected $misses = 0;
 	protected $writes = 0;
-	protected $deletes = 0;
 
-	public function get_subscribed_events() : array {
+	public function delete( int $amount = 1 ) {
+		$this->deletes += $amount;
+
+		return $this;
+	}
+
+	public function get_subscribed_events(): array {
 		return [
-			'cfw_pre_resolve' => function( \WP_Object_Cache $wp_object_cache ) {
+			'cfw_pre_resolve' => function ( \WP_Object_Cache $wp_object_cache ) {
 				// @todo Include hit percentage?
 				if ( property_exists( $wp_object_cache, 'cache_hits' ) ) {
 					$this->hit( (int) $wp_object_cache->cache_hits );
@@ -49,6 +55,18 @@ class Wp_Object_Cache extends DataSource implements Subscriber {
 		];
 	}
 
+	public function hit( int $amount = 1 ) {
+		$this->hits += $amount;
+
+		return $this;
+	}
+
+	public function miss( int $amount = 1 ) {
+		$this->misses += $amount;
+
+		return $this;
+	}
+
 	public function resolve( Request $request ) {
 		$stats = array_filter( [
 			'Reads' => $this->hits + $this->misses,
@@ -65,26 +83,8 @@ class Wp_Object_Cache extends DataSource implements Subscriber {
 		return $request;
 	}
 
-	public function hit( int $amount = 1 ) {
-		$this->hits += $amount;
-
-		return $this;
-	}
-
-	public function miss( int $amount = 1 ) {
-		$this->misses += $amount;
-
-		return $this;
-	}
-
 	public function write( int $amount = 1 ) {
 		$this->writes += $amount;
-
-		return $this;
-	}
-
-	public function delete( int $amount = 1 ) {
-		$this->deletes += $amount;
 
 		return $this;
 	}

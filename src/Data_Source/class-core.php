@@ -7,24 +7,12 @@ use Clockwork\Request\Request;
 use Clockwork\Request\Timeline\Timeline;
 
 class Core extends DataSource {
-	protected $version;
 	protected $timestart;
+	protected $version;
 
 	public function __construct( $version, $timestart ) {
 		$this->version = $version;
 		$this->timestart = $timestart;
-	}
-
-	public function set_version( $version ) {
-		$this->version = $version;
-
-		return $this;
-	}
-
-	public function set_timestart( $timestart ) {
-		$this->timestart = $timestart;
-
-		return $this;
 	}
 
 	public function resolve( Request $request ) {
@@ -36,6 +24,18 @@ class Core extends DataSource {
 		$request->timeline()->merge( $this->build_timeline() );
 
 		return $request;
+	}
+
+	public function set_timestart( $timestart ) {
+		$this->timestart = $timestart;
+
+		return $this;
+	}
+
+	public function set_version( $version ) {
+		$this->version = $version;
+
+		return $this;
 	}
 
 	protected function build_timeline() {

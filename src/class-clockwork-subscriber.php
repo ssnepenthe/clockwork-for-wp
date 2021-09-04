@@ -15,32 +15,6 @@ class Clockwork_Subscriber implements Subscriber {
 		$this->plugin = $plugin;
 	}
 
-	public function get_subscribed_events() : array {
-		$events = [
-			'wp_enqueue_scripts' => 'enqueue_scripts',
-		];
-
-		if (
-			// @todo Redundant conditions?
-			( $this->plugin->is_enabled() && $this->plugin->is_recording() )
-			&& $this->plugin->is_collecting_requests()
-		) {
-			// wp_loaded fires on frontend but also login, admin, etc.
-			$events['wp_loaded'] = [ 'initialize_request', Event_Manager::LATE_EVENT ];
-		}
-
-		// @todo Redundant conditions?
-		if ( $this->plugin->is_recording() ) {
-			if ( $this->plugin->is_collecting_commands() ) {
-				$events['shutdown'] = [ 'finalize_command', Event_Manager::LATE_EVENT ];
-			} else if ( $this->plugin->is_collecting_requests() ) {
-				$events['shutdown'] = [ 'finalize_request', Event_Manager::LATE_EVENT ];
-			}
-		}
-
-		return $events;
-	}
-
 	public function enqueue_scripts() {
 		// @todo Should this be implemented as a separate plugin?
 		wp_register_script(
@@ -68,14 +42,6 @@ class Clockwork_Subscriber implements Subscriber {
 		}
 	}
 
-	public function finalize_request( Clockwork $clockwork, Event_Manager $event_manager ) {
-		$event_manager->trigger( 'cfw_pre_resolve' ); // @todo pass $clockwork? $container?
-
-		$clockwork
-			->resolveRequest()
-			->storeRequest();
-	}
-
 	public function finalize_command(  Clockwork $clockwork, Event_Manager $event_manager ) {
 		$command = Command_Context::current();
 
@@ -99,6 +65,40 @@ class Clockwork_Subscriber implements Subscriber {
 				$this->plugin->config( 'wp_cli.collect_output', false ) ? $command->output() : ''
 			)
 			->storeRequest();
+	}
+
+	public function finalize_request( Clockwork $clockwork, Event_Manager $event_manager ) {
+		$event_manager->trigger( 'cfw_pre_resolve' ); // @todo pass $clockwork? $container?
+
+		$clockwork
+			->resolveRequest()
+			->storeRequest();
+	}
+
+	public function get_subscribed_events(): array {
+		$events = [
+			'wp_enqueue_scripts' => 'enqueue_scripts',
+		];
+
+		if (
+			// @todo Redundant conditions?
+			( $this->plugin->is_enabled() && $this->plugin->is_recording() )
+			&& $this->plugin->is_collecting_requests()
+		) {
+			// wp_loaded fires on frontend but also login, admin, etc.
+			$events['wp_loaded'] = [ 'initialize_request', Event_Manager::LATE_EVENT ];
+		}
+
+		// @todo Redundant conditions?
+		if ( $this->plugin->is_recording() ) {
+			if ( $this->plugin->is_collecting_commands() ) {
+				$events['shutdown'] = [ 'finalize_command', Event_Manager::LATE_EVENT ];
+			} elseif ( $this->plugin->is_collecting_requests() ) {
+				$events['shutdown'] = [ 'finalize_request', Event_Manager::LATE_EVENT ];
+			}
+		}
+
+		return $events;
 	}
 
 	public function initialize_request( Request $request ) {

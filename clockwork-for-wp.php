@@ -3,13 +3,14 @@
 use Clockwork_For_Wp\Data_Source\Errors;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Plugin;
-/**
+
+/*
  * A basic Clockwork integration for WordPress.
  *
  * @package clockwork_for_wp
  */
 
-/**
+/*
  * Plugin Name: Clockwork for WP
  * Plugin URI: https://github.com/ssnepenthe/clockwork-for-wp
  * Description: A basic <a href="https://underground.works/clockwork/">Clockwork</a> integration for WordPress.
@@ -20,7 +21,7 @@ use Clockwork_For_Wp\Plugin;
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	die;
+	exit;
 }
 
 function _cfw_deactivate_self() {
@@ -32,7 +33,7 @@ function _cfw_deactivate_self() {
 }
 
 function _cfw_admin_error_notice( $message ) {
-	$notice = <<<EOD
+	$notice = <<<'EOD'
 <div class="notice notice-error">
 	<p>Clockwork for WP deactivated: %s</p>
 </div>
@@ -43,7 +44,7 @@ EOD;
 
 if ( ! function_exists( 'wp_get_environment_type' ) ) {
 	add_action( 'admin_init', '_cfw_deactivate_self' );
-	add_action( 'admin_notices', function() {
+	add_action( 'admin_notices', function () {
 		_cfw_admin_error_notice( 'This plugin requires WordPress version 5.5.0 or greater.' );
 	} );
 
@@ -55,7 +56,7 @@ if (
 	&& ! ( defined( 'CFW_RUN_ON_PROD' ) && CFW_RUN_ON_PROD )
 ) {
 	add_action( 'admin_init', '_cfw_deactivate_self' );
-	add_action( 'admin_notices', function() {
+	add_action( 'admin_notices', function () {
 		_cfw_admin_error_notice( 'This plugin can only run on non-production environments.' );
 	} );
 
@@ -63,7 +64,7 @@ if (
 }
 
 if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
-    require_once __DIR__ . '/vendor/autoload.php';
+	require_once __DIR__ . '/vendor/autoload.php';
 }
 
 // @todo Check for minimum php version.
@@ -81,14 +82,14 @@ function _cfw_instance() {
 	return $instance;
 }
 
-( function( $plugin ) {
+( function ( $plugin ) {
 	// Resolve error handler immediately so we catch as many errors as possible.
 	// @todo Check config to make sure error feature is enabled? Or probably a constant?
 	// @todo Move to plugin constructor?
 	$plugin[ Errors::class ]->register();
 
 	$plugin[ Event_Manager::class ]
-		->on( 'plugin_loaded', function( $file, Plugin $plugin ) {
+		->on( 'plugin_loaded', function ( $file, Plugin $plugin ) {
 			if ( __FILE__ !== $file ) {
 				return;
 			}

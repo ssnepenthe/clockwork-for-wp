@@ -5,7 +5,6 @@ namespace Clockwork_For_Wp\Api;
 use Clockwork\Authentication\AuthenticatorInterface;
 use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Metadata;
-
 use function Clockwork_For_Wp\array_only;
 
 class Api_Controller {
@@ -40,10 +39,10 @@ class Api_Controller {
 
 		$authenticated = $this->authenticator->check(
 			// @todo Move to route handler invoker?
-			isset( $_SERVER['HTTP_X_CLOCKWORK_AUTH'] ) ? $_SERVER['HTTP_X_CLOCKWORK_AUTH'] : ''
+			$_SERVER['HTTP_X_CLOCKWORK_AUTH'] ?? ''
 		);
 
-		if ( $authenticated !== true ) {
+		if ( true !== $authenticated ) {
 			wp_send_json( [
 				'message' => $authenticated,
 				'requires' => $this->authenticator->requires(),
@@ -105,18 +104,6 @@ class Api_Controller {
 		return $data;
 	}
 
-	protected function is_json_request() {
-		$content_type = '';
-
-		if ( isset( $_SERVER['HTTP_CONTENT_TYPE'] ) ) {
-			$content_type = $_SERVER['HTTP_CONTENT_TYPE'];
-		} elseif ( isset( $_SERVER['CONTENT_TYPE'] ) ) {
-			$content_type = $_SERVER['CONTENT_TYPE'];
-		}
-
-		return 0 === strpos( $content_type, 'application/json' );
-	}
-
 	// @todo Move to route handler invoker?
 	protected function extract_credentials() {
 		if ( ! $this->is_json_request() ) {
@@ -137,8 +124,20 @@ class Api_Controller {
 		}
 
 		return [
-			'username' => isset( $decoded['username'] ) ? $decoded['username'] : null,
-			'password' => isset( $decoded['password'] ) ? $decoded['password'] : null,
+			'username' => $decoded['username'] ?? null,
+			'password' => $decoded['password'] ?? null,
 		];
+	}
+
+	protected function is_json_request() {
+		$content_type = '';
+
+		if ( isset( $_SERVER['HTTP_CONTENT_TYPE'] ) ) {
+			$content_type = $_SERVER['HTTP_CONTENT_TYPE'];
+		} elseif ( isset( $_SERVER['CONTENT_TYPE'] ) ) {
+			$content_type = $_SERVER['CONTENT_TYPE'];
+		}
+
+		return 0 === strpos( $content_type, 'application/json' );
 	}
 }

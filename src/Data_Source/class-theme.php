@@ -18,9 +18,18 @@ class Theme extends DataSource implements Subscriber {
 	protected $template;
 	protected $theme_root;
 
-	public function get_subscribed_events() : array {
+	public function configure_theme( $theme_root, $is_child_theme, $template, $stylesheet ) {
+		$this->theme_root = $theme_root;
+		$this->is_child_theme = $is_child_theme;
+		$this->template = $template;
+		$this->stylesheet = $stylesheet;
+
+		return $this;
+	}
+
+	public function get_subscribed_events(): array {
 		return [
-			'cfw_pre_resolve' => function( $content_width ) {
+			'cfw_pre_resolve' => function ( $content_width ) {
 				$this
 					// @todo Constructor?
 					->configure_theme(
@@ -37,12 +46,12 @@ class Theme extends DataSource implements Subscriber {
 						)
 					);
 			},
-			'body_class' => [ function( $classes ) {
+			'body_class' => [ function ( $classes ) {
 				$this->set_body_classes( is_array( $classes ) ? $classes : [] );
 
 				return $classes;
 			}, Event_Manager::LATE_EVENT ],
-			'template_include' => [ function( $template ) {
+			'template_include' => [ function ( $template ) {
 				$this->set_included_template( $template );
 
 				return $template;
@@ -73,15 +82,6 @@ class Theme extends DataSource implements Subscriber {
 		return $request;
 	}
 
-	public function configure_theme( $theme_root, $is_child_theme, $template, $stylesheet ) {
-		$this->theme_root = $theme_root;
-		$this->is_child_theme = $is_child_theme;
-		$this->template = $template;
-		$this->stylesheet = $stylesheet;
-
-		return $this;
-	}
-
 	public function set_body_classes( array $body_classes ) {
 		$this->body_classes = array_values( array_map( 'strval', $body_classes ) );
 
@@ -107,7 +107,7 @@ class Theme extends DataSource implements Subscriber {
 	}
 
 	protected function body_classes_table() {
-		return array_map( function( $class ) {
+		return array_map( function ( $class ) {
 			return [ 'Class' => $class ];
 		}, $this->body_classes );
 	}
@@ -133,14 +133,14 @@ class Theme extends DataSource implements Subscriber {
 				'Item' => 'Content Width',
 				'Value' => $this->content_width,
 			],
-		], function( $row ) {
+		], function ( $row ) {
 			return null !== $row['Value'];
 		} );
 	}
 
 	// @todo Deferred set from provider?
 	protected function template_parts_table() {
-		return array_map( function( $file_path ) {
+		return array_map( function ( $file_path ) {
 			$File = pathinfo( $file_path, PATHINFO_BASENAME );
 			$Path = ltrim( str_replace( $this->theme_root, '', $file_path ), '/' );
 

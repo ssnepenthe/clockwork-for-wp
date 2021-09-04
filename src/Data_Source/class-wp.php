@@ -9,9 +9,19 @@ use Clockwork_For_Wp\Event_Management\Subscriber;
 class Wp extends DataSource implements Subscriber {
 	protected $variables = [];
 
-	public function get_subscribed_events() : array {
+	// @todo Records_Variables trait to share with Wp_Query data source?
+	public function add_variable( $var, $value ) {
+		$this->variables[] = [
+			'Variable' => $var,
+			'Value' => $value,
+		];
+
+		return $this;
+	}
+
+	public function get_subscribed_events(): array {
 		return [
-			'cfw_pre_resolve' => function( \WP $wp ) {
+			'cfw_pre_resolve' => function ( \WP $wp ) {
 				// @todo Move to rewrite?
 				foreach ( [ 'request', 'query_string', 'matched_rule', 'matched_query' ] as $var ) {
 					if ( property_exists( $wp, $var ) && $wp->{$var} ) {
@@ -28,15 +38,5 @@ class Wp extends DataSource implements Subscriber {
 		}
 
 		return $request;
-	}
-
-	// @todo Records_Variables trait to share with Wp_Query data source?
-	public function add_variable( $var, $value ) {
-		$this->variables[] = [
-			'Variable' => $var,
-			'Value'    => $value,
-		];
-
-		return $this;
 	}
 }

@@ -12,7 +12,7 @@ abstract class Base_Command {
 	protected $options = [];
 
 	public function arguments(): array {
-		return array_map( function( $synopsis, $description ) {
+		return array_map( function ( $synopsis, $description ) {
 			$parsed = SynopsisParser::parse( $synopsis )[0];
 			$parsed['description'] = $description;
 
@@ -46,7 +46,7 @@ abstract class Base_Command {
 	}
 
 	public function options(): array {
-		return array_map( function( $synopsis, $description ) {
+		return array_map( function ( $synopsis, $description ) {
 			$parsed = SynopsisParser::parse( $synopsis )[0];
 			$parsed['description'] = $description;
 

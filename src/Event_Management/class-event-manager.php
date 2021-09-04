@@ -7,10 +7,9 @@ use InvalidArgumentException;
 use Invoker\Invoker;
 
 class Event_Manager {
-	const EARLY_EVENT = -999;
-	const DEFAULT_EVENT = 10;
-	const LATE_EVENT = 999;
-
+	public const DEFAULT_EVENT = 10;
+	public const EARLY_EVENT = -999;
+	public const LATE_EVENT = 999;
 	protected $invoker;
 
 	public function __construct( Invoker $invoker ) {
@@ -45,8 +44,12 @@ class Event_Manager {
 		return $this;
 	}
 
+	public function filter( $tag, ...$args ) {
+		return \apply_filters( $tag, ...$args );
+	}
+
 	public function on( $tag, $callable, $priority = self::DEFAULT_EVENT ) {
-		\add_action( $tag, function( ...$args ) use ( $callable ) {
+		\add_action( $tag, function ( ...$args ) use ( $callable ) {
 			return $this->invoker->call( $callable, $args );
 		}, $priority, 999 );
 
@@ -59,10 +62,6 @@ class Event_Manager {
 		return $this;
 	}
 
-	public function filter( $tag, ...$args ) {
-		return \apply_filters( $tag, ...$args );
-	}
-
 	protected function attach_subscriber_callback(
 		Subscriber $subscriber,
 		string $tag,
@@ -73,13 +72,13 @@ class Event_Manager {
 
 			throw new InvalidArgumentException(
 				"Incorrect array shape provided by {$subscriber_class} for tag {$tag} - "
-					. "callback expected at index 0"
+					. 'callback expected at index 0'
 			);
 		}
 
 		if ( is_string( $args[0] ) ) {
 			$callable = [ $subscriber, $args[0] ];
-		} else if ( $args[0] instanceof Closure ) {
+		} elseif ( $args[0] instanceof Closure ) {
 			$callable = $args[0];
 		} else {
 			$subscriber_class = get_class( $subscriber );

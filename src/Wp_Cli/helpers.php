@@ -22,7 +22,7 @@ function add_command( $command ) {
 
 	WP_CLI::add_command(
 		"{$namespace} {$command->name()}",
-		function( $args, $assoc_args ) use ( $command ) {
+		function ( $args, $assoc_args ) use ( $command ) {
 			$parameters = [
 				'args' => $args,
 				// 'arguments' => $args,
@@ -40,7 +40,7 @@ function add_command( $command ) {
 			foreach ( $command->options() as $synopsis ) {
 				if ( isset( $assoc_args[ $synopsis['name'] ] ) ) {
 					$parameters[ $synopsis['name'] ] = $assoc_args[ $synopsis['name'] ];
-				} else if ( 'flag' === $synopsis['type'] ){
+				} elseif ( 'flag' === $synopsis['type'] ) {
 					$parameters[ $synopsis['name'] ] = false;
 				}
 			}

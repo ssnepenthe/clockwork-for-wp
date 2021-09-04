@@ -15,7 +15,7 @@ class Api_Provider extends Base_Provider {
 	}
 
 	public function register() {
-		$this->plugin[ Api_Controller::class ] = function() {
+		$this->plugin[ Api_Controller::class ] = function () {
 			return new Api_Controller(
 				$this->plugin[ AuthenticatorInterface::class ],
 				$this->plugin[ Metadata::class ],
@@ -23,12 +23,12 @@ class Api_Provider extends Base_Provider {
 			);
 		};
 
-		$this->plugin[ Api_Subscriber::class ] = function() {
+		$this->plugin[ Api_Subscriber::class ] = function () {
 			return new Api_Subscriber();
 		};
 	}
 
-	protected function subscribers() : array {
+	protected function subscribers(): array {
 		return [ Api_Subscriber::class ];
 	}
 }

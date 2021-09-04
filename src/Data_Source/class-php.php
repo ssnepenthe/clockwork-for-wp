@@ -14,7 +14,7 @@ class Php extends PhpDataSource {
 	public function removePasswords( array $data ) {
 		// @todo Should we also allow for removing data from keys?
 		// @todo Should this override apply to all data sources?
-		$values = array_map( function( $value, $key ) {
+		$values = array_map( function ( $value, $key ) {
 			foreach ( $this->sensitive_patterns as $pattern ) {
 				if ( 1 === preg_match( $pattern, $key ) ) {
 					return '*removed*';
@@ -33,9 +33,9 @@ class Php extends PhpDataSource {
 		if ( array_key_exists( 'Cookie', $headers ) ) {
 			// We are removing sensitive data from the $_COOKIE array elsewhere...
 			// Lets make sure to parse the cookie headers so we can remove the same data.
-			$headers['Cookie'] = array_map( function( $cookie_string ) {
-				$clean = array_map( function( $pair ) {
-					list( $key, $value ) = explode( '=', trim( $pair ) );
+			$headers['Cookie'] = array_map( function ( $cookie_string ) {
+				$clean = array_map( function ( $pair ) {
+					[ $key, $value ] = explode( '=', trim( $pair ) );
 
 					$clean = $this->removePasswords( [ $key => $value ] );
 

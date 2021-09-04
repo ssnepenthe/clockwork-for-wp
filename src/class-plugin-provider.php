@@ -3,7 +3,6 @@
 namespace Clockwork_For_Wp;
 
 use Clockwork\Clockwork;
-use Clockwork\Storage\StorageInterface;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Invoker\Invoker;
 use Invoker\ParameterResolver\AssociativeArrayResolver;
@@ -18,7 +17,7 @@ class Plugin_Provider extends Base_Provider {
 	public function register() {
 		require_once $this->plugin['dir'] . '/src/plugin-helpers.php';
 
-		$this->plugin[ Config::class ] = function() {
+		$this->plugin[ Config::class ] = function () {
 			$values = include $this->plugin['dir'] . '/src/config.php';
 			$config = new Config( $values );
 
@@ -27,7 +26,7 @@ class Plugin_Provider extends Base_Provider {
 			return $config;
 		};
 
-		$this->plugin[ Invoker::class ] = function() {
+		$this->plugin[ Invoker::class ] = function () {
 			$psr_container = new Container( $this->plugin->get_container() );
 
 			return new Invoker(
@@ -42,7 +41,7 @@ class Plugin_Provider extends Base_Provider {
 			);
 		};
 
-		$this->plugin[ Metadata::class ] = function() {
+		$this->plugin[ Metadata::class ] = function () {
 			$clockwork = $this->plugin[ Clockwork::class ];
 
 			return new Metadata( $clockwork, $clockwork->storage() );

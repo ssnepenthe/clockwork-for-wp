@@ -7,7 +7,7 @@ use Clockwork_For_Wp\Plugin;
 use Clockwork_For_Wp\Routing\Route_Collection;
 
 class Api_Subscriber implements Subscriber {
-	public function get_subscribed_events() : array {
+	public function get_subscribed_events(): array {
 		return [
 			'init' => 'register_routes',
 		];

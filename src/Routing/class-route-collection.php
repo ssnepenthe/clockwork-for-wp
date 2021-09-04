@@ -3,8 +3,8 @@
 namespace Clockwork_For_Wp\Routing;
 
 class Route_Collection {
-	protected $routes = [];
 	protected $prefix;
+	protected $routes = [];
 
 	public function __construct( string $prefix = '' ) {
 		$this->prefix = $prefix;
@@ -22,23 +22,14 @@ class Route_Collection {
 		return $this->add( new Route( 'GET', $regex, $query, $handler ) );
 	}
 
-	public function post( string $regex, string $query, $handler ) {
-		return $this->add( new Route( 'POST', $regex, $query, $handler ) );
-	}
+	public function get_query_vars() {
+		$query_vars = [];
 
-	public function put( string $regex, string $query, $handler ) {
-		return $this->add( new Route( 'PUT', $regex, $query, $handler ) );
-	}
-
-	// @todo Method name.
-	public function match( $method, $matched_pattern ) {
-		$key = $method . ':' . $matched_pattern;
-
-		if ( ! array_key_exists( $key, $this->routes ) ) {
-			return null;
+		foreach ( $this->routes as $route ) {
+			$query_vars = array_merge( $query_vars, $route->get_query_array() );
 		}
 
-		return $this->routes[ $key ];
+		return array_keys( $query_vars );
 	}
 
 	public function get_rewrite_array() {
@@ -65,13 +56,22 @@ class Route_Collection {
 		return $rewrite_array;
 	}
 
-	public function get_query_vars() {
-		$query_vars = [];
+	// @todo Method name.
+	public function match( $method, $matched_pattern ) {
+		$key = $method . ':' . $matched_pattern;
 
-		foreach ( $this->routes as $route ) {
-			$query_vars = array_merge( $query_vars, $route->get_query_array() );
+		if ( ! array_key_exists( $key, $this->routes ) ) {
+			return;
 		}
 
-		return array_keys( $query_vars );
+		return $this->routes[ $key ];
+	}
+
+	public function post( string $regex, string $query, $handler ) {
+		return $this->add( new Route( 'POST', $regex, $query, $handler ) );
+	}
+
+	public function put( string $regex, string $query, $handler ) {
+		return $this->add( new Route( 'PUT', $regex, $query, $handler ) );
 	}
 }

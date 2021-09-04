@@ -5,7 +5,6 @@ namespace Clockwork_For_Wp;
 use ArrayAccess;
 use Clockwork\Clockwork;
 use Clockwork\Request\IncomingRequest;
-use Clockwork\Request\Request;
 use Clockwork_For_Wp\Api\Api_Provider;
 use Clockwork_For_Wp\Data_Source\Data_Source_Provider;
 use Clockwork_For_Wp\Event_Management\Event_Management_Provider;
@@ -14,12 +13,13 @@ use Clockwork_For_Wp\Web_App\Web_App_Provider;
 use Clockwork_For_Wp\Wp_Cli\Cli_Collection_Helper;
 use Clockwork_For_Wp\Wp_Cli\Wp_Cli_Provider;
 use Pimple\Container;
+use RuntimeException;
 
 class Plugin implements ArrayAccess {
-	protected $container;
-	protected $providers = [];
 	protected $booted = false;
+	protected $container;
 	protected $locked = false;
+	protected $providers = [];
 
 	public function __construct( array $providers = null, array $values = null ) {
 		if ( null === $providers ) {
@@ -50,10 +50,6 @@ class Plugin implements ArrayAccess {
 		}
 	}
 
-	public function get_container() {
-		return $this->container;
-	}
-
 	public function boot() {
 		if ( $this->booted ) {
 			return;
@@ -66,31 +62,6 @@ class Plugin implements ArrayAccess {
 		$this->booted = true;
 	}
 
-	// @todo Method name?
-	public function lock() {
-		if ( $this->locked ) {
-			return;
-		}
-
-		foreach ( $this->providers as $provider ) {
-			$provider->registered();
-		}
-
-		$this->locked = true;
-	}
-
-	public function register( Provider $provider ) {
-		if ( $this->locked ) {
-			throw new \RuntimeException( 'Cannot register providers after plugin has been locked' );
-		}
-
-		$provider->register();
-
-		$this->providers[ get_class( $provider ) ] = $provider;
-
-		return $this;
-	}
-
 	public function config( $path, $default = null ) {
 		if ( ! isset( $this[ Config::class ] ) ) {
 			return $default;
@@ -99,10 +70,18 @@ class Plugin implements ArrayAccess {
 		return $this[ Config::class ]->get( $path, $default );
 	}
 
+	public function factory( $callable ) {
+		return $this->container->factory( $callable );
+	}
+
+	public function get_container() {
+		return $this->container;
+	}
+
 	public function get_enabled_data_sources() {
 		return array_filter(
 			$this->config( 'data_sources', [] ),
-			function( $data_source, $feature ) {
+			function ( $data_source, $feature ) {
 				return ( $data_source['enabled'] ?? false )
 					&& $this->is_feature_available( $feature );
 			},
@@ -110,30 +89,32 @@ class Plugin implements ArrayAccess {
 		);
 	}
 
-	public function is_feature_enabled( $feature ) {
-		return $this->config( "data_sources.{$feature}.enabled", false )
-			&& $this->is_feature_available( $feature );
-	}
-
-	public function is_feature_available( $feature ) {
-		// @todo Allow custom conditions to be registered.
-		if ( 'wpdb' === $feature ) {
-			return defined( 'SAVEQUERIES' ) && SAVEQUERIES;
-		} elseif ( 'xdebug' === $feature ) {
-			return extension_loaded( 'xdebug' ); // @todo get_loaded_extensions()?
-		}
-
-		return true;
-	}
-
-	public function is_collecting_data() {
-		return $this->is_collecting_commands() || $this->is_collecting_requests();
+	public function is_collecting_client_metrics() {
+		return (bool) $this->config( 'collect_client_metrics', true );
 	}
 
 	public function is_collecting_commands() {
 		return ( $this->is_enabled() || $this->config( 'collect_data_always', false ) )
 			&& $this->is_running_in_console()
 			&& $this->config( 'wp_cli.collect', false );
+	}
+
+	public function is_collecting_data() {
+		return $this->is_collecting_commands() || $this->is_collecting_requests();
+	}
+
+	public function is_collecting_heartbeat_requests() {
+		return (bool) $this->config( 'collect_heartbeat', true );
+	}
+
+	public function is_collecting_requests() {
+		return ( $this->is_enabled() || $this->config( 'collect_data_always', false ) )
+			&& ! $this->is_running_in_console()
+			&& $this[ Clockwork::class ]->shouldCollect()->filter( $this[ IncomingRequest::class ] )
+			&& (
+				! $this[ Incoming_Request::class ]->is_heartbeat()
+				|| $this->is_collecting_heartbeat_requests()
+			);
 	}
 
 	public function is_command_filtered( $command ) {
@@ -154,30 +135,29 @@ class Plugin implements ArrayAccess {
 		return in_array( $command, $except, true );
 	}
 
-	public function is_collecting_client_metrics() {
-		return (bool) $this->config( 'collect_client_metrics', true );
+	public function is_enabled() {
+		return (bool) $this->config( 'enable', true );
 	}
 
-	public function is_collecting_heartbeat_requests() {
-		return (bool) $this->config( 'collect_heartbeat', true );
+	public function is_feature_available( $feature ) {
+		// @todo Allow custom conditions to be registered.
+		if ( 'wpdb' === $feature ) {
+			return defined( 'SAVEQUERIES' ) && SAVEQUERIES;
+		}
+		if ( 'xdebug' === $feature ) {
+			return extension_loaded( 'xdebug' ); // @todo get_loaded_extensions()?
+		}
+
+		return true;
 	}
 
-	public function is_collecting_requests() {
-		return ( $this->is_enabled() || $this->config( 'collect_data_always', false ) )
-			&& ! $this->is_running_in_console()
-			&& $this[ Clockwork::class ]->shouldCollect()->filter( $this[ IncomingRequest::class ] )
-			&& (
-				! $this[ Incoming_Request::class ]->is_heartbeat()
-				|| $this->is_collecting_heartbeat_requests()
-			);
+	public function is_feature_enabled( $feature ) {
+		return $this->config( "data_sources.{$feature}.enabled", false )
+			&& $this->is_feature_available( $feature );
 	}
 
 	public function is_recording() {
 		return $this->is_enabled() || $this->config( 'collect_data_always', false );
-	}
-
-	public function is_enabled() {
-		return (bool) $this->config( 'enable', true );
 	}
 
 	public function is_running_in_console() {
@@ -193,13 +173,17 @@ class Plugin implements ArrayAccess {
 		return $this->config( 'enable', true ) && $this->config( 'web', true );
 	}
 
-	// @todo extend method?
-	public function protect( $callable ) {
-		return $this->container->protect( $callable );
-	}
+	// @todo Method name?
+	public function lock() {
+		if ( $this->locked ) {
+			return;
+		}
 
-	public function factory( $callable ) {
-		return $this->container->factory( $callable );
+		foreach ( $this->providers as $provider ) {
+			$provider->registered();
+		}
+
+		$this->locked = true;
 	}
 
 	public function offsetExists( $offset ) {
@@ -216,5 +200,22 @@ class Plugin implements ArrayAccess {
 
 	public function offsetUnset( $offset ) {
 		$this->container->offsetUnset( $offset );
+	}
+
+	// @todo extend method?
+	public function protect( $callable ) {
+		return $this->container->protect( $callable );
+	}
+
+	public function register( Provider $provider ) {
+		if ( $this->locked ) {
+			throw new RuntimeException( 'Cannot register providers after plugin has been locked' );
+		}
+
+		$provider->register();
+
+		$this->providers[ get_class( $provider ) ] = $provider;
+
+		return $this;
 	}
 }

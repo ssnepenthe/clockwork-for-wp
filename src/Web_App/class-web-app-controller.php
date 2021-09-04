@@ -3,12 +3,13 @@
 namespace Clockwork_For_Wp\Web_App;
 
 use Clockwork\Web\Web;
+use WP_Query;
 
 class Web_App_Controller {
 	protected $web_helper;
 	protected $wp_query;
 
-	public function __construct( Web $web_helper, \WP_Query $wp_query ) {
+	public function __construct( Web $web_helper, WP_Query $wp_query ) {
 		$this->web_helper = $web_helper;
 		$this->wp_query = $wp_query;
 	}
@@ -33,7 +34,7 @@ class Web_App_Controller {
 		header( "Content-Length: {$size}" );
 
 		readfile( $file['path'] );
-		die;
+		exit;
 	}
 
 	protected function trigger_not_found() {

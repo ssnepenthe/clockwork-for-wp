@@ -2,8 +2,13 @@
 
 namespace Clockwork_For_Wp;
 
+use Closure;
+use ReflectionFunction;
+
 /**
  * Adapted from Illuminate\Support\Arr.
+ *
+ * @param null|mixed $default
  */
 function array_get( array $array, string $path, $default = null ) {
 	if ( array_key_exists( $path, $array ) ) {
@@ -42,7 +47,7 @@ function array_set( array &$array, string $path, $value ) {
 	$segments = explode( '.', $path );
 
 	foreach ( $segments as $i => $segment ) {
-		if ( count( $segments ) === 1 ) {
+		if ( 1 === count( $segments ) ) {
 			break;
 		}
 
@@ -52,7 +57,7 @@ function array_set( array &$array, string $path, $value ) {
 			$array[ $segment ] = [];
 		}
 
-		$array =& $array[ $segment ];
+		$array = &$array[ $segment ];
 	}
 
 	$array[ array_shift( $segments ) ] = $value;
@@ -101,13 +106,14 @@ function describe_callable( $callable ) {
 			$class = get_class( $callable[0] );
 
 			return "{$class}->{$callable[1]}()";
-		} elseif ( is_string( $callable[0] ) ) {
+		}
+		if ( is_string( $callable[0] ) ) {
 			return "{$callable[0]}::{$callable[1]}()";
 		}
 	}
 
-	if ( $callable instanceof \Closure ) {
-		$reflection = new \ReflectionFunction( $callable );
+	if ( $callable instanceof Closure ) {
+		$reflection = new ReflectionFunction( $callable );
 		// @todo Configurable set of directories to strip from the fron of filename.
 		// $filename = str_replace( ABSPATH, '', $reflection->getFileName() );
 

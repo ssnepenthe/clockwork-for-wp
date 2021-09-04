@@ -5,12 +5,10 @@ namespace Clockwork_For_Wp\Wp_Cli;
 use WP_CLI;
 
 class Generate_Command_Lists_Command extends Base_Command {
-	protected $name = 'generate-command-lists';
-
-	protected $description = 'Generates lists of commands that should be ignored by Clockwork. Used for development only.';
-
 	protected $clockwork = [];
 	protected $core = [];
+	protected $description = 'Generates lists of commands that should be ignored by Clockwork. Used for development only.';
+	protected $name = 'generate-command-lists';
 
 	public function __invoke() {
 		$this->enumerate_commands( WP_CLI::get_root_command() );

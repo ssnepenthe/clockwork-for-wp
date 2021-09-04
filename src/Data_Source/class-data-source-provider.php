@@ -8,7 +8,7 @@ use Clockwork_For_Wp\Event_Management\Event_Manager;
 
 class Data_Source_Provider extends Base_Provider {
 	public function register() {
-		$this->plugin[ Conditionals::class ] = function() {
+		$this->plugin[ Conditionals::class ] = function () {
 			$conditionals = [
 				'is_404',
 				'is_admin',
@@ -55,7 +55,7 @@ class Data_Source_Provider extends Base_Provider {
 			return new Conditionals( ...$conditionals );
 		};
 
-		$this->plugin[ Constants::class ] = function() {
+		$this->plugin[ Constants::class ] = function () {
 			$constants = [
 				'WP_DEBUG',
 				'WP_DEBUG_DISPLAY',
@@ -75,34 +75,34 @@ class Data_Source_Provider extends Base_Provider {
 			return new Constants( ...$constants );
 		};
 
-		$this->plugin[ Core::class ] = function() {
+		$this->plugin[ Core::class ] = function () {
 			return new Core( $this->plugin['wp_version'], $this->plugin['timestart'] );
 		};
 
-		$this->plugin[ Errors::class ] = $this->plugin->factory( function() {
+		$this->plugin[ Errors::class ] = $this->plugin->factory( function () {
 			return Errors::get_instance();
 		} );
 
-		$this->plugin[ Php::class ] = function() {
+		$this->plugin[ Php::class ] = function () {
 			$cookies = implode( '|', [ AUTH_COOKIE, SECURE_AUTH_COOKIE, LOGGED_IN_COOKIE ] );
 
 			// @todo Option in plugin config for additional patterns?
 			return new Php( '/pass|pwd/i', "/{$cookies}/i" );
 		};
 
-		$this->plugin[ Rest_Api::class ] = function() {
+		$this->plugin[ Rest_Api::class ] = function () {
 			return new Rest_Api();
 		};
 
-		$this->plugin[ Theme::class ] = function() {
+		$this->plugin[ Theme::class ] = function () {
 			return new Theme();
 		};
 
-		$this->plugin[ Transients::class ] = function() {
+		$this->plugin[ Transients::class ] = function () {
 			return new Transients();
 		};
 
-		$this->plugin[ Wp_Hook::class ] = function() {
+		$this->plugin[ Wp_Hook::class ] = function () {
 			$config = $this->plugin->config( 'data_sources.wp_hook.config', [] );
 
 			$data_source = new Wp_Hook( $config['all_hooks'] ?? false );
@@ -112,7 +112,7 @@ class Data_Source_Provider extends Base_Provider {
 				$config['only_tags'] ?? []
 			);
 
-			$data_source->addFilter( function( $hook ) use ( $tag_filter ) {
+			$data_source->addFilter( function ( $hook ) use ( $tag_filter ) {
 				return $tag_filter( $hook['Tag'] );
 			} );
 
@@ -121,42 +121,42 @@ class Data_Source_Provider extends Base_Provider {
 				$config['only_callbacks'] ?? []
 			);
 
-			$data_source->addFilter( function( $hook ) use ( $callback_filter ) {
+			$data_source->addFilter( function ( $hook ) use ( $callback_filter ) {
 				return $callback_filter( $hook['Callback'] );
 			} );
 
 			return $data_source;
 		};
 
-		$this->plugin[ Wp_Http::class ] = function() {
+		$this->plugin[ Wp_Http::class ] = function () {
 			return new Wp_Http();
 		};
 
-		$this->plugin[ Wp_Mail::class ] = function() {
+		$this->plugin[ Wp_Mail::class ] = function () {
 			return new Wp_Mail();
 		};
 
-		$this->plugin[ Wp_Object_Cache::class ] = function() {
+		$this->plugin[ Wp_Object_Cache::class ] = function () {
 			return new Wp_Object_Cache();
 		};
 
-		$this->plugin[ Wp_Query::class ] = function() {
+		$this->plugin[ Wp_Query::class ] = function () {
 			return new Wp_Query();
 		};
 
-		$this->plugin[ Wp_Redirect::class ] = function() {
+		$this->plugin[ Wp_Redirect::class ] = function () {
 			return new Wp_Redirect();
 		};
 
-		$this->plugin[ Wp_Rewrite::class ] = function() {
+		$this->plugin[ Wp_Rewrite::class ] = function () {
 			return new Wp_Rewrite();
 		};
 
-		$this->plugin[ Wp::class ] = function() {
+		$this->plugin[ Wp::class ] = function () {
 			return new Wp();
 		};
 
-		$this->plugin[ Wpdb::class ] = function() {
+		$this->plugin[ Wpdb::class ] = function () {
 			$config = $this->plugin[ Config::class ]->get( 'data_sources.wpdb.config', [] );
 
 			$data_source = new Wpdb(
@@ -167,7 +167,7 @@ class Data_Source_Provider extends Base_Provider {
 			if ( $config['slow_only'] ?? false ) {
 				$slow_threshold = $config['slow_threshold'] ?? 50;
 
-				$data_source->addFilter( function( $query ) use ( $slow_threshold ) {
+				$data_source->addFilter( function ( $query ) use ( $slow_threshold ) {
 					// @todo Should this be inclusive (i.e. >=) instead?
 					return $query['duration'] > $slow_threshold;
 				} );
@@ -181,7 +181,7 @@ class Data_Source_Provider extends Base_Provider {
 			return $data_source;
 		};
 
-		$this->plugin[ Xdebug::class ] = function() {
+		$this->plugin[ Xdebug::class ] = function () {
 			return new Xdebug();
 		};
 	}
@@ -199,7 +199,7 @@ class Data_Source_Provider extends Base_Provider {
 			$only_types = $config['only_types'] ?? false;
 
 			// Filter errors by type.
-			$errors->addFilter( function( $error ) use ( $except_types, $only_types ) {
+			$errors->addFilter( function ( $error ) use ( $except_types, $only_types ) {
 				if ( is_int( $only_types ) ) {
 					return ( $error['type'] & $only_types ) > 0;
 				}
@@ -217,7 +217,7 @@ class Data_Source_Provider extends Base_Provider {
 				$config['only_messages'] ?? []
 			);
 
-			$errors->addFilter( function( $error ) use ( $message_filter ) {
+			$errors->addFilter( function ( $error ) use ( $message_filter ) {
 				return $message_filter( $error['message'] );
 			} );
 
@@ -227,14 +227,14 @@ class Data_Source_Provider extends Base_Provider {
 				$config['only_files'] ?? []
 			);
 
-			$errors->addFilter( function( $error ) use ( $file_filter ) {
+			$errors->addFilter( function ( $error ) use ( $file_filter ) {
 				return $file_filter( $error['file'] );
 			} );
 
 			// Filter suppressed errors.
 			$include_suppressed = $config['include_suppressed_errors'] ?? false;
 
-			$errors->addFilter( function( $error ) use ( $include_suppressed ) {
+			$errors->addFilter( function ( $error ) use ( $include_suppressed ) {
 				return ! $error['suppressed'] || $include_suppressed;
 			} );
 
@@ -244,7 +244,7 @@ class Data_Source_Provider extends Base_Provider {
 		}
 	}
 
-	protected function subscribers() : array {
+	protected function subscribers(): array {
 		$subscribers = [];
 
 		if ( $this->plugin->is_feature_enabled( 'rest_api' ) ) {
