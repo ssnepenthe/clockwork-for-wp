@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp;
 
 use ArrayAccess;
@@ -15,13 +17,13 @@ use Clockwork_For_Wp\Wp_Cli\Wp_Cli_Provider;
 use Pimple\Container;
 use RuntimeException;
 
-class Plugin implements ArrayAccess {
-	protected $booted = false;
-	protected $container;
-	protected $locked = false;
-	protected $providers = [];
+final class Plugin implements ArrayAccess {
+	private $booted = false;
+	private $container;
+	private $locked = false;
+	private $providers = [];
 
-	public function __construct( array $providers = null, array $values = null ) {
+	public function __construct( ?array $providers = null, ?array $values = null ) {
 		if ( null === $providers ) {
 			$providers = [
 				Clockwork_Provider::class,
@@ -39,7 +41,7 @@ class Plugin implements ArrayAccess {
 
 		$this->container = new Container( $values ?: [] );
 
-		$this[ Plugin::class ] = $this;
+		$this[ self::class ] = $this;
 
 		foreach ( $providers as $provider ) {
 			if ( ! $provider instanceof Provider ) {
@@ -50,7 +52,7 @@ class Plugin implements ArrayAccess {
 		}
 	}
 
-	public function boot() {
+	public function boot(): void {
 		if ( $this->booted ) {
 			return;
 		}
@@ -79,13 +81,13 @@ class Plugin implements ArrayAccess {
 	}
 
 	public function get_enabled_data_sources() {
-		return array_filter(
+		return \array_filter(
 			$this->config( 'data_sources', [] ),
 			function ( $data_source, $feature ) {
 				return ( $data_source['enabled'] ?? false )
 					&& $this->is_feature_available( $feature );
 			},
-			ARRAY_FILTER_USE_BOTH
+			\ARRAY_FILTER_USE_BOTH
 		);
 	}
 
@@ -120,19 +122,19 @@ class Plugin implements ArrayAccess {
 	public function is_command_filtered( $command ) {
 		$only = $this->config( 'wp_cli.only', [] );
 
-		if ( count( $only ) > 0 ) {
-			return ! in_array( $command, $only, true );
+		if ( \count( $only ) > 0 ) {
+			return ! \in_array( $command, $only, true );
 		}
 
 		$except = $this->config( 'wp_cli.except', [] );
 
 		if ( $this->config( 'wp_cli.except_built_in_commands', true ) ) {
-			$except = array_merge( $except, Cli_Collection_Helper::get_core_command_list() );
+			$except = \array_merge( $except, Cli_Collection_Helper::get_core_command_list() );
 		}
 
-		$except = array_merge( $except, Cli_Collection_Helper::get_clockwork_command_list() );
+		$except = \array_merge( $except, Cli_Collection_Helper::get_clockwork_command_list() );
 
-		return in_array( $command, $except, true );
+		return \in_array( $command, $except, true );
 	}
 
 	public function is_enabled() {
@@ -142,10 +144,10 @@ class Plugin implements ArrayAccess {
 	public function is_feature_available( $feature ) {
 		// @todo Allow custom conditions to be registered.
 		if ( 'wpdb' === $feature ) {
-			return defined( 'SAVEQUERIES' ) && SAVEQUERIES;
+			return \defined( 'SAVEQUERIES' ) && SAVEQUERIES;
 		}
 		if ( 'xdebug' === $feature ) {
-			return extension_loaded( 'xdebug' ); // @todo get_loaded_extensions()?
+			return \extension_loaded( 'xdebug' ); // @todo get_loaded_extensions()?
 		}
 
 		return true;
@@ -162,7 +164,7 @@ class Plugin implements ArrayAccess {
 
 	public function is_running_in_console() {
 		// @todo Do we actually care if it is in console but not WP-CLI?
-		return ( defined( 'WP_CLI' ) && WP_CLI ) || in_array( PHP_SAPI, [ 'cli', 'phpdbg' ], true );
+		return ( \defined( 'WP_CLI' ) && WP_CLI ) || \in_array( \PHP_SAPI, [ 'cli', 'phpdbg' ], true );
 	}
 
 	public function is_toolbar_enabled() {
@@ -174,7 +176,7 @@ class Plugin implements ArrayAccess {
 	}
 
 	// @todo Method name?
-	public function lock() {
+	public function lock(): void {
 		if ( $this->locked ) {
 			return;
 		}
@@ -194,11 +196,11 @@ class Plugin implements ArrayAccess {
 		return $this->container->offsetGet( $offset );
 	}
 
-	public function offsetSet( $offset, $value ) {
+	public function offsetSet( $offset, $value ): void {
 		$this->container->offsetSet( $offset, $value );
 	}
 
-	public function offsetUnset( $offset ) {
+	public function offsetUnset( $offset ): void {
 		$this->container->offsetUnset( $offset );
 	}
 
@@ -214,7 +216,7 @@ class Plugin implements ArrayAccess {
 
 		$provider->register();
 
-		$this->providers[ get_class( $provider ) ] = $provider;
+		$this->providers[ \get_class( $provider ) ] = $provider;
 
 		return $this;
 	}

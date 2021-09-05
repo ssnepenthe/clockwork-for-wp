@@ -1,14 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 $finder = \PhpCsFixer\Finder::create()
 	->in(__DIR__ . '/src');
 
 $config = (new \PhpCsFixer\Config())
-	->setIndent("\t");
+	->setIndent("\t")
+	->setRiskyAllowed(true);
 
 return $config->setRules([
+	'array_push' => true,
+	'mb_str_functions' => true,
+	'no_alias_functions' => true,
 	'no_alias_language_construct_call' => true,
 	'no_mixed_echo_print' => true,
+	'pow_to_exponentiation' => true,
+	'random_api_migration' => true,
+	'set_type_to_cast' => true,
 	'array_syntax' => true,
 	'no_multiline_whitespace_around_double_arrow' => true,
 	'no_trailing_comma_in_singleline_array' => true,
@@ -19,6 +28,7 @@ return $config->setRules([
 		'position_after_functions_and_oop_constructs' => 'same',
 	],
 	'encoding' => true,
+	'non_printable_character' => true,
 	'constant_case' => true,
 	'lowercase_keywords' => true,
 	'lowercase_static_reference' => true,
@@ -28,6 +38,7 @@ return $config->setRules([
 	'native_function_type_declaration_casing' => true,
 	'cast_spaces' => true,
 	'lowercase_cast' => true,
+	'modernize_types_casting' => true,
 	'no_short_bool_cast' => true,
 	'no_unset_cast' => true,
 	'short_scalar_cast' => true,
@@ -39,8 +50,11 @@ return $config->setRules([
 		],
 	],
 	'class_definition' => true,
+	'final_class' => true,
 	'no_blank_lines_after_class_opening' => true,
 	'no_null_property_initialization' => true,
+	'no_php4_constructor' => true,
+	'no_unneeded_final_method' => true,
 	'ordered_class_elements' => [
 		'order' => [
 			'use_trait',
@@ -66,7 +80,10 @@ return $config->setRules([
 		],
 		'sort_algorithm' => 'alpha',
 	],
+	'ordered_interfaces' => true,
+	'ordered_traits' => true,
 	'protected_to_private' => true,
+	'self_accessor' => true,
 	'self_static_accessor' => true,
 	'single_class_element_per_statement' => true,
 	'single_trait_insert_per_statement' => true,
@@ -75,6 +92,7 @@ return $config->setRules([
 	'no_empty_comment' => true,
 	'no_trailing_whitespace_in_comment' => true,
 	'single_line_comment_style' => true,
+	'native_constant_invocation' => true,
 	'elseif' => true,
 	'include' => true,
 	'no_break_comment' => true,
@@ -96,14 +114,22 @@ return $config->setRules([
 	// 	'closure_function_spacing' => 'none',
 	// ],
 	'function_typehint_space' => true,
+	'implode_call' => true,
 	'lambda_not_used_import' => true,
 	'method_argument_space' => true,
+	'native_function_invocation' => [
+		'include' => ['@all'],
+		'exclude' => ['add_command', 'array_get', 'array_has', 'array_only', 'array_set'],
+	],
 	'no_spaces_after_function_name' => true,
-	// @todo This puts us back at PHP 7.1+.
-	// 'nullable_type_declaration_for_default_null_value' => true,
+	'no_unreachable_default_argument_value' => true,
+	'no_useless_sprintf' => true,
+	'nullable_type_declaration_for_default_null_value' => true,
+	'regular_callable_call' => true,
 	'return_type_declaration' => true,
+	'static_lambda' => true,
+	'void_return' => true,
 	'fully_qualified_strict_types' => true,
-	// @todo Revisit once we get to prepending \ on global functions?
 	'global_namespace_import' => true,
 	'no_leading_import_slash' => true,
 	'no_unused_imports' => true,
@@ -116,7 +142,11 @@ return $config->setRules([
 	'combine_consecutive_unsets' => true,
 	'declare_equal_normalize' => true,
 	'declare_parentheses' => true,
+	'dir_constant' => true,
 	'explicit_indirect_variable' => true,
+	'function_to_constant' => true,
+	'is_null' => true,
+	'no_unset_on_property' => true,
 	'single_space_after_construct' => true,
 	'list_syntax' => true,
 	'blank_line_after_namespace' => true,
@@ -127,6 +157,7 @@ return $config->setRules([
 	'concat_space' => [
 		'spacing' => 'one',
 	],
+	'logical_operators' => true,
 	'new_with_braces' => true,
 	'not_operator_with_space' => true,
 	'object_operator_without_whitespace' => true,
@@ -134,6 +165,7 @@ return $config->setRules([
 	'standardize_increment' => true,
 	'standardize_not_equals' => true,
 	'ternary_operator_spaces' => true,
+	'ternary_to_elvis_operator' => true,
 	'ternary_to_null_coalescing' => true,
 	'unary_operator_spaces' => true,
 	'blank_line_after_opening_tag' => true,
@@ -176,12 +208,17 @@ return $config->setRules([
 	'no_singleline_whitespace_before_semicolons' => true,
 	'semicolon_after_instruction' => true,
 	'space_after_semicolon' => true,
+	'declare_strict_types' => true,
+	'strict_comparison' => true,
+	'strict_param' => true,
 	'escape_implicit_backslashes' => true,
 	'explicit_string_variable' => true,
 	'heredoc_to_nowdoc' => true,
 	'no_binary_string' => true,
+	'no_trailing_whitespace_in_string' => true,
 	'simple_to_complex_string_variable' => true,
 	'single_quote' => true,
+	'string_line_ending' => true,
 	'array_indentation' => true,
 	'blank_line_before_statement' => true,
 	'compact_nullable_typehint' => true,

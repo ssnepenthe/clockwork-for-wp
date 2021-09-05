@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp;
 
 // @todo Consider supporting read-only values.
-class Config {
-	protected $values = [];
+final class Config {
+	private $values = [];
 
 	public function __construct( array $values = [] ) {
 		$this->values = $values;
@@ -18,7 +20,7 @@ class Config {
 		return array_has( $this->values, $path );
 	}
 
-	public function set( $path, $value = null ) {
+	public function set( $path, $value = null ): void {
 		array_set( $this->values, $path, $value );
 
 		// ???

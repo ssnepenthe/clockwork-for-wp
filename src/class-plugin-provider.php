@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp;
 
 use Clockwork\Clockwork;
@@ -13,8 +15,8 @@ use Invoker\ParameterResolver\NumericArrayResolver;
 use Invoker\ParameterResolver\ResolverChain;
 use Pimple\Psr11\Container;
 
-class Plugin_Provider extends Base_Provider {
-	public function register() {
+final class Plugin_Provider extends Base_Provider {
+	public function register(): void {
 		require_once $this->plugin['dir'] . '/src/plugin-helpers.php';
 
 		$this->plugin[ Config::class ] = function () {

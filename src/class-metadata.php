@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp;
 
 use Clockwork\Clockwork;
@@ -7,9 +9,9 @@ use Clockwork\Request\Request;
 use Clockwork\Storage\Search;
 use Clockwork\Storage\StorageInterface;
 
-class Metadata {
-	protected $clockwork;
-	protected $storage;
+final class Metadata {
+	private $clockwork;
+	private $storage;
 
 	public function __construct( Clockwork $clockwork, StorageInterface $storage ) {
 		$this->clockwork = $clockwork;
@@ -42,9 +44,9 @@ class Metadata {
 		return $this->storage->update( $request );
 	}
 
-	protected function apply_defaults( $direction, $count ) {
+	private function apply_defaults( $direction, $count ) {
 		return [
-			in_array( $direction, [ 'previous', 'next' ], true ) ? $direction : null,
+			\in_array( $direction, [ 'previous', 'next' ], true ) ? $direction : null,
 			null !== $count ? (int) $count : null,
 		];
 	}

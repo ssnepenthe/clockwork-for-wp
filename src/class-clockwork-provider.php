@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp;
 
 use Clockwork\Authentication\AuthenticatorInterface;
@@ -17,8 +19,8 @@ use Clockwork\Storage\StorageInterface;
 use Clockwork_For_Wp\Data_Source\Php;
 use InvalidArgumentException;
 
-class Clockwork_Provider extends Base_Provider {
-	public function boot() {
+final class Clockwork_Provider extends Base_Provider {
+	public function boot(): void {
 		if ( $this->plugin->is_collecting_data() ) {
 			// Clockwork instance is resolved even when we are not collecting data in order to take
 			// advantage of helper methods like shouldCollect.
@@ -29,7 +31,7 @@ class Clockwork_Provider extends Base_Provider {
 		}
 	}
 
-	public function register() {
+	public function register(): void {
 		$this->plugin[ Clockwork_Subscriber::class ] = function () {
 			return new Clockwork_Subscriber( $this->plugin );
 		};
@@ -55,8 +57,8 @@ class Clockwork_Provider extends Base_Provider {
 		};
 
 		$this->plugin[ SimpleAuthenticator::class ] = $this->plugin->protect(
-			function ( array $config ) {
-				if ( ! array_key_exists( 'password', $config ) ) {
+			static function ( array $config ) {
+				if ( ! \array_key_exists( 'password', $config ) ) {
 					throw new InvalidArgumentException(
 						'Missing "password" key from simple authenticator config array'
 					);
@@ -79,8 +81,8 @@ class Clockwork_Provider extends Base_Provider {
 		} );
 
 		$this->plugin[ FileStorage::class ] = $this->plugin->protect(
-			function ( array $config, $expiration ) {
-				if ( ! array_key_exists( 'path', $config ) ) {
+			static function ( array $config, $expiration ) {
+				if ( ! \array_key_exists( 'path', $config ) ) {
 					throw new InvalidArgumentException(
 						'Missing "path" key from file storage config array'
 					);
@@ -94,8 +96,8 @@ class Clockwork_Provider extends Base_Provider {
 		);
 
 		$this->plugin[ SqlStorage::class ] = $this->plugin->protect(
-			function ( array $config, $expiration ) {
-				if ( ! array_key_exists( 'dsn', $config ) ) {
+			static function ( array $config, $expiration ) {
+				if ( ! \array_key_exists( 'dsn', $config ) ) {
 					throw new InvalidArgumentException(
 						'Missing "dns" key from sql storage config array'
 					);
@@ -109,11 +111,11 @@ class Clockwork_Provider extends Base_Provider {
 			}
 		);
 
-		$this->plugin[ Log::class ] = function () {
+		$this->plugin[ Log::class ] = static function () {
 			return new Log();
 		};
 
-		$this->plugin[ Request::class ] = function () {
+		$this->plugin[ Request::class ] = static function () {
 			return new Request();
 		};
 
@@ -125,12 +127,12 @@ class Clockwork_Provider extends Base_Provider {
 			return $this->plugin[ Incoming_Request::class ];
 		} );
 
-		$this->plugin[ Incoming_Request::class ] = function () {
+		$this->plugin[ Incoming_Request::class ] = static function () {
 			return Incoming_Request::from_globals();
 		};
 	}
 
-	public function registered() {
+	public function registered(): void {
 		$this->configure_serializer();
 		$this->configure_should_collect();
 
@@ -139,7 +141,11 @@ class Clockwork_Provider extends Base_Provider {
 		}
 	}
 
-	protected function add_data_sources() {
+	protected function subscribers(): array {
+		return [ Clockwork_Subscriber::class ];
+	}
+
+	private function add_data_sources(): void {
 		$clockwork = $this->plugin[ Clockwork::class ];
 
 		$clockwork->addDataSource( $this->plugin[ Php::class ] );
@@ -149,7 +155,7 @@ class Clockwork_Provider extends Base_Provider {
 		}
 	}
 
-	protected function configure_serializer() {
+	private function configure_serializer(): void {
 		Serializer::defaults( [
 			'limit' => $this->plugin->config( 'serialization.depth', 10 ),
 			'blackbox' => $this->plugin->config( 'serialization.blackbox', [
@@ -158,7 +164,7 @@ class Clockwork_Provider extends Base_Provider {
 			] ),
 			'traces' => $this->plugin->config( 'stack_traces.enabled', true ),
 			'tracesSkip' => StackFilter::make()
-				->isNotVendor( array_merge(
+				->isNotVendor( \array_merge(
 					$this->plugin->config( 'stack_traces.skip_vendors', [] ),
 					[ 'itsgoingd' ]
 				) )
@@ -169,7 +175,7 @@ class Clockwork_Provider extends Base_Provider {
 		] );
 	}
 
-	protected function configure_should_collect() {
+	private function configure_should_collect(): void {
 		$should_collect = $this->plugin[ Clockwork::class ]->shouldCollect();
 
 		$should_collect->merge( [
@@ -181,9 +187,5 @@ class Clockwork_Provider extends Base_Provider {
 		] );
 
 		$should_collect->except( [ '/__clockwork(?:/.*)?' ] );
-	}
-
-	protected function subscribers(): array {
-		return [ Clockwork_Subscriber::class ];
 	}
 }

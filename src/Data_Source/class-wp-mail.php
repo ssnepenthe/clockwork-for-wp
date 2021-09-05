@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
@@ -11,18 +13,18 @@ use WP_Error;
 use function Clockwork_For_Wp\wp_error_to_array;
 
 // @todo Use phpmailer_init hook to get more details?
-class Wp_Mail extends DataSource implements Subscriber {
-	protected $emails;
-	protected $log;
+final class Wp_Mail extends DataSource implements Subscriber {
+	private $emails;
+	private $log;
 
-	public function __construct( Timeline $emails = null, Log $log = null ) {
+	public function __construct( ?Timeline $emails = null, ?Log $log = null ) {
 		$this->emails = $emails ?: new Timeline();
 		$this->log = $log ?: new Log();
 	}
 
 	public function get_subscribed_events(): array {
 		return [
-			'wp_mail_failed' => function ( WP_Error $error ) {
+			'wp_mail_failed' => function ( WP_Error $error ): void {
 				// @todo Truncate field within error_data.
 				$data = wp_error_to_array( $error );
 
@@ -37,26 +39,26 @@ class Wp_Mail extends DataSource implements Subscriber {
 		];
 	}
 
-	public function record_failure( $context ) {
+	public function record_failure( $context ): void {
 		$this->log->error( 'Failed to send an email', $context );
 	}
 
-	public function record_send( $args ) {
+	public function record_send( $args ): void {
 		$to = $args['to'] ?? '';
 		$subject = $args['subject'] ?? '';
 		$headers = $args['headers'] ?? [];
-		$time = microtime( true );
+		$time = \microtime( true );
 
 		$this->emails->event( 'Sending an email', [
-			'name' => 'email_' . hash( 'md5', serialize( $args ) ),
-			'data' => compact( 'to', 'subject', 'headers' ),
+			'name' => 'email_' . \hash( 'md5', \serialize( $args ) ),
+			'data' => \compact( 'to', 'subject', 'headers' ),
 			'start' => $time,
 			'end' => $time,
 		] );
 	}
 
 	public function resolve( Request $request ) {
-		$request->emailsData = array_merge( $request->emailsData, $this->emails->finalize() );
+		$request->emailsData = \array_merge( $request->emailsData, $this->emails->finalize() );
 		$request->log()->merge( $this->log );
 
 		return $request;

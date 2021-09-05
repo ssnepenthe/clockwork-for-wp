@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Data_Source;
 
-class Except_Only_Filter {
+final class Except_Only_Filter {
 	public function __construct( array $except, array $only ) {
-		$this->except = implode( '|', $except );
-		$this->only = implode( '|', $only );
+		$this->except = \implode( '|', $except );
+		$this->only = \implode( '|', $only );
 	}
 
 	public function __invoke( $value ) {
@@ -14,11 +16,11 @@ class Except_Only_Filter {
 
 	public function passes( $value ) {
 		if ( $this->only ) {
-			return 1 === preg_match( "/{$this->only}/", $value );
+			return 1 === \preg_match( "/{$this->only}/", $value );
 		}
 
 		if ( $this->except ) {
-			return 1 !== preg_match( "/{$this->except}/", $value );
+			return 1 !== \preg_match( "/{$this->except}/", $value );
 		}
 
 		return true;

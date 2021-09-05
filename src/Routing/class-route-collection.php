@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Routing;
 
-class Route_Collection {
-	protected $prefix;
-	protected $routes = [];
+final class Route_Collection {
+	private $prefix;
+	private $routes = [];
 
 	public function __construct( string $prefix = '' ) {
 		$this->prefix = $prefix;
@@ -26,10 +28,10 @@ class Route_Collection {
 		$query_vars = [];
 
 		foreach ( $this->routes as $route ) {
-			$query_vars = array_merge( $query_vars, $route->get_query_array() );
+			$query_vars = \array_merge( $query_vars, $route->get_query_array() );
 		}
 
-		return array_keys( $query_vars );
+		return \array_keys( $query_vars );
 	}
 
 	public function get_rewrite_array() {
@@ -60,7 +62,7 @@ class Route_Collection {
 	public function match( $method, $matched_pattern ) {
 		$key = $method . ':' . $matched_pattern;
 
-		if ( ! array_key_exists( $key, $this->routes ) ) {
+		if ( ! \array_key_exists( $key, $this->routes ) ) {
 			return;
 		}
 

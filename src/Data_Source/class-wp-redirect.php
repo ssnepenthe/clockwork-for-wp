@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
@@ -11,21 +13,21 @@ use Clockwork_For_Wp\Event_Management\Subscriber;
 use InvalidArgumentException;
 
 // @todo Would be nice to get this tested by our browser tests.
-class Wp_Redirect extends DataSource implements Subscriber {
-	protected $filtered = [
+final class Wp_Redirect extends DataSource implements Subscriber {
+	private $filtered = [
 		'location' => null,
 		'status' => null,
 		'x-redirect-by' => null,
 	];
-	protected $finalized = false;
-	protected $initial = [
+	private $finalized = false;
+	private $initial = [
 		'location' => null,
 		'status' => 302,
 		'x-redirect-by' => 'WordPress',
 	];
-	protected $trace;
+	private $trace;
 
-	public function finalize_wp_redirect_call() {
+	public function finalize_wp_redirect_call(): void {
 		$this->finalized = true;
 	}
 
@@ -61,7 +63,7 @@ class Wp_Redirect extends DataSource implements Subscriber {
 	}
 
 	public function resolve( Request $request ) {
-		if ( ! is_string( $this->initial['location'] ) ) {
+		if ( ! \is_string( $this->initial['location'] ) ) {
 			return $request;
 		}
 
@@ -70,7 +72,7 @@ class Wp_Redirect extends DataSource implements Subscriber {
 			'trace' => $this->trace,
 		];
 
-		$filtered = array_diff( $this->filtered, $this->initial );
+		$filtered = \array_diff( $this->filtered, $this->initial );
 
 		if ( [] !== $filtered ) {
 			$context['Filtered Args'] = $filtered;
@@ -81,8 +83,8 @@ class Wp_Redirect extends DataSource implements Subscriber {
 		return $request;
 	}
 
-	public function set_filtered( $key, $value ) {
-		if ( ! array_key_exists( $key, $this->filtered ) ) {
+	public function set_filtered( $key, $value ): void {
+		if ( ! \array_key_exists( $key, $this->filtered ) ) {
 			throw new InvalidArgumentException(
 				"Cannot set invalid key {$key} on filtered args array"
 			);
@@ -91,8 +93,8 @@ class Wp_Redirect extends DataSource implements Subscriber {
 		$this->filtered[ $key ] = $value;
 	}
 
-	public function set_initial( $key, $value ) {
-		if ( ! array_key_exists( $key, $this->initial ) ) {
+	public function set_initial( $key, $value ): void {
+		if ( ! \array_key_exists( $key, $this->initial ) ) {
 			throw new InvalidArgumentException(
 				"Cannot set invalid key {$key} on initial args array"
 			);
@@ -101,7 +103,7 @@ class Wp_Redirect extends DataSource implements Subscriber {
 		$this->initial[ $key ] = $value;
 	}
 
-	protected function build_message() {
+	private function build_message() {
 		$message = 'Call to "wp_redirect"';
 
 		if ( ! $this->finalized ) {
@@ -117,7 +119,7 @@ class Wp_Redirect extends DataSource implements Subscriber {
 		return $message;
 	}
 
-	protected function record_wp_redirect_call() {
+	private function record_wp_redirect_call(): void {
 		// @todo Set limit? Limit from config is only enforced by the serializer when the request is resolved.
 		// Seems like limitless trace with arguments might end up causing some memory issues...
 		$this->trace = StackTrace::get( [ 'arguments' => true ] )->skip(

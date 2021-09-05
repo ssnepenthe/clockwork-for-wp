@@ -1,18 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Wp_Cli;
 
 use WP_CLI;
 use WP_CLI\DocParser;
 use WP_CLI\SynopsisParser;
 
-class Command_Context {
-	protected $args;
-	protected $command;
-	protected $command_path;
-	protected $options;
-	protected $parser;
-	protected $synopsis;
+final class Command_Context {
+	private $args;
+	private $command;
+	private $command_path;
+	private $options;
+	private $parser;
+	private $synopsis;
 
 	public function __construct( $command, $args, $options, $command_path ) {
 		$this->command = $command;
@@ -76,13 +78,13 @@ class Command_Context {
 	}
 
 	public function get_params( $types ) {
-		return array_filter( $this->synopsis, function ( $param ) use ( $types ) {
-			return in_array( $param['type'], $types, true );
+		return \array_filter( $this->synopsis, static function ( $param ) use ( $types ) {
+			return \in_array( $param['type'], $types, true );
 		} );
 	}
 
 	public function name() {
-		return implode( ' ', $this->command_path );
+		return \implode( ' ', $this->command_path );
 	}
 
 	// @todo Verify how "generic" options are handled... I think it should be fine.
@@ -97,14 +99,14 @@ class Command_Context {
 
 		// @todo Need to look in to coloring in clockwork UI.
 		// @todo Better formatting.
-		return trim( $logger->stdout . PHP_EOL . PHP_EOL . $logger->stderr );
+		return \trim( $logger->stdout . \PHP_EOL . \PHP_EOL . $logger->stderr );
 	}
 
-	protected function mock_doc() {
+	private function mock_doc() {
 		$mock_doc = [ $this->command->get_shortdesc(), '' ];
-		$mock_doc = array_merge( $mock_doc, explode( "\n", $this->command->get_longdesc() ) );
+		$mock_doc = \array_merge( $mock_doc, \explode( "\n", $this->command->get_longdesc() ) );
 
-		return '/**' . PHP_EOL . '* ' . implode( PHP_EOL . '* ', $mock_doc ) . PHP_EOL . '*/';
+		return '/**' . \PHP_EOL . '* ' . \implode( \PHP_EOL . '* ', $mock_doc ) . \PHP_EOL . '*/';
 	}
 
 	public static function current() {
@@ -112,12 +114,12 @@ class Command_Context {
 
 		$command = $runner->find_command_to_run( $runner->arguments );
 
-		if ( ! is_array( $command ) ) {
+		if ( ! \is_array( $command ) ) {
 			return;
 		}
 
-		$global = _cfw_instance()->config( 'wp_cli.record_global_parameters', false );
-		$global_runtime = _cfw_instance()->config(
+		$global = \_cfw_instance()->config( 'wp_cli.record_global_parameters', false );
+		$global_runtime = \_cfw_instance()->config(
 			'wp_cli.record_global_runtime_parameters',
 			true
 		);
@@ -128,14 +130,14 @@ class Command_Context {
 		$options = $runner->assoc_args;
 
 		if ( $global ) {
-			$options = array_merge( array_filter( $runner->config, $global_filter ), $options );
+			$options = \array_merge( \array_filter( $runner->config, $global_filter ), $options );
 		} elseif ( $global_runtime ) {
-			$options = array_merge(
-				array_filter( $runner->runtime_config, $global_filter ),
+			$options = \array_merge(
+				\array_filter( $runner->runtime_config, $global_filter ),
 				$options
 			);
 		}
 
-		return new static( $command[0], $command[1], $options, $command[2] );
+		return new self( $command[0], $command[1], $options, $command[2] );
 	}
 }

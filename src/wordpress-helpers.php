@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp;
 
 use Requests_Utility_CaseInsensitiveDictionary;
@@ -7,7 +9,7 @@ use WP_Error;
 
 function prepare_rest_route( array $handlers_array ) {
 	// @todo Filter necessary?
-	$methods = array_keys( array_filter( $handlers_array['methods'] ) );
+	$methods = \array_keys( \array_filter( $handlers_array['methods'] ) );
 	$callback = $handlers_array['callback'] ?? null;
 	$permission_callback = $handlers_array['permission_callback'] ?? null;
 
@@ -45,7 +47,7 @@ function prepare_http_response( $response ) {
 function prepare_wpdb_query( array $query_array ): array {
 	$query = $query_array[0] ?? '';
 	$duration = isset( $query_array[1] ) ? ( $query_array[1] * 1000 ) : 0;
-	$start = $query_array[3] ?? microtime( true ) - ( $duration / 1000 );
+	$start = $query_array[3] ?? \microtime( true ) - ( $duration / 1000 );
 
 	return [ $query, $duration, $start ];
 }

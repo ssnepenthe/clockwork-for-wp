@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
@@ -7,11 +9,11 @@ use Clockwork\Request\Request;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 use function Clockwork_For_Wp\describe_value;
 
-class Wp_Rewrite extends DataSource implements Subscriber {
-	protected $front = '';
-	protected $rules = [];
-	protected $structure = '';
-	protected $trailing_slash = false;
+final class Wp_Rewrite extends DataSource implements Subscriber {
+	private $front = '';
+	private $rules = [];
+	private $structure = '';
+	private $trailing_slash = false;
 
 	public function add_rule( $regex, $query ) {
 		$this->rules[] = [
@@ -24,7 +26,7 @@ class Wp_Rewrite extends DataSource implements Subscriber {
 
 	public function get_subscribed_events(): array {
 		return [
-			'cfw_pre_resolve' => function ( \WP_Rewrite $wp_rewrite ) {
+			'cfw_pre_resolve' => function ( \WP_Rewrite $wp_rewrite ): void {
 				$this
 					->set_structure( $wp_rewrite->permalink_structure )
 					->set_trailing_slash( $wp_rewrite->use_trailing_slashes )

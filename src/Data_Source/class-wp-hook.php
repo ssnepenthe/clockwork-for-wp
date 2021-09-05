@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
@@ -8,9 +10,9 @@ use Clockwork_For_Wp\Event_Management\Subscriber;
 use function Clockwork_For_Wp\describe_callable;
 use function Clockwork_For_Wp\describe_unavailable_callable;
 
-class Wp_Hook extends DataSource implements Subscriber {
-	protected $all_hooks;
-	protected $hooks = [];
+final class Wp_Hook extends DataSource implements Subscriber {
+	private $all_hooks;
+	private $hooks = [];
 
 	public function __construct( bool $all_hooks = false ) {
 		$this->all_hooks = $all_hooks;
@@ -18,14 +20,14 @@ class Wp_Hook extends DataSource implements Subscriber {
 
 	public function add_hook(
 		string $tag,
-		int $priority = null,
+		?int $priority = null,
 		$callback = null,
-		int $accepted_args = null
-	) {
+		?int $accepted_args = null
+	): void {
 		if ( null === $callback ) {
 			$callback_description = '';
 		} else {
-			$callback_description = is_callable( $callback )
+			$callback_description = \is_callable( $callback )
 				? describe_callable( $callback )
 				: describe_unavailable_callable( $callback );
 		}
@@ -47,8 +49,8 @@ class Wp_Hook extends DataSource implements Subscriber {
 
 	public function get_subscribed_events(): array {
 		return [
-			'cfw_pre_resolve' => function ( $wp_filter, $wp_actions ) {
-				$tags = $this->all_hooks ? array_keys( $wp_filter ) : array_keys( $wp_actions );
+			'cfw_pre_resolve' => function ( $wp_filter, $wp_actions ): void {
+				$tags = $this->all_hooks ? \array_keys( $wp_filter ) : \array_keys( $wp_actions );
 
 				foreach ( $tags as $tag ) {
 					if ( isset( $wp_filter[ $tag ] ) ) {
@@ -71,7 +73,7 @@ class Wp_Hook extends DataSource implements Subscriber {
 	}
 
 	public function resolve( Request $request ) {
-		if ( count( $this->hooks ) > 0 ) {
+		if ( \count( $this->hooks ) > 0 ) {
 			$request->userData( 'Hooks' )->table( 'Hooks', $this->hooks );
 		}
 

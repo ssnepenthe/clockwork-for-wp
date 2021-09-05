@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
@@ -8,19 +10,19 @@ use Clockwork\Request\Request;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 use function Clockwork_For_Wp\prepare_wpdb_query;
 
-class Wpdb extends DataSource implements Subscriber {
-	protected $custom_model_identifiers = [];
-	protected $detect_duplicate_queries;
-	protected $duplicates = [];
-	protected $pattern_model_map;
-	protected $queries = [];
+final class Wpdb extends DataSource implements Subscriber {
+	private $custom_model_identifiers = [];
+	private $detect_duplicate_queries;
+	private $duplicates = [];
+	private $pattern_model_map;
+	private $queries = [];
 
 	public function __construct( bool $detect_duplicate_queries, array $pattern_model_map ) {
 		$this->detect_duplicate_queries = $detect_duplicate_queries;
 		$this->pattern_model_map = $pattern_model_map;
 	}
 
-	public function add_custom_model_identifier( callable $identifier ) {
+	public function add_custom_model_identifier( callable $identifier ): void {
 		$this->custom_model_identifiers[] = $identifier;
 	}
 
@@ -52,8 +54,8 @@ class Wpdb extends DataSource implements Subscriber {
 
 	public function get_subscribed_events(): array {
 		return [
-			'cfw_pre_resolve' => function ( \wpdb $wpdb ) {
-				if ( ! is_array( $wpdb->queries ) || count( $wpdb->queries ) < 1 ) {
+			'cfw_pre_resolve' => function ( \wpdb $wpdb ): void {
+				if ( ! \is_array( $wpdb->queries ) || \count( $wpdb->queries ) < 1 ) {
 					return;
 				}
 
@@ -92,7 +94,7 @@ class Wpdb extends DataSource implements Subscriber {
 		return $this;
 	}
 
-	protected function append_duplicate_queries_warnings( $request ) {
+	private function append_duplicate_queries_warnings( $request ): void {
 		$log = new Log();
 
 		foreach ( $this->duplicates as $sql => $count ) {
@@ -106,17 +108,17 @@ class Wpdb extends DataSource implements Subscriber {
 		$request->log()->merge( $log );
 	}
 
-	protected function call_custom_model_identifiers( $query ) {
+	private function call_custom_model_identifiers( $query ) {
 		foreach ( $this->custom_model_identifiers as $identifier ) {
 			$model = $identifier( $query );
 
-			if ( is_string( $model ) ) {
+			if ( \is_string( $model ) ) {
 				return $model;
 			}
 		}
 	}
 
-	protected function capitalize_keywords( $query ) {
+	private function capitalize_keywords( $query ) {
 		// Adapted from Clockwork\EloquentDataSource::createRunnableQuery().
 		$keywords = [
 			'select',
@@ -135,27 +137,27 @@ class Wpdb extends DataSource implements Subscriber {
 			'desc',
 		];
 
-		return preg_replace_callback(
-			'/\b' . implode( '\b|\b', $keywords ) . '\b/i',
-			function ( $match ) {
-				return strtoupper( $match[0] );
+		return \preg_replace_callback(
+			'/\b' . \implode( '\b|\b', $keywords ) . '\b/i',
+			static function ( $match ) {
+				return \mb_strtoupper( $match[0] );
 			},
 			$query
 		);
 	}
 
-	protected function identify_model( $query ) {
+	private function identify_model( $query ) {
 		$model = $this->call_custom_model_identifiers( $query );
 
-		if ( is_string( $model ) ) {
+		if ( \is_string( $model ) ) {
 			return $model;
 		}
 
 		$pattern = '/(?:from|into|update)\s+(`)?(?<table>[^\s`]+)(?(1)`)/i';
 
-		if ( 1 === preg_match( $pattern, $query, $matches ) ) {
+		if ( 1 === \preg_match( $pattern, $query, $matches ) ) {
 			foreach ( $this->pattern_model_map as $pattern => $model ) {
-				if ( 1 === preg_match( $pattern, $matches['table'] ) ) {
+				if ( 1 === \preg_match( $pattern, $matches['table'] ) ) {
 					return $model;
 				}
 			}
@@ -164,22 +166,22 @@ class Wpdb extends DataSource implements Subscriber {
 		return '(unknown)';
 	}
 
-	protected function normalize_query( $query ) {
+	private function normalize_query( $query ) {
 		// Yoinked from query monitor.
 
 		// newline to space.
-		$query = str_replace( [ "\r\n", "\r", "\n" ], ' ', $query );
+		$query = \str_replace( [ "\r\n", "\r", "\n" ], ' ', $query );
 
 		// remove tab and backtick.
-		$query = str_replace( [ "\t", '`' ], '', $query );
+		$query = \str_replace( [ "\t", '`' ], '', $query );
 
 		// collapse whitespace.
-		$query = preg_replace( '/[[:space:]]+/', ' ', $query );
+		$query = \preg_replace( '/[[:space:]]+/', ' ', $query );
 
 		// trim.
-		$query = trim( $query );
+		$query = \trim( $query );
 
 		// remove trailing semicolon.
-		return rtrim( $query, ';' );
+		return \rtrim( $query, ';' );
 	}
 }

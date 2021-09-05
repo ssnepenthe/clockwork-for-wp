@@ -1,18 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp;
 
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 
-class Base_Provider implements Provider {
+abstract class Base_Provider implements Provider {
 	protected $plugin;
 
 	public function __construct( Plugin $plugin ) {
 		$this->plugin = $plugin;
 	}
 
-	public function boot() {
-		if ( count( $subscribers = $this->subscribers() ) > 0 ) {
+	public function boot(): void {
+		if ( \count( $subscribers = $this->subscribers() ) > 0 ) {
 			$events = $this->plugin[ Event_Manager::class ];
 
 			foreach ( $subscribers as $subscriber ) {
@@ -21,12 +23,10 @@ class Base_Provider implements Provider {
 		}
 	}
 
-	public function register() {
-
+	public function register(): void {
 	}
 
-	public function registered() {
-
+	public function registered(): void {
 	}
 
 	protected function subscribers(): array {

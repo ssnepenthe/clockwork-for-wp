@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Wp_Cli;
 
 use Invoker\Invoker;
 use WP_CLI;
 
-function add_command( $command ) {
+function add_command( $command ): void {
 	static $namespace;
 
-	if ( ! defined( 'WP_CLI' ) || ! WP_CLI || ! class_exists( 'WP_CLI' ) ) {
+	if ( ! \defined( 'WP_CLI' ) || ! WP_CLI || ! \class_exists( 'WP_CLI' ) ) {
 		return;
 	}
 
@@ -22,7 +24,7 @@ function add_command( $command ) {
 
 	WP_CLI::add_command(
 		"{$namespace} {$command->name()}",
-		function ( $args, $assoc_args ) use ( $command ) {
+		static function ( $args, $assoc_args ) use ( $command ): void {
 			$parameters = [
 				'args' => $args,
 				// 'arguments' => $args,
@@ -45,7 +47,7 @@ function add_command( $command ) {
 				}
 			}
 
-			_cfw_instance()[ Invoker::class ]->call( $command, $parameters );
+			\_cfw_instance()[ Invoker::class ]->call( $command, $parameters );
 		},
 		[
 			'shortdesc' => $command->shortdesc(),

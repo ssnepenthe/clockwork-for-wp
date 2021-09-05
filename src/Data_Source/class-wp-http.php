@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
@@ -9,21 +11,21 @@ use Clockwork\Request\Timeline\Timeline;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 use function Clockwork_For_Wp\prepare_http_response;
 
-class Wp_Http extends DataSource implements Subscriber {
-	protected $log;
-	protected $timeline;
+final class Wp_Http extends DataSource implements Subscriber {
+	private $log;
+	private $timeline;
 
-	public function __construct( Log $log = null, Timeline $timeline = null ) {
+	public function __construct( ?Log $log = null, ?Timeline $timeline = null ) {
 		$this->log = $log ?: new Log();
 		$this->timeline = $timeline ?: new Timeline();
 	}
 
 	public function ensure_args_have_meta( $args, $url ) {
-		if ( ! array_key_exists( '_cfw_meta', $args ) ) {
-			$start = microtime( true );
+		if ( ! \array_key_exists( '_cfw_meta', $args ) ) {
+			$start = \microtime( true );
 
 			$args['_cfw_meta'] = [
-				'fingerprint' => hash( 'md5', (string) $start . $url . serialize( $args ) ),
+				'fingerprint' => \hash( 'md5', (string) $start . $url . \serialize( $args ) ),
 				'start' => $start,
 				'url' => $url,
 			];
@@ -32,7 +34,7 @@ class Wp_Http extends DataSource implements Subscriber {
 		return $args;
 	}
 
-	public function finish_request( $response, $args ) {
+	public function finish_request( $response, $args ): void {
 		if ( ! $this->args_have_meta( $args ) ) {
 			$this->log_meta_error( $args );
 		} elseif ( null !== $response['error'] ) {
@@ -45,7 +47,7 @@ class Wp_Http extends DataSource implements Subscriber {
 
 	public function get_subscribed_events(): array {
 		return [
-			'http_api_debug' => function ( $response, $_, $_2, $args ) {
+			'http_api_debug' => function ( $response, $_, $_2, $args ): void {
 				$this->finish_request( prepare_http_response( $response ), $args );
 			},
 			'http_request_args' => function ( $args, $url ) {
@@ -74,40 +76,40 @@ class Wp_Http extends DataSource implements Subscriber {
 		return $request;
 	}
 
-	public function start_request( $args ) {
+	public function start_request( $args ): void {
 		if ( $this->args_have_meta( $args ) ) {
 			$this->start_event( $args );
 		}
 	}
 
-	protected function args_have_meta( $args ) {
-		return is_array( $args )
+	private function args_have_meta( $args ) {
+		return \is_array( $args )
 			&& isset( $args['_cfw_meta'] )
-			&& 3 === count( array_intersect(
+			&& 3 === \count( \array_intersect(
 				[ 'fingerprint', 'start', 'url' ],
-				array_keys( $args['_cfw_meta'] )
+				\array_keys( $args['_cfw_meta'] )
 			) );
 	}
 
-	protected function end_event( $args ) {
+	private function end_event( $args ): void {
 		$this->timeline->event( "http_{$args['_cfw_meta']['fingerprint']}" )->end();
 	}
 
-	protected function log_meta_error( $args ) {
+	private function log_meta_error( $args ): void {
 		$this->log->error(
 			'Error in HTTP data source - meta is not set in provided args',
-			compact( 'args' )
+			\compact( 'args' )
 		);
 	}
 
-	protected function log_request_failure( $error, $args ) {
+	private function log_request_failure( $error, $args ): void {
 		$this->log->error(
 			"HTTP request for {$args['_cfw_meta']['url']} failed",
-			compact( 'args', 'error' )
+			\compact( 'args', 'error' )
 		);
 	}
 
-	protected function log_request_success( $response, $args ) {
+	private function log_request_success( $response, $args ): void {
 		$this->log->info( "HTTP request for {$args['_cfw_meta']['url']} succeeded", [
 			'args' => $args,
 			// @todo Should this be included? Just serves to increase the metadata storage requirements.
@@ -118,7 +120,7 @@ class Wp_Http extends DataSource implements Subscriber {
 		] );
 	}
 
-	protected function start_event( $args ) {
+	private function start_event( $args ): void {
 		$this->timeline->event( "HTTP request for {$args['_cfw_meta']['url']}", [
 			'name' => "http_{$args['_cfw_meta']['fingerprint']}",
 			'start' => $args['_cfw_meta']['start'],

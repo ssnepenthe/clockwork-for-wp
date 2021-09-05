@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
@@ -7,8 +9,8 @@ use Clockwork\Request\Request;
 use function Clockwork_For_Wp\describe_callable;
 use function Clockwork_For_Wp\describe_value;
 
-class Conditionals extends DataSource {
-	protected $conditionals = [];
+final class Conditionals extends DataSource {
+	private $conditionals = [];
 
 	public function __construct( callable ...$conditionals ) {
 		$this->conditionals = $conditionals;
@@ -33,17 +35,17 @@ class Conditionals extends DataSource {
 		return $this;
 	}
 
-	protected function build_table() {
-		$table = array_map( function ( $callable ) {
+	private function build_table() {
+		$table = \array_map( static function ( $callable ) {
 			return [
 				'Function' => describe_callable( $callable ),
-				'Value' => describe_value( (bool) call_user_func( $callable ) ),
+				'Value' => describe_value( (bool) $callable( ) ),
 			];
 		}, $this->conditionals );
 
-		usort( $table, function ( $a, $b ) {
+		\usort( $table, static function ( $a, $b ) {
 			if ( $a['Value'] === $b['Value'] ) {
-				return strcmp( $a['Function'], $b['Function'] );
+				return \strcmp( $a['Function'], $b['Function'] );
 			}
 
 			return 'TRUE' === $a['Value'] ? -1 : 1;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Clockwork_For_Wp\Data_Source\Errors;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Plugin;
@@ -20,50 +22,50 @@ use Clockwork_For_Wp\Plugin;
  * License: MIT
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-function _cfw_deactivate_self() {
+function _cfw_deactivate_self(): void {
 	if ( isset( $_GET['activate'] ) ) {
 		unset( $_GET['activate'] );
 	}
 
-	deactivate_plugins( __FILE__ );
+	\deactivate_plugins( __FILE__ );
 }
 
-function _cfw_admin_error_notice( $message ) {
+function _cfw_admin_error_notice( $message ): void {
 	$notice = <<<'EOD'
 <div class="notice notice-error">
 	<p>Clockwork for WP deactivated: %s</p>
 </div>
 EOD;
 
-	printf( $notice, esc_html( $message ) );
+	\printf( $notice, \esc_html( $message ) );
 }
 
-if ( ! function_exists( 'wp_get_environment_type' ) ) {
-	add_action( 'admin_init', '_cfw_deactivate_self' );
-	add_action( 'admin_notices', function () {
-		_cfw_admin_error_notice( 'This plugin requires WordPress version 5.5.0 or greater.' );
+if ( ! \function_exists( 'wp_get_environment_type' ) ) {
+	\add_action( 'admin_init', '_cfw_deactivate_self' );
+	\add_action( 'admin_notices', static function (): void {
+		\_cfw_admin_error_notice( 'This plugin requires WordPress version 5.5.0 or greater.' );
 	} );
 
 	return;
 }
 
 if (
-	'production' === wp_get_environment_type()
-	&& ! ( defined( 'CFW_RUN_ON_PROD' ) && CFW_RUN_ON_PROD )
+	'production' === \wp_get_environment_type()
+	&& ! ( \defined( 'CFW_RUN_ON_PROD' ) && CFW_RUN_ON_PROD )
 ) {
-	add_action( 'admin_init', '_cfw_deactivate_self' );
-	add_action( 'admin_notices', function () {
-		_cfw_admin_error_notice( 'This plugin can only run on non-production environments.' );
+	\add_action( 'admin_init', '_cfw_deactivate_self' );
+	\add_action( 'admin_notices', static function (): void {
+		\_cfw_admin_error_notice( 'This plugin can only run on non-production environments.' );
 	} );
 
 	return;
 }
 
-if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+if ( \file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	require_once __DIR__ . '/vendor/autoload.php';
 }
 
@@ -82,14 +84,14 @@ function _cfw_instance() {
 	return $instance;
 }
 
-( function ( $plugin ) {
+( static function ( $plugin ): void {
 	// Resolve error handler immediately so we catch as many errors as possible.
 	// @todo Check config to make sure error feature is enabled? Or probably a constant?
 	// @todo Move to plugin constructor?
 	$plugin[ Errors::class ]->register();
 
 	$plugin[ Event_Manager::class ]
-		->on( 'plugin_loaded', function ( $file, Plugin $plugin ) {
+		->on( 'plugin_loaded', static function ( $file, Plugin $plugin ): void {
 			if ( __FILE__ !== $file ) {
 				return;
 			}
@@ -97,4 +99,4 @@ function _cfw_instance() {
 			$plugin->lock();
 		}, Event_Manager::EARLY_EVENT )
 		->on( 'plugins_loaded', [ $plugin, 'boot' ], Event_Manager::EARLY_EVENT );
-} )( _cfw_instance() );
+} )( \_cfw_instance() );

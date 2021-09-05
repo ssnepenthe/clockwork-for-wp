@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Wp_Cli;
 
 use ReflectionProperty;
 use WP_CLI;
 
-class Cli_Collection_Helper {
-	protected static $logger;
-	protected static $logger_initialized = false;
+final class Cli_Collection_Helper {
+	private static $logger;
+	private static $logger_initialized = false;
 
 	public static function get_clockwork_command_list() {
 		$commands = include __DIR__ . '/clockwork-command-list.php';
@@ -22,12 +24,12 @@ class Cli_Collection_Helper {
 	}
 
 	public static function get_plugin_logger() {
-		if ( null === static::$logger ) {
-			static::$logger = new Recorder( WP_CLI::get_runner()->in_color() );
-			static::$logger->ob_start();
+		if ( null === self::$logger ) {
+			self::$logger = new Recorder( WP_CLI::get_runner()->in_color() );
+			self::$logger->ob_start();
 		}
 
-		return static::$logger;
+		return self::$logger;
 	}
 
 	public static function get_wp_cli_logger() {
@@ -44,15 +46,15 @@ class Cli_Collection_Helper {
 		return $logger;
 	}
 
-	public static function initialize_logger() {
-		if ( static::$logger_initialized ) {
+	public static function initialize_logger(): void {
+		if ( self::$logger_initialized ) {
 			return;
 		}
 
 		WP_CLI::set_logger(
-			new Logger_Chain( static::get_wp_cli_logger(), static::get_plugin_logger() )
+			new Logger_Chain( self::get_wp_cli_logger(), self::get_plugin_logger() )
 		);
 
-		static::$logger_initialized = true;
+		self::$logger_initialized = true;
 	}
 }

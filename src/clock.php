@@ -1,6 +1,8 @@
 <?php
 
-if ( ! function_exists( 'clock' ) ) {
+declare(strict_types=1);
+
+if ( ! \function_exists( 'clock' ) ) {
 	// Log a message to Clockwork, returns Clockwork instance when called with no arguments, first argument otherwise
 	function clock( ...$arguments ) {
 		if ( empty( $arguments ) ) {

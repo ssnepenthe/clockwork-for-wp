@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp;
 
 use Clockwork\Clockwork;
@@ -8,16 +10,16 @@ use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Wp_Cli\Command_Context;
 
-class Clockwork_Subscriber implements Subscriber {
-	protected $plugin;
+final class Clockwork_Subscriber implements Subscriber {
+	private $plugin;
 
 	public function __construct( Plugin $plugin ) {
 		$this->plugin = $plugin;
 	}
 
-	public function enqueue_scripts() {
+	public function enqueue_scripts(): void {
 		// @todo Should this be implemented as a separate plugin?
-		wp_register_script(
+		\wp_register_script(
 			'clockwork-metrics',
 			'https://cdn.jsdelivr.net/gh/underground-works/clockwork-browser@1/dist/metrics.js',
 			[],
@@ -25,7 +27,7 @@ class Clockwork_Subscriber implements Subscriber {
 			true
 		);
 
-		wp_register_script(
+		\wp_register_script(
 			'clockwork-toolbar',
 			'https://cdn.jsdelivr.net/gh/underground-works/clockwork-browser@1/dist/toolbar.js',
 			[],
@@ -34,15 +36,15 @@ class Clockwork_Subscriber implements Subscriber {
 		);
 
 		if ( $this->plugin->is_collecting_client_metrics() ) {
-			wp_enqueue_script( 'clockwork-metrics' );
+			\wp_enqueue_script( 'clockwork-metrics' );
 		}
 
 		if ( $this->plugin->is_toolbar_enabled() ) {
-			wp_enqueue_script( 'clockwork-toolbar' );
+			\wp_enqueue_script( 'clockwork-toolbar' );
 		}
 	}
 
-	public function finalize_command(  Clockwork $clockwork, Event_Manager $event_manager ) {
+	public function finalize_command(  Clockwork $clockwork, Event_Manager $event_manager ): void {
 		$command = Command_Context::current();
 
 		if (
@@ -67,7 +69,7 @@ class Clockwork_Subscriber implements Subscriber {
 			->storeRequest();
 	}
 
-	public function finalize_request( Clockwork $clockwork, Event_Manager $event_manager ) {
+	public function finalize_request( Clockwork $clockwork, Event_Manager $event_manager ): void {
 		$event_manager->trigger( 'cfw_pre_resolve' ); // @todo pass $clockwork? $container?
 
 		$clockwork
@@ -101,22 +103,22 @@ class Clockwork_Subscriber implements Subscriber {
 		return $events;
 	}
 
-	public function initialize_request( Request $request ) {
-		if ( headers_sent() ) {
+	public function initialize_request( Request $request ): void {
+		if ( \headers_sent() ) {
 			return;
 		}
 
 		// @todo Any reason to suppress errors?
 		// @todo Use wp_headers filter of send_headers action? See WP::send_headers().
-		header( 'X-Clockwork-Id: ' . $request->id );
-		header( 'X-Clockwork-Version: ' . Clockwork::VERSION );
+		\header( 'X-Clockwork-Id: ' . $request->id );
+		\header( 'X-Clockwork-Version: ' . Clockwork::VERSION );
 
 		// @todo Set clockwork path header?
 
 		$extra_headers = $this->plugin->config( 'headers' );
 
 		foreach ( $extra_headers as $header_name => $header_value ) {
-			header( "X-Clockwork-Header-{$header_name}: {$header_value}" );
+			\header( "X-Clockwork-Header-{$header_name}: {$header_value}" );
 		}
 
 		// @todo Set subrequest headers?
@@ -125,7 +127,7 @@ class Clockwork_Subscriber implements Subscriber {
 			$this->plugin->is_collecting_client_metrics()
 			|| $this->plugin->is_toolbar_enabled()
 		) {
-			$cookie = json_encode( [
+			$cookie = \json_encode( [
 				'requestId' => $request->id,
 				'version' => Clockwork::VERSION,
 				'path' => '/__clockwork/',
@@ -135,13 +137,13 @@ class Clockwork_Subscriber implements Subscriber {
 				'toolbar' => $this->plugin->is_toolbar_enabled(),
 			] );
 
-			setcookie(
+			\setcookie(
 				'x-clockwork',
 				$cookie,
-				time() + 60,
+				\time() + 60,
 				COOKIEPATH,
 				COOKIE_DOMAIN,
-				is_ssl() && 'https' === parse_url( home_url(), PHP_URL_SCHEME ),
+				\is_ssl() && 'https' === \parse_url( \home_url(), \PHP_URL_SCHEME ),
 				false
 			);
 		}

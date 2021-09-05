@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Routing;
 
-class Route {
-	protected $handler;
-	protected $method;
-	protected $prefix = '';
-	protected $query;
-	protected $regex;
+final class Route {
+	private $handler;
+	private $method;
+	private $prefix = '';
+	private $query;
+	private $regex;
 
 	public function __construct( string $method, string $regex, string $query, $handler ) {
 		$this->method = $method;
@@ -27,9 +29,9 @@ class Route {
 	public function get_query() {
 		$query_array = $this->get_query_array();
 
-		$query_string = implode( '&', array_map( function ( $key, $value ) {
+		$query_string = \implode( '&', \array_map( static function ( $key, $value ) {
 			return "{$key}={$value}";
-		}, array_keys( $query_array ), $query_array ) );
+		}, \array_keys( $query_array ), $query_array ) );
 
 		return "index.php?{$query_string}";
 	}
@@ -45,7 +47,7 @@ class Route {
 	}
 
 	public function get_query_vars() {
-		return array_keys( $this->get_query_array() );
+		return \array_keys( $this->get_query_array() );
 	}
 
 	public function get_raw_query() {
@@ -53,22 +55,22 @@ class Route {
 	}
 
 	public function get_raw_query_array() {
-		$query_string = parse_url( $this->query, PHP_URL_QUERY );
+		$query_string = \parse_url( $this->query, \PHP_URL_QUERY );
 
-		parse_str( $query_string, $query_array );
+		\parse_str( $query_string, $query_array );
 
 		return $query_array;
 	}
 
 	public function get_raw_query_vars() {
-		return array_keys( $this->get_raw_query_array() );
+		return \array_keys( $this->get_raw_query_array() );
 	}
 
 	public function get_regex() {
 		return $this->regex;
 	}
 
-	public function set_prefix( string $prefix ) {
+	public function set_prefix( string $prefix ): void {
 		$this->prefix = $prefix;
 	}
 }

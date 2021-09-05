@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Api;
 
 use Clockwork\Authentication\AuthenticatorInterface;
@@ -7,10 +9,10 @@ use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Metadata;
 use function Clockwork_For_Wp\array_only;
 
-class Api_Controller {
-	protected $authenticator;
-	protected $metadata;
-	protected $request;
+final class Api_Controller {
+	private $authenticator;
+	private $metadata;
+	private $request;
 
 	public function __construct(
 		AuthenticatorInterface $authenticator,
@@ -22,15 +24,15 @@ class Api_Controller {
 		$this->request = $request;
 	}
 
-	public function authenticate() {
+	public function authenticate(): void {
 		$token = $this->authenticator->attempt(
-			array_filter( $this->extract_credentials() ) // @todo Filter necessary?
+			\array_filter( $this->extract_credentials() ) // @todo Filter necessary?
 		);
 
-		wp_send_json( [ 'token' => $token ], $token ? 200 : 403 );
+		\wp_send_json( [ 'token' => $token ], $token ? 200 : 403 );
 	}
 
-	public function serve_json( $id, $direction = null, $count = null, $extended = null ) {
+	public function serve_json( $id, $direction = null, $count = null, $extended = null ): void {
 		// @todo Handle 404s.
 		// @todo Is this really necessary?
 		if ( null === $id ) {
@@ -43,7 +45,7 @@ class Api_Controller {
 		);
 
 		if ( true !== $authenticated ) {
-			wp_send_json( [
+			\wp_send_json( [
 				'message' => $authenticated,
 				'requires' => $this->authenticator->requires(),
 			], 403 );
@@ -57,21 +59,21 @@ class Api_Controller {
 
 		$data = $this->apply_filters( $data );
 
-		wp_send_json( $data ); // @todo
+		\wp_send_json( $data ); // @todo
 	}
 
-	public function update_data( $id ) {
+	public function update_data( $id ): void {
 		$request = $this->metadata->get( $id );
 
 		if ( ! $request ) {
-			wp_send_json( [ 'message' => 'Request not found.' ], 404 );
+			\wp_send_json( [ 'message' => 'Request not found.' ], 404 );
 		}
 
 		$content = $this->request->json();
 		$token = $content['_token'] ?? '';
 
-		if ( ! $request->updateToken || ! hash_equals( $request->updateToken, $token ) ) {
-			wp_send_json( [ 'message' => 'Invalid update token.' ], 403 );
+		if ( ! $request->updateToken || ! \hash_equals( $request->updateToken, $token ) ) {
+			\wp_send_json( [ 'message' => 'Invalid update token.' ], 403 );
 		}
 
 		foreach ( array_only( $content, [ 'clientMetrics', 'webVitals' ] ) as $key => $value ) {
@@ -81,22 +83,22 @@ class Api_Controller {
 		$this->metadata->update( $request );
 	}
 
-	protected function apply_filters( $data ) {
+	private function apply_filters( $data ) {
 		$except = isset( $this->request->input['except'] )
-			? explode( ',', $this->request->input['except'] )
+			? \explode( ',', $this->request->input['except'] )
 			: [];
 		$only = isset( $this->request->input['only'] )
-			? explode( ',', $this->request->input['only'] )
+			? \explode( ',', $this->request->input['only'] )
 			: null;
 
-		$transformer = function ( $request ) use ( $except, $only ) {
+		$transformer = static function ( $request ) use ( $except, $only ) {
 			return $only
 				? $request->only( $only )
-				: $request->except( array_merge( $except, [ 'updateToken' ] ) );
+				: $request->except( \array_merge( $except, [ 'updateToken' ] ) );
 		};
 
-		if ( is_array( $data ) ) {
-			$data = array_map( $transformer, $data );
+		if ( \is_array( $data ) ) {
+			$data = \array_map( $transformer, $data );
 		} elseif ( $data ) {
 			$data = $transformer( $data );
 		}
@@ -105,21 +107,21 @@ class Api_Controller {
 	}
 
 	// @todo Move to route handler invoker?
-	protected function extract_credentials() {
+	private function extract_credentials() {
 		if ( ! $this->is_json_request() ) {
 			// Clockwork as browser extension sends POST request as multipart/form-data.
 			return [
-				'username' => filter_input( INPUT_POST, 'username' ),
-				'password' => filter_input( INPUT_POST, 'password' ),
+				'username' => \filter_input( \INPUT_POST, 'username' ),
+				'password' => \filter_input( \INPUT_POST, 'password' ),
 			];
 		}
 
 		// @todo Verify this is still necessary after updating clockwork.
 		// Clockwork as web-app sends POST request as application/json.
-		$input = file_get_contents( 'php://input' );
-		$decoded = json_decode( $input, true );
+		$input = \file_get_contents( 'php://input' );
+		$decoded = \json_decode( $input, true );
 
-		if ( null === $decoded || JSON_ERROR_NONE !== json_last_error() ) {
+		if ( null === $decoded || \JSON_ERROR_NONE !== \json_last_error() ) {
 			return [];
 		}
 
@@ -129,7 +131,7 @@ class Api_Controller {
 		];
 	}
 
-	protected function is_json_request() {
+	private function is_json_request() {
 		$content_type = '';
 
 		if ( isset( $_SERVER['HTTP_CONTENT_TYPE'] ) ) {
@@ -138,6 +140,6 @@ class Api_Controller {
 			$content_type = $_SERVER['CONTENT_TYPE'];
 		}
 
-		return 0 === strpos( $content_type, 'application/json' );
+		return 0 === \mb_strpos( $content_type, 'application/json' );
 	}
 }

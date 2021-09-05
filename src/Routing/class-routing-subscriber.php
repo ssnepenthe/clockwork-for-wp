@@ -1,18 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Routing;
 
 use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Incoming_Request;
 use WP;
 
-class Routing_Subscriber implements Subscriber {
+final class Routing_Subscriber implements Subscriber {
 	public function call_matched_handler(
 		Route_Collection $routes,
 		WP $wp,
 		Route_Handler_Invoker $invoker,
 		Incoming_Request $request
-	) {
+	): void {
 		// @todo $route = $routes->match( $request );?
 		$route = $routes->match( $request->intended_method(), $wp->matched_rule );
 
@@ -28,7 +30,7 @@ class Routing_Subscriber implements Subscriber {
 			return $rules;
 		}
 
-		return array_diff_key( $rules, $routes->get_rewrite_array() );
+		return \array_diff_key( $rules, $routes->get_rewrite_array() );
 	}
 
 	// @todo route collection via constructor?
@@ -45,7 +47,7 @@ class Routing_Subscriber implements Subscriber {
 	}
 
 	public function merge_query_vars( $query_vars, Route_Collection $routes ) {
-		return array_merge( $routes->get_query_vars(), $query_vars );
+		return \array_merge( $routes->get_query_vars(), $query_vars );
 	}
 
 	public function merge_rules( $rules, Route_Collection $routes, Incoming_Request $request ) {
@@ -53,17 +55,17 @@ class Routing_Subscriber implements Subscriber {
 			return $rules;
 		}
 
-		return array_merge(
+		return \array_merge(
 			$routes->get_rewrite_array_for_method( $request->intended_method() ),
 			$rules
 		);
 	}
 
-	public function reset_query_flags() {
+	public function reset_query_flags(): void {
 		// @todo
 	}
 
-	protected function should_modify_rules( $rules ) {
-		return is_array( $rules ) && count( $rules ) > 0;
+	private function should_modify_rules( $rules ) {
+		return \is_array( $rules ) && \count( $rules ) > 0;
 	}
 }

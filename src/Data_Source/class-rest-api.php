@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
@@ -9,12 +11,12 @@ use WP_REST_Server;
 use function Clockwork_For_Wp\describe_callable;
 use function Clockwork_For_Wp\prepare_rest_route;
 
-class Rest_Api extends DataSource implements Subscriber {
-	protected $routes = [];
+final class Rest_Api extends DataSource implements Subscriber {
+	private $routes = [];
 
 	public function add_route( $path, $methods, $callback = null, $permission_callback = null ) {
-		if ( is_array( $methods ) ) {
-			$methods = implode( ', ', $methods );
+		if ( \is_array( $methods ) ) {
+			$methods = \implode( ', ', $methods );
 		}
 
 		if ( null === $callback ) {
@@ -42,7 +44,7 @@ class Rest_Api extends DataSource implements Subscriber {
 
 	public function get_subscribed_events(): array {
 		return [
-			'cfw_pre_resolve' => function ( WP_REST_Server $wp_rest_server ) {
+			'cfw_pre_resolve' => function ( WP_REST_Server $wp_rest_server ): void {
 				// @todo Option for core rest endpoints to be filtered from list.
 				// @todo Option for what route fields get recorded.
 				foreach ( $wp_rest_server->get_routes() as $path => $handlers ) {
@@ -57,7 +59,7 @@ class Rest_Api extends DataSource implements Subscriber {
 	}
 
 	public function resolve( Request $request ) {
-		if ( count( $this->routes ) > 0 ) {
+		if ( \count( $this->routes ) > 0 ) {
 			$request->userData( 'Routing' )->table( 'REST Routes', $this->routes );
 		}
 

@@ -1,19 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Routing;
 
 use Closure;
 use Invoker\Invoker;
 
-class Route_Handler_Invoker {
-	protected $invoker;
-	protected $param_prefix;
-	protected $param_resolver;
+final class Route_Handler_Invoker {
+	private $invoker;
+	private $param_prefix;
+	private $param_resolver;
 
 	public function __construct(
 		Invoker $invoker,
 		string $param_prefix = '',
-		Closure $param_resolver = null
+		?Closure $param_resolver = null
 	) {
 		$this->invoker = $invoker;
 		$this->param_prefix = $param_prefix;
@@ -35,16 +37,16 @@ class Route_Handler_Invoker {
 	}
 
 	public function strip_param_prefix( $param_name ) {
-		$prefix_length = strlen( $this->param_prefix );
+		$prefix_length = \mb_strlen( $this->param_prefix );
 
-		if ( substr( $param_name, 0, $prefix_length ) === $this->param_prefix ) {
-			return substr_replace( $param_name, '', 0, $prefix_length );
+		if ( \mb_substr( $param_name, 0, $prefix_length ) === $this->param_prefix ) {
+			return \substr_replace( $param_name, '', 0, $prefix_length );
 		}
 
 		return $param_name;
 	}
 
-	protected function get_additional_params( $route ) {
-		return call_user_func( $this->param_resolver, $route );
+	private function get_additional_params( $route ) {
+		return ($this->param_resolver)( $route );
 	}
 }

@@ -1,5 +1,10 @@
 <?php
-/**
+
+declare(strict_types=1);
+
+use Clockwork_For_Wp\Wp_Cli\Cli_Collection_Helper;
+
+/*
  * If you would like to collect WP-CLI output, it can be beneficial to add this file to the list of
  * "requires" in your WP-CLI config file.
  *
@@ -12,9 +17,7 @@
  * @see https://make.wordpress.org/cli/handbook/references/config/
  */
 
-use Clockwork_For_Wp\Wp_Cli\Cli_Collection_Helper;
-
-if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+if ( \file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	require_once __DIR__ . '/vendor/autoload.php';
 }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Clockwork\Authentication\SimpleAuthenticator;
 use Clockwork\Storage\FileStorage;
 use Clockwork\Storage\SqlStorage;

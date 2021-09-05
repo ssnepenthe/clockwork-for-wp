@@ -1,19 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Api;
 
 use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Plugin;
 use Clockwork_For_Wp\Routing\Route_Collection;
 
-class Api_Subscriber implements Subscriber {
+final class Api_Subscriber implements Subscriber {
 	public function get_subscribed_events(): array {
 		return [
 			'init' => 'register_routes',
 		];
 	}
 
-	public function register_routes( Route_Collection $routes, Plugin $plugin ) {
+	public function register_routes( Route_Collection $routes, Plugin $plugin ): void {
 		$routes->post(
 			'__clockwork\/auth',
 			'index.php?auth=1',

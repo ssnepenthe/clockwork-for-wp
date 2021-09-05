@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Request;
 use Clockwork\Request\Timeline\Timeline;
 
-class Core extends DataSource {
-	protected $timestart;
-	protected $version;
+final class Core extends DataSource {
+	private $timestart;
+	private $version;
 
 	public function __construct( $version, $timestart ) {
 		$this->version = $version;
@@ -38,7 +40,7 @@ class Core extends DataSource {
 		return $this;
 	}
 
-	protected function build_timeline() {
+	private function build_timeline() {
 		$timeline = new Timeline();
 
 		$timeline->event( 'Total Execution', [

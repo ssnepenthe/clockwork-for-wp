@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\XdebugDataSource;
@@ -17,19 +19,19 @@ use Clockwork_For_Wp\Event_Management\Subscriber;
  *
  * @todo Need to look into this more - is it a bug or intended behavior?
  */
-class Xdebug extends XdebugDataSource implements Subscriber {
-	protected $profiler_filename;
+final class Xdebug extends XdebugDataSource implements Subscriber {
+	private $profiler_filename;
 
 	public function get_subscribed_events(): array {
 		return [
-			'init' => function () {
-				$this->set_profiler_filename( xdebug_get_profiler_filename() );
+			'init' => function (): void {
+				$this->set_profiler_filename( \xdebug_get_profiler_filename() );
 			},
 		];
 	}
 
 	public function resolve( Request $request ) {
-		if ( is_string( $this->profiler_filename ) ) {
+		if ( \is_string( $this->profiler_filename ) ) {
 			$request->xdebug = [
 				'profile' => $this->profiler_filename,
 			];
