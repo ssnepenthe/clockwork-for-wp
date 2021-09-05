@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Data_Source;
 
 final class Except_Only_Filter {
+	private $except;
+	private $only;
+
 	public function __construct( array $except, array $only ) {
 		$this->except = \implode( '|', $except );
 		$this->only = \implode( '|', $only );

@@ -17,11 +17,21 @@ function add_command( $command ): void {
 	if ( ! $namespace ) {
 		$namespace = 'clockwork';
 
+		/**
+		 * @psalm-suppress TooManyArguments
+		 *
+		 * @see https://github.com/humanmade/psalm-plugin-wordpress/issues/14
+		 */
 		WP_CLI::add_command( $namespace, Command_Namespace::class, [
 			'shortdesc' => 'Manages the Clockwork for WP plugin.',
 		] );
 	}
 
+	/**
+	 * @psalm-suppress TooManyArguments
+	 *
+	 * @see https://github.com/humanmade/psalm-plugin-wordpress/issues/14
+	 */
 	WP_CLI::add_command(
 		"{$namespace} {$command->name()}",
 		static function ( $args, $assoc_args ) use ( $command ): void {

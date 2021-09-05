@@ -28,6 +28,11 @@ final class Web_App_Subscriber implements Subscriber {
 	}
 
 	public function redirect_shortcut(): void {
+		/**
+		 * @psalm-suppress InvalidArgument
+		 *
+		 * @see https://github.com/humanmade/psalm-plugin-wordpress/issues/13
+		 */
 		$clockwork = \home_url( '__clockwork', 'relative' );
 
 		if (

@@ -72,17 +72,7 @@ if ( \file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 // @todo Check for minimum php version.
 // @todo Check that dependencies have been installed.
 
-function _cfw_instance() {
-	static $instance = null;
-
-	if ( null === $instance ) {
-		$instance = new Plugin( null, [
-			'dir' => __DIR__,
-		] );
-	}
-
-	return $instance;
-}
+require_once __DIR__ . '/src/instance.php';
 
 ( static function ( $plugin ): void {
 	// Resolve error handler immediately so we catch as many errors as possible.

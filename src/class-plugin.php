@@ -14,6 +14,7 @@ use Clockwork_For_Wp\Routing\Routing_Provider;
 use Clockwork_For_Wp\Web_App\Web_App_Provider;
 use Clockwork_For_Wp\Wp_Cli\Cli_Collection_Helper;
 use Clockwork_For_Wp\Wp_Cli\Wp_Cli_Provider;
+use InvalidArgumentException;
 use Pimple\Container;
 use RuntimeException;
 
@@ -44,8 +45,12 @@ final class Plugin implements ArrayAccess {
 		$this[ self::class ] = $this;
 
 		foreach ( $providers as $provider ) {
-			if ( ! $provider instanceof Provider ) {
+			if ( \is_string( $provider ) && \is_subclass_of( $provider, Base_Provider::class ) ) {
 				$provider = new $provider( $this );
+			}
+
+			if ( ! $provider instanceof Provider ) {
+				throw new InvalidArgumentException( '@todo' );
 			}
 
 			$this->register( $provider );
