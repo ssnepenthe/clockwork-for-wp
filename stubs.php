@@ -1,6 +1,7 @@
 <?php
 
 // Until https://github.com/humanmade/psalm-plugin-wordpress/issues/1 is resolved.
+// phpcs:ignoreFile
 
 define( 'WP_CONTENT_DIR', './wp-content' );
 define( 'COOKIE_DOMAIN', 'false' );

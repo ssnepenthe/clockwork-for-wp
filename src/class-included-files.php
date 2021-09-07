@@ -30,17 +30,21 @@ final class Included_Files {
 			return [];
 		}
 
-		return self::filtered( static function ( $file_path ) {
-			return self::in_child_theme_dir_callback()( $file_path )
-				&& self::is_included_template_part_callback()( $file_path );
-		} );
+		return self::filtered(
+			static function ( $file_path ) {
+				return self::in_child_theme_dir_callback()( $file_path )
+					&& self::is_included_template_part_callback()( $file_path );
+			}
+		);
 	}
 
 	public static function template_parts_from_parent_theme() {
-		return self::filtered( static function ( $file_path ) {
-			return self::in_parent_theme_dir_callback()( $file_path )
-				&& self::is_included_template_part_callback()( $file_path );
-		} );
+		return self::filtered(
+			static function ( $file_path ) {
+				return self::in_parent_theme_dir_callback()( $file_path )
+					&& self::is_included_template_part_callback()( $file_path );
+			}
+		);
 	}
 
 	private static function in_child_theme_dir_callback() {

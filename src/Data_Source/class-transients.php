@@ -68,15 +68,18 @@ final class Transients extends DataSource implements Subscriber {
 			$for_size = \serialize( $for_size );
 		}
 
-		return \array_filter( [
-			'Type' => $type,
-			'Key' => $key,
-			'Value' => $value,
-			'Expiration' => $expiration,
-			'Is Site' => $is_site ? 'Yes' : 'No',
-			'Size' => \is_string( $for_size ) ? \mb_strlen( $for_size ) : null,
-		], static function ( $value ) {
-			return null !== $value;
-		} );
+		return \array_filter(
+			[
+				'Type' => $type,
+				'Key' => $key,
+				'Value' => $value,
+				'Expiration' => $expiration,
+				'Is Site' => $is_site ? 'Yes' : 'No',
+				'Size' => \is_string( $for_size ) ? \mb_strlen( $for_size ) : null,
+			],
+			static function ( $value ) {
+				return null !== $value;
+			}
+		);
 	}
 }

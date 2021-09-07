@@ -17,6 +17,8 @@ final class Clean_Command extends Base_Command {
 	];
 
 	public function __invoke( Config $config, $all = false, $expiration = null ): void {
+		$force = true;
+
 		if ( $all ) {
 			$config->set( 'storage.expiration', 0 );
 		} elseif ( null !== $expiration ) {
@@ -24,7 +26,7 @@ final class Clean_Command extends Base_Command {
 			$config->set( 'storage.expiration', \abs( (int) $expiration ) );
 		}
 
-		\_cfw_instance()[ StorageInterface::class ]->cleanup( $force = true );
+		\_cfw_instance()[ StorageInterface::class ]->cleanup( $force );
 
 		// See https://github.com/itsgoingd/clockwork/issues/510
 		// @todo Revisit after the release of Clockwork v6.

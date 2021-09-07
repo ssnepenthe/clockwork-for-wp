@@ -46,9 +46,12 @@ EOD;
 
 if ( ! \function_exists( 'wp_get_environment_type' ) ) {
 	\add_action( 'admin_init', '_cfw_deactivate_self' );
-	\add_action( 'admin_notices', static function (): void {
-		\_cfw_admin_error_notice( 'This plugin requires WordPress version 5.5.0 or greater.' );
-	} );
+	\add_action(
+		'admin_notices',
+		static function (): void {
+			\_cfw_admin_error_notice( 'This plugin requires WordPress version 5.5.0 or greater.' );
+		}
+	);
 
 	return;
 }
@@ -58,9 +61,12 @@ if (
 	&& ! ( \defined( 'CFW_RUN_ON_PROD' ) && CFW_RUN_ON_PROD )
 ) {
 	\add_action( 'admin_init', '_cfw_deactivate_self' );
-	\add_action( 'admin_notices', static function (): void {
-		\_cfw_admin_error_notice( 'This plugin can only run on non-production environments.' );
-	} );
+	\add_action(
+		'admin_notices',
+		static function (): void {
+			\_cfw_admin_error_notice( 'This plugin can only run on non-production environments.' );
+		}
+	);
 
 	return;
 }
@@ -81,12 +87,16 @@ require_once __DIR__ . '/src/instance.php';
 	$plugin[ Errors::class ]->register();
 
 	$plugin[ Event_Manager::class ]
-		->on( 'plugin_loaded', static function ( $file, Plugin $plugin ): void {
-			if ( __FILE__ !== $file ) {
-				return;
-			}
+		->on(
+			'plugin_loaded',
+			static function ( $file, Plugin $plugin ): void {
+				if ( __FILE__ !== $file ) {
+					return;
+				}
 
-			$plugin->lock();
-		}, Event_Manager::EARLY_EVENT )
+				$plugin->lock();
+			},
+			Event_Manager::EARLY_EVENT
+		)
 		->on( 'plugins_loaded', [ $plugin, 'boot' ], Event_Manager::EARLY_EVENT );
 } )( \_cfw_instance() );

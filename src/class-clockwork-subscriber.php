@@ -23,7 +23,7 @@ final class Clockwork_Subscriber implements Subscriber {
 			'clockwork-metrics',
 			'https://cdn.jsdelivr.net/gh/underground-works/clockwork-browser@1/dist/metrics.js',
 			[],
-			false,
+			'1.0.0',
 			true
 		);
 
@@ -31,7 +31,7 @@ final class Clockwork_Subscriber implements Subscriber {
 			'clockwork-toolbar',
 			'https://cdn.jsdelivr.net/gh/underground-works/clockwork-browser@1/dist/toolbar.js',
 			[],
-			false,
+			'1.0.0',
 			true
 		);
 
@@ -44,7 +44,7 @@ final class Clockwork_Subscriber implements Subscriber {
 		}
 	}
 
-	public function finalize_command(  Clockwork $clockwork, Event_Manager $event_manager ): void {
+	public function finalize_command( Clockwork $clockwork, Event_Manager $event_manager ): void {
 		$command = Command_Context::current();
 
 		if (
@@ -127,15 +127,17 @@ final class Clockwork_Subscriber implements Subscriber {
 			$this->plugin->is_collecting_client_metrics()
 			|| $this->plugin->is_toolbar_enabled()
 		) {
-			$cookie = \json_encode( [
-				'requestId' => $request->id,
-				'version' => Clockwork::VERSION,
-				'path' => '/__clockwork/',
-				'webPath' => '/__clockwork/app',
-				'token' => $request->updateToken,
-				'metrics' => $this->plugin->is_collecting_client_metrics(),
-				'toolbar' => $this->plugin->is_toolbar_enabled(),
-			] );
+			$cookie = \json_encode(
+				[
+					'requestId' => $request->id,
+					'version' => Clockwork::VERSION,
+					'path' => '/__clockwork/',
+					'webPath' => '/__clockwork/app',
+					'token' => $request->updateToken,
+					'metrics' => $this->plugin->is_collecting_client_metrics(),
+					'toolbar' => $this->plugin->is_toolbar_enabled(),
+				]
+			);
 
 			\setcookie(
 				'x-clockwork',

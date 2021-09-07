@@ -40,7 +40,7 @@ final class Generate_Command_Lists_Command extends Base_Command {
 	private function template() {
 		$eol = \PHP_EOL;
 
-		return "<?php{$eol}{$eol}return %s;";
+		return "<?php{$eol}{$eol}// phpcs:ignoreFile{$eol}{$eol}return %s;{$eol}";
 	}
 
 	private function write( $which ) {

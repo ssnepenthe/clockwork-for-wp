@@ -35,7 +35,7 @@ function array_get( array $array, string $path, $default = null ) {
 function array_has( array $array, string $path ) {
 	$default = '__CFW__hopefully_unique_enough_default__CFW__';
 
-	return $default !== array_get( $array, $path, $default );
+	return array_get( $array, $path, $default ) !== $default;
 }
 
 function array_only( $array, $keys ) {

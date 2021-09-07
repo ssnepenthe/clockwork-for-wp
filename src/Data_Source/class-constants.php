@@ -35,15 +35,18 @@ final class Constants extends DataSource {
 
 	private function build_table() {
 		// @todo Sort alphabetically?
-		return \array_map( static function ( $constant ) {
-			$value = \defined( $constant )
-				? describe_value( \constant( $constant ) )
-				: '(NOT DEFINED)';
+		return \array_map(
+			static function ( $constant ) {
+				$value = \defined( $constant )
+					? describe_value( \constant( $constant ) )
+					: '(NOT DEFINED)';
 
-			return [
-				'Name' => $constant,
-				'Value' => $value,
-			];
-		}, $this->constants );
+				return [
+					'Name' => $constant,
+					'Value' => $value,
+				];
+			},
+			$this->constants
+		);
 	}
 }

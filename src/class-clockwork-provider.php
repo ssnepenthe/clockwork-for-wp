@@ -37,7 +37,7 @@ final class Clockwork_Provider extends Base_Provider {
 		};
 
 		$this->plugin[ Clockwork::class ] = function () {
-			return (new Clockwork())
+			return ( new Clockwork() )
 				->authenticator( $this->plugin[ AuthenticatorInterface::class ] )
 				->request( $this->plugin[ Request::class ] )
 				->storage( $this->plugin[ StorageInterface::class ] );
@@ -68,17 +68,19 @@ final class Clockwork_Provider extends Base_Provider {
 			}
 		);
 
-		$this->plugin[ StorageInterface::class ] = $this->plugin->factory( function () {
-			$config = $this->plugin[ Config::class ]->get( 'storage', [] );
-			$driver = $config['driver'] ?? 'file';
-			$expiration = $config['expiration'] ?? null;
-			$factory_id = $config['drivers'][ $driver ]['class'] ?? FileStorage::class;
+		$this->plugin[ StorageInterface::class ] = $this->plugin->factory(
+			function () {
+				$config = $this->plugin[ Config::class ]->get( 'storage', [] );
+				$driver = $config['driver'] ?? 'file';
+				$expiration = $config['expiration'] ?? null;
+				$factory_id = $config['drivers'][ $driver ]['class'] ?? FileStorage::class;
 
-			return $this->plugin[ $factory_id ](
-				$config['drivers'][ $driver ]['config'] ?? [],
-				$expiration
-			);
-		} );
+				return $this->plugin[ $factory_id ](
+					$config['drivers'][ $driver ]['config'] ?? [],
+					$expiration
+				);
+			}
+		);
 
 		$this->plugin[ FileStorage::class ] = $this->plugin->protect(
 			static function ( array $config, $expiration ) {
@@ -123,9 +125,11 @@ final class Clockwork_Provider extends Base_Provider {
 		// Could probably even create it within Plugin::__construct() and save it to container.
 		$this->plugin[ Request::class ];
 
-		$this->plugin[ IncomingRequest::class ] = $this->plugin->factory( function () {
-			return $this->plugin[ Incoming_Request::class ];
-		} );
+		$this->plugin[ IncomingRequest::class ] = $this->plugin->factory(
+			function () {
+				return $this->plugin[ Incoming_Request::class ];
+			}
+		);
 
 		$this->plugin[ Incoming_Request::class ] = static function () {
 			return Incoming_Request::from_globals();
@@ -156,35 +160,44 @@ final class Clockwork_Provider extends Base_Provider {
 	}
 
 	private function configure_serializer(): void {
-		Serializer::defaults( [
-			'limit' => $this->plugin->config( 'serialization.depth', 10 ),
-			'blackbox' => $this->plugin->config( 'serialization.blackbox', [
-				\Pimple\Container::class,
-				\Pimple\Psr11\Container::class,
-			] ),
-			'traces' => $this->plugin->config( 'stack_traces.enabled', true ),
-			'tracesSkip' => StackFilter::make()
-				->isNotVendor( \array_merge(
-					$this->plugin->config( 'stack_traces.skip_vendors', [] ),
-					[ 'itsgoingd' ]
-				) )
-				->isNotNamespace( $this->plugin->config( 'stack_traces.skip_namespaces', [] ) )
-				->isNotFunction( [ 'call_user_func', 'call_user_func_array' ] )
-				->isNotClass( $this->plugin->config( 'stack_traces.skip_classes', [] ) ),
-			'tracesLimit' => $this->plugin->config( 'stack_traces.limit', 10 ),
-		] );
+		Serializer::defaults(
+			[
+				'limit' => $this->plugin->config( 'serialization.depth', 10 ),
+				'blackbox' => $this->plugin->config(
+					'serialization.blackbox',
+					[
+						\Pimple\Container::class,
+						\Pimple\Psr11\Container::class,
+					]
+				),
+				'traces' => $this->plugin->config( 'stack_traces.enabled', true ),
+				'tracesSkip' => StackFilter::make()
+					->isNotVendor(
+						\array_merge(
+							$this->plugin->config( 'stack_traces.skip_vendors', [] ),
+							[ 'itsgoingd' ]
+						)
+					)
+					->isNotNamespace( $this->plugin->config( 'stack_traces.skip_namespaces', [] ) )
+					->isNotFunction( [ 'call_user_func', 'call_user_func_array' ] )
+					->isNotClass( $this->plugin->config( 'stack_traces.skip_classes', [] ) ),
+				'tracesLimit' => $this->plugin->config( 'stack_traces.limit', 10 ),
+			]
+		);
 	}
 
 	private function configure_should_collect(): void {
 		$should_collect = $this->plugin[ Clockwork::class ]->shouldCollect();
 
-		$should_collect->merge( [
-			'onDemand' => $this->plugin->config( 'requests.on_demand', false ),
-			'sample' => $this->plugin->config( 'requests.sample', false ),
-			'except' => $this->plugin->config( 'requests.except', [] ),
-			'only' => $this->plugin->config( 'requests.only', [] ),
-			'exceptPreflight' => $this->plugin->config( 'requests.except_preflight', true ),
-		] );
+		$should_collect->merge(
+			[
+				'onDemand' => $this->plugin->config( 'requests.on_demand', false ),
+				'sample' => $this->plugin->config( 'requests.sample', false ),
+				'except' => $this->plugin->config( 'requests.except', [] ),
+				'only' => $this->plugin->config( 'requests.only', [] ),
+				'exceptPreflight' => $this->plugin->config( 'requests.except_preflight', true ),
+			]
+		);
 
 		$should_collect->except( [ '/__clockwork(?:/.*)?' ] );
 	}

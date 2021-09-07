@@ -18,7 +18,9 @@
         "wp-cli/wp-cli-bundle": "^2.5",
         "friendsofphp/php-cs-fixer": "^3.1",
         "vimeo/psalm": "^4.10",
-        "humanmade/psalm-plugin-wordpress": "^2.0"
+        "humanmade/psalm-plugin-wordpress": "^2.0",
+        "wp-coding-standards/wpcs": "^2.3",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1"
     },
     "autoload": { "classmap": ["src/"] },
     "autoload-dev": { "classmap": ["tests/"] },

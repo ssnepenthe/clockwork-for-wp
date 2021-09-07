@@ -36,20 +36,26 @@ final class Conditionals extends DataSource {
 	}
 
 	private function build_table() {
-		$table = \array_map( static function ( $callable ) {
-			return [
-				'Function' => describe_callable( $callable ),
-				'Value' => describe_value( (bool) $callable( ) ),
-			];
-		}, $this->conditionals );
+		$table = \array_map(
+			static function ( $callable ) {
+				return [
+					'Function' => describe_callable( $callable ),
+					'Value' => describe_value( (bool) $callable() ),
+				];
+			},
+			$this->conditionals
+		);
 
-		\usort( $table, static function ( $a, $b ) {
-			if ( $a['Value'] === $b['Value'] ) {
-				return \strcmp( $a['Function'], $b['Function'] );
+		\usort(
+			$table,
+			static function ( $a, $b ) {
+				if ( $a['Value'] === $b['Value'] ) {
+					return \strcmp( $a['Function'], $b['Function'] );
+				}
+
+				return 'TRUE' === $a['Value'] ? -1 : 1;
 			}
-
-			return 'TRUE' === $a['Value'] ? -1 : 1;
-		} );
+		);
 
 		return $table;
 	}

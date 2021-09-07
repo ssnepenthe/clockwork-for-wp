@@ -1,5 +1,7 @@
 <?php
 
+// phpcs:ignoreFile
+
 return array (
   0 => 'cache',
   1 => 'cache add',

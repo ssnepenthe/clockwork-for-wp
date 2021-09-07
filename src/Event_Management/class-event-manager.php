@@ -51,9 +51,14 @@ final class Event_Manager {
 	}
 
 	public function on( $tag, $callable, $priority = self::DEFAULT_EVENT ) {
-		\add_action( $tag, function ( ...$args ) use ( $callable ) {
-			return $this->invoker->call( $callable, $args );
-		}, $priority, 999 );
+		\add_action(
+			$tag,
+			function ( ...$args ) use ( $callable ) {
+				return $this->invoker->call( $callable, $args );
+			},
+			$priority,
+			999
+		);
 
 		return $this;
 	}

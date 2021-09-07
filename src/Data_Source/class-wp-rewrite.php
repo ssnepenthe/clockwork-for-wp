@@ -39,20 +39,23 @@ final class Wp_Rewrite extends DataSource implements Subscriber {
 	public function resolve( Request $request ) {
 		$panel = $request->userData( 'Routing' );
 
-		$panel->table( 'Rewrite Settings', [
+		$panel->table(
+			'Rewrite Settings',
 			[
-				'Item' => 'Permalink Structure',
-				'Value' => $this->structure,
-			],
-			[
-				'Item' => 'Trailing Slash?',
-				'Value' => describe_value( $this->trailing_slash ),
-			],
-			[
-				'Item' => 'Rewrite Front',
-				'Value' => $this->front,
-			],
-		] );
+				[
+					'Item' => 'Permalink Structure',
+					'Value' => $this->structure,
+				],
+				[
+					'Item' => 'Trailing Slash?',
+					'Value' => describe_value( $this->trailing_slash ),
+				],
+				[
+					'Item' => 'Rewrite Front',
+					'Value' => $this->front,
+				],
+			]
+		);
 		$panel->table( 'Rewrite Rules', $this->rules );
 
 		return $request;

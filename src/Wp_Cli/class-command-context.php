@@ -32,7 +32,7 @@ final class Command_Context {
 		$arguments = [];
 		$i = 0;
 
-		foreach ( $this->get_params( ['positional'] ) as $arg ) {
+		foreach ( $this->get_params( [ 'positional' ] ) as $arg ) {
 			if ( isset( $this->args[ $i ] ) ) {
 				$arguments[ $arg['name'] ] = $this->args[ $i ];
 			}
@@ -46,7 +46,7 @@ final class Command_Context {
 	public function default_arguments() {
 		$args_with_defaults = [];
 
-		foreach ( $this->get_params( ['positional'] ) as $param ) {
+		foreach ( $this->get_params( [ 'positional' ] ) as $param ) {
 			$param_args = $this->parser->get_arg_args( $param['name'] );
 
 			if ( ! isset( $param_args['default'] ) ) {
@@ -64,7 +64,7 @@ final class Command_Context {
 		// If added, we should unset any from our options that came from defaults.
 		$options_with_defaults = [];
 
-		foreach ( $this->get_params( ['assoc', 'flag'] ) as $param ) {
+		foreach ( $this->get_params( [ 'assoc', 'flag' ] ) as $param ) {
 			$param_args = $this->parser->get_param_args( $param['name'] );
 
 			if ( ! isset( $param_args['default'] ) ) {
@@ -78,9 +78,12 @@ final class Command_Context {
 	}
 
 	public function get_params( $types ) {
-		return \array_filter( $this->synopsis, static function ( $param ) use ( $types ) {
-			return \in_array( $param['type'], $types, true );
-		} );
+		return \array_filter(
+			$this->synopsis,
+			static function ( $param ) use ( $types ) {
+				return \in_array( $param['type'], $types, true );
+			}
+		);
 	}
 
 	public function name() {
@@ -93,9 +96,8 @@ final class Command_Context {
 	}
 
 	public function output() {
+		// WP flushes output buffer on shutdown.
 		$logger = Cli_Collection_Helper::get_plugin_logger();
-		// We are flushing buffers in the "wp_loaded" hook at priority 999.
-		// $logger->ob_end();
 
 		// @todo Need to look in to coloring in clockwork UI.
 		// @todo Better formatting.

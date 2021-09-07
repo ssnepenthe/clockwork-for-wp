@@ -29,9 +29,16 @@ final class Route {
 	public function get_query() {
 		$query_array = $this->get_query_array();
 
-		$query_string = \implode( '&', \array_map( static function ( $key, $value ) {
-			return "{$key}={$value}";
-		}, \array_keys( $query_array ), $query_array ) );
+		$query_string = \implode(
+			'&',
+			\array_map(
+				static function ( $key, $value ) {
+					return "{$key}={$value}";
+				},
+				\array_keys( $query_array ),
+				$query_array
+			)
+		);
 
 		return "index.php?{$query_string}";
 	}

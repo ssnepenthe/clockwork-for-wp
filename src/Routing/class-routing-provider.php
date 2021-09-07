@@ -29,9 +29,12 @@ final class Routing_Provider extends Base_Provider {
 						$params[ $key ] = \get_query_var( $param_name );
 					}
 
-					return \array_filter( $params, static function ( $param ) {
-						return null !== $param;
-					} );
+					return \array_filter(
+						$params,
+						static function ( $param ) {
+							return null !== $param;
+						}
+					);
 				}
 			);
 		};

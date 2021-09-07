@@ -32,13 +32,15 @@ final class Plugin_Provider extends Base_Provider {
 			$psr_container = new Container( $this->plugin->get_container() );
 
 			return new Invoker(
-				new ResolverChain( [
-					new TypeHintContainerResolver( $psr_container ),
-					new ParameterNameContainerResolver( $psr_container ),
-					new NumericArrayResolver(),
-					new AssociativeArrayResolver(),
-					new DefaultValueResolver(),
-				] ),
+				new ResolverChain(
+					[
+						new TypeHintContainerResolver( $psr_container ),
+						new ParameterNameContainerResolver( $psr_container ),
+						new NumericArrayResolver(),
+						new AssociativeArrayResolver(),
+						new DefaultValueResolver(),
+					]
+				),
 				$psr_container
 			);
 		};

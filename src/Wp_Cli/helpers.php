@@ -22,9 +22,13 @@ function add_command( $command ): void {
 		 *
 		 * @see https://github.com/humanmade/psalm-plugin-wordpress/issues/14
 		 */
-		WP_CLI::add_command( $namespace, Command_Namespace::class, [
-			'shortdesc' => 'Manages the Clockwork for WP plugin.',
-		] );
+		WP_CLI::add_command(
+			$namespace,
+			Command_Namespace::class,
+			[
+				'shortdesc' => 'Manages the Clockwork for WP plugin.',
+			]
+		);
 	}
 
 	/**

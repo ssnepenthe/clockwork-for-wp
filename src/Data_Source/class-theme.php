@@ -48,16 +48,22 @@ final class Theme extends DataSource implements Subscriber {
 						)
 					);
 			},
-			'body_class' => [ function ( $classes ) {
-				$this->set_body_classes( \is_array( $classes ) ? $classes : [] );
+			'body_class' => [
+				function ( $classes ) {
+					$this->set_body_classes( \is_array( $classes ) ? $classes : [] );
 
-				return $classes;
-			}, Event_Manager::LATE_EVENT ],
-			'template_include' => [ function ( $template ) {
-				$this->set_included_template( $template );
+					return $classes;
+				},
+				Event_Manager::LATE_EVENT,
+			],
+			'template_include' => [
+				function ( $template ) {
+					$this->set_included_template( $template );
 
-				return $template;
-			}, Event_Manager::LATE_EVENT ],
+					return $template;
+				},
+				Event_Manager::LATE_EVENT,
+			],
 		];
 	}
 
@@ -109,44 +115,61 @@ final class Theme extends DataSource implements Subscriber {
 	}
 
 	private function body_classes_table() {
-		return \array_map( static function ( $class ) {
-			return [ 'Class' => $class ];
-		}, $this->body_classes );
+		return \array_map(
+			static function ( $class ) {
+				return [ 'Class' => $class ];
+			},
+			$this->body_classes
+		);
 	}
 
 	private function included_template_table() {
-		$File = \pathinfo( $this->included_template, \PATHINFO_BASENAME );
-		$Path = \ltrim( \str_replace( $this->theme_root, '', $this->included_template ), '/' );
+		$file = \pathinfo( $this->included_template, \PATHINFO_BASENAME );
+		$path = \ltrim( \str_replace( $this->theme_root, '', $this->included_template ), '/' );
 
-		return [ \compact( 'File', 'Path' ) ];
+		return [
+			[
+				'File' => $file,
+				'Path' => $path,
+			],
+		];
 	}
 
 	private function miscellaneous_table() {
-		return \array_filter( [
+		return \array_filter(
 			[
-				'Item' => 'Theme',
-				'Value' => $this->is_child_theme ? $this->stylesheet : $this->template,
+				[
+					'Item' => 'Theme',
+					'Value' => $this->is_child_theme ? $this->stylesheet : $this->template,
+				],
+				[
+					'Item' => 'Parent Theme',
+					'Value' => $this->is_child_theme ? $this->template : null,
+				],
+				[
+					'Item' => 'Content Width',
+					'Value' => $this->content_width,
+				],
 			],
-			[
-				'Item' => 'Parent Theme',
-				'Value' => $this->is_child_theme ? $this->template : null,
-			],
-			[
-				'Item' => 'Content Width',
-				'Value' => $this->content_width,
-			],
-		], static function ( $row ) {
-			return null !== $row['Value'];
-		} );
+			static function ( $row ) {
+				return null !== $row['Value'];
+			}
+		);
 	}
 
 	// @todo Deferred set from provider?
 	private function template_parts_table() {
-		return \array_map( function ( $file_path ) {
-			$File = \pathinfo( $file_path, \PATHINFO_BASENAME );
-			$Path = \ltrim( \str_replace( $this->theme_root, '', $file_path ), '/' );
+		return \array_map(
+			function ( $file_path ) {
+				$file = \pathinfo( $file_path, \PATHINFO_BASENAME );
+				$path = \ltrim( \str_replace( $this->theme_root, '', $file_path ), '/' );
 
-			return \compact( 'File', 'Path' );
-		}, $this->included_template_parts );
+				return [
+					'File' => $file,
+					'Path' => $path,
+				];
+			},
+			$this->included_template_parts
+		);
 	}
 }

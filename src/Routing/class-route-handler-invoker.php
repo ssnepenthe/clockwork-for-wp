@@ -47,6 +47,6 @@ final class Route_Handler_Invoker {
 	}
 
 	private function get_additional_params( $route ) {
-		return ($this->param_resolver)( $route );
+		return ( $this->param_resolver )( $route );
 	}
 }

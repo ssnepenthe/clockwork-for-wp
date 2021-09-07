@@ -41,14 +41,17 @@ final class Api_Controller {
 
 		$authenticated = $this->authenticator->check(
 			// @todo Move to route handler invoker?
-			$_SERVER['HTTP_X_CLOCKWORK_AUTH'] ?? ''
+			$this->request->header( 'X_CLOCKWORK_AUTH' )
 		);
 
 		if ( true !== $authenticated ) {
-			\wp_send_json( [
-				'message' => $authenticated,
-				'requires' => $this->authenticator->requires(),
-			], 403 );
+			\wp_send_json(
+				[
+					'message' => $authenticated,
+					'requires' => $this->authenticator->requires(),
+				],
+				403
+			);
 		}
 
 		if ( null !== $extended ) {
@@ -108,7 +111,7 @@ final class Api_Controller {
 
 	// @todo Move to route handler invoker?
 	private function extract_credentials() {
-		if ( ! $this->is_json_request() ) {
+		if ( ! $this->request->is_json() ) {
 			// Clockwork as browser extension sends POST request as multipart/form-data.
 			return [
 				'username' => \filter_input( \INPUT_POST, 'username' ),
@@ -129,17 +132,5 @@ final class Api_Controller {
 			'username' => $decoded['username'] ?? null,
 			'password' => $decoded['password'] ?? null,
 		];
-	}
-
-	private function is_json_request() {
-		$content_type = '';
-
-		if ( isset( $_SERVER['HTTP_CONTENT_TYPE'] ) ) {
-			$content_type = $_SERVER['HTTP_CONTENT_TYPE'];
-		} elseif ( isset( $_SERVER['CONTENT_TYPE'] ) ) {
-			$content_type = $_SERVER['CONTENT_TYPE'];
-		}
-
-		return 0 === \mb_strpos( $content_type, 'application/json' );
 	}
 }

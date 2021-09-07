@@ -52,7 +52,7 @@ return [
 	// Configure HTTP requests data collection.
 	'requests' => [
 
-		// bool|string. Only collect data when clockwork extension is open or a request includes a "clockwork-profile" cookie or get/post data key. If set to a string this will be used as a "secret" that must be passed as the "clockwork-profile" value
+		// bool|string. Only collect data when clockwork extension is open or a request includes a "clockwork-profile" cookie or get/post data key. If set to a string this will be used as a "secret" that must be passed as the "clockwork-profile" value.
 		'on_demand' => false,
 
 		// bool|int. Sample the collected requests (e.g. set to 100 to only collect 1 in 100 requests).

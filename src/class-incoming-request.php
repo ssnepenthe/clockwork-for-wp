@@ -39,6 +39,10 @@ final class Incoming_Request extends IncomingRequest {
 			&& 'heartbeat' === $this->input['action'];
 	}
 
+	public function is_json() {
+		return 0 === \mb_strpos( $this->header( 'CONTENT_TYPE' ), 'application/json' );
+	}
+
 	public function is_put() {
 		$method = \mb_strtoupper( $this->method );
 
@@ -88,13 +92,15 @@ final class Incoming_Request extends IncomingRequest {
 	}
 
 	public static function from_globals() {
-		return new self( [
-			'ajax_uri' => \parse_url( \admin_url( 'admin-ajax.php' ), \PHP_URL_PATH ),
-			'cookies' => $_COOKIE,
-			'headers' => self::extract_headers( $_SERVER ),
-			'input' => $_REQUEST,
-			'method' => $_SERVER['REQUEST_METHOD'],
-			'uri' => $_SERVER['REQUEST_URI'],
-		] );
+		return new self(
+			[
+				'ajax_uri' => \parse_url( \admin_url( 'admin-ajax.php' ), \PHP_URL_PATH ),
+				'cookies' => $_COOKIE,
+				'headers' => self::extract_headers( $_SERVER ),
+				'input' => $_REQUEST,
+				'method' => $_SERVER['REQUEST_METHOD'],
+				'uri' => $_SERVER['REQUEST_URI'],
+			]
+		);
 	}
 }

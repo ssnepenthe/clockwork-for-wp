@@ -23,16 +23,19 @@ final class Errors extends DataSource {
 		$this->record( $no, $str, $file, $line );
 
 		if ( \is_callable( $this->original_handler ) ) {
-			return ($this->original_handler)( $no, $str, $file, $line );
+			return ( $this->original_handler )( $no, $str, $file, $line );
 		}
 
 		return false;
 	}
 
 	public function reapply_filters(): void {
-		$this->errors = \array_filter( $this->errors, function ( $error ) {
-			return $this->passesFilters( [ $error ] );
-		} );
+		$this->errors = \array_filter(
+			$this->errors,
+			function ( $error ) {
+				return $this->passesFilters( [ $error ] );
+			}
+		);
 	}
 
 	public function record( $no, $str, $file = null, $line = null ): void {
@@ -110,11 +113,15 @@ final class Errors extends DataSource {
 
 			$log_method = $this->log_method( $error['type'] );
 
-			\call_user_func( [ $log, $log_method ], $message, [
-				'type' => $this->friendly_type( $error['type'] ),
-				'file' => $error['file'],
-				'line' => $error['line'],
-			] );
+			\call_user_func(
+				[ $log, $log_method ],
+				$message,
+				[
+					'type' => $this->friendly_type( $error['type'] ),
+					'file' => $error['file'],
+					'line' => $error['line'],
+				]
+			);
 		}
 
 		$request->log()->merge( $log );
@@ -164,7 +171,7 @@ final class Errors extends DataSource {
 			'E_USER_DEPRECATED',
 			'E_ALL',
 		] as $constant ) {
-			if ( \defined( $constant ) && $type === \constant( $constant ) ) {
+			if ( \defined( $constant ) && \constant( $constant ) === $type ) {
 				return $constant;
 			}
 		}

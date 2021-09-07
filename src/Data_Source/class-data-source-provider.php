@@ -81,9 +81,11 @@ final class Data_Source_Provider extends Base_Provider {
 			return new Core( $this->plugin['wp_version'], $this->plugin['timestart'] );
 		};
 
-		$this->plugin[ Errors::class ] = $this->plugin->factory( static function () {
-			return Errors::get_instance();
-		} );
+		$this->plugin[ Errors::class ] = $this->plugin->factory(
+			static function () {
+				return Errors::get_instance();
+			}
+		);
 
 		$this->plugin[ Php::class ] = static function () {
 			$cookies = \implode( '|', [ AUTH_COOKIE, SECURE_AUTH_COOKIE, LOGGED_IN_COOKIE ] );
@@ -114,18 +116,22 @@ final class Data_Source_Provider extends Base_Provider {
 				$config['only_tags'] ?? []
 			);
 
-			$data_source->addFilter( static function ( $hook ) use ( $tag_filter ) {
-				return $tag_filter( $hook['Tag'] );
-			} );
+			$data_source->addFilter(
+				static function ( $hook ) use ( $tag_filter ) {
+					return $tag_filter( $hook['Tag'] );
+				}
+			);
 
 			$callback_filter = new Except_Only_Filter(
 				$config['except_callbacks'] ?? [],
 				$config['only_callbacks'] ?? []
 			);
 
-			$data_source->addFilter( static function ( $hook ) use ( $callback_filter ) {
-				return $callback_filter( $hook['Callback'] );
-			} );
+			$data_source->addFilter(
+				static function ( $hook ) use ( $callback_filter ) {
+					return $callback_filter( $hook['Callback'] );
+				}
+			);
 
 			return $data_source;
 		};
@@ -169,10 +175,12 @@ final class Data_Source_Provider extends Base_Provider {
 			if ( $config['slow_only'] ?? false ) {
 				$slow_threshold = $config['slow_threshold'] ?? 50;
 
-				$data_source->addFilter( static function ( $query ) use ( $slow_threshold ) {
-					// @todo Should this be inclusive (i.e. >=) instead?
-					return $query['duration'] > $slow_threshold;
-				} );
+				$data_source->addFilter(
+					static function ( $query ) use ( $slow_threshold ) {
+						// @todo Should this be inclusive (i.e. >=) instead?
+						return $query['duration'] > $slow_threshold;
+					}
+				);
 			}
 
 			$this->plugin[ Event_Manager::class ]->trigger(
@@ -201,17 +209,19 @@ final class Data_Source_Provider extends Base_Provider {
 			$only_types = $config['only_types'] ?? false;
 
 			// Filter errors by type.
-			$errors->addFilter( static function ( $error ) use ( $except_types, $only_types ) {
-				if ( \is_int( $only_types ) ) {
-					return ( $error['type'] & $only_types ) > 0;
-				}
+			$errors->addFilter(
+				static function ( $error ) use ( $except_types, $only_types ) {
+					if ( \is_int( $only_types ) ) {
+						return ( $error['type'] & $only_types ) > 0;
+					}
 
-				if ( \is_int( $except_types ) ) {
-					return ( $error['type'] & $except_types ) < 1;
-				}
+					if ( \is_int( $except_types ) ) {
+						return ( $error['type'] & $except_types ) < 1;
+					}
 
-				return true;
-			} );
+					return true;
+				}
+			);
 
 			// Filter errors by message pattern.
 			$message_filter = new Except_Only_Filter(
@@ -219,9 +229,11 @@ final class Data_Source_Provider extends Base_Provider {
 				$config['only_messages'] ?? []
 			);
 
-			$errors->addFilter( static function ( $error ) use ( $message_filter ) {
-				return $message_filter( $error['message'] );
-			} );
+			$errors->addFilter(
+				static function ( $error ) use ( $message_filter ) {
+					return $message_filter( $error['message'] );
+				}
+			);
 
 			// Filter errors by file pattern.
 			$file_filter = new Except_Only_Filter(
@@ -229,16 +241,20 @@ final class Data_Source_Provider extends Base_Provider {
 				$config['only_files'] ?? []
 			);
 
-			$errors->addFilter( static function ( $error ) use ( $file_filter ) {
-				return $file_filter( $error['file'] );
-			} );
+			$errors->addFilter(
+				static function ( $error ) use ( $file_filter ) {
+					return $file_filter( $error['file'] );
+				}
+			);
 
 			// Filter suppressed errors.
 			$include_suppressed = $config['include_suppressed_errors'] ?? false;
 
-			$errors->addFilter( static function ( $error ) use ( $include_suppressed ) {
-				return ! $error['suppressed'] || $include_suppressed;
-			} );
+			$errors->addFilter(
+				static function ( $error ) use ( $include_suppressed ) {
+					return ! $error['suppressed'] || $include_suppressed;
+				}
+			);
 
 			$errors->reapply_filters();
 		} else {

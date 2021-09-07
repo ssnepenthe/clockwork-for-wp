@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Web_App;
 
 use Clockwork_For_Wp\Event_Management\Subscriber;
+use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Routing\Route_Collection;
 
 final class Web_App_Subscriber implements Subscriber {
@@ -20,25 +21,20 @@ final class Web_App_Subscriber implements Subscriber {
 	public function prevent_canonical_redirect( $redirect, $requested ) {
 		$clockwork = \home_url( '__clockwork' );
 
-		if ( $clockwork === \mb_substr( $requested, 0, \mb_strlen( $clockwork ) ) ) {
+		if ( \mb_substr( $requested, 0, \mb_strlen( $clockwork ) ) === $clockwork ) {
 			return $requested;
 		}
 
 		return $redirect;
 	}
 
-	public function redirect_shortcut(): void {
+	public function redirect_shortcut( Incoming_Request $request ): void {
 		/**
 		 * @psalm-suppress InvalidArgument
 		 *
 		 * @see https://github.com/humanmade/psalm-plugin-wordpress/issues/13
 		 */
-		$clockwork = \home_url( '__clockwork', 'relative' );
-
-		if (
-			! isset( $_SERVER['REQUEST_URI'] )
-			|| $clockwork !== \untrailingslashit( $_SERVER['REQUEST_URI'] )
-		) {
+		if ( \untrailingslashit( $request->uri ) !== \home_url( '__clockwork', 'relative' ) ) {
 			return;
 		}
 

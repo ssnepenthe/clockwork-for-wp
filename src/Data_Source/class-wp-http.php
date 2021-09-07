@@ -85,10 +85,12 @@ final class Wp_Http extends DataSource implements Subscriber {
 	private function args_have_meta( $args ) {
 		return \is_array( $args )
 			&& isset( $args['_cfw_meta'] )
-			&& 3 === \count( \array_intersect(
-				[ 'fingerprint', 'start', 'url' ],
-				\array_keys( $args['_cfw_meta'] )
-			) );
+			&& 3 === \count(
+				\array_intersect(
+					[ 'fingerprint', 'start', 'url' ],
+					\array_keys( $args['_cfw_meta'] )
+				)
+			);
 	}
 
 	private function end_event( $args ): void {
@@ -110,21 +112,27 @@ final class Wp_Http extends DataSource implements Subscriber {
 	}
 
 	private function log_request_success( $response, $args ): void {
-		$this->log->info( "HTTP request for {$args['_cfw_meta']['url']} succeeded", [
-			'args' => $args,
-			// @todo Should this be included? Just serves to increase the metadata storage requirements.
-			// 'body' => $response['body'],
-			'cookies' => $response['cookies'],
-			'headers' => $response['headers'],
-			'status' => $response['status'],
-		] );
+		$this->log->info(
+			"HTTP request for {$args['_cfw_meta']['url']} succeeded",
+			[
+				'args' => $args,
+				// @todo Should this be included? Just serves to increase the metadata storage requirements.
+				// 'body' => $response['body'],
+				'cookies' => $response['cookies'],
+				'headers' => $response['headers'],
+				'status' => $response['status'],
+			]
+		);
 	}
 
 	private function start_event( $args ): void {
-		$this->timeline->event( "HTTP request for {$args['_cfw_meta']['url']}", [
-			'name' => "http_{$args['_cfw_meta']['fingerprint']}",
-			'start' => $args['_cfw_meta']['start'],
-			'data' => $args,
-		] );
+		$this->timeline->event(
+			"HTTP request for {$args['_cfw_meta']['url']}",
+			[
+				'name' => "http_{$args['_cfw_meta']['fingerprint']}",
+				'start' => $args['_cfw_meta']['start'],
+				'data' => $args,
+			]
+		);
 	}
 }

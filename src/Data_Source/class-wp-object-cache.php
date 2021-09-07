@@ -70,13 +70,15 @@ final class Wp_Object_Cache extends DataSource implements Subscriber {
 	}
 
 	public function resolve( Request $request ) {
-		$stats = \array_filter( [
-			'Reads' => $this->hits + $this->misses,
-			'Hits' => $this->hits,
-			'Misses' => $this->misses,
-			'Writes' => $this->writes,
-			'Deletes' => $this->deletes,
-		] );
+		$stats = \array_filter(
+			[
+				'Reads' => $this->hits + $this->misses,
+				'Hits' => $this->hits,
+				'Misses' => $this->misses,
+				'Writes' => $this->writes,
+				'Deletes' => $this->deletes,
+			]
+		);
 
 		if ( \count( $stats ) > 0 ) {
 			$request->userData( 'Caching' )->counters( $stats );

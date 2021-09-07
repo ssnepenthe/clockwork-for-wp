@@ -19,10 +19,7 @@ final class Core extends DataSource {
 
 	public function resolve( Request $request ) {
 		// @todo Consider options for filling the "controller" slot.
-		$request->userData( 'WordPress' )->counters( [
-			'WP Version' => $this->version,
-		] );
-
+		$request->userData( 'WordPress' )->counters( [ 'WP Version' => $this->version ] );
 		$request->timeline()->merge( $this->build_timeline() );
 
 		return $request;
@@ -43,14 +40,20 @@ final class Core extends DataSource {
 	private function build_timeline() {
 		$timeline = new Timeline();
 
-		$timeline->event( 'Total Execution', [
-			'name' => 'total',
-		] );
-		$timeline->event( 'Core Timer Start', [
-			'name' => 'core_timer',
-			'start' => $this->timestart,
-			'end' => $this->timestart,
-		] );
+		$timeline->event(
+			'Total Execution',
+			[
+				'name' => 'total',
+			]
+		);
+		$timeline->event(
+			'Core Timer Start',
+			[
+				'name' => 'core_timer',
+				'start' => $this->timestart,
+				'end' => $this->timestart,
+			]
+		);
 
 		return $timeline;
 	}

@@ -75,10 +75,15 @@ final class Wpdb extends DataSource implements Subscriber {
 
 		foreach ( $this->queries as $query ) {
 			// @todo
-			$request->addDatabaseQuery( $query['query'], [], $query['duration'], [
-				'model' => $query['model'],
-				'time' => $query['start'],
-			] );
+			$request->addDatabaseQuery(
+				$query['query'],
+				[],
+				$query['duration'],
+				[
+					'model' => $query['model'],
+					'time' => $query['start'],
+				]
+			);
 		}
 
 		return $request;

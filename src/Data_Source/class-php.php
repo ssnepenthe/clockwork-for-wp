@@ -16,15 +16,19 @@ final class Php extends PhpDataSource {
 	public function removePasswords( array $data ) {
 		// @todo Should we also allow for removing data from keys?
 		// @todo Should this override apply to all data sources?
-		$values = \array_map( function ( $value, $key ) {
-			foreach ( $this->sensitive_patterns as $pattern ) {
-				if ( 1 === \preg_match( $pattern, $key ) ) {
-					return '*removed*';
+		$values = \array_map(
+			function ( $value, $key ) {
+				foreach ( $this->sensitive_patterns as $pattern ) {
+					if ( 1 === \preg_match( $pattern, $key ) ) {
+						return '*removed*';
+					}
 				}
-			}
 
-			return $value;
-		}, $data, $keys = \array_keys( $data ) );
+				return $value;
+			},
+			$data,
+			$keys = \array_keys( $data )
+		);
 
 		return \array_combine( $keys, $values );
 	}
@@ -35,20 +39,26 @@ final class Php extends PhpDataSource {
 		if ( \array_key_exists( 'Cookie', $headers ) ) {
 			// We are removing sensitive data from the $_COOKIE array elsewhere...
 			// Lets make sure to parse the cookie headers so we can remove the same data.
-			$headers['Cookie'] = \array_map( function ( $cookie_string ) {
-				$clean = \array_map( function ( $pair ) {
-					[ $key, $value ] = \explode( '=', \trim( $pair ) );
+			$headers['Cookie'] = \array_map(
+				function ( $cookie_string ) {
+					$clean = \array_map(
+						function ( $pair ) {
+							[ $key, $value ] = \explode( '=', \trim( $pair ) );
 
-					$clean = $this->removePasswords( [ $key => $value ] );
+							$clean = $this->removePasswords( [ $key => $value ] );
 
-					$key = \key( $clean );
-					$value = \current( $clean );
+							$key = \key( $clean );
+							$value = \current( $clean );
 
-					return "{$key}={$value}";
-				}, \explode( ';', $cookie_string ) );
+							return "{$key}={$value}";
+						},
+						\explode( ';', $cookie_string )
+					);
 
-				return \implode( '; ', $clean );
-			}, $headers['Cookie'] );
+					return \implode( '; ', $clean );
+				},
+				$headers['Cookie']
+			);
 		}
 
 		return $headers;

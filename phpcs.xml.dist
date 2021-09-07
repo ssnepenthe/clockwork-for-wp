@@ -2,20 +2,53 @@
 <ruleset name="WordPress Coding Standards for Plugins">
     <description>Generally-applicable sniffs for WordPress plugins</description>
 
-    <rule ref="PHPCompatibility"/>
-    <config name="testVersion" value="5.5-"/>
-
-    <rule ref="WordPress-Core" />
-    <rule ref="WordPress-Docs" />
-    <rule ref="WordPress-Extra" />
-    <rule ref="WordPress-VIP" />
-
-    <!-- Check all PHP files in directory tree by default. -->
-    <arg name="extensions" value="php"/>
     <file>.</file>
+    <exclude-pattern>/tests/</exclude-pattern>
+    <exclude-pattern>/vendor/</exclude-pattern>
 
-    <!-- Show progress and sniff codes in all reports -->
     <arg value="ps"/>
+    <arg name="basepath" value="./"/>
+    <arg name="colors"/>
+    <arg name="extensions" value="php"/>
+    <arg name="parallel" value="8"/>
 
-    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <config name="minimum_supported_wp_version" value="5.5"/>
+
+    <rule ref="WordPress">
+        <exclude name="WordPress.PHP.DisallowShortTernary.Found"/>
+    </rule>
+
+    <rule ref="WordPress.NamingConventions.ValidVariableName" >
+        <properties>
+            <property name="customPropertiesWhitelist" type="array">
+                <element value="updateToken"/>
+                <element value="emailsData"/>
+            </property>
+        </properties>
+    </rule>
+
+    <rule ref="Generic.Arrays.DisallowShortArraySyntax.Found">
+        <exclude-pattern>/src/</exclude-pattern>
+        <exclude-pattern>clockwork-for-wp.php</exclude-pattern>
+    </rule>
+
+    <rule ref="Squiz.Commenting.ClassComment.Missing">
+        <exclude-pattern>/src/</exclude-pattern>
+        <exclude-pattern>clockwork-for-wp.php</exclude-pattern>
+    </rule>
+
+    <rule ref="Squiz.Commenting.FileComment.Missing">
+        <exclude-pattern>/src/</exclude-pattern>
+        <exclude-pattern>clockwork-for-wp.php</exclude-pattern>
+    </rule>
+
+    <rule ref="Squiz.Commenting.FunctionComment.Missing">
+        <exclude-pattern>/src/</exclude-pattern>
+        <exclude-pattern>clockwork-for-wp.php</exclude-pattern>
+    </rule>
+
+    <rule ref="Squiz.Commenting.VariableComment.Missing">
+        <exclude-pattern>/src/</exclude-pattern>
+        <exclude-pattern>clockwork-for-wp.php</exclude-pattern>
+    </rule>
 </ruleset>

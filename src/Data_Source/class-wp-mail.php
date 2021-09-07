@@ -49,12 +49,15 @@ final class Wp_Mail extends DataSource implements Subscriber {
 		$headers = $args['headers'] ?? [];
 		$time = \microtime( true );
 
-		$this->emails->event( 'Sending an email', [
-			'name' => 'email_' . \hash( 'md5', \serialize( $args ) ),
-			'data' => \compact( 'to', 'subject', 'headers' ),
-			'start' => $time,
-			'end' => $time,
-		] );
+		$this->emails->event(
+			'Sending an email',
+			[
+				'name' => 'email_' . \hash( 'md5', \serialize( $args ) ),
+				'data' => \compact( 'to', 'subject', 'headers' ),
+				'start' => $time,
+				'end' => $time,
+			]
+		);
 	}
 
 	public function resolve( Request $request ) {

@@ -14,7 +14,9 @@ abstract class Base_Provider implements Provider {
 	}
 
 	public function boot(): void {
-		if ( \count( $subscribers = $this->subscribers() ) > 0 ) {
+		$subscribers = $this->subscribers();
+
+		if ( \count( $subscribers ) > 0 ) {
 			$events = $this->plugin[ Event_Manager::class ];
 
 			foreach ( $subscribers as $subscriber ) {

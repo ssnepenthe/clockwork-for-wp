@@ -14,12 +14,16 @@ abstract class Base_Command {
 	protected $options = [];
 
 	final public function arguments(): array {
-		return \array_map( static function ( $synopsis, $description ) {
-			$parsed = SynopsisParser::parse( $synopsis )[0];
-			$parsed['description'] = $description;
+		return \array_map(
+			static function ( $synopsis, $description ) {
+				$parsed = SynopsisParser::parse( $synopsis )[0];
+				$parsed['description'] = $description;
 
-			return $parsed;
-		}, \array_keys( $this->arguments ), $this->arguments );
+				return $parsed;
+			},
+			\array_keys( $this->arguments ),
+			$this->arguments
+		);
 	}
 
 	final public function longdesc(): string {
@@ -48,12 +52,16 @@ abstract class Base_Command {
 	}
 
 	final public function options(): array {
-		return \array_map( static function ( $synopsis, $description ) {
-			$parsed = SynopsisParser::parse( $synopsis )[0];
-			$parsed['description'] = $description;
+		return \array_map(
+			static function ( $synopsis, $description ) {
+				$parsed = SynopsisParser::parse( $synopsis )[0];
+				$parsed['description'] = $description;
 
-			return $parsed;
-		}, \array_keys( $this->options ), $this->options );
+				return $parsed;
+			},
+			\array_keys( $this->options ),
+			$this->options
+		);
 	}
 
 	final public function shortdesc(): string {
