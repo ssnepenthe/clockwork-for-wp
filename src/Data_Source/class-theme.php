@@ -104,26 +104,71 @@ final class Theme extends DataSource implements Subscriber {
 	public function resolve( Request $request ) {
 		$panel = $request->userData( 'Theme' );
 
-		$panel->table( 'Miscellaneous', $this->miscellaneous_table() );
+		$table = \array_filter(
+			[
+				[
+					'label' => 'Theme',
+					'value' => $this->is_child_theme ? $this->stylesheet : $this->template,
+				],
+				[
+					'label' => 'Parent Theme',
+					'value' => $this->is_child_theme ? $this->template : null,
+				],
+				[
+					'label' => 'Content Width',
+					'value' => $this->content_width,
+				],
+			],
+			static function ( $row ) {
+				return null !== $row['value'];
+			}
+		);
 
 		if ( '' !== $this->included_template ) {
-			$panel->table( 'Included Template', $this->included_template_table() );
+			$table[] = [
+				'label' => 'Included Template',
+				'value' => $this->theme_relative_path( $this->included_template ),
+			];
 		}
 
 		if ( 0 !== \count( $this->template_hierarchy ) ) {
-			$panel->table( 'Template Hierarchy', $this->template_hierarchy_table() );
+			$table[] = [
+				'label' => 'Template Hierarchy',
+				'value' => \array_map(
+					function ( $file_path ) {
+						return $this->theme_relative_path( $file_path );
+					},
+					\array_unique( $this->template_hierarchy )
+				),
+			];
 		}
 
 		if ( 0 !== \count( $this->included_template_parts ) ) {
-			$panel->table(
-				'Template Parts',
-				$this->template_parts_table()
+			$template_parts = \array_map(
+				function ( $file_path ) {
+					return $this->theme_relative_path( $file_path );
+				},
+				$this->included_template_parts
 			);
+			\sort( $template_parts );
+
+			$table[] = [
+				'label' => 'Included Template Parts',
+				'value' => $template_parts,
+			];
 		}
 
 		if ( 0 !== \count( $this->body_classes ) ) {
-			$panel->table( 'Body Classes', $this->body_classes_table() );
+			$classes = $this->body_classes;
+			\sort( $classes );
+
+			$table[] = [
+				'label' => 'Body Classes',
+				'value' => $classes,
+			];
 		}
+
+		$panel->table( 'Theme Data', $table );
 
 		return $request;
 	}
@@ -152,19 +197,6 @@ final class Theme extends DataSource implements Subscriber {
 		return $this;
 	}
 
-	private function body_classes_table() {
-		return \array_map(
-			static function ( $class ) {
-				return [ 'Class' => $class ];
-			},
-			$this->body_classes
-		);
-	}
-
-	private function file_basename( string $path ): string {
-		return \pathinfo( $path, \PATHINFO_BASENAME );
-	}
-
 	/**
 	 * @return array<string, string>
 	 */
@@ -190,64 +222,6 @@ final class Theme extends DataSource implements Subscriber {
 			'is_archive' => 'archive_template_hierarchy',
 			'__return_true' => 'index_template_hierarchy',
 		];
-	}
-
-	private function included_template_table() {
-		return [
-			[
-				'File' => $this->file_basename( $this->included_template ),
-				'Path' => $this->theme_relative_path( $this->included_template ),
-			],
-		];
-	}
-
-	private function miscellaneous_table() {
-		return \array_filter(
-			[
-				[
-					'Item' => 'Theme',
-					'Value' => $this->is_child_theme ? $this->stylesheet : $this->template,
-				],
-				[
-					'Item' => 'Parent Theme',
-					'Value' => $this->is_child_theme ? $this->template : null,
-				],
-				[
-					'Item' => 'Content Width',
-					'Value' => $this->content_width,
-				],
-			],
-			static function ( $row ) {
-				return null !== $row['Value'];
-			}
-		);
-	}
-
-	/**
-	 * @return array<int, array{File: string, Path: string}>
-	 */
-	private function template_hierarchy_table(): array {
-		return \array_map(
-			function ( $file_path ) {
-				return [
-					'File' => $this->file_basename( $file_path ),
-					'Path' => $this->theme_relative_path( $file_path ),
-				];
-			},
-			\array_unique( $this->template_hierarchy )
-		);
-	}
-
-	private function template_parts_table() {
-		return \array_map(
-			function ( $file_path ) {
-				return [
-					'File' => $this->file_basename( $file_path ),
-					'Path' => $this->theme_relative_path( $file_path ),
-				];
-			},
-			$this->included_template_parts
-		);
 	}
 
 	private function theme_relative_path( string $path ): string {
