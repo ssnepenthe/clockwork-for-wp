@@ -13,7 +13,7 @@ use Clockwork_For_Wp\Included_Files;
 final class Theme extends DataSource implements Subscriber {
 	private $body_classes = [];
 	private $content_width;
-	private $included_template = '';
+	private $included_template;
 	private $included_template_parts = [];
 	private $is_child_theme = false;
 	private $stylesheet;
@@ -30,25 +30,14 @@ final class Theme extends DataSource implements Subscriber {
 		return $this;
 	}
 
-	public function configure_theme( $theme_root, $is_child_theme, $template, $stylesheet ) {
-		$this->theme_root = $theme_root;
-		$this->is_child_theme = $is_child_theme;
-		$this->template = $template;
-		$this->stylesheet = $stylesheet;
-
-		return $this;
-	}
-
 	public function get_subscribed_events(): array {
 		return [
 			'cfw_pre_resolve' => function ( $content_width ): void {
 				$this
-					->configure_theme(
-						\get_theme_root(),
-						\is_child_theme(),
-						\get_template(),
-						\get_stylesheet()
-					)
+					->set_theme_root( \get_theme_root() )
+					->set_is_child_theme( \is_child_theme() )
+					->set_template( \get_template() )
+					->set_stylesheet( \get_stylesheet() )
 					->set_content_width( $content_width )
 					->set_included_template_parts(
 						...\array_merge(
@@ -124,7 +113,7 @@ final class Theme extends DataSource implements Subscriber {
 			}
 		);
 
-		if ( '' !== $this->included_template ) {
+		if ( null !== $this->included_template ) {
 			$table[] = [
 				'label' => 'Included Template',
 				'value' => $this->theme_relative_path( $this->included_template ),
@@ -193,6 +182,30 @@ final class Theme extends DataSource implements Subscriber {
 
 	public function set_included_template_parts( string ...$template_parts ) {
 		$this->included_template_parts = $template_parts;
+
+		return $this;
+	}
+
+	public function set_is_child_theme( bool $is_child_theme ): self {
+		$this->is_child_theme = $is_child_theme;
+
+		return $this;
+	}
+
+	public function set_stylesheet( string $stylesheet ): self {
+		$this->stylesheet = $stylesheet;
+
+		return $this;
+	}
+
+	public function set_template( string $template ): self {
+		$this->template = $template;
+
+		return $this;
+	}
+
+	public function set_theme_root( string $theme_root ): self {
+		$this->theme_root = $theme_root;
 
 		return $this;
 	}
