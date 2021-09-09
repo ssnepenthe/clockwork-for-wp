@@ -184,6 +184,10 @@ final class Theme extends DataSource implements Subscriber {
 		$table = \array_filter(
 			[
 				[
+					'label' => 'Theme Root',
+					'value' => $this->theme_root,
+				],
+				[
 					'label' => 'Theme',
 					'value' => $this->is_child_theme ? $this->stylesheet : $this->template,
 				],
