@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
+use Clockwork\Helpers\StackFilter;
+use Clockwork\Helpers\StackTrace;
 use Clockwork\Request\Request;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
-use Clockwork_For_Wp\Included_Files;
 
 final class Theme extends DataSource implements Subscriber {
 	/**
@@ -25,11 +26,6 @@ final class Theme extends DataSource implements Subscriber {
 	 * @var null|string
 	 */
 	private $included_template;
-
-	/**
-	 * @var string[]
-	 */
-	private $included_template_parts = [];
 
 	/**
 	 * @var bool
@@ -52,12 +48,36 @@ final class Theme extends DataSource implements Subscriber {
 	private $template_hierarchy = [];
 
 	/**
+	 * @var array<int, array{slug: string, name: string, templates: array, args: array, caller: string}>
+	 */
+	private $template_parts = [];
+
+	/**
 	 * @var null|string
 	 */
 	private $theme_root;
 
 	public function add_hierarchy_templates( array $templates ): self {
 		$this->template_hierarchy = \array_merge( $this->template_hierarchy, $templates );
+
+		return $this;
+	}
+
+	/**
+	 * @param string[] $templates
+	 */
+	public function add_requested_template_part(
+		string $slug,
+		string $name,
+		array $templates,
+		array $args
+	): self {
+		$caller_frame = StackTrace::get()->first(
+			StackFilter::make()->isFunction( 'get_template_part' )
+		);
+		$caller = "{$caller_frame->file} (line {$caller_frame->line})";
+
+		$this->template_parts[] = \compact( 'slug', 'name', 'templates', 'args', 'caller' );
 
 		return $this;
 	}
@@ -79,13 +99,7 @@ final class Theme extends DataSource implements Subscriber {
 						->set_is_child_theme( \is_child_theme() )
 						->set_template( \get_template() )
 						->set_stylesheet( \get_stylesheet() )
-						->set_content_width( $recorded_content_width )
-						->set_included_template_parts(
-							...\array_merge(
-								Included_Files::template_parts_from_parent_theme(),
-								Included_Files::template_parts_from_child_theme()
-							)
-						);
+						->set_content_width( $recorded_content_width );
 				},
 			],
 			'body_class' => [
@@ -106,6 +120,14 @@ final class Theme extends DataSource implements Subscriber {
 					return $classes;
 				},
 				Event_Manager::LATE_EVENT,
+			],
+			'get_template_part' => [
+				/**
+				 * @param string[] $templates
+				 */
+				function ( string $slug, string $name, array $templates, array $args ): void {
+					$this->add_requested_template_part( $slug, $name, $templates, $args );
+				},
 			],
 			'template_include' => [
 				/**
@@ -198,19 +220,42 @@ final class Theme extends DataSource implements Subscriber {
 			];
 		}
 
-		if ( 0 !== \count( $this->included_template_parts ) ) {
-			$template_parts = \array_map(
-				function ( $file_path ) {
-					return $this->theme_relative_path( $file_path );
-				},
-				$this->included_template_parts
-			);
-			\sort( $template_parts );
+		if ( 0 !== \count( $this->template_parts ) ) {
+			$found_templates = $not_found_templates = [];
 
-			$table[] = [
-				'label' => 'Included Template Parts',
-				'value' => $template_parts,
-			];
+			foreach ( $this->template_parts as $template_part ) {
+				// @todo No WP dependencies here...
+				$file = \locate_template( $template_part['templates'] );
+
+				if ( $file ) {
+					$relative = $this->theme_relative_path( $file );
+					$template_part['file'] = $relative;
+
+					$found_templates[ \str_replace( '.php', '', $relative ) ] = $template_part;
+				} else {
+					$key = $template_part['slug'];
+
+					if ( '' !== $template_part['name'] ) {
+						$key .= "-{$template_part['name']}";
+					}
+
+					$not_found_templates[ $key ] = $template_part;
+				}
+			}
+
+			if ( \count( $found_templates ) > 0 ) {
+				$table[] = [
+					'label' => 'Loaded Template Parts',
+					'value' => $found_templates,
+				];
+			}
+
+			if ( \count( $not_found_templates ) > 0 ) {
+				$table[] = [
+					'label' => 'Not Found Template Parts',
+					'value' => $not_found_templates,
+				];
+			}
 		}
 
 		if ( 0 !== \count( $this->body_classes ) ) {
@@ -242,12 +287,6 @@ final class Theme extends DataSource implements Subscriber {
 
 	public function set_included_template( string $included_template ): self {
 		$this->included_template = $included_template;
-
-		return $this;
-	}
-
-	public function set_included_template_parts( string ...$template_parts ): self {
-		$this->included_template_parts = $template_parts;
 
 		return $this;
 	}
