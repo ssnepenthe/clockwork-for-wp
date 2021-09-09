@@ -6,6 +6,7 @@ namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
 use Clockwork\Helpers\StackFilter;
+use Clockwork\Helpers\StackFrame;
 use Clockwork\Helpers\StackTrace;
 use Clockwork\Request\Request;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
@@ -48,7 +49,7 @@ final class Theme extends DataSource implements Subscriber {
 	private $template_hierarchy = [];
 
 	/**
-	 * @var array<int, array{slug: string, name: string, templates: array, args: array, caller: string}>
+	 * @var array<int, array{slug: string, name: string, templates: array, args: array, caller: string, file: string, loaded: bool}>
 	 */
 	private $template_parts = [];
 
@@ -70,14 +71,38 @@ final class Theme extends DataSource implements Subscriber {
 		string $slug,
 		string $name,
 		array $templates,
-		array $args
+		array $args,
+		string $located_template,
+		?StackFrame $caller_frame = null
 	): self {
-		$caller_frame = StackTrace::get()->first(
+		if ( $located_template ) {
+			$loaded = true;
+			$file = $located_template;
+		} else {
+			$loaded = false;
+			$file = $slug;
+
+			if ( '' !== $name ) {
+				$file .= "-{$name}";
+			}
+
+			$file .= '.php';
+		}
+
+		$caller_frame = $caller_frame ?? StackTrace::get()->first(
 			StackFilter::make()->isFunction( 'get_template_part' )
 		);
 		$caller = "{$caller_frame->file} (line {$caller_frame->line})";
 
-		$this->template_parts[] = \compact( 'slug', 'name', 'templates', 'args', 'caller' );
+		$this->template_parts[] = \compact(
+			'slug',
+			'name',
+			'templates',
+			'args',
+			'file',
+			'loaded',
+			'caller'
+		);
 
 		return $this;
 	}
@@ -126,7 +151,13 @@ final class Theme extends DataSource implements Subscriber {
 				 * @param string[] $templates
 				 */
 				function ( string $slug, string $name, array $templates, array $args ): void {
-					$this->add_requested_template_part( $slug, $name, $templates, $args );
+					$this->add_requested_template_part(
+						$slug,
+						$name,
+						$templates,
+						$args,
+						\locate_template( $templates )
+					);
 				},
 			],
 			'template_include' => [
@@ -223,21 +254,15 @@ final class Theme extends DataSource implements Subscriber {
 			$found_templates = $not_found_templates = [];
 
 			foreach ( $this->template_parts as $template_part ) {
-				// @todo No WP dependencies here...
-				$file = \locate_template( $template_part['templates'] );
+				if ( $template_part['loaded'] ) {
+					$template_part['file'] = $this->theme_relative_path( $template_part['file'] );
+				}
 
-				if ( $file ) {
-					$relative = $this->theme_relative_path( $file );
-					$template_part['file'] = $relative;
+				$key = \str_replace( '.php', '', $template_part['file'] );
 
-					$found_templates[ \str_replace( '.php', '', $relative ) ] = $template_part;
+				if ( $template_part['loaded'] ) {
+					$found_templates[ $key ] = $template_part;
 				} else {
-					$key = $template_part['slug'];
-
-					if ( '' !== $template_part['name'] ) {
-						$key .= "-{$template_part['name']}";
-					}
-
 					$not_found_templates[ $key ] = $template_part;
 				}
 			}
