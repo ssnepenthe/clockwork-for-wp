@@ -351,6 +351,14 @@ final class Theme extends DataSource implements Subscriber {
 			return $path;
 		}
 
-		return \ltrim( \str_replace( $this->theme_root, '', $path ), '/' );
+		$search = $this->theme_root;
+
+		$has_theme = \is_string( $this->stylesheet ) && \is_string( $this->template );
+
+		if ( $has_theme ) {
+			$search .= '/' . ( $this->is_child_theme ? $this->stylesheet : $this->template );
+		}
+
+		return \ltrim( \str_replace( $search, '', $path ), '/' );
 	}
 }
