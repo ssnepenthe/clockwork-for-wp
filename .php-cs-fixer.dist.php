@@ -42,13 +42,7 @@ return $config->setRules([
 	'no_short_bool_cast' => true,
 	'no_unset_cast' => true,
 	'short_scalar_cast' => true,
-	'class_attributes_separation' => [
-		'elements' => [
-			'const' => 'none',
-			'method' => 'one',
-			'property' => 'none',
-		],
-	],
+	'class_attributes_separation' => true,
 	'class_definition' => true,
 	'final_class' => true,
 	'no_blank_lines_after_class_opening' => true,
