@@ -210,8 +210,6 @@ final class Theme extends DataSource implements Subscriber {
 	}
 
 	public function resolve( Request $request ): Request {
-		$panel = $request->userData( 'Theme' );
-
 		$table = \array_filter(
 			[
 				[
@@ -292,7 +290,9 @@ final class Theme extends DataSource implements Subscriber {
 			];
 		}
 
-		$panel->table( 'Theme Data', $table );
+		if ( \count( $table ) > 0 ) {
+			$request->userData( 'Theme' )->table( 'Theme Data', $table );
+		}
 
 		return $request;
 	}
