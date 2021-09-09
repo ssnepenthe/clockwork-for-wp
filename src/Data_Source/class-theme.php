@@ -215,12 +215,7 @@ final class Theme extends DataSource implements Subscriber {
 		if ( 0 !== \count( $this->template_hierarchy ) ) {
 			$table[] = [
 				'label' => 'Template Hierarchy',
-				'value' => \array_map(
-					function ( $file_path ) {
-						return $this->theme_relative_path( $file_path );
-					},
-					\array_unique( $this->template_hierarchy )
-				),
+				'value' => \array_unique( $this->template_hierarchy ),
 			];
 		}
 
