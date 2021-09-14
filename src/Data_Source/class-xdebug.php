@@ -25,7 +25,16 @@ final class Xdebug extends XdebugDataSource implements Subscriber {
 	public function get_subscribed_events(): array {
 		return [
 			'init' => function (): void {
-				$this->set_profiler_filename( \xdebug_get_profiler_filename() );
+				$filename = \xdebug_get_profiler_filename();
+
+				/**
+				 * @psalm-suppress RedundantCondition
+				 *
+				 * @see https://github.com/vimeo/psalm/issues/6484
+				 */
+				if ( \is_string( $filename ) ) {
+					$this->set_profiler_filename( $filename );
+				}
 			},
 		];
 	}
