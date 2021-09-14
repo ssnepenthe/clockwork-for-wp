@@ -148,11 +148,7 @@ class Theme_Test extends TestCase {
 			['template-parts/header/site-branding.php', 'template-parts/header/site.php'],
 			[],
 			"{$theme_root}/{$theme}/template-parts/header/site-branding.php",
-			new StackFrame( [
-				'function' => 'not_relevant',
-				'file' => '/some/fake/file/path',
-				'line' => 15,
-			] )
+			$this->make_stack_frame()
 		);
 		$data_source->add_requested_template_part(
 			'template-parts/content/content',
@@ -160,11 +156,7 @@ class Theme_Test extends TestCase {
 			['template-parts/content/content.php'],
 			[],
 			"{$theme_root}/{$theme}/template-parts/content/content.php",
-			new StackFrame( [
-				'function' => 'not_relevant',
-				'file' => '/some/fake/file/path',
-				'line' => 15,
-			] )
+			$this->make_stack_frame()
 		);
 		$data_source->add_requested_template_part(
 			'template-parts/footer/footer',
@@ -172,11 +164,7 @@ class Theme_Test extends TestCase {
 			['template-parts/footer/footer-widgets.php', 'template-parts/footer/footer.php'],
 			['test' => 'args', 'dummy' => 'data'],
 			"{$theme_root}/{$theme}/template-parts/footer/footer-widgets.php",
-			new StackFrame( [
-				'function' => 'not_relevant',
-				'file' => '/some/fake/file/path',
-				'line' => 15,
-			] )
+			$this->make_stack_frame()
 		);
 
 		$data_source->resolve( $request );
@@ -232,11 +220,7 @@ class Theme_Test extends TestCase {
 			['template-parts/header/site-branding.php', 'template-parts/header/site.php'],
 			[],
 			'',
-			new StackFrame( [
-				'function' => 'not_relevant',
-				'file' => '/some/fake/file/path',
-				'line' => 15,
-			] )
+			$this->make_stack_frame()
 		);
 		$data_source->add_requested_template_part(
 			'template-parts/content/content',
@@ -244,11 +228,7 @@ class Theme_Test extends TestCase {
 			['template-parts/content/content.php'],
 			[],
 			'',
-			new StackFrame( [
-				'function' => 'not_relevant',
-				'file' => '/some/fake/file/path',
-				'line' => 15,
-			] )
+			$this->make_stack_frame()
 		);
 		$data_source->add_requested_template_part(
 			'template-parts/footer/footer',
@@ -256,11 +236,7 @@ class Theme_Test extends TestCase {
 			['template-parts/footer/footer-widgets.php', 'template-parts/footer/footer.php'],
 			['test' => 'args', 'dummy' => 'data'],
 			'',
-			new StackFrame( [
-				'function' => 'not_relevant',
-				'file' => '/some/fake/file/path',
-				'line' => 15,
-			] )
+			$this->make_stack_frame()
 		);
 
 		$data_source->resolve( $request );
@@ -378,5 +354,13 @@ class Theme_Test extends TestCase {
 			'label' => 'Included Template',
 			'value' => $template,
 		], $request->userData( 'Theme' )->toArray()[0][3] );
+	}
+
+	private function make_stack_frame() {
+		return new StackFrame( [
+			'function' => 'not_relevant',
+			'file' => '/some/fake/file/path',
+			'line' => 15,
+		], '%%testbasepath%%', '%%testvendorpath%%' );
 	}
 }
