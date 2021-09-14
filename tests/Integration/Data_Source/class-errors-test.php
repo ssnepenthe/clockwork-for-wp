@@ -130,7 +130,8 @@ class Errors_Test extends TestCase {
 
 		$this->setUp();
 
-		error_reporting( $error_reporting );
+		// When current error reporting setting is 0 and initial error reporting setting is not, we assume error suppression.
+		error_reporting( 0 );
 
 		$this->data_source->record( E_ERROR, $message, $file, $line );
 
@@ -140,6 +141,9 @@ class Errors_Test extends TestCase {
 			'@-suppressed',
 			$this->request->log()->messages[0]['message']
 		);
+
+		// Restore error reporting.
+		error_reporting( $error_reporting );
 	}
 
 	/** @test */
