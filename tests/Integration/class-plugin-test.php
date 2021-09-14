@@ -66,43 +66,6 @@ class Plugin_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_can_check_if_clockwork_is_collecting_data() {
-		$this->markTestSkipped(
-			'Revisit this after implementing logic for collecting test and cli data.'
-		);
-
-		// Default true.
-		$config = new Config( [] );
-		$plugin = new Plugin( [], [ Config::class => $config ] );
-
-		$this->assertTrue( $plugin->is_collecting_data() );
-
-		// Enabled and collecting data always.
-		$config = new Config( [ 'enable' => true, 'collect_data_always' => true ] );
-		$plugin = new Plugin( [], [ Config::class => $config ] );
-
-		$this->assertTrue( $plugin->is_collecting_data() );
-
-		// Enabled, not collecting data always.
-		$config = new Config( [ 'enable' => true, 'collect_data_always' => false ] );
-		$plugin = new Plugin( [], [ Config::class => $config ] );
-
-		$this->assertTrue( $plugin->is_collecting_data() );
-
-		// Disabled, collecting data always.
-		$config = new Config( [ 'enable' => false, 'collect_data_always' => true ] );
-		$plugin = new Plugin( [], [ Config::class => $config ] );
-
-		$this->assertTrue( $plugin->is_collecting_data() );
-
-		// Disabled, not collecting data always.
-		$config = new Config( [ 'enable' => false, 'collect_data_always' => false ] );
-		$plugin = new Plugin( [], [ Config::class => $config ] );
-
-		$this->assertFalse( $plugin->is_collecting_data() );
-	}
-
-	/** @test */
 	public function it_can_check_if_clockwork_is_enabled() {
 		// Default true.
 		$config = new Config( [] );
