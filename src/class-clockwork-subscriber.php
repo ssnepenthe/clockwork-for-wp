@@ -144,7 +144,7 @@ final class Clockwork_Subscriber implements Subscriber {
 				$cookie,
 				\time() + 60,
 				COOKIEPATH,
-				COOKIE_DOMAIN,
+				COOKIE_DOMAIN ?: '',
 				\is_ssl() && 'https' === \parse_url( \home_url(), \PHP_URL_SCHEME ),
 				false
 			);
