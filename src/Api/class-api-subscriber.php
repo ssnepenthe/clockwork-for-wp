@@ -16,28 +16,18 @@ final class Api_Subscriber implements Subscriber {
 	}
 
 	public function register_routes( Route_Collection $routes, Plugin $plugin ): void {
-		$routes->post(
-			'__clockwork\/auth',
-			'index.php?auth=1',
-			[ Api_Controller::class, 'authenticate' ]
-		);
-		$routes->get(
-			'__clockwork\/([0-9-]+|latest)\/extended',
-			'index.php?id=$matches[1]&extended=1',
-			[ Api_Controller::class, 'serve_json' ]
-		);
+		$routes->post( '__clockwork/auth', [ Api_Controller::class, 'authenticate' ] );
 
 		if ( $plugin->is_collecting_client_metrics() ) {
-			$routes->put(
-				'__clockwork\/([0-9-]+)',
-				'index.php?id=$matches[1]&update=1',
-				[ Api_Controller::class, 'update_data' ]
-			);
+			$routes->put( '__clockwork/{id:[0-9-]+}', [ Api_Controller::class, 'update_data' ] );
 		}
 
 		$routes->get(
-			'__clockwork\/([0-9-]+|latest)(?:\/(next|previous))?(?(2)\/(\d+))?',
-			'index.php?id=$matches[1]&direction=$matches[2]&count=$matches[3]',
+			'__clockwork/{id:[0-9-]+|latest}/extended',
+			[ Api_Controller::class, 'serve_json' ]
+		);
+		$routes->get(
+			'__clockwork/{id:[0-9-]+|latest}[/{direction:next|previous}[/{count:\d+}]]',
 			[ Api_Controller::class, 'serve_json' ]
 		);
 	}

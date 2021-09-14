@@ -43,15 +43,7 @@ final class Web_App_Subscriber implements Subscriber {
 	}
 
 	public function register_routes( Route_Collection $routes ): void {
-		$routes->get(
-			'__clockwork/app',
-			'index.php?app=1&asset=index.html',
-			[ Web_App_Controller::class, 'serve_assets' ]
-		);
-		$routes->get(
-			'__clockwork/(.*)',
-			'index.php?app=1&asset=$matches[1]',
-			[ Web_App_Controller::class, 'serve_assets' ]
-		);
+		$routes->get( '__clockwork/app', [ Web_App_Controller::class, 'serve_assets' ] );
+		$routes->get( '__clockwork/{asset:.*}', [ Web_App_Controller::class, 'serve_assets' ] );
 	}
 }

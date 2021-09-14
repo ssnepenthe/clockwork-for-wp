@@ -8,17 +8,24 @@ use Clockwork_For_Wp\Base_Provider;
 use Invoker\Invoker;
 
 final class Routing_Provider extends Base_Provider {
+	// @todo Configurable prefix?
+	private const PREFIX = 'cfw_';
+
 	public function register(): void {
-		$this->plugin[ Route_Collection::class ] = static function () {
-			// @todo Configurable prefix?
-			return new Route_Collection( 'cfw_' );
+		require_once $this->plugin['dir'] . '/src/Routing/helpers.php';
+
+		$this->plugin[ Fastroute_Converter::class ] = static function () {
+			return new Fastroute_Converter( self::PREFIX );
+		};
+
+		$this->plugin[ Route_Collection::class ] = function () {
+			return new Route_Collection( $this->plugin[ Fastroute_Converter::class ] );
 		};
 
 		$this->plugin[ Route_Handler_Invoker::class ] = function () {
 			return new Route_Handler_Invoker(
 				$this->plugin[ Invoker::class ],
-				// @todo Configurable prefix?
-				'cfw_',
+				self::PREFIX,
 				function ( Route $route ) {
 					$params = [];
 

@@ -12,7 +12,7 @@ class Route_Handler_Invoker_Test extends TestCase {
 	public function it_does_not_inject_any_additional_params_by_default() {
 		$invoker = new Route_Handler_Invoker( new Invoker );
 
-		$result = $invoker->invoke_handler( new Route( '', '', '', function( ...$params ) {
+		$result = $invoker->invoke_handler( new Route( '', '', [], function( ...$params ) {
 			return $params;
 		} ) );
 
@@ -25,7 +25,7 @@ class Route_Handler_Invoker_Test extends TestCase {
 			return [ 'a' => 1, 'b' => 2, 'c' => 3 ];
 		} );
 
-		$result = $invoker->invoke_handler( new Route( '', '', '', function( $a, $b, $c ) {
+		$result = $invoker->invoke_handler( new Route( '', '', [], function( $a, $b, $c ) {
 			return [ $c, $b, $a ];
 		} ) );
 
@@ -34,15 +34,14 @@ class Route_Handler_Invoker_Test extends TestCase {
 
 	/** @test */
 	public function it_binds_param_resolver_to_invoker_instance() {
-		$invoker = new Route_Handler_Invoker( new Invoker, 'abc_', function() {
-			return [ $this->strip_param_prefix( 'abc_apples' ) => 'bananas' ];
+		$phpunit = $this;
+		$invoker = new Route_Handler_Invoker( new Invoker, '', function() use ( $phpunit ) {
+			$phpunit->assertInstanceOf( Route_Handler_Invoker::class, $this );
+
+			return [];
 		} );
 
-		$result = $invoker->invoke_handler( new Route( '', '', '', function( $apples ) {
-			return $apples;
-		} ) );
-
-		$this->assertSame( 'bananas', $result );
+		$result = $invoker->invoke_handler( new Route( '', '', [], function() {} ) );
 	}
 
 	/** @test */

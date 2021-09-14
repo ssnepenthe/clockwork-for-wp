@@ -9,6 +9,7 @@ use WP_Query;
 
 final class Web_App_Controller {
 	private $web_helper;
+
 	private $wp_query;
 
 	public function __construct( Web $web_helper, WP_Query $wp_query ) {
@@ -16,7 +17,7 @@ final class Web_App_Controller {
 		$this->wp_query = $wp_query;
 	}
 
-	public function serve_assets( $asset ): void {
+	public function serve_assets( $asset = 'index.html' ): void {
 		$asset = \rtrim( $asset, '/\\' );
 		$file = $this->web_helper->asset( $asset );
 

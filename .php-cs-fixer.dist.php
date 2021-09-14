@@ -113,7 +113,14 @@ return $config->setRules([
 	'method_argument_space' => true,
 	'native_function_invocation' => [
 		'include' => ['@all'],
-		'exclude' => ['add_command', 'array_get', 'array_has', 'array_only', 'array_set'],
+		'exclude' => [
+			'add_command',
+			'array_get',
+			'array_has',
+			'array_only',
+			'array_set',
+			'build_unencoded_query',
+		],
 	],
 	'no_spaces_after_function_name' => true,
 	'no_unreachable_default_argument_value' => true,

@@ -8,4 +8,5 @@ require_once __DIR__ . '/src/clock.php';
 require_once __DIR__ . '/src/instance.php';
 require_once __DIR__ . '/src/plugin-helpers.php';
 require_once __DIR__ . '/src/wordpress-helpers.php';
+require_once __DIR__ . '/src/Routing/helpers.php';
 require_once __DIR__ . '/src/Wp_Cli/helpers.php';
