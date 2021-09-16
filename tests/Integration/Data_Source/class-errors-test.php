@@ -16,47 +16,78 @@ class Errors_Test extends TestCase {
 		}
 	}
 
-	/** @test */
-	public function it_correctly_records_error_data() {
+	public function test_handle_returns_false_by_default() {
 		$data_source = $this->make_data_source( E_ERROR );
-		$request = new Request();
 		$input = $this->get_function_specific_test_input();
 
-		$data_source->record( E_ERROR, $input['message'], $input['file'], $input['line'] );
-
-		$data_source->resolve( $request );
-
-		$entry = $request->log()->messages[0];
-
-		$this->assertEquals( $input['message'], $entry['message'] );
-		$this->assertEquals( [
-			'__type__' => 'array',
-			'type' => 'E_ERROR',
-			'file' => $input['file'],
-			'line' => $input['line'],
-		], $entry['context'] );
-		$this->assertEquals( 'error', $entry['level'] );
+		$this->assertFalse(
+			$data_source->handle( E_ERROR, $input['message'], $input['file'], $input['line'] )
+		);
 	}
 
-	/** @test */
-	public function it_prevents_duplicates_from_being_recorded() {
+	public function test_handle_invokes_original_handler_if_callable() {
 		$data_source = $this->make_data_source( E_ERROR );
-		$request = new Request();
 		$input = $this->get_function_specific_test_input();
+		$data_source->set_original_handler(
+			function( $type, $message, $file, $line ) use ( $input ) {
+				$this->assertSame( E_ERROR, $type );
+				$this->assertSame( $input['message'], $message );
+				$this->assertSame( $input['file'], $file );
+				$this->assertSame( $input['line'], $line );
 
-		$data_source->record( E_ERROR, $input['message'], $input['file'], $input['line'] );
-		$data_source->record( E_ERROR, $input['message'], $input['file'], $input['line'] );
+				return true;
+			}
+		);
 
-		$data_source->resolve( $request );
-
-		$this->assertCount( 1, $request->log()->messages );
+		$this->assertTrue(
+			$data_source->handle( E_ERROR, $input['message'], $input['file'], $input['line'] )
+		);
 	}
 
-	/** @test */
-	public function it_only_logs_configured_error_levels() {
-		$data_source = $this->make_data_source( E_ERROR | E_WARNING );
-		$request = new Request();
+	public function test_reapply_filters() {
+		$data_source = $this->make_data_source( E_ERROR );
 		$input = $this->get_function_specific_test_input();
+
+		$data_source->record( E_ERROR, $input['message'], $input['file'], $input['line'] );
+		$data_source->record( E_ERROR, $input['message'], $input['file'], $input['line'] + 1 );
+
+		// With no filters, both errors should be recorded.
+		$this->assertCount( 2, $data_source->get_errors() );
+
+		$data_source->addFilter( function( $error ) use ( $input ) {
+			return $error['line'] <= $input['line'];
+		} );
+		$data_source->reapply_filters();
+		$errors = $data_source->get_errors();
+
+		// With filter, the second error should have been discarded.
+		$this->assertCount( 1, $errors );
+		$this->assertSame( $input['line'], array_shift( $errors )['line'] );
+	}
+
+	public function test_record_flags_errors_as_probably_suppressed() {
+		$data_source = $this->make_data_source( E_ERROR );
+		$input = $this->get_function_specific_test_input();
+
+		$data_source->record( E_ERROR, $input['message'], $input['file'], $input['line'] );
+
+		// When current error reporting setting is 0 and initial error reporting setting is not, we assume error suppression.
+		$error_reporting = error_reporting( 0 );
+		$data_source->record( E_ERROR, $input['message'], $input['file'], $input['line'] + 1 );
+		error_reporting( $error_reporting );
+
+		$errors = $data_source->get_errors();
+
+		$this->assertCount( 2, $errors );
+		$this->assertFalse( array_shift( $errors )['suppressed'] );
+		$this->assertTrue( array_shift( $errors  )['suppressed'] );
+	}
+
+	public function test_record_discards_errors_based_on_current_error_reporting() {
+		$data_source = $this->make_data_source( E_ERROR );
+		$input = $this->get_function_specific_test_input();
+
+		$error_reporting = error_reporting( E_ERROR | E_WARNING );
 
 		// Should be recorded.
 		$data_source->record( E_ERROR, $input['message'], $input['file'], $input['line'] );
@@ -68,50 +99,124 @@ class Errors_Test extends TestCase {
 		$data_source->record( E_CORE_ERROR, $input['message'], $input['file'], $input['line'] );
 		$data_source->record( E_CORE_WARNING, $input['message'], $input['file'], $input['line'] );
 		$data_source->record( E_COMPILE_ERROR, $input['message'], $input['file'], $input['line'] );
-		$data_source->record( E_COMPILE_WARNING, $input['message'], $input['file'], $input['line'] );
+		$data_source->record(
+			E_COMPILE_WARNING,
+			$input['message'],
+			$input['file'],
+			$input['line']
+		);
 		$data_source->record( E_USER_ERROR, $input['message'], $input['file'], $input['line'] );
 		$data_source->record( E_USER_WARNING, $input['message'], $input['file'], $input['line'] );
 		$data_source->record( E_USER_NOTICE, $input['message'], $input['file'], $input['line'] );
 		$data_source->record( E_STRICT, $input['message'], $input['file'], $input['line'] );
-		$data_source->record( E_RECOVERABLE_ERROR, $input['message'], $input['file'], $input['line'] );
-		$data_source->record( E_DEPRECATED, $input['message'], $input['file'], $input['line'] );
-		$data_source->record( E_USER_DEPRECATED, $input['message'], $input['file'], $input['line'] );
-
-		$data_source->resolve( $request );
-
-		$this->assertCount( 2, $request->log()->messages );
-		$this->assertEquals( 'E_ERROR', $request->log()->messages[0]['context']['type'] );
-		$this->assertEquals( 'E_WARNING', $request->log()->messages[1]['context']['type'] );
-	}
-
-	/** @test */
-	public function it_does_not_mark_errors_as_suppressed_by_default() {
-		$data_source = $this->make_data_source( E_ERROR );
-		$request = new Request();
-		$input = $this->get_function_specific_test_input();
-
-		$data_source->record( E_ERROR, $input['message'], $input['file'], $input['line'] );
-
-		$data_source->resolve( $request );
-
-		$this->assertStringNotContainsString(
-			'@-suppressed',
-			$request->log()->messages[0]['message']
+		$data_source->record(
+			E_RECOVERABLE_ERROR,
+			$input['message'],
+			$input['file'],
+			$input['line']
 		);
+		$data_source->record( E_DEPRECATED, $input['message'], $input['file'], $input['line'] );
+		$data_source->record(
+			E_USER_DEPRECATED,
+			$input['message'],
+			$input['file'],
+			$input['line']
+		);
+
+		error_reporting( $error_reporting );
+
+		$errors = $data_source->get_errors();
+
+		$this->assertCount( 2, $errors );
+		$this->assertSame( E_ERROR, array_shift( $errors )['type'] );
+		$this->assertSame( E_WARNING, array_shift( $errors )['type'] );
 	}
 
-	/** @test */
-	public function it_correctly_guesses_when_error_has_been_suppressed() {
-		$data_source = $this->make_data_source( E_ERROR );
-		$request = new Request();
+	public function test_record_discards_suppressed_errors_based_on_original_error_reporting() {
+		$data_source = $this->make_data_source( E_ERROR | E_WARNING );
 		$input = $this->get_function_specific_test_input();
 
-		// When current error reporting setting is 0 and initial error reporting setting is not, we assume error suppression.
-		error_reporting( 0 );
+		// Errors are flagged as suppressed when error reporting is currently set to 0 but was set to something else when error handle instance was created.
+		$error_reporting = error_reporting( 0 );
+
+		// Should be recorded.
+		$data_source->record( E_ERROR, $input['message'], $input['file'], $input['line'] );
+		$data_source->record( E_WARNING, $input['message'], $input['file'], $input['line'] );
+
+		// Should not be recorded.
+		$data_source->record( E_PARSE, $input['message'], $input['file'], $input['line'] );
+		$data_source->record( E_NOTICE, $input['message'], $input['file'], $input['line'] );
+		$data_source->record( E_CORE_ERROR, $input['message'], $input['file'], $input['line'] );
+		$data_source->record( E_CORE_WARNING, $input['message'], $input['file'], $input['line'] );
+		$data_source->record( E_COMPILE_ERROR, $input['message'], $input['file'], $input['line'] );
+		$data_source->record(
+			E_COMPILE_WARNING,
+			$input['message'],
+			$input['file'],
+			$input['line']
+		);
+		$data_source->record( E_USER_ERROR, $input['message'], $input['file'], $input['line'] );
+		$data_source->record( E_USER_WARNING, $input['message'], $input['file'], $input['line'] );
+		$data_source->record( E_USER_NOTICE, $input['message'], $input['file'], $input['line'] );
+		$data_source->record( E_STRICT, $input['message'], $input['file'], $input['line'] );
+		$data_source->record(
+			E_RECOVERABLE_ERROR,
+			$input['message'],
+			$input['file'],
+			$input['line']
+		);
+		$data_source->record( E_DEPRECATED, $input['message'], $input['file'], $input['line'] );
+		$data_source->record(
+			E_USER_DEPRECATED,
+			$input['message'],
+			$input['file'],
+			$input['line']
+		);
+
+		error_reporting( $error_reporting );
+
+		$errors = $data_source->get_errors();
+
+		$this->assertCount( 2, $errors );
+		$this->assertSame( E_ERROR, array_shift( $errors )['type'] );
+		$this->assertSame( E_WARNING, array_shift( $errors )['type'] );
+	}
+
+	public function test_record_discards_errors_based_on_user_defined_callbacks() {
+		$data_source = $this->make_data_source( E_ERROR );
+		$input = $this->get_function_specific_test_input();
+		$data_source->addFilter( function( $error ) use ( $input ) {
+			return $error['line'] <= $input['line'];
+		} );
 
 		$data_source->record( E_ERROR, $input['message'], $input['file'], $input['line'] );
+		$data_source->record( E_ERROR, $input['message'], $input['file'], $input['line'] + 1 );
 
-		$data_source->resolve( $request );
+		$errors = $data_source->get_errors();
+
+		$this->assertCount( 1, $errors );
+		$this->assertSame( $input['line'], array_shift( $errors )['line'] );
+	}
+
+	public function test_record_prevents_duplicate_errors_from_being_recorded() {
+		$data_source = $this->make_data_source( E_ERROR );
+		$input = $this->get_function_specific_test_input();
+
+		$data_source->record( E_ERROR, $input['message'], $input['file'], $input['line'] );
+		$data_source->record( E_ERROR, $input['message'], $input['file'], $input['line'] );
+
+		$this->assertCount( 1, $data_source->get_errors() );
+	}
+
+	public function test_resolve_adds_error_suppression_note_to_message() {
+		$data_source = $this->make_data_source( E_ERROR );
+		$input = $this->get_function_specific_test_input();
+
+		$error_reporting = error_reporting( 0 );
+		$data_source->record( E_ERROR, $input['message'], $input['file'], $input['line'] );
+		error_reporting( $error_reporting );
+
+		$request = $data_source->resolve( new Request() );
 
 		$this->assertStringContainsString(
 			'@-suppressed',
@@ -119,41 +224,90 @@ class Errors_Test extends TestCase {
 		);
 	}
 
-	/** @test */
-	public function it_correctly_chooses_log_level_based_on_error_type() {
+	/** @dataProvider provides_types_to_levels */
+	public function test_resolve_correctly_sets_level_based_on_error_type( $type, $level ) {
 		$data_source = $this->make_data_source( E_ALL );
-		$request = new Request();
 		$input = $this->get_function_specific_test_input();
 
-		// @todo Data provider?
-		$levels = [
-			[ E_ERROR, 'error' ],
-			[ E_PARSE, 'error' ],
-			[ E_CORE_ERROR, 'error' ],
-			[ E_COMPILE_ERROR, 'error' ],
-			[ E_USER_ERROR, 'error' ],
-			[ E_RECOVERABLE_ERROR, 'error' ],
-			[ E_WARNING, 'warning' ],
-			[ E_CORE_WARNING, 'warning' ],
-			[ E_COMPILE_WARNING, 'warning' ],
-			[ E_USER_WARNING, 'warning' ],
-			[ E_DEPRECATED, 'warning' ],
-			[ E_USER_DEPRECATED, 'warning' ],
-			[ E_NOTICE, 'notice' ],
-			[ E_USER_NOTICE, 'notice' ],
-			[ E_STRICT, 'notice' ],
-		];
+		$data_source->record( $type, $input['message'], $input['file'], $input['line'] );
 
-		foreach ( $levels as [ $contant, $_ ] ) {
-			$data_source->record( $contant, $input['message'], $input['file'], $input['line'] );
-		}
-
-		$data_source->resolve( $request );
+		$request = $data_source->resolve( new Request() );
 		$messages = $request->log()->messages;
 
-		foreach ( $levels as $i => [ $_, $level ] ) {
-			$this->assertSame( $level, $messages[ $i ]['level'] );
-		}
+		$this->assertCount( 1, $messages );
+		$this->assertSame( $level, $messages[0]['level'] );
+	}
+
+	/** @dataProvider provides_types_to_labels */
+	public function test_resolve_converts_error_type_int_to_human_readable_string( $type, $label ) {
+		$data_source = $this->make_data_source( E_ALL );
+		$input = $this->get_function_specific_test_input();
+
+		$data_source->record( $type, $input['message'], $input['file'], $input['line'] );
+
+		$request = $data_source->resolve( new Request() );
+		$messages = $request->log()->messages;
+
+		$this->assertCount( 1, $messages );
+		$this->assertSame( $label, $messages[0]['context']['type'] );
+	}
+
+	public function test_resolve_stores_data_on_request() {
+		$data_source = $this->make_data_source( E_ALL );
+		$input = $this->get_function_specific_test_input();
+		$data_source->record( E_ERROR, $input['message'], $input['file'], $input['line'] );
+
+		$request = $data_source->resolve( new Request() );
+		$messages = $request->log()->messages;
+
+		$this->assertCount( 1, $messages );
+
+		$message = $messages[0];
+
+		$this->assertSame( $input['message'], $message['message'] );
+		$this->assertSame( [
+			'__type__' => 'array',
+			'type' => 'E_ERROR',
+			'file' => $input['file'],
+			'line' => $input['line'],
+		], $message['context'] );
+		$this->assertSame( 'error', $message['level'] );
+	}
+
+	public function provides_types_to_levels() {
+		yield [ E_ERROR, 'error' ];
+		yield [ E_PARSE, 'error' ];
+		yield [ E_CORE_ERROR, 'error' ];
+		yield [ E_COMPILE_ERROR, 'error' ];
+		yield [ E_USER_ERROR, 'error' ];
+		yield [ E_RECOVERABLE_ERROR, 'error' ];
+		yield [ E_WARNING, 'warning' ];
+		yield [ E_CORE_WARNING, 'warning' ];
+		yield [ E_COMPILE_WARNING, 'warning' ];
+		yield [ E_USER_WARNING, 'warning' ];
+		yield [ E_DEPRECATED, 'warning' ];
+		yield [ E_USER_DEPRECATED, 'warning' ];
+		yield [ E_NOTICE, 'notice' ];
+		yield [ E_USER_NOTICE, 'notice' ];
+		yield [ E_STRICT, 'notice' ];
+	}
+
+	public function provides_types_to_labels() {
+		yield [ E_ERROR, 'E_ERROR' ];
+		yield [ E_PARSE, 'E_PARSE' ];
+		yield [ E_CORE_ERROR, 'E_CORE_ERROR' ];
+		yield [ E_COMPILE_ERROR, 'E_COMPILE_ERROR' ];
+		yield [ E_USER_ERROR, 'E_USER_ERROR' ];
+		yield [ E_RECOVERABLE_ERROR, 'E_RECOVERABLE_ERROR' ];
+		yield [ E_WARNING, 'E_WARNING' ];
+		yield [ E_CORE_WARNING, 'E_CORE_WARNING' ];
+		yield [ E_COMPILE_WARNING, 'E_COMPILE_WARNING' ];
+		yield [ E_USER_WARNING, 'E_USER_WARNING' ];
+		yield [ E_DEPRECATED, 'E_DEPRECATED' ];
+		yield [ E_USER_DEPRECATED, 'E_USER_DEPRECATED' ];
+		yield [ E_NOTICE, 'E_NOTICE' ];
+		yield [ E_USER_NOTICE, 'E_USER_NOTICE' ];
+		yield [ E_STRICT, 'E_STRICT' ];
 	}
 
 	private function make_data_source( int $error_reporting ): Errors {
