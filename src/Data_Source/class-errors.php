@@ -9,21 +9,52 @@ use Clockwork\Request\Log;
 use Clockwork\Request\Request;
 
 final class Errors extends DataSource {
+	/**
+	 * @var int
+	 */
 	private $error_reporting;
+
+	/**
+	 * @var array<string, array{type: int, message: string, file: null|string, line: null|int, suppressed: bool}>
+	 */
 	private $errors = [];
+
+	/**
+	 * @var null|callable
+	 */
 	private $original_handler;
+
+	/**
+	 * @var bool
+	 */
 	private $registered = false;
+
+	/**
+	 * @var null|self
+	 */
 	private static $instance;
 
 	public function __construct() {
 		$this->error_reporting = \error_reporting();
 	}
 
-	public function handle( $no, $str, $file = null, $line = null ) {
-		$this->record( $no, $str, $file, $line );
+	/**
+	 * @return array<string, array{type: int, message: string, file: null|string, line: null|int, suppressed: bool}>
+	 */
+	public function get_errors(): array {
+		return $this->errors;
+	}
+
+	public function handle(
+		int $type,
+		string $message,
+		?string $file = null,
+		?int $line = null
+	): bool {
+		$this->record( $type, $message, $file, $line );
 
 		if ( \is_callable( $this->original_handler ) ) {
-			return ( $this->original_handler )( $no, $str, $file, $line );
+			return ( $this->original_handler )( $type, $message, $file, $line );
 		}
 
 		return false;
@@ -32,13 +63,13 @@ final class Errors extends DataSource {
 	public function reapply_filters(): void {
 		$this->errors = \array_filter(
 			$this->errors,
-			function ( $error ) {
+			function ( array $error ): bool {
 				return $this->passesFilters( [ $error ] );
 			}
 		);
 	}
 
-	public function record( $no, $str, $file = null, $line = null ): void {
+	public function record( int $no, string $str, ?string $file = null, ?int $line = null ): void {
 		$probably_suppressed = 0 === \error_reporting() && 0 !== $this->error_reporting;
 
 		if ( $probably_suppressed ) {
@@ -78,15 +109,23 @@ final class Errors extends DataSource {
 			$this->record( $error['type'], $error['message'], $error['file'], $error['line'] );
 		}
 
-		$this->original_handler = \set_error_handler( [ $this, 'handle' ] );
+		$original_handler = \set_error_handler( [ $this, 'handle' ] );
+
+		if ( \is_callable( $original_handler ) ) {
+			$this->set_original_handler( $original_handler );
+		}
 
 		$this->registered = true;
 	}
 
-	public function resolve( Request $request ) {
+	public function resolve( Request $request ): Request {
 		$this->append_log( $request );
 
 		return $request;
+	}
+
+	public function set_original_handler( callable $handler ): void {
+		$this->original_handler = $handler;
 	}
 
 	public function unregister(): void {
@@ -101,7 +140,7 @@ final class Errors extends DataSource {
 		$this->registered = false;
 	}
 
-	private function append_log( $request ): void {
+	private function append_log( Request $request ): void {
 		$log = new Log();
 
 		foreach ( $this->errors as $error ) {
@@ -125,31 +164,6 @@ final class Errors extends DataSource {
 		}
 
 		$request->log()->merge( $log );
-	}
-
-	private function friendly_label( $type ) {
-		// Is this thorough enough?
-		switch ( $type ) {
-			case \E_COMPILE_WARNING:
-			case \E_CORE_WARNING:
-			case \E_USER_WARNING:
-			case \E_WARNING:
-				return 'Warning';
-
-			case \E_NOTICE:
-			case \E_USER_NOTICE:
-				return 'Notice';
-
-			case \E_DEPRECATED:
-			case \E_USER_DEPRECATED:
-				return 'Deprecated';
-
-			case \E_RECOVERABLE_ERROR:
-				return 'Catchable fatal error';
-
-			default:
-				return 'Fatal error';
-		}
 	}
 
 	private function friendly_type( $type ) {
@@ -204,7 +218,7 @@ final class Errors extends DataSource {
 		}
 	}
 
-	public static function get_instance() {
+	public static function get_instance(): self {
 		if ( ! self::$instance instanceof self ) {
 			self::$instance = new self();
 		}
