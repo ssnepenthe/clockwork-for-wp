@@ -15,6 +15,9 @@ final class Conditionals extends DataSource {
 	 */
 	private $conditionals = [];
 
+	/**
+	 * @param array<int, array{conditional: callable, label?: string, when?: callable}> $conditionals
+	 */
 	public function __construct( array $conditionals = [] ) {
 		$this->set_conditionals( $conditionals );
 	}
@@ -47,6 +50,9 @@ final class Conditionals extends DataSource {
 		return $request;
 	}
 
+	/**
+	 * @param array<int, array{conditional: callable, label?: string, when?: callable}> $conditionals
+	 */
 	public function set_conditionals( array $conditionals ): self {
 		foreach ( $conditionals as $conditional ) {
 			$this->add_conditional(
