@@ -93,7 +93,7 @@ function describe_unavailable_callable( $unavailable_callable ) {
 	return '(Unknown)';
 }
 
-function describe_callable( $callable ) {
+function describe_callable( $callable ): string {
 	if ( ! \is_callable( $callable ) ) {
 		return '(Non-callable value)';
 	}
@@ -131,7 +131,7 @@ function describe_callable( $callable ) {
 
 // @todo Should we be forcing string or can it be any scalar value?
 // @todo Should we skip this in favor of a simple json_encode?
-function describe_value( $value ) {
+function describe_value( $value ): string {
 	if ( null === $value ) {
 		return 'NULL';
 	}

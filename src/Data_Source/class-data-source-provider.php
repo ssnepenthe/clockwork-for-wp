@@ -7,54 +7,68 @@ namespace Clockwork_For_Wp\Data_Source;
 use Clockwork_For_Wp\Base_Provider;
 use Clockwork_For_Wp\Config;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
+use InvalidArgumentException;
 
 final class Data_Source_Provider extends Base_Provider {
 	public function register(): void {
-		$this->plugin[ Conditionals::class ] = static function () {
-			$conditionals = [
-				'is_404',
-				'is_admin',
-				'is_archive',
-				'is_attachment',
-				'is_author',
-				'is_blog_admin',
-				'is_category',
-				'is_comment_feed',
-				'is_customize_preview',
-				'is_date',
-				'is_day',
-				'is_embed',
-				'is_feed',
-				'is_front_page',
-				'is_home',
-				'is_month',
-				'is_network_admin',
-				'is_page',
-				'is_page_template',
-				'is_paged',
-				'is_post_type_archive',
-				'is_preview',
-				'is_robots',
-				'is_rtl',
-				'is_search',
-				'is_single',
-				'is_singular',
-				'is_ssl',
-				'is_sticky', // @todo???
-				'is_tag',
-				'is_tax',
-				'is_time',
-				'is_trackback',
-				'is_user_admin',
-				'is_year',
-			];
+		$this->plugin[ Conditionals::class ] = function (): Conditionals {
+			$conditionals = $this->plugin->config(
+				'data_sources.conditionals.config.conditionals',
+				[]
+			);
 
-			if ( \is_multisite() ) {
-				$conditionals[] = 'is_main_network';
-				$conditionals[] = 'is_main_site';
+			if ( ! \is_array( $conditionals ) ) {
+				throw new InvalidArgumentException( 'Conditionals must be of type "array"' );
 			}
 
-			return new Conditionals( ...$conditionals );
+			$data_source = new Conditionals();
+
+			foreach ( $conditionals as $conditional ) {
+				if ( \is_callable( $conditional ) ) {
+					$conditional = [ 'conditional' => $conditional ];
+				}
+
+				if ( ! \is_array( $conditional ) ) {
+					throw new InvalidArgumentException(
+						'Conditionals must be of type "array" of with values of type "callable" or "array"'
+					);
+				}
+
+				if (
+					! \array_key_exists( 'conditional', $conditional )
+					|| ! \is_callable( $conditional['conditional'] )
+				) {
+					throw new InvalidArgumentException(
+						'Conditionals must be of type "callable" or "array" with value at key "conditional" of type "callable"'
+					);
+				}
+
+				if (
+					\array_key_exists( 'label', $conditional )
+					&& ! \is_string( $conditional['label'] )
+				) {
+					throw new InvalidArgumentException(
+						'Optional conditional label must be of type "string"'
+					);
+				}
+
+				if (
+					\array_key_exists( 'when', $conditional )
+					&& ! \is_callable( $conditional['when'] )
+				) {
+					throw new InvalidArgumentException(
+						'Optional conditional when condition must be of type "callable"'
+					);
+				}
+
+				$data_source->add_conditional(
+					$conditional['conditional'],
+					$conditional['label'] ?? null,
+					$conditional['when'] ?? null
+				);
+			}
+
+			return $data_source;
 		};
 
 		$this->plugin[ Constants::class ] = static function () {

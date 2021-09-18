@@ -79,6 +79,56 @@ return [
 
 			'data_source_class' => Conditionals::class,
 
+			'config' => [
+
+				// array<int, array{conditional: callable, label?: string, when?: callable}|callable>. List of conditionals to check. Can optionally be provided as an array with required key 'conditional' and optional keys 'label' and 'when'. When provided as array, 'conditional' refers to the conditional to check, 'label' allows you to override the label displayed in Clockwork and 'when' is a callable that allows check for this conditional to be disabled at runtime.
+				'conditionals' => [
+					'is_404',
+					'is_admin',
+					'is_archive',
+					'is_attachment',
+					'is_author',
+					'is_blog_admin',
+					'is_category',
+					'is_comment_feed',
+					'is_customize_preview',
+					'is_date',
+					'is_day',
+					'is_embed',
+					'is_feed',
+					'is_front_page',
+					'is_home',
+					'is_month',
+					'is_network_admin',
+					'is_page',
+					'is_page_template',
+					'is_paged',
+					'is_post_type_archive',
+					'is_preview',
+					'is_robots',
+					'is_rtl',
+					'is_search',
+					'is_single',
+					'is_singular',
+					'is_ssl',
+					[
+						'conditional' => static function (): bool {
+							return \get_post() instanceof WP_Post && \is_sticky();
+						},
+						'label' => 'is_sticky()',
+					],
+					'is_tag',
+					'is_tax',
+					'is_time',
+					'is_trackback',
+					'is_user_admin',
+					'is_year',
+					[ 'conditional' => 'is_main_network', 'when' => 'is_multisite' ],
+					[ 'conditional' => 'is_main_site', 'when' => 'is_multisite' ],
+				],
+
+			],
+
 		],
 
 		// The constants data source records the values of a number of WordPress defined constants.
