@@ -71,24 +71,10 @@ final class Data_Source_Provider extends Base_Provider {
 			return $data_source;
 		};
 
-		$this->plugin[ Constants::class ] = static function () {
-			$constants = [
-				'WP_DEBUG',
-				'WP_DEBUG_DISPLAY',
-				'WP_DEBUG_LOG',
-				'SCRIPT_DEBUG',
-				'WP_CACHE',
-				'CONCATENATE_SCRIPTS',
-				'COMPRESS_SCRIPTS',
-				'COMPRESS_CSS',
-				'WP_LOCAL_DEV',
-			];
-
-			if ( \is_multisite() ) {
-				$constants[] = 'SUNRISE';
-			}
-
-			return new Constants( ...$constants );
+		$this->plugin[ Constants::class ] = function (): Constants {
+			return Constants::from(
+				$this->plugin->config( 'data_sources.constants.config', [] )
+			);
 		};
 
 		$this->plugin[ Core::class ] = function () {

@@ -19,65 +19,63 @@ class Constants_Test extends TestCase {
 	public function it_correctly_records_constant_data() {
 		$class = __CLASS__;
 
-		$data_source = new Constants(
-			"{$class}::STRING_VALUE",
-			"{$class}::TRUE_VALUE",
-			"{$class}::FALSE_VALUE",
-			"{$class}::NULL_VALUE",
-			"{$class}::INT_VALUE",
-			"{$class}::FLOAT_VALUE",
-			"{$class}::ARRAY_VALUE",
-			"{$class}::NOT_DEFINED"
-		);
+		$data_source = new Constants( [
+			// Strings are wrapped in quotes.
+			[ 'constant' => "{$class}::STRING_VALUE" ],
+
+			// Booleans and null are displayed as string equivalent, all uppercase.
+			[ 'constant' => "{$class}::TRUE_VALUE" ],
+			[ 'constant' => "{$class}::FALSE_VALUE" ],
+			[ 'constant' => "{$class}::NULL_VALUE" ],
+
+			// Numeric values are displayed as string equivalent.
+			[ 'constant' => "{$class}::INT_VALUE" ],
+			[ 'constant' => "{$class}::FLOAT_VALUE" ],
+
+			// Non-scalar values are labelled as such (pending improvements to describe_value()).
+			[ 'constant' => "{$class}::ARRAY_VALUE" ],
+
+			// Undefined constants are labelled as such.
+			[ 'constant' => "{$class}::NOT_DEFINED" ],
+		] );
 
 		$request = new Request();
 		$data_source->resolve( $request );
 		$data = $request->userData( 'WordPress' )->toArray()[0];
 
 		$this->assertEquals( [
-			// Strings are wrapped in quotes.
+			// Results are sorted alphabetically by constant.
 			[
-				'Name' => "{$class}::STRING_VALUE",
-				'Value' => '"apples"',
-			],
-
-			// Booleans are displayed as string equivalent, all uppercase.
-			[
-				'Name' => "{$class}::TRUE_VALUE",
-				'Value' => 'TRUE',
+				'constant' => "{$class}::ARRAY_VALUE",
+				'value' => '(NON-SCALAR VALUE)',
 			],
 			[
-				'Name' => "{$class}::FALSE_VALUE",
-				'Value' => 'FALSE',
-			],
-
-			// Null is displayed as string equivalent, all uppercase.
-			[
-				'Name' => "{$class}::NULL_VALUE",
-				'Value' => 'NULL',
-			],
-
-			// Numeric values are displayed as string equivalent.
-			[
-				'Name' => "{$class}::INT_VALUE",
-				'Value' => '5',
+				'constant' => "{$class}::FALSE_VALUE",
+				'value' => 'FALSE',
 			],
 			[
-				'Name' => "{$class}::FLOAT_VALUE",
-				'Value' => '4.7',
+				'constant' => "{$class}::FLOAT_VALUE",
+				'value' => '4.7',
 			],
-
-			// Non-scalar values are labelled as such.
-			// @todo
 			[
-				'Name' => "{$class}::ARRAY_VALUE",
-				'Value' => '(NON-SCALAR VALUE)',
+				'constant' => "{$class}::INT_VALUE",
+				'value' => '5',
 			],
-
-			// Undefined constants are labelled as such.
 			[
-				'Name' => "{$class}::NOT_DEFINED",
-				'Value' => '(NOT DEFINED)',
+				'constant' => "{$class}::NOT_DEFINED",
+				'value' => '(NOT DEFINED)',
+			],
+			[
+				'constant' => "{$class}::NULL_VALUE",
+				'value' => 'NULL',
+			],
+			[
+				'constant' => "{$class}::STRING_VALUE",
+				'value' => '"apples"',
+			],
+			[
+				'constant' => "{$class}::TRUE_VALUE",
+				'value' => 'TRUE',
 			],
 			'__meta' => [
 				'showAs' => 'table',

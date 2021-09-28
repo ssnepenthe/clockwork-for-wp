@@ -138,6 +138,26 @@ return [
 
 			'data_source_class' => Constants::class,
 
+			'config' => [
+
+				'constants' => [
+					'WP_DEBUG',
+					'WP_DEBUG_DISPLAY',
+					'WP_DEBUG_LOG',
+					'SCRIPT_DEBUG',
+					'WP_CACHE',
+					'CONCATENATE_SCRIPTS',
+					'COMPRESS_SCRIPTS',
+					'COMPRESS_CSS',
+					'WP_LOCAL_DEV',
+					[
+						'constant' => 'SUNRISE',
+						'when' => 'is_multisite',
+					],
+				],
+
+			],
+
 		],
 
 		// The core data source records basic WordPress info such as the current version and total execution time.
