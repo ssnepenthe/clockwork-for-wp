@@ -33,7 +33,11 @@ final class Constants extends DataSource {
 	}
 
 	public function resolve( Request $request ): Request {
-		$request->userData( 'WordPress' )->table( 'Constants', $this->build_table() );
+		$table = $this->build_table();
+
+		if ( [] !== $table ) {
+			$request->userData( 'WordPress' )->table( 'Constants', $table );
+		}
 
 		return $request;
 	}
