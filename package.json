@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/ssnepenthe/clockwork-for-wp/issues"
   },
-  "homepage": "https://github.com/ssnepenthe/clockwork-for-wp#readme"
+  "homepage": "https://github.com/ssnepenthe/clockwork-for-wp#readme",
+  "devDependencies": {
+    "cypress": "^9.1.1"
+  }
 }
