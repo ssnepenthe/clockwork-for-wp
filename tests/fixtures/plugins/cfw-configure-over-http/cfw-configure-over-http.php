@@ -267,8 +267,8 @@ class Metadata {
 
 \add_action( 'wp_footer', function() {
 	printf(
-		'<span id="cfw-coh-ajaxurl">%s</span><span id="cfw-coh-clockwork-id">%s</span>',
-		\esc_html( \admin_url( 'admin-ajax.php' ) ),
+		'<span data-cy="ajaxurl">%s</span><span data-cy="request-id">%s</span>',
+		\esc_html( \admin_url( 'admin-ajax.php', 'relative' ) ),
 		\esc_html( \_cfw_instance()[ \Clockwork\Request\Request::class ]->id )
 	);
 } );
