@@ -35,3 +35,17 @@ Cypress.Commands.add('cleanMetadata', () => {
             })
         });
 });
+
+Cypress.Commands.add('createRequests', (qty = 1) => {
+    cy.task('getAjaxUrl')
+        .then(url => {
+            cy.request({
+                url,
+                qs: {
+                    action: 'cfw_coh_request_factory',
+                    qty
+                }
+            })
+            .its('body.data');
+        });
+});
