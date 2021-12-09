@@ -89,6 +89,7 @@ class Config_Fetcher {
 		return [
 			'enable' => [ $this, 'boolean' ],
 			'collect_data_always' => [ $this, 'boolean' ],
+			'collect_client_metrics' => [ $this, 'boolean' ],
 			'web' => [ $this, 'boolean' ],
 			'register_helpers' => [ $this, 'boolean' ],
 			'headers' => [ $this, 'associative_array_of_strings' ],
