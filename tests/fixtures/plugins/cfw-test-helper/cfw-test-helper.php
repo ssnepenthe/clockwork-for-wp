@@ -98,7 +98,6 @@ function print_test_context() {
 $namespace = __NAMESPACE__;
 $actions = [
 	'request_by_id',
-	'request_count',
 	'clean_requests',
 	'create_requests',
 	'set_config',

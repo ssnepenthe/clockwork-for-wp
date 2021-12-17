@@ -16,16 +16,6 @@ function request_by_id() {
 	}
 }
 
-function request_count() {
-	try {
-		$file_list = Metadata::list_all();
-
-		\wp_send_json_success( \count( $file_list ) );
-	} catch ( \Exception $e ) {
-		\wp_send_json_error();
-	}
-}
-
 function clean_requests() {
 	try {
 		Metadata::cleanup();
