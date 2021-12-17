@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
-const base64url = require('base64url');
-const qs = require('qs');
+import base64url from 'base64url';
+import qs from 'qs';
 
 describe('Frontend', () => {
 
