@@ -12,7 +12,9 @@ namespace Cfw_Configure_Over_Http;
  * License: MIT
  */
 
-function deactivate() {
+// @todo be obnoxiously intrusive about notifying the user that this plugin is active.
+
+ function deactivate() {
 	if ( isset( $_GET['activate'] ) ) {
 		unset( $_GET['activate'] );
 	}
@@ -256,7 +258,13 @@ class Metadata {
 }
 
 \add_action( 'cfw_config_init', function( $config ) {
-	foreach ( ( new Config_Fetcher( $_GET ) )->get_config() as $key => $value ) {
+	$request_config = get_option( 'cfw_coh_config', null );
+
+	if ( ! is_array( $request_config ) ) {
+		$request_config = $_GET;
+	}
+
+	foreach ( ( new Config_Fetcher( $request_config ) )->get_config() as $key => $value ) {
 		$config->set( $key, $value );
 	}
 
@@ -343,3 +351,23 @@ function request_factory() {
 }
 \add_action( 'wp_ajax_cfw_coh_request_factory', __NAMESPACE__ . '\\request_factory' );
 \add_action( 'wp_ajax_nopriv_cfw_coh_request_factory', __NAMESPACE__ . '\\request_factory' );
+
+function set_config() {
+	if ( ! array_key_exists( 'config', $_REQUEST ) ) {
+		wp_send_json_error();
+	}
+
+	update_option( 'cfw_coh_config', $_REQUEST['config'] );
+
+	wp_send_json_success();
+}
+\add_action( 'wp_ajax_cfw_coh_set_config', __NAMESPACE__ . '\\set_config' );
+\add_action( 'wp_ajax_nopriv_cfw_coh_set_config', __NAMESPACE__ . '\\set_config' );
+
+function reset_config() {
+	delete_option( 'cfw_coh_config' );
+
+	wp_send_json_success();
+}
+\add_action( 'wp_ajax_cfw_coh_reset_config', __NAMESPACE__ . '\\reset_config' );
+\add_action( 'wp_ajax_nopriv_cfw_coh_reset_config', __NAMESPACE__ . '\\reset_config' );

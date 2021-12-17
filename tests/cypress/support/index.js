@@ -21,11 +21,22 @@ import './commands'
 // require('./commands')
 
 before(() => {
-    cy.visit('/?enable=0')
-        .get('[data-cy="ajaxurl"]')
-        .invoke('text')
-        .then(url => cy.task('setAjaxUrl', url));
+    cy.visit({
+        url: '/?enable=0',
+        log: false,
+    })
+        .get('[data-cy="ajaxurl"]', {log: false})
+        .invoke({log: false}, 'text')
+        .then(url => {
+            cy.task('setAjaxUrl', url, {log: false})
+
+            Cypress.log({
+                name: 'setAjaxUrl',
+                message: '',
+                consoleProps: () => ({url}),
+            });
+        });
 });
 
-beforeEach(() => cy.cleanMetadata());
-after(() => cy.cleanMetadata());
+beforeEach(() => cy.cleanRequests());
+after(() => cy.cleanRequests());

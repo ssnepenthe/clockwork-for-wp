@@ -24,28 +24,103 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-Cypress.Commands.add('cleanMetadata', () => {
-    cy.task('getAjaxUrl')
+Cypress.Commands.add('cleanRequests', () => {
+    cy.task('getAjaxUrl', null, {log: false})
         .then(url => {
             cy.request({
                 url,
                 qs: {
                     action: 'cfw_coh_clean_metadata'
-                }
-            })
+                },
+                log: false,
+            });
+
+            Cypress.log({
+                name: 'cleanRequests',
+                message: '',
+            });
         });
 });
 
 Cypress.Commands.add('createRequests', (qty = 1) => {
-    cy.task('getAjaxUrl')
+    cy.task('getAjaxUrl', null, {log: false})
         .then(url => {
             cy.request({
                 url,
                 qs: {
                     action: 'cfw_coh_request_factory',
-                    qty
+                    qty,
+                    log: false
                 }
             })
             .its('body.data');
+        });
+});
+
+Cypress.Commands.add('getRequestById', id => {
+    cy.task('getAjaxUrl', null, {log: false})
+        .then(url => {
+            cy.request({
+                url,
+                qs: {
+                    action: 'cfw_coh_metadata_by_id',
+                    id,
+                    log: false,
+                }
+            })
+            .its('body.data');
+        });
+});
+
+Cypress.Commands.add('hasRequest', id => {
+    cy.task('getAjaxUrl', null, {log: false})
+        .then(url => {
+            cy.request({
+                url,
+                qs: {
+                    action: 'cfw_coh_metadata_by_id',
+                    id,
+                    log: false,
+                }
+            })
+                .its('body.success');
+        });
+});
+
+Cypress.Commands.add('setConfig', config => {
+    cy.task('getAjaxUrl', null, {log: false})
+        .then(url => {
+            cy.request({
+                url,
+                qs: {
+                    action: 'cfw_coh_set_config',
+                    config,
+                },
+                log: false,
+            });
+
+            Cypress.log({
+                name: 'setConfig',
+                message: '',
+                consoleProps: () => ({config}),
+            });
+        });
+});
+
+Cypress.Commands.add('resetConfig', () => {
+    cy.task('getAjaxUrl', null, {log: false})
+        .then(url => {
+            cy.request({
+                url,
+                qs: {
+                    action: 'cfw_coh_reset_config',
+                },
+                log: false,
+            });
+
+            Cypress.log({
+                name: 'resetConfig',
+                message: '',
+            });
         });
 });
