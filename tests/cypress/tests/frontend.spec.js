@@ -15,9 +15,14 @@ describe('Frontend', () => {
 
         });
 
-        it.skip('Adds clockwork version header to responses', () => {
+        it('Adds clockwork version header to responses', () => {
 
-            // @todo store version in ctx along with ajaxurl?
+            cy.task('getTestContext')
+                .then(context => {
+                    cy.request('/')
+                        .its('headers.x-clockwork-version')
+                        .should('equal', context.clockworkVersion);
+                });
 
         });
 

@@ -13,6 +13,7 @@
 // the project's config changing)
 
 let ajaxurl;
+let testContext;
 
 /**
  * @type {Cypress.PluginConfig}
@@ -23,12 +24,12 @@ module.exports = (on, config) => {
   // `config` is the resolved Cypress config
   on('task', {
 
-      getAjaxUrl() {
-          return ajaxurl;
+      getTestContext() {
+        return testContext;
       },
 
-      setAjaxUrl(url) {
-        ajaxurl = url;
+      setTestContext(context) {
+        testContext = context;
 
         return null;
       },

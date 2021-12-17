@@ -25,15 +25,17 @@ before(() => {
         url: '/?enable=0',
         log: false,
     })
-        .get('[data-cy="ajaxurl"]', {log: false})
+        .get('[data-cy="test-context"]', {log: false})
         .invoke({log: false}, 'text')
-        .then(url => {
-            cy.task('setAjaxUrl', url, {log: false})
+        .then(context => {
+            let parsedContext = JSON.parse(context);
+
+            cy.task('setTestContext', parsedContext, {log: false})
 
             Cypress.log({
-                name: 'setAjaxUrl',
+                name: 'setTestContext',
                 message: '',
-                consoleProps: () => ({url}),
+                consoleProps: () => ({context: parsedContext}),
             });
         });
 });

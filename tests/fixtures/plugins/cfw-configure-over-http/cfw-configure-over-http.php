@@ -275,9 +275,14 @@ class Metadata {
 } );
 
 \add_action( 'wp_footer', function() {
+	$context = [
+		'ajaxUrl' => \admin_url( 'admin-ajax.php', 'relative' ),
+		'clockworkVersion' => \Clockwork\Clockwork::VERSION,
+	];
+
 	printf(
-		'<span data-cy="ajaxurl">%s</span><span data-cy="request-id">%s</span>',
-		\esc_html( \admin_url( 'admin-ajax.php', 'relative' ) ),
+		'<span data-cy="test-context">%s</span><span data-cy="request-id">%s</span>',
+		json_encode( $context ),
 		\esc_html( \_cfw_instance()[ \Clockwork\Request\Request::class ]->id )
 	);
 } );

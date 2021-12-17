@@ -25,10 +25,10 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 Cypress.Commands.add('cleanRequests', () => {
-    cy.task('getAjaxUrl', null, {log: false})
-        .then(url => {
+    cy.task('getTestContext', null, {log: false})
+        .then(context => {
             cy.request({
-                url,
+                url: context.ajaxUrl,
                 qs: {
                     action: 'cfw_coh_clean_metadata'
                 },
@@ -43,10 +43,10 @@ Cypress.Commands.add('cleanRequests', () => {
 });
 
 Cypress.Commands.add('createRequests', (qty = 1) => {
-    cy.task('getAjaxUrl', null, {log: false})
-        .then(url => {
+    cy.task('getTestContext', null, {log: false})
+        .then(context => {
             cy.request({
-                url,
+                url: context.ajaxUrl,
                 qs: {
                     action: 'cfw_coh_request_factory',
                     qty,
@@ -58,10 +58,10 @@ Cypress.Commands.add('createRequests', (qty = 1) => {
 });
 
 Cypress.Commands.add('getRequestById', id => {
-    cy.task('getAjaxUrl', null, {log: false})
-        .then(url => {
+    cy.task('getTestContext', null, {log: false})
+        .then(context => {
             cy.request({
-                url,
+                url: context.ajaxUrl,
                 qs: {
                     action: 'cfw_coh_metadata_by_id',
                     id,
@@ -73,10 +73,10 @@ Cypress.Commands.add('getRequestById', id => {
 });
 
 Cypress.Commands.add('hasRequest', id => {
-    cy.task('getAjaxUrl', null, {log: false})
-        .then(url => {
+    cy.task('getTestContext', null, {log: false})
+        .then(context => {
             cy.request({
-                url,
+                url: context.ajaxUrl,
                 qs: {
                     action: 'cfw_coh_metadata_by_id',
                     id,
@@ -88,10 +88,10 @@ Cypress.Commands.add('hasRequest', id => {
 });
 
 Cypress.Commands.add('setConfig', config => {
-    cy.task('getAjaxUrl', null, {log: false})
-        .then(url => {
+    cy.task('getTestContext', null, {log: false})
+        .then(context => {
             cy.request({
-                url,
+                url: context.ajaxUrl,
                 qs: {
                     action: 'cfw_coh_set_config',
                     config,
@@ -108,10 +108,10 @@ Cypress.Commands.add('setConfig', config => {
 });
 
 Cypress.Commands.add('resetConfig', () => {
-    cy.task('getAjaxUrl', null, {log: false})
-        .then(url => {
+    cy.task('getTestContext', null, {log: false})
+        .then(context => {
             cy.request({
-                url,
+                url: context.ajaxUrl,
                 qs: {
                     action: 'cfw_coh_reset_config',
                 },
