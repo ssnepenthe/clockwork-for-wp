@@ -74,7 +74,7 @@ function apply_config( $config ) {
 	}
 
 	$requests_except = $config->get( 'requests.except', [] );
-	$requests_except[] = 'action=cfw_coh_';
+	$requests_except[] = 'action=cfwth_';
 
 	$config->set( 'requests.except', $requests_except );
 };
@@ -95,17 +95,17 @@ function print_test_context() {
 \add_action( 'cfw_config_init', __NAMESPACE__ . '\\apply_config' );
 \add_action( 'wp_footer', __NAMESPACE__ . '\\print_test_context' );
 
+$namespace = __NAMESPACE__;
 $actions = [
-	'metadata_by_id',
-	'metadata_count',
-	'clean_metadata',
-	'request_factory',
+	'request_by_id',
+	'request_count',
+	'clean_requests',
+	'create_requests',
 	'set_config',
 	'reset_config',
 ];
-$namespace = __NAMESPACE__;
 
 foreach ( $actions as $action ) {
-	\add_action( "wp_ajax_cfw_coh_{$action}", "{$namespace}\\{$action}" );
-	\add_action( "wp_ajax_nopriv_cfw_coh_{$action}", "{$namespace}\\{$action}" );
+	\add_action( "wp_ajax_cfwth_{$action}", "{$namespace}\\{$action}" );
+	\add_action( "wp_ajax_nopriv_cfwth_{$action}", "{$namespace}\\{$action}" );
 }

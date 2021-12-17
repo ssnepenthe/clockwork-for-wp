@@ -30,7 +30,7 @@ Cypress.Commands.add('cleanRequests', () => {
             cy.request({
                 url: context.ajaxUrl,
                 qs: {
-                    action: 'cfw_coh_clean_metadata'
+                    action: 'cfwth_clean_requests'
                 },
                 log: false,
             });
@@ -48,7 +48,7 @@ Cypress.Commands.add('createRequests', (qty = 1) => {
             cy.request({
                 url: context.ajaxUrl,
                 qs: {
-                    action: 'cfw_coh_request_factory',
+                    action: 'cfwth_create_requests',
                     qty,
                     log: false
                 }
@@ -63,7 +63,7 @@ Cypress.Commands.add('getRequestById', id => {
             cy.request({
                 url: context.ajaxUrl,
                 qs: {
-                    action: 'cfw_coh_metadata_by_id',
+                    action: 'cfwth_request_by_id',
                     id,
                     log: false,
                 }
@@ -78,7 +78,7 @@ Cypress.Commands.add('hasRequest', id => {
             cy.request({
                 url: context.ajaxUrl,
                 qs: {
-                    action: 'cfw_coh_metadata_by_id',
+                    action: 'cfwth_request_by_id',
                     id,
                     log: false,
                 }
@@ -93,7 +93,7 @@ Cypress.Commands.add('setConfig', config => {
             cy.request({
                 url: context.ajaxUrl,
                 qs: {
-                    action: 'cfw_coh_set_config',
+                    action: 'cfwth_set_config',
                     config,
                 },
                 log: false,
@@ -113,7 +113,7 @@ Cypress.Commands.add('resetConfig', () => {
             cy.request({
                 url: context.ajaxUrl,
                 qs: {
-                    action: 'cfw_coh_reset_config',
+                    action: 'cfwth_reset_config',
                 },
                 log: false,
             });

@@ -2,7 +2,7 @@
 
 namespace Cfw_Test_Helper;
 
-function metadata_by_id() {
+function request_by_id() {
 	if ( ! \array_key_exists( 'id', $_REQUEST ) ) {
 		\wp_send_json_error();
 	}
@@ -16,7 +16,7 @@ function metadata_by_id() {
 	}
 }
 
-function metadata_count() {
+function request_count() {
 	try {
 		$file_list = Metadata::list_all();
 
@@ -26,7 +26,7 @@ function metadata_count() {
 	}
 }
 
-function clean_metadata() {
+function clean_requests() {
 	try {
 		Metadata::cleanup();
 
@@ -36,7 +36,7 @@ function clean_metadata() {
 	}
 }
 
-function request_factory() {
+function create_requests() {
 	if ( ! \array_key_exists( 'qty', $_REQUEST ) ) {
 		\wp_send_json_error();
 	}
