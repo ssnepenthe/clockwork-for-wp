@@ -26,3 +26,6 @@ before(() => {
         .invoke('text')
         .then(url => cy.task('setAjaxUrl', url));
 });
+
+beforeEach(() => cy.cleanMetadata());
+after(() => cy.cleanMetadata());

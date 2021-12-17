@@ -320,7 +320,7 @@ function request_factory() {
 	}
 
 	$qty = min( max( 1, (int) $_REQUEST['qty'] ), 10 );
-	$request_ids = [];
+	$requests = [];
 
 	$clockwork = ( new \Clockwork\Clockwork() )
 		->storage( _cfw_instance()[ \Clockwork\Storage\StorageInterface::class ] );
@@ -328,7 +328,10 @@ function request_factory() {
 	for ( $i = 0; $i < $qty; $i++ ) {
 		$request = new \Clockwork\Request\Request();
 
-		$request_ids[] = $request->id;
+		$requests[] = [
+			'id' => $request->id,
+			'updateToken' => $request->updateToken,
+		];
 
 		$clockwork
 			->request( $request )
@@ -336,7 +339,7 @@ function request_factory() {
 			->storeRequest();
 	}
 
-	\wp_send_json_success( $request_ids );
+	\wp_send_json_success( $requests );
 }
 \add_action( 'wp_ajax_cfw_coh_request_factory', __NAMESPACE__ . '\\request_factory' );
 \add_action( 'wp_ajax_nopriv_cfw_coh_request_factory', __NAMESPACE__ . '\\request_factory' );
