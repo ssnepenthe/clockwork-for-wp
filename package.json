@@ -1,0 +1,27 @@
+{
+  "name": "clockwork-for-wp",
+  "version": "1.0.0",
+  "description": "A basic Clockwork integration for WordPress",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ssnepenthe/clockwork-for-wp.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ssnepenthe/clockwork-for-wp/issues"
+  },
+  "homepage": "https://github.com/ssnepenthe/clockwork-for-wp#readme",
+  "devDependencies": {
+    "base64url": "^3.0.1",
+    "cypress": "^9.1.1",
+    "qs": "^6.10.2"
+  }
+}

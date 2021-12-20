@@ -12,7 +12,6 @@
     "require-dev": {
         "psy/psysh": "^0.9.7",
         "symfony/var-dumper": "^4.1",
-        "fabpot/goutte": "^4.0",
         "phpunit/phpunit": "^8.5",
         "spomky-labs/base64url": "^2.0",
         "wp-cli/wp-cli-bundle": "^2.5",

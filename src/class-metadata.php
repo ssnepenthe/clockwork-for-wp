@@ -37,7 +37,9 @@ final class Metadata {
 	public function get_extended( $id = null, $direction = null, $count = null ) {
 		$data = $this->get( $id, $direction, $count );
 
-		return $this->clockwork->extendRequest( $data );
+		$this->clockwork->extendRequest( $data );
+
+		return $data;
 	}
 
 	public function update( Request $request ) {
