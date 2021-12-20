@@ -12,7 +12,7 @@ class Config_Fetcher {
 	public function get_config() {
 		$config = [];
 
-		foreach ( $this->desired_configs() as $key => $caster ) {
+		foreach ( $this->config_caster_map() as $key => $caster ) {
 			$value = \Clockwork_For_Wp\array_get( $this->input, $key );
 
 			if ( null === $value ) {
@@ -31,7 +31,7 @@ class Config_Fetcher {
 		return $config;
 	}
 
-	protected function desired_configs() {
+	protected function config_caster_map() {
 		return [
 			'enable' => [ $this, 'boolean' ],
 			'collect_data_always' => [ $this, 'boolean' ],
