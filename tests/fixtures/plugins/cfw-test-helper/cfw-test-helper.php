@@ -12,8 +12,6 @@ namespace Cfw_Test_Helper;
  * License: MIT
  */
 
-// @todo be obnoxiously intrusive about notifying the user that this plugin is active.
-
 function deactivate() {
 	if ( isset( $_GET['activate'] ) ) {
 		unset( $_GET['activate'] );
@@ -63,6 +61,7 @@ const CONFIG_KEY = 'cfwth_config';
 require_once __DIR__ . '/ajax-handlers.php';
 require_once __DIR__ . '/class-config-fetcher.php';
 require_once __DIR__ . '/class-metadata.php';
+require_once __DIR__ . '/obnoxious-stuff.php';
 
 function apply_config( $config ) {
 	$request_config = get_option( CONFIG_KEY, null );
@@ -93,6 +92,10 @@ function print_test_context() {
 		\esc_html( \_cfw_instance()[ \Clockwork\Request\Request::class ]->id )
 	);
 };
+
+// @todo wp_body_open may not be sufficent depending on currently active theme.
+add_action( 'wp_body_open', __NAMESPACE__ . '\\obnoxious_frontend_warning' );
+add_action( 'admin_notices', __NAMESPACE__ . '\\obnoxious_admin_warning' );
 
 \add_action( 'cfw_config_init', __NAMESPACE__ . '\\apply_config' );
 \add_action( 'wp_footer', __NAMESPACE__ . '\\print_test_context' );
