@@ -64,23 +64,25 @@ require_once __DIR__ . '/class-config-fetcher.php';
 require_once __DIR__ . '/class-metadata.php';
 require_once __DIR__ . '/obnoxious-stuff.php';
 
-// @todo wp_body_open may not be sufficent depending on currently active theme.
-add_action( 'wp_body_open', __NAMESPACE__ . '\\obnoxious_frontend_warning' );
-add_action( 'admin_notices', __NAMESPACE__ . '\\obnoxious_admin_warning' );
+(function() {
+	$namespace = __NAMESPACE__;
+	$ajax_actions = [
+		'request_by_id',
+		'clean_requests',
+		'create_requests',
+		'set_config',
+		'reset_config',
+	];
 
-\add_action( 'cfw_config_init', __NAMESPACE__ . '\\apply_config' );
-\add_action( 'wp_footer', __NAMESPACE__ . '\\print_test_context' );
+	// @todo wp_body_open may not be sufficent depending on currently active theme.
+	\add_action( 'wp_body_open', "{$namespace}\\obnoxious_frontend_warning" );
+	\add_action( 'admin_notices', "{$namespace}\\obnoxious_admin_warning" );
 
-$namespace = __NAMESPACE__;
-$actions = [
-	'request_by_id',
-	'clean_requests',
-	'create_requests',
-	'set_config',
-	'reset_config',
-];
+	\add_action( 'cfw_config_init', "{$namespace}\\apply_config" );
+	\add_action( 'wp_footer', "{$namespace}\\print_test_context" );
 
-foreach ( $actions as $action ) {
-	\add_action( "wp_ajax_cfwth_{$action}", "{$namespace}\\{$action}" );
-	\add_action( "wp_ajax_nopriv_cfwth_{$action}", "{$namespace}\\{$action}" );
-}
+	foreach ( $ajax_actions as $action ) {
+		\add_action( "wp_ajax_cfwth_{$action}", "{$namespace}\\{$action}" );
+		\add_action( "wp_ajax_nopriv_cfwth_{$action}", "{$namespace}\\{$action}" );
+	}
+})();
