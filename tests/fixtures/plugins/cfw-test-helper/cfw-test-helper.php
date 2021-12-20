@@ -59,7 +59,7 @@ if ( ! \is_plugin_active( 'clockwork-for-wp/clockwork-for-wp.php' ) ) {
 const CONFIG_KEY = 'cfwth_config';
 
 require_once __DIR__ . '/actual-plugin-stuff.php';
-require_once __DIR__ . '/ajax-handlers.php';
+require_once __DIR__ . '/ajax-stuff.php';
 require_once __DIR__ . '/class-config-fetcher.php';
 require_once __DIR__ . '/class-metadata.php';
 require_once __DIR__ . '/obnoxious-stuff.php';
