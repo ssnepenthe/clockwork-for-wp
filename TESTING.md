@@ -12,4 +12,4 @@ The `cfw-test-helper` plugin within the `tests/fixtures/plugins` directory must 
 
 ## IMPORTANT!!!
 
-Do not run the `cfw-test-helper` plugin on publicly a machine that is publicly accessible. It allows `clockwork-for-wp` to be configured on-the-fly via query string params without any authentication or authorization checks. It could be used by attackers to expose sensitive information about the server and/or WordPress install.
+Do not run the `cfw-test-helper` plugin on a machine that is publicly accessible. It allows `clockwork-for-wp` to be configured on-the-fly via query string params without any authentication or authorization checks. It could be used by attackers to expose sensitive information about the server and/or WordPress install.
