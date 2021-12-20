@@ -64,7 +64,7 @@ require_once __DIR__ . '/class-config-fetcher.php';
 require_once __DIR__ . '/class-metadata.php';
 require_once __DIR__ . '/obnoxious-stuff.php';
 
-(function() {
+( function() {
 	$namespace = __NAMESPACE__;
 	$ajax_actions = [
 		'request_by_id',
@@ -85,4 +85,4 @@ require_once __DIR__ . '/obnoxious-stuff.php';
 		\add_action( "wp_ajax_cfwth_{$action}", "{$namespace}\\{$action}" );
 		\add_action( "wp_ajax_nopriv_cfwth_{$action}", "{$namespace}\\{$action}" );
 	}
-})();
+} )();
