@@ -59,13 +59,13 @@ function set_config() {
 		wp_send_json_error();
 	}
 
-	update_option( 'cfw_coh_config', $_REQUEST['config'] );
+	update_option( CONFIG_KEY, $_REQUEST['config'] );
 
 	wp_send_json_success();
 }
 
 function reset_config() {
-	delete_option( 'cfw_coh_config' );
+	delete_option( CONFIG_KEY );
 
 	wp_send_json_success();
 }

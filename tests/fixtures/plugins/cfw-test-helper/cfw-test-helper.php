@@ -58,12 +58,14 @@ if ( ! \is_plugin_active( 'clockwork-for-wp/clockwork-for-wp.php' ) ) {
 	return;
 }
 
+const CONFIG_KEY = 'cfwth_config';
+
 require_once __DIR__ . '/class-config-fetcher.php';
 require_once __DIR__ . '/class-metadata.php';
 require_once __DIR__ . '/ajax-handlers.php';
 
 function apply_config( $config ) {
-	$request_config = get_option( 'cfw_coh_config', null );
+	$request_config = get_option( CONFIG_KEY, null );
 
 	if ( ! is_array( $request_config ) ) {
 		$request_config = $_GET;
