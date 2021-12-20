@@ -29,8 +29,12 @@ class Metadata {
 	}
 
 	public static function cleanup() {
-		foreach ( static::list_all_with_index() as $file ) {
-			\unlink( $file );
+		$all_with_index = static::list_all_with_index();
+
+		if ( is_array( $all_with_index ) ) {
+			foreach ( $all_with_index as $file ) {
+				\unlink( $file );
+			}
 		}
 	}
 
