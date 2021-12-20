@@ -58,40 +58,11 @@ if ( ! \is_plugin_active( 'clockwork-for-wp/clockwork-for-wp.php' ) ) {
 
 const CONFIG_KEY = 'cfwth_config';
 
+require_once __DIR__ . '/actual-plugin-stuff.php';
 require_once __DIR__ . '/ajax-handlers.php';
 require_once __DIR__ . '/class-config-fetcher.php';
 require_once __DIR__ . '/class-metadata.php';
 require_once __DIR__ . '/obnoxious-stuff.php';
-
-function apply_config( $config ) {
-	$request_config = get_option( CONFIG_KEY, null );
-
-	if ( ! is_array( $request_config ) ) {
-		$request_config = $_GET;
-	}
-
-	foreach ( ( new Config_Fetcher( $request_config ) )->get_config() as $key => $value ) {
-		$config->set( $key, $value );
-	}
-
-	$requests_except = $config->get( 'requests.except', [] );
-	$requests_except[] = 'action=cfwth_';
-
-	$config->set( 'requests.except', $requests_except );
-};
-
-function print_test_context() {
-	$context = [
-		'ajaxUrl' => \admin_url( 'admin-ajax.php', 'relative' ),
-		'clockworkVersion' => \Clockwork\Clockwork::VERSION,
-	];
-
-	printf(
-		'<span data-cy="test-context">%s</span><span data-cy="request-id">%s</span>',
-		json_encode( $context ),
-		\esc_html( \_cfw_instance()[ \Clockwork\Request\Request::class ]->id )
-	);
-};
 
 // @todo wp_body_open may not be sufficent depending on currently active theme.
 add_action( 'wp_body_open', __NAMESPACE__ . '\\obnoxious_frontend_warning' );
