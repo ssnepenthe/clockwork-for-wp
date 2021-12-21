@@ -1,0 +1,7 @@
+{
+    "name": "ssnepenthe/cfw-test-helper",
+    "license": "MIT",
+    "require": {
+        "spomky-labs/base64url": "^2.0"
+    }
+}

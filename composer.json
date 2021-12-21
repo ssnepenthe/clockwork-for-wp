@@ -13,7 +13,6 @@
         "psy/psysh": "^0.9.7",
         "symfony/var-dumper": "^4.1",
         "phpunit/phpunit": "^8.5",
-        "spomky-labs/base64url": "^2.0",
         "wp-cli/wp-cli-bundle": "^2.5",
         "friendsofphp/php-cs-fixer": "^3.1",
         "vimeo/psalm": "^4.10",

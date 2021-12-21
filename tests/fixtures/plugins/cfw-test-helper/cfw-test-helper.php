@@ -48,13 +48,26 @@ if ( ! \function_exists( 'is_plugin_active' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/plugin.php';
 }
 
-if ( ! \is_plugin_active( 'clockwork-for-wp/clockwork-for-wp.php' ) ) {
+if ( ! (
+	\is_plugin_active( 'clockwork-for-wp/clockwork-for-wp.php' )
+	|| \is_plugin_active( 'php-scoper-clockwork/clockwork-for-wp.php' )
+) ) {
 	\add_action( 'admin_init', __NAMESPACE__ . '\\deactivate' );
 	\add_action( 'admin_notices', function() {
 		notify( 'This plugin requires Clockwork for WP to be installed and active' );
 	} );
 	return;
 }
+
+if ( ! file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+	\add_action( 'admin_init', __NAMESPACE__ . '\\deactivate' );
+	\add_action( 'admin_notices', function() {
+		notify( 'You must run "composer install" to install dependencies' );
+	} );
+	return;
+}
+
+require_once __DIR__ . '/vendor/autoload.php';
 
 const CONFIG_KEY = 'cfwth_config';
 

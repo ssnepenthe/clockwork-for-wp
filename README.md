@@ -19,7 +19,11 @@ The primary reasons I would recommend using this plugin over Query Monitor would
 PHP 7.1 or greater, WP 5.5 or greater and Composer.
 
 ## Installation
-For now either [require dev-master via Composer using a vcs repository](https://getcomposer.org/doc/05-repositories.md#vcs) or clone this repo into your plugins directory and manually run `composer install`.
+This plugin currently requires composer.
+
+If your site is already using composer, add this repo as a VCS repository to your root composer.json and then install as usual (i.e. `composer require ssnepenthe/clockwork-for-wp --dev`).
+
+Otherwise, clone this repo into your plugins directory and manually run `composer install`.
 
 Optionally install one of the Clockwork browser extensions ([Chrome](https://chrome.google.com/webstore/detail/clockwork/dmggabnehkmmfmdffgajcflpdjlnoemp), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/clockwork-dev-tools/)).
 
@@ -74,3 +78,37 @@ If you want to capture earlier errors, you can manually register the clockwork e
 
 ## WP-CLI
 If you would like to collect WP-CLI output, it can be beneficial (but not necessary) to add the "initialize-wp-cli-logger.php" file to the list of requires in your [WP-CLI config](https://make.wordpress.org/cli/handbook/references/config/) to ensure as much output as possible is captured.
+
+## PHP-Scoper
+Depending on how your site is configured to use composer, you may run into some issues with dependency conflicts. These should generally be resolvable by scoping the plugin dependencies with PHP-Scoper.
+
+To do so, you will need to install three tools:
+
+* [PHP-Scoper](https://github.com/humbug/php-scoper)
+* [PHP-Scoper Prefix Remover](https://github.com/pxlrbt/php-scoper-prefix-remover)
+* [WordPress Stubs](https://github.com/php-stubs/wordpress-stubs)
+
+Refer to the respective documentation for installation instructions for each package, but installing as global composer dependencies is probably the simplest method (e.g. `composer global require humbug/php-scoper`, etc.).
+
+Once installed, adapt the following:
+
+```sh
+# Clone this repo into a temporary directory.
+cd ~/code
+git clone git@github.com:ssnepenthe/clockwork-for-wp.git && cd clockwork-for-wp
+
+# Install dependencies.
+composer install --no-dev --classmap-authoritative
+
+# Run php-scoper.
+# WP_STUB_FILE variable should point to the wordpress-stubs package installed previously. If the first character is "~" it will be replaced with $_SERVER['HOME'].
+# Optionally set EXCLUDE_PSR=1 to prevent scoping psr dependencies (psr/container and psr/log).
+# Depending on server configuration, you may or may not need to adjust memory limit as shown below.
+WP_STUB_FILE="~/.composer/vendor/php-stubs/wordpress-stubs/wordpress-stubs.php" php -d memory_limit=512M ~/.composer/vendor/bin/php-scoper add-prefix
+
+# After php-scoper has finished, we need to dump the autoloader from within the "build" directory.
+composer dump --classmap-authoritative --working-dir=build
+
+# Finally move the scoped "build" dir into your WordPress plugins dir and rename to "clockwork-for-wp".
+mv build /srv/www/wordpress/public_html/wp-content/plugins/clockwork-for-wp
+```

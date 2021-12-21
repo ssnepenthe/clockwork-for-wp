@@ -71,7 +71,9 @@ if (
 	return;
 }
 
-if ( \file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+if ( \file_exists( __DIR__ . '/vendor/scoper-autoload.php' ) ) {
+	require_once __DIR__ . '/vendor/scoper-autoload.php';
+} elseif ( \file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 	require_once __DIR__ . '/vendor/autoload.php';
 }
 
@@ -90,7 +92,8 @@ require_once __DIR__ . '/src/instance.php';
 		->on(
 			'plugin_loaded',
 			static function ( $file, Plugin $plugin ): void {
-				if ( __FILE__ !== $file ) {
+				// realpath in case plugin is symlinked - e.g. when we are testing php-scoper.
+				if ( __FILE__ !== \realpath( $file ) ) {
 					return;
 				}
 
