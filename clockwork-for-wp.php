@@ -90,7 +90,7 @@ require_once __DIR__ . '/src/instance.php';
 		->on(
 			'plugin_loaded',
 			static function ( $file, Plugin $plugin ): void {
-				if ( __FILE__ !== $file ) {
+				if ( __FILE__ !== \realpath( $file ) ) {
 					return;
 				}
 
