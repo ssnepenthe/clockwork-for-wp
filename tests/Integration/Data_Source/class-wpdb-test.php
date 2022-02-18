@@ -184,7 +184,6 @@ class Wpdb_Test extends TestCase {
 
 	protected function create_data_source_via_factory( $config = [] ) {
 		return ( new Data_Source_Factory( new Plugin( [], [
-			'dir' => 'irrelevant',
 			Event_Manager::class => new class {
 				public function trigger( ...$args ) {
 					// Not important...

@@ -17,10 +17,10 @@ use Pimple\Psr11\Container;
 
 final class Plugin_Provider extends Base_Provider {
 	public function register(): void {
-		require_once $this->plugin['dir'] . '/src/plugin-helpers.php';
+		require_once __DIR__ . '/plugin-helpers.php';
 
 		$this->plugin[ Config::class ] = function () {
-			$values = include $this->plugin['dir'] . '/src/config.php';
+			$values = include __DIR__ . '/config.php';
 			$config = new Config( $values );
 
 			$this->plugin[ Event_Manager::class ]->trigger( 'cfw_config_init', $config );

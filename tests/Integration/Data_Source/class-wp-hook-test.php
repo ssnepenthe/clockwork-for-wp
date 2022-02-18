@@ -233,7 +233,7 @@ class Wp_Hook_Test extends TestCase {
 	}
 
 	protected function create_data_source_via_factory( $filters = [] ) {
-		return ( new Data_Source_Factory( new Plugin( [], [ 'dir' => 'irrelevant' ] ) ) )->create(
+		return ( new Data_Source_Factory( new Plugin() ) )->create(
 			'wp_hook',
 			[
 				'except_callbacks' => $filters['except_callbacks'] ?? [],

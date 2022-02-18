@@ -8,7 +8,7 @@ use Clockwork_For_Wp\Base_Provider;
 
 final class Wp_Cli_Provider extends Base_Provider {
 	public function register(): void {
-		require_once $this->plugin['dir'] . '/src/Wp_Cli/helpers.php';
+		require_once __DIR__ . '/helpers.php';
 	}
 
 	public function registered(): void {

@@ -8,12 +8,7 @@ function _cfw_instance(): Plugin {
 	static $instance = null;
 
 	if ( null === $instance ) {
-		$instance = new Plugin(
-			null,
-			[
-				'dir' => \dirname( __DIR__ ),
-			]
-		);
+		$instance = new Plugin();
 	}
 
 	return $instance;

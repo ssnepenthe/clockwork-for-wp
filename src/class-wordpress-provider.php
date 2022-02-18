@@ -13,7 +13,7 @@ use wpdb;
 
 final class Wordpress_Provider extends Base_Provider {
 	public function register(): void {
-		require_once $this->plugin['dir'] . '/src/wordpress-helpers.php';
+		require_once __DIR__ . '/wordpress-helpers.php';
 
 		// @todo consider prefixing params that are not type-hintable to avoid accidental injections.
 		$this->plugin['content_width'] = $this->plugin->factory(

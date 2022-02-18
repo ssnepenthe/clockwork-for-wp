@@ -89,7 +89,6 @@ class Data_Source_Factory_Test extends TestCase {
 
 	protected function create_factory() {
 		return new Data_Source\Data_Source_Factory( new Plugin( [], [
-			'dir' => 'irrelevant',
 			'wp_version' => 'irrelevant',
 			'timestart' => 'irrelevant',
 			Config::class => new Config( [
