@@ -8,6 +8,7 @@ use Clockwork_For_Wp\Data_Source\Wpdb;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Plugin;
 use Clockwork\Request\Request;
+use Clockwork_For_Wp\Data_Source\Data_Source_Factory;
 use PHPUnit\Framework\TestCase;
 
 class Wpdb_Test extends TestCase {
@@ -130,7 +131,7 @@ class Wpdb_Test extends TestCase {
 			[ 'select * from tags', 150, $untested_time ],
 		];
 
-		$data_source = $this->create_data_source_via_plugin( [
+		$data_source = $this->create_data_source_via_factory( [
 			'slow_only' => true,
 			'slow_threshold' => 75,
 		] );
@@ -143,7 +144,7 @@ class Wpdb_Test extends TestCase {
 		$this->assertEquals( 'SELECT * FROM users', $request->databaseQueries[0]['query'] );
 		$this->assertEquals( 'SELECT * FROM tags', $request->databaseQueries[1]['query'] );
 
-		$data_source = $this->create_data_source_via_plugin( [
+		$data_source = $this->create_data_source_via_factory( [
 			'slow_only' => true,
 			'slow_threshold' => 100,
 		] );
@@ -181,28 +182,18 @@ class Wpdb_Test extends TestCase {
 		$this->assertEquals( 'TESTMODEL', $request->databaseQueries[0]['model'] );
 	}
 
-	protected function create_data_source_via_plugin( $config = [] ) {
-		$plugin = new Plugin( [ Data_Source_Provider::class ], [
-			Config::class => new Config( [
-				'data_sources' => [
-					'wpdb' => [
-						'config' => [
-							'pattern_model_map' => $config['pattern_model_map'] ?? $this->pattern_model_map(),
-							'slow_only' => $config['slow_only'] ?? false,
-							'slow_threshold' => $config['slow_threshold'] ?? 50
-						],
-					],
-				],
-			] ),
+	protected function create_data_source_via_factory( $config = [] ) {
+		return ( new Data_Source_Factory( new Plugin( [], [
+			'dir' => 'irrelevant',
 			Event_Manager::class => new class {
 				public function trigger( ...$args ) {
-					// Not important.
+					// Not important...
 				}
 			},
-			'dir' => 'irrelevant',
+		] ) ) )->create( 'wpdb', [
+			'pattern_model_map' => $config['pattern_model_map'] ?? $this->pattern_model_map(),
+			'slow_only' => $config['slow_only'] ?? false,
+			'slow_threshold' => $config['slow_threshold'] ?? 50
 		] );
-		$plugin->boot();
-
-		return $plugin[ Wpdb::class ];
 	}
 }

@@ -5,23 +5,6 @@ declare(strict_types=1);
 use Clockwork\Authentication\SimpleAuthenticator;
 use Clockwork\Storage\FileStorage;
 use Clockwork\Storage\SqlStorage;
-use Clockwork_For_Wp\Data_Source\Conditionals;
-use Clockwork_For_Wp\Data_Source\Constants;
-use Clockwork_For_Wp\Data_Source\Core;
-use Clockwork_For_Wp\Data_Source\Errors;
-use Clockwork_For_Wp\Data_Source\Rest_Api;
-use Clockwork_For_Wp\Data_Source\Theme;
-use Clockwork_For_Wp\Data_Source\Transients;
-use Clockwork_For_Wp\Data_Source\Wp;
-use Clockwork_For_Wp\Data_Source\Wp_Hook;
-use Clockwork_For_Wp\Data_Source\Wp_Http;
-use Clockwork_For_Wp\Data_Source\Wp_Mail;
-use Clockwork_For_Wp\Data_Source\Wp_Object_Cache;
-use Clockwork_For_Wp\Data_Source\Wp_Query;
-use Clockwork_For_Wp\Data_Source\Wp_Redirect;
-use Clockwork_For_Wp\Data_Source\Wp_Rewrite;
-use Clockwork_For_Wp\Data_Source\Wpdb;
-use Clockwork_For_Wp\Data_Source\Xdebug;
 
 return [
 
@@ -69,15 +52,13 @@ return [
 
 	],
 
-	// Configure data sources. Enable or disable any data source by setting the corresponding "enabled" value. It is unlikely that you will ever modify the "data_source_class" value - this is the ID used to resolve the data source instance from the container.
+	// Configure data sources. Enable or disable any data source by setting the corresponding "enabled" value.
 	'data_sources' => [
 
 		// The conditionals data source records the values of a number of WordPress conditional functions.
 		'conditionals' => [
 
 			'enabled' => false,
-
-			'data_source_class' => Conditionals::class,
 
 			'config' => [
 
@@ -136,8 +117,6 @@ return [
 
 			'enabled' => false,
 
-			'data_source_class' => Constants::class,
-
 			'config' => [
 
 				'constants' => [
@@ -165,8 +144,6 @@ return [
 
 			'enabled' => false,
 
-			'data_source_class' => Core::class,
-
 		],
 
 		// The errors data source records PHP errors to the clockwork log.
@@ -174,8 +151,6 @@ return [
 		'errors' => [
 
 			'enabled' => false,
-
-			'data_source_class' => Errors::class,
 
 			'config' => [
 
@@ -209,16 +184,12 @@ return [
 
 			'enabled' => false,
 
-			'data_source_class' => Rest_Api::class,
-
 		],
 
 		// The theme data source records theme-specific data such as body classes and loaded template parts.
 		'theme' => [
 
 			'enabled' => false,
-
-			'data_source_class' => Theme::class,
 
 		],
 
@@ -227,16 +198,12 @@ return [
 
 			'enabled' => false,
 
-			'data_source_class' => Transients::class,
-
 		],
 
 		// The wp_hook data source records data about all registered hooks.
 		'wp_hook' => [
 
 			'enabled' => false,
-
-			'data_source_class' => Wp_Hook::class,
 
 			'config' => [
 
@@ -264,16 +231,12 @@ return [
 
 			'enabled' => false,
 
-			'data_source_class' => Wp_Http::class,
-
 		],
 
 		// The wp_mail data source records mail sent with wp_mail() as well as any errors encountered when sending mail.
 		'wp_mail' => [
 
 			'enabled' => false,
-
-			'data_source_class' => Wp_Mail::class,
 
 		],
 
@@ -282,16 +245,12 @@ return [
 
 			'enabled' => false,
 
-			'data_source_class' => Wp_Object_Cache::class,
-
 		],
 
 		// The wp_query data source records the values of all query vars for a given request.
 		'wp_query' => [
 
 			'enabled' => false,
-
-			'data_source_class' => Wp_Query::class,
 
 		],
 
@@ -300,16 +259,12 @@ return [
 
 			'enabled' => false,
 
-			'data_source_class' => Wp_Redirect::class,
-
 		],
 
 		// The wp_rewrite data source records all rewrite rules currently registered with WordPress.
 		'wp_rewrite' => [
 
 			'enabled' => false,
-
-			'data_source_class' => Wp_Rewrite::class,
 
 		],
 
@@ -318,16 +273,12 @@ return [
 
 			'enabled' => false,
 
-			'data_source_class' => Wp::class,
-
 		],
 
 		// The wpdb data source records all database queries made in the current request and can attempt to identify duplicate queries. To enable you must also defined the "SAVEQUERIES" constant to true.
 		'wpdb' => [
 
 			'enabled' => false,
-
-			'data_source_class' => Wpdb::class,
 
 			'config' => [
 
@@ -363,8 +314,6 @@ return [
 		'xdebug' => [
 
 			'enabled' => false,
-
-			'data_source_class' => Xdebug::class,
 
 		],
 

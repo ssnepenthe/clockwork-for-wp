@@ -4,6 +4,7 @@ namespace Clockwork_For_Wp\Tests\Integration\Data_Source;
 
 use Clockwork\Request\Request;
 use Clockwork_For_Wp\Config;
+use Clockwork_For_Wp\Data_Source\Data_Source_Factory;
 use Clockwork_For_Wp\Data_Source\Data_Source_Provider;
 use Clockwork_For_Wp\Data_Source\Wp_Hook;
 use Clockwork_For_Wp\Plugin;
@@ -53,7 +54,7 @@ class Wp_Hook_Test extends TestCase {
 
 	/** @test */
 	public function it_can_be_configured_to_collect_all_hook_tags_except_a_subset() {
-		$data_source = $this->create_data_source_via_plugin( [
+		$data_source = $this->create_data_source_via_factory( [
 			'except_tags' => [ 'tag2', 'tag3_[\w]', '^tag4', '5$' ],
 		] );
 		$request = new Request();
@@ -83,7 +84,7 @@ class Wp_Hook_Test extends TestCase {
 
 	/** @test */
 	public function it_can_be_configured_to_only_collect_a_subset_of_hook_tags() {
-		$data_source = $this->create_data_source_via_plugin( [
+		$data_source = $this->create_data_source_via_factory( [
 			'only_tags' => [ 'tag2', 'tag3_[\w]', '^tag4', '5$' ],
 		] );
 		$request = new Request();
@@ -116,7 +117,7 @@ class Wp_Hook_Test extends TestCase {
 
 	/** @test */
 	public function it_favors_the_only_tags_configuration_over_the_except_tags_configuration() {
-		$data_source = $this->create_data_source_via_plugin( [
+		$data_source = $this->create_data_source_via_factory( [
 			'except_tags' => [ 'tag2' ],
 			'only_tags' => [ 'tag2' ],
 		] );
@@ -150,7 +151,7 @@ class Wp_Hook_Test extends TestCase {
 
 	/** @test */
 	public function it_can_be_configured_to_collect_all_hooks_by_callback_except_a_subset() {
-		$data_source = $this->create_data_source_via_plugin( [
+		$data_source = $this->create_data_source_via_factory( [
 			'except_callbacks' => [ '^array_' ],
 		] );
 		$request = new Request();
@@ -174,7 +175,7 @@ class Wp_Hook_Test extends TestCase {
 
 	/** @test */
 	public function it_can_be_configured_to_only_collect_a_subset_of_hooks_by_callback() {
-		$data_source = $this->create_data_source_via_plugin( [
+		$data_source = $this->create_data_source_via_factory( [
 			'only_callbacks' => [ '^array_' ],
 		] );
 		$request = new Request();
@@ -198,7 +199,7 @@ class Wp_Hook_Test extends TestCase {
 
 	/** @test */
 	public function it_favors_the_only_callbacks_configuration_over_the_except_callbacks_configuration() {
-		$data_source = $this->create_data_source_via_plugin( [
+		$data_source = $this->create_data_source_via_factory( [
 			'except_callbacks' => [ '^array_' ],
 			'only_callbacks' => [ '^array_' ],
 		] );
@@ -231,24 +232,15 @@ class Wp_Hook_Test extends TestCase {
 		$this->assertEquals( [], $request->userData );
 	}
 
-	protected function create_data_source_via_plugin( $filters = [] ) {
-		$plugin = new Plugin( [ Data_Source_Provider::class ], [
-			Config::class => new Config( [
-				'data_sources' => [
-					'wp_hook' => [
-						'config' => [
-							'except_callbacks' => $filters['except_callbacks'] ?? [],
-							'only_callbacks' => $filters['only_callbacks'] ?? [],
-							'except_tags' => $filters['except_tags'] ?? [],
-							'only_tags' => $filters['only_tags'] ?? [],
-						],
-					],
-				],
-			] ),
-			'dir' => 'irrelevant',
-		] );
-		$plugin->boot();
-
-		return $plugin[ Wp_Hook::class ];
+	protected function create_data_source_via_factory( $filters = [] ) {
+		return ( new Data_Source_Factory( new Plugin( [], [ 'dir' => 'irrelevant' ] ) ) )->create(
+			'wp_hook',
+			[
+				'except_callbacks' => $filters['except_callbacks'] ?? [],
+				'only_callbacks' => $filters['only_callbacks'] ?? [],
+				'except_tags' => $filters['except_tags'] ?? [],
+				'only_tags' => $filters['only_tags'] ?? [],
+			]
+		);
 	}
 }

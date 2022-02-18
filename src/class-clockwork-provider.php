@@ -16,7 +16,7 @@ use Clockwork\Request\Request;
 use Clockwork\Storage\FileStorage;
 use Clockwork\Storage\SqlStorage;
 use Clockwork\Storage\StorageInterface;
-use Clockwork_For_Wp\Data_Source\Php;
+use Clockwork_For_Wp\Data_Source\Data_Source_Factory;
 use InvalidArgumentException;
 
 final class Clockwork_Provider extends Base_Provider {
@@ -151,11 +151,12 @@ final class Clockwork_Provider extends Base_Provider {
 
 	private function add_data_sources(): void {
 		$clockwork = $this->plugin[ Clockwork::class ];
+		$data_source_factory = $this->plugin[ Data_Source_Factory::class ];
 
-		$clockwork->addDataSource( $this->plugin[ Php::class ] );
+		$clockwork->addDataSource( $data_source_factory->create( 'php' ) );
 
-		foreach ( $this->plugin->get_enabled_data_sources() as $data_source ) {
-			$clockwork->addDataSource( $this->plugin[ $data_source['data_source_class'] ] );
+		foreach ( $data_source_factory->get_enabled_data_sources() as $data_source ) {
+			$clockwork->addDataSource( $data_source );
 		}
 	}
 

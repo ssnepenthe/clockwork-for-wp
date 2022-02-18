@@ -20,8 +20,11 @@ use RuntimeException;
 
 final class Plugin implements ArrayAccess {
 	private $booted = false;
+
 	private $container;
+
 	private $locked = false;
+
 	private $providers = [];
 
 	public function __construct( ?array $providers = null, ?array $values = null ) {
@@ -83,17 +86,6 @@ final class Plugin implements ArrayAccess {
 
 	public function get_container() {
 		return $this->container;
-	}
-
-	public function get_enabled_data_sources() {
-		return \array_filter(
-			$this->config( 'data_sources', [] ),
-			function ( $data_source, $feature ) {
-				return ( $data_source['enabled'] ?? false )
-					&& $this->is_feature_available( $feature );
-			},
-			\ARRAY_FILTER_USE_BOTH
-		);
 	}
 
 	public function is_collecting_client_metrics() {

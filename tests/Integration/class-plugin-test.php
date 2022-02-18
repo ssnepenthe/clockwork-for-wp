@@ -30,24 +30,6 @@ class Plugin_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_provides_a_list_of_enabled_data_sources() {
-		$plugin = new Plugin( [], [
-			Config::class => new Config( [
-				'data_sources' => [
-					'one' => [ 'enabled' => true ],
-					'two' => [ 'enabled' => false ],
-					'three' => [ 'enabled' => true ],
-				],
-			] ),
-		] );
-
-		$this->assertEquals( [
-			'one' => [ 'enabled' => true ],
-			'three' => [ 'enabled' => true ],
-		], $plugin->get_enabled_data_sources() );
-	}
-
-	/** @test */
 	public function it_can_check_if_a_feature_is_enabled() {
 		$plugin = new Plugin( [], [
 			Config::class => new Config( [

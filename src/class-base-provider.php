@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp;
 
 use Clockwork_For_Wp\Event_Management\Event_Manager;
+use Clockwork_For_Wp\Event_Management\Subscriber;
 
 abstract class Base_Provider implements Provider {
 	protected $plugin;
@@ -20,7 +21,11 @@ abstract class Base_Provider implements Provider {
 			$events = $this->plugin[ Event_Manager::class ];
 
 			foreach ( $subscribers as $subscriber ) {
-				$events->attach( $this->plugin[ $subscriber ] );
+				if ( ! $subscriber instanceof Subscriber ) {
+					$subscriber = $this->plugin[ $subscriber ];
+				}
+
+				$events->attach( $subscriber );
 			}
 		}
 	}
