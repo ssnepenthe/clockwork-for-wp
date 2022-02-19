@@ -9,13 +9,8 @@ use WP_CLI;
 
 final class Cli_Collection_Helper {
 	private static $logger;
+
 	private static $logger_initialized = false;
-
-	public static function get_clockwork_command_list() {
-		$commands = include __DIR__ . '/clockwork-command-list.php';
-
-		return $commands;
-	}
 
 	public static function get_core_command_list() {
 		$commands = include __DIR__ . '/core-command-list.php';

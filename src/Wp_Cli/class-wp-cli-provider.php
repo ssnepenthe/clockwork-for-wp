@@ -17,6 +17,6 @@ final class Wp_Cli_Provider extends Base_Provider {
 		}
 
 		add_command( new Clean_Command() );
-		add_command( new Generate_Command_Lists_Command() );
+		add_command( new Generate_Command_List_Command() );
 	}
 }

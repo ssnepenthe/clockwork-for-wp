@@ -121,6 +121,10 @@ final class Plugin implements ArrayAccess {
 	}
 
 	public function is_command_filtered( $command ) {
+		if ( 'clockwork' === \mb_substr( $command, 0, 9 ) ) {
+			return true;
+		}
+
 		$only = $this->config( 'wp_cli.only', [] );
 
 		if ( \count( $only ) > 0 ) {
@@ -132,8 +136,6 @@ final class Plugin implements ArrayAccess {
 		if ( $this->config( 'wp_cli.except_built_in_commands', true ) ) {
 			$except = \array_merge( $except, Cli_Collection_Helper::get_core_command_list() );
 		}
-
-		$except = \array_merge( $except, Cli_Collection_Helper::get_clockwork_command_list() );
 
 		return \in_array( $command, $except, true );
 	}
