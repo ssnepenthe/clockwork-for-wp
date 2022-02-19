@@ -13,9 +13,13 @@ final class Cli_Collection_Helper {
 	private static $logger_initialized = false;
 
 	public static function get_core_command_list() {
-		$commands = include __DIR__ . '/core-command-list.php';
+		$commands = include self::get_core_command_list_path();
 
 		return $commands;
+	}
+
+	public static function get_core_command_list_path(): string {
+		return \dirname( \_cfw_instance()['file'] ) . '/generated/wp-cli-core-command-list.php';
 	}
 
 	public static function get_plugin_logger() {

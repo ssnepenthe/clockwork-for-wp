@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Clockwork_For_Wp\Wp_Cli;
 
+use Clockwork_For_Wp\Cli_Data_Collection\Cli_Collection_Helper;
 use WP_CLI;
 
 final class Generate_Command_List_Command extends Base_Command {
@@ -17,7 +18,7 @@ final class Generate_Command_List_Command extends Base_Command {
 		$this->enumerate_commands( WP_CLI::get_root_command() );
 
 		\file_put_contents(
-			__DIR__ . '/../Cli_Data_Collection/core-command-list.php',
+			Cli_Collection_Helper::get_core_command_list_path(),
 			\sprintf( $this->template(), \var_export( $this->commands, true ) )
 		);
 
