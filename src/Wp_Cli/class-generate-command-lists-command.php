@@ -45,7 +45,7 @@ final class Generate_Command_Lists_Command extends Base_Command {
 
 	private function write( $which ) {
 		return \file_put_contents(
-			__DIR__ . "/../Wp_Cli/{$which}-command-list.php",
+			__DIR__ . "/../Cli_Data_Collection/{$which}-command-list.php",
 			\sprintf( $this->template(), \var_export( $this->{$which}, true ) )
 		);
 	}

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Clockwork_For_Wp\Wp_Cli\Cli_Collection_Helper;
+use Clockwork_For_Wp\Cli_Data_Collection\Cli_Collection_Helper;
 
 /*
  * If you would like to collect WP-CLI output, it can be beneficial to add this file to the list of

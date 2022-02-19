@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Clockwork_For_Wp\Wp_Cli;
+namespace Clockwork_For_Wp\Cli_Data_Collection;
 
 use ReflectionProperty;
 use WP_CLI;

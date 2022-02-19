@@ -6,9 +6,9 @@ namespace Clockwork_For_Wp;
 
 use Clockwork\Clockwork;
 use Clockwork\Request\Request;
+use Clockwork_For_Wp\Cli_Data_Collection\Command_Context;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
-use Clockwork_For_Wp\Wp_Cli\Command_Context;
 
 final class Clockwork_Subscriber implements Subscriber {
 	private $plugin;
