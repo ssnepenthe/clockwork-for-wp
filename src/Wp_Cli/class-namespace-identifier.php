@@ -6,5 +6,8 @@ namespace Clockwork_For_Wp\Wp_Cli;
 
 use WP_CLI\Dispatcher\CommandNamespace;
 
-final class Command_Namespace extends CommandNamespace {
+/**
+ * @internal
+ */
+final class Namespace_Identifier extends CommandNamespace {
 }

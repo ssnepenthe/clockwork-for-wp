@@ -5,18 +5,35 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Wp_Cli;
 
 use Clockwork_For_Wp\Base_Provider;
+use Invoker\Invoker;
 
+/**
+ * @internal
+ */
 final class Wp_Cli_Provider extends Base_Provider {
+	public function boot(): void {
+		$this->plugin[ Command_Registry::class ]->initialize();
+	}
+
 	public function register(): void {
-		require_once __DIR__ . '/helpers.php';
+		$this->plugin[ Command_Registry::class ] = function () {
+			return new Command_Registry( $this->plugin[ Invoker::class ] );
+		};
 	}
 
 	public function registered(): void {
-		if ( ! \defined( 'WP_CLI' ) || ! WP_CLI || ! \class_exists( 'WP_CLI' ) ) {
+		if ( ! ( \defined( 'WP_CLI' ) && WP_CLI ) ) {
 			return;
 		}
 
-		add_command( new Clean_Command() );
-		add_command( new Generate_Command_List_Command() );
+		$this->plugin[ Command_Registry::class ]->namespace(
+			'clockwork',
+			'Manages the Clockwork for WP plugin.',
+			static function ( Command_Registry $scoped_registry ): void {
+				$scoped_registry
+					->add( new Clean_Command() )
+					->add( new Generate_Command_List_Command() );
+			}
+		);
 	}
 }

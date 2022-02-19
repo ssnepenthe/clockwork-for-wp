@@ -8,15 +8,26 @@ use Clockwork\Storage\StorageInterface;
 use Clockwork_For_Wp\Config;
 use WP_CLI;
 
-final class Clean_Command extends Base_Command {
-	protected $description = 'Cleans Clockwork request metadata.';
-	protected $name = 'clean';
-	protected $options = [
-		'[--all]' => 'Cleans all data.',
-		'[--expiration=<expiration>]' => 'Cleans data older than specified value in minutes. Does nothing if "--all" is also set.',
-	];
+/**
+ * @internal
+ */
+final class Clean_Command extends Command {
+	public function configure(): void {
+		$this->set_name( 'clean' )
+			->set_description( 'Cleans Clockwork request metadata.' )
+			->add_flag(
+				( new Flag( 'all' ) )
+					->set_description( 'Cleans all data.' )
+			)
+			->add_option(
+				( new Option( 'expiration' ) )
+					->set_description(
+						'Cleans data older than specified value in minutes. Does nothing if "--all" is also set.'
+					)
+			);
+	}
 
-	public function __invoke( Config $config, $all = false, $expiration = null ): void {
+	public function handle( Config $config, $all = false, $expiration = null ): void {
 		$force = true;
 
 		if ( $all ) {

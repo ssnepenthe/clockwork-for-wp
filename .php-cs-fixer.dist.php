@@ -44,7 +44,7 @@ return $config->setRules([
 	'short_scalar_cast' => true,
 	'class_attributes_separation' => true,
 	'class_definition' => true,
-	'final_class' => true,
+	'final_internal_class' => true,
 	'no_blank_lines_after_class_opening' => true,
 	'no_null_property_initialization' => true,
 	'no_php4_constructor' => true,

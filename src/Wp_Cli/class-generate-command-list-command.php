@@ -7,14 +7,20 @@ namespace Clockwork_For_Wp\Wp_Cli;
 use Clockwork_For_Wp\Cli_Data_Collection\Cli_Collection_Helper;
 use WP_CLI;
 
-final class Generate_Command_List_Command extends Base_Command {
-	protected $description = 'Generates list of core commands to be ignored by Clockwork. Used for development only.';
-
-	protected $name = 'generate-command-list';
-
+/**
+ * @internal
+ */
+final class Generate_Command_List_Command extends Command {
 	private $commands = [];
 
-	public function __invoke(): void {
+	public function configure(): void {
+		$this->set_name( 'generate-command-list' )
+			->set_description(
+				'Generates list of core commands to be ignored by Clockwork. Used for development only.'
+			);
+	}
+
+	public function handle(): void {
 		$this->enumerate_commands( WP_CLI::get_root_command() );
 
 		\file_put_contents(
