@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use Clockwork_For_Wp\Data_Source\Errors;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Plugin;
 
 /*
@@ -80,23 +78,4 @@ if ( \file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
 
 require_once __DIR__ . '/src/instance.php';
 
-( static function ( $plugin ): void {
-	// Resolve error handler immediately so we catch as many errors as possible.
-	// @todo Check config to make sure error feature is enabled? Or probably a constant?
-	// @todo Move to plugin constructor?
-	Errors::get_instance()->register();
-
-	$plugin[ Event_Manager::class ]
-		->on(
-			'plugin_loaded',
-			static function ( $file, Plugin $plugin ): void {
-				if ( __FILE__ !== \realpath( $file ) ) {
-					return;
-				}
-
-				$plugin->lock();
-			},
-			Event_Manager::EARLY_EVENT
-		)
-		->on( 'plugins_loaded', [ $plugin, 'boot' ], Event_Manager::EARLY_EVENT );
-} )( \_cfw_instance() );
+\_cfw_instance()->run();

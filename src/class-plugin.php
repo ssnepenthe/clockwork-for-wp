@@ -9,7 +9,9 @@ use Clockwork\Clockwork;
 use Clockwork\Request\IncomingRequest;
 use Clockwork_For_Wp\Api\Api_Provider;
 use Clockwork_For_Wp\Data_Source\Data_Source_Provider;
+use Clockwork_For_Wp\Data_Source\Errors;
 use Clockwork_For_Wp\Event_Management\Event_Management_Provider;
+use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Routing\Routing_Provider;
 use Clockwork_For_Wp\Web_App\Web_App_Provider;
 use Clockwork_For_Wp\Wp_Cli\Cli_Collection_Helper;
@@ -216,5 +218,25 @@ final class Plugin implements ArrayAccess {
 		$this->providers[ \get_class( $provider ) ] = $provider;
 
 		return $this;
+	}
+
+	public function run(): void {
+		// Resolve error handler immediately so we catch as many errors as possible.
+		// @todo Move to plugin constructor?
+		Errors::get_instance()->register();
+
+		$this[ Event_Manager::class ]
+			->on(
+				'plugin_loaded',
+				function ( $file ): void {
+					if ( $this['file'] !== \realpath( $file ) ) {
+						return;
+					}
+
+					$this->lock();
+				},
+				Event_Manager::EARLY_EVENT
+			)
+			->on( 'plugins_loaded', [ $this, 'boot' ], Event_Manager::EARLY_EVENT );
 	}
 }
