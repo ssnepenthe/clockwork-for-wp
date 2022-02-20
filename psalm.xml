@@ -17,8 +17,4 @@
     <plugins>
         <pluginClass class="PsalmWordPress\Plugin"/>
     </plugins>
-
-    <stubs>
-        <file name="stubs.php"/>
-    </stubs>
 </psalm>
