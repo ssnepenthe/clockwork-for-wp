@@ -159,26 +159,18 @@ final class Data_Source_Factory {
 	private function create_wp_hook_data_source( array $config ): Wp_Hook {
 		$data_source = new Wp_Hook( $config['all_hooks'] ?? false );
 
-		$tag_filter = new Except_Only_Filter(
-			$config['except_tags'] ?? [],
-			$config['only_tags'] ?? []
+		$data_source->addFilter(
+			( new Filter() )
+				->except( $config['except_tags'] ?? [] )
+				->only( $config['only_tags'] ?? [] )
+				->to_closure( 'Tag' )
 		);
 
 		$data_source->addFilter(
-			static function ( $hook ) use ( $tag_filter ) {
-				return $tag_filter( $hook['Tag'] );
-			}
-		);
-
-		$callback_filter = new Except_Only_Filter(
-			$config['except_callbacks'] ?? [],
-			$config['only_callbacks'] ?? []
-		);
-
-		$data_source->addFilter(
-			static function ( $hook ) use ( $callback_filter ) {
-				return $callback_filter( $hook['Callback'] );
-			}
+			( new Filter() )
+				->except( $config['except_callbacks'] ?? [] )
+				->only( $config['only_callbacks'] ?? [] )
+				->to_closure( 'Callback' )
 		);
 
 		return $data_source;

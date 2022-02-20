@@ -42,27 +42,19 @@ final class Data_Source_Provider extends Base_Provider {
 			);
 
 			// Filter errors by message pattern.
-			$message_filter = new Except_Only_Filter(
-				$config['except_messages'] ?? [],
-				$config['only_messages'] ?? []
-			);
-
 			$errors->addFilter(
-				static function ( $error ) use ( $message_filter ) {
-					return $message_filter( $error['message'] );
-				}
+				( new Filter() )
+					->except( $config['except_messages'] ?? [] )
+					->only( $config['only_messages'] ?? [] )
+					->to_closure( 'message' )
 			);
 
 			// Filter errors by file pattern.
-			$file_filter = new Except_Only_Filter(
-				$config['except_files'] ?? [],
-				$config['only_files'] ?? []
-			);
-
 			$errors->addFilter(
-				static function ( $error ) use ( $file_filter ) {
-					return $file_filter( $error['file'] );
-				}
+				( new Filter() )
+					->except( $config['except_files'] ?? [] )
+					->only( $config['only_files'] ?? [] )
+					->to_closure( 'file' )
 			);
 
 			// Filter suppressed errors.
