@@ -47,11 +47,13 @@ final class Filter {
 		return function ( $value ) use ( $key ) {
 			if ( \is_string( $key ) ) {
 				if ( ! \is_array( $value ) ) {
-					throw new InvalidArgumentException( '@todo' );
+					throw new InvalidArgumentException(
+						'Cannot check non-array values when key is provided'
+					);
 				}
 
 				if ( ! \array_key_exists( $key, $value ) ) {
-					throw new InvalidArgumentException( '@todo' );
+					throw new InvalidArgumentException( "Value to check must contain key {$key}" );
 				}
 
 				$value = $value[ $key ];

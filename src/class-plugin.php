@@ -57,7 +57,7 @@ final class Plugin implements ArrayAccess {
 			}
 
 			if ( ! $provider instanceof Provider ) {
-				throw new InvalidArgumentException( '@todo' );
+				throw new InvalidArgumentException( 'Invalid provider type in plugin constructor' );
 			}
 
 			$this->register( $provider );

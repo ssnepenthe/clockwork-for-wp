@@ -26,7 +26,7 @@ final class Storage_Factory {
 			return ( [ $this, $method ] )( $config );
 		}
 
-		throw new InvalidArgumentException( '@todo' );
+		throw new InvalidArgumentException( "Unable to create unsupported storage type {$name}" );
 	}
 
 	public function register_custom_factory( string $name, callable $factory ) {
@@ -38,7 +38,9 @@ final class Storage_Factory {
 	private function call_custom_factory( $name, array $config ): StorageInterface {
 		if ( ! $this->has_custom_factory( $name ) ) {
 			// @todo is this necessary in final class on private function?
-			throw new InvalidArgumentException( '@todo' );
+			throw new InvalidArgumentException(
+				"No custom factory registered for storage type {$name}"
+			);
 		}
 
 		return ( $this->custom_factories[ $name ] )( $config );
