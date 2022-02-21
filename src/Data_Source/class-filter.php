@@ -45,12 +45,12 @@ final class Filter {
 
 	public function to_closure( ?string $key = null ): Closure {
 		return function ( $value ) use ( $key ) {
-			if ( is_string( $key ) ) {
-				if ( ! is_array( $value ) ) {
+			if ( \is_string( $key ) ) {
+				if ( ! \is_array( $value ) ) {
 					throw new InvalidArgumentException( '@todo' );
 				}
 
-				if ( ! array_key_exists( $key, $value ) ) {
+				if ( ! \array_key_exists( $key, $value ) ) {
 					throw new InvalidArgumentException( '@todo' );
 				}
 
