@@ -125,9 +125,7 @@ describe('Clockwork Webapp', () => {
             authentication: {
                 enabled: 1,
                 drivers: {
-                    simple: {
-                        config: { password },
-                    },
+                    simple: { password },
                 },
             },
         };
@@ -166,6 +164,7 @@ describe('Clockwork Webapp', () => {
                 onLoad: hideWhatsNewModal,
             });
 
+            // This isn't working on FF dev edition on Windows 11...
             cy.get('input[type="password"]')
                 .type('wrong-password{enter}');
 

@@ -308,9 +308,7 @@ describe('Request API', () => {
             authentication: {
                 enabled: 1,
                 drivers: {
-                    simple: {
-                        config: { password },
-                    },
+                    simple: { password },
                 },
             },
         };
