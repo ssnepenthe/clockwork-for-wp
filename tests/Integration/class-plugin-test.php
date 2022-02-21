@@ -4,10 +4,10 @@ namespace Clockwork_For_Wp\Tests\Integration;
 
 use Clockwork\Clockwork;
 use Clockwork\Request\IncomingRequest;
-use Clockwork\Request\Request;
 use Clockwork_For_Wp\Clockwork_Provider;
 use Clockwork_For_Wp\Config;
 use Clockwork_For_Wp\Plugin;
+use Clockwork_For_Wp\Storage_Factory;
 use Null_Storage_For_Tests;
 use PHPUnit\Framework\TestCase;
 
@@ -109,19 +109,14 @@ class Plugin_Test extends TestCase {
 				],
 				'storage' => [
 					'driver' => 'null',
-					'drivers' => [
-						'null' => [
-							'class' => Null_Storage_For_Tests::class,
-						],
-					],
 				],
 				'register_helpers' => false,
 			] ),
 		] );
-		$plugin[ Null_Storage_For_Tests::class ] = $plugin->protect( function() {
+		$plugin->register( new Clockwork_Provider( $plugin ) );
+		$plugin[ Storage_Factory::class ]->register_custom_factory( 'null', function() {
 			return new Null_Storage_For_Tests();
 		} );
-		$plugin->register( new Clockwork_Provider( $plugin ) );
 		$plugin->lock();
 
 		$request = function( $uri ) {
@@ -157,19 +152,14 @@ class Plugin_Test extends TestCase {
 				],
 				'storage' => [
 					'driver' => 'null',
-					'drivers' => [
-						'null' => [
-							'class' => Null_Storage_For_Tests::class,
-						],
-					],
 				],
 				'register_helpers' => false,
 			] ),
 		] );
-		$plugin[ Null_Storage_For_Tests::class ] = $plugin->protect( function() {
+		$plugin->register( new Clockwork_Provider( $plugin ) );
+		$plugin[ Storage_Factory::class ]->register_custom_factory( 'null', function() {
 			return new Null_Storage_For_Tests();
 		} );
-		$plugin->register( new Clockwork_Provider( $plugin ) );
 		$plugin->lock();
 
 		$request = function( $uri ) {
@@ -200,19 +190,14 @@ class Plugin_Test extends TestCase {
 					],
 					'storage' => [
 						'driver' => 'null',
-						'drivers' => [
-							'null' => [
-								'class' => Null_Storage_For_Tests::class,
-							],
-						],
 					],
 					'register_helpers' => false,
 				] ),
 			] );
-			$plugin[ Null_Storage_For_Tests::class ] = $plugin->protect( function() {
+			$plugin->register( new Clockwork_Provider( $plugin ) );
+			$plugin[ Storage_Factory::class ]->register_custom_factory( 'null', function() {
 				return new Null_Storage_For_Tests();
 			} );
-			$plugin->register( new Clockwork_Provider( $plugin ) );
 			$plugin->lock();
 
 			return $plugin[ Clockwork::class ]->shouldCollect();

@@ -13,12 +13,13 @@ use Clockwork\Helpers\StackFilter;
 use Clockwork\Request\IncomingRequest;
 use Clockwork\Request\Log;
 use Clockwork\Request\Request;
-use Clockwork\Storage\FileStorage;
-use Clockwork\Storage\SqlStorage;
 use Clockwork\Storage\StorageInterface;
 use Clockwork_For_Wp\Data_Source\Data_Source_Factory;
 use InvalidArgumentException;
 
+/**
+ * @internal
+ */
 final class Clockwork_Provider extends Base_Provider {
 	public function boot(): void {
 		if ( $this->plugin->is_collecting_data() ) {
@@ -68,48 +69,24 @@ final class Clockwork_Provider extends Base_Provider {
 			}
 		);
 
+		$this->plugin[ Storage_Factory::class ] = static function () {
+			return new Storage_Factory();
+		};
+
 		$this->plugin[ StorageInterface::class ] = $this->plugin->factory(
 			function () {
-				$config = $this->plugin[ Config::class ]->get( 'storage', [] );
-				$driver = $config['driver'] ?? 'file';
-				$expiration = $config['expiration'] ?? null;
-				$factory_id = $config['drivers'][ $driver ]['class'] ?? FileStorage::class;
+				$storage_config = $this->plugin[ Config::class ]->get( 'storage', [] );
+				$driver = $storage_config['driver'] ?? 'file';
+				$driver_config = $storage_config['drivers'][ $driver ] ?? [];
 
-				return $this->plugin[ $factory_id ](
-					$config['drivers'][ $driver ]['config'] ?? [],
-					$expiration
-				);
-			}
-		);
-
-		$this->plugin[ FileStorage::class ] = $this->plugin->protect(
-			static function ( array $config, $expiration ) {
-				if ( ! \array_key_exists( 'path', $config ) ) {
-					throw new InvalidArgumentException(
-						'Missing "path" key from file storage config array'
-					);
+				if (
+					! \array_key_exists( 'expiration', $driver_config )
+					&& \array_key_exists( 'expiration', $storage_config )
+				) {
+					$driver_config['expiration'] = $storage_config['expiration'];
 				}
 
-				$dir_permissions = $config['dir_permissions'] ?? 0700;
-				$compress = $config['compress'] ?? false;
-
-				return new FileStorage( $config['path'], $dir_permissions, $expiration, $compress );
-			}
-		);
-
-		$this->plugin[ SqlStorage::class ] = $this->plugin->protect(
-			static function ( array $config, $expiration ) {
-				if ( ! \array_key_exists( 'dsn', $config ) ) {
-					throw new InvalidArgumentException(
-						'Missing "dns" key from sql storage config array'
-					);
-				}
-
-				$table = $config['table'] ?? 'clockwork';
-				$username = $config['username'] ?? null;
-				$password = $config['password'] ?? null;
-
-				return new SqlStorage( $config['dsn'], $table, $username, $password, $expiration );
+				return $this->plugin[ Storage_Factory::class ]->create( $driver, $driver_config );
 			}
 		);
 

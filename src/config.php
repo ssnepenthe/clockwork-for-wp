@@ -3,8 +3,6 @@
 declare(strict_types=1);
 
 use Clockwork\Authentication\SimpleAuthenticator;
-use Clockwork\Storage\FileStorage;
-use Clockwork\Storage\SqlStorage;
 
 return [
 
@@ -361,41 +359,29 @@ return [
 
 			'file' => [
 
-				'class' => FileStorage::class,
+				// int. Directory permissions to use if the driver has to create the storage directory. Should be specified as an octal number.
+				'dir_permissions' => 0700,
 
-				'config' => [
+				// string. Path where metadata is stored. By default it is stored in the wp-content directory, but ideally should be moved somewhere that is not web accessible.
+				'path' => WP_CONTENT_DIR . '/cfw-data',
 
-					// int. Directory permissions to use if the driver has to create the storage directory. Should be specified as an octal number.
-					'dir_permissions' => 0700,
-
-					// string. Path where metadata is stored. By default it is stored in the wp-content directory, but ideally should be moved somewhere that is not web accessible.
-					'path' => WP_CONTENT_DIR . '/cfw-data',
-
-					'compress' => false,
-
-				],
+				'compress' => false,
 
 			],
 
 			'sql' => [
 
-				'class' => SqlStorage::class,
+				// string|PDO. DSN used by PDO to connect to a database. Can optionally be a pre-existing PDO instance.
+				'dsn' => '',
 
-				'config' => [
+				// string. The table where metadata should be stored. It will be automatically created and updated when needed.
+				'table' => 'clockwork',
 
-					// string|PDO. DSN used by PDO to connect to a database. Can optionally be a pre-existing PDO instance.
-					'dsn' => '',
+				// string. Username used to connect to the database.
+				'username' => null,
 
-					// string. The table where metadata should be stored. It will be automatically created and updated when needed.
-					'table' => 'clockwork',
-
-					// string. Username used to connect to the database.
-					'username' => null,
-
-					// string. Password used to connect to the database.
-					'password' => null,
-
-				],
+				// string. Password used to connect to the database.
+				'password' => null,
 
 			],
 

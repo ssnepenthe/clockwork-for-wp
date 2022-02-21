@@ -15,7 +15,7 @@ class Metadata {
 			);
 		}
 
-		return rtrim( $config->get( 'storage.drivers.file.config.path' ), '/\\' );
+		return rtrim( $config->get( 'storage.drivers.file.path' ), '/\\' );
 	}
 
 	public static function list_all() {

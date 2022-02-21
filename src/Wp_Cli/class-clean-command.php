@@ -42,7 +42,7 @@ final class Clean_Command extends Command {
 		// See https://github.com/itsgoingd/clockwork/issues/510
 		// @todo Revisit after the release of Clockwork v6.
 		if ( $all && 'file' === $config->get( 'storage.driver', 'file' ) ) {
-			$path = $config->get( 'storage.drivers.file.config.path' );
+			$path = $config->get( 'storage.drivers.file.path' );
 
 			foreach ( \glob( $path . '/*.json' ) as $file ) {
 				\unlink( $file );

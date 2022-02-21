@@ -19,7 +19,8 @@
         "vimeo/psalm": "^4.10",
         "humanmade/psalm-plugin-wordpress": "dev-master",
         "wp-coding-standards/wpcs": "^2.3",
-        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1"
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
+        "mikey179/vfsstream": "^1.6"
     },
     "autoload": { "classmap": ["src/"] },
     "autoload-dev": { "classmap": ["tests/"] },
