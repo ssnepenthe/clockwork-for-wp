@@ -76,7 +76,7 @@ class Config_Fetcher {
 			// @todo Will we ever want to configure storage for tests?
 
 			'authentication.enabled' => [ $this, 'boolean' ],
-			'authentication.drivers.simple.config.password' => [ $this, 'string' ],
+			'authentication.drivers.simple.password' => [ $this, 'string' ],
 
 			// @todo Will we ever want to configure serialization for tests?
 			// @todo Will we ever want to configure stack traces for tests?

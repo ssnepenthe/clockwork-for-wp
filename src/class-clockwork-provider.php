@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp;
 
 use Clockwork\Authentication\AuthenticatorInterface;
-use Clockwork\Authentication\NullAuthenticator;
-use Clockwork\Authentication\SimpleAuthenticator;
 use Clockwork\Clockwork;
 use Clockwork\Helpers\Serializer;
 use Clockwork\Helpers\StackFilter;
@@ -15,7 +13,6 @@ use Clockwork\Request\Log;
 use Clockwork\Request\Request;
 use Clockwork\Storage\StorageInterface;
 use Clockwork_For_Wp\Data_Source\Data_Source_Factory;
-use InvalidArgumentException;
 
 /**
  * @internal
@@ -44,30 +41,22 @@ final class Clockwork_Provider extends Base_Provider {
 				->storage( $this->plugin[ StorageInterface::class ] );
 		};
 
+		$this->plugin[ Authenticator_Factory::class ] = static function () {
+			return new Authenticator_Factory();
+		};
+
 		$this->plugin[ AuthenticatorInterface::class ] = function () {
 			$config = $this->plugin[ Config::class ]->get( 'authentication', [] );
+			$factory = $this->plugin[ Authenticator_Factory::class ];
 
 			if ( ! ( $config['enabled'] ?? false ) ) {
-				return new NullAuthenticator();
+				return $factory->create( 'null' );
 			}
 
 			$driver = $config['driver'] ?? 'simple';
-			$factory_id = $config['drivers'][ $driver ]['class'] ?? SimpleAuthenticator::class;
 
-			return $this->plugin[ $factory_id ]( $config['drivers'][ $driver ]['config'] ?? [] );
+			return $factory->create( $driver, $config['drivers'][ $driver ] ?? [] );
 		};
-
-		$this->plugin[ SimpleAuthenticator::class ] = $this->plugin->protect(
-			static function ( array $config ) {
-				if ( ! \array_key_exists( 'password', $config ) ) {
-					throw new InvalidArgumentException(
-						'Missing "password" key from simple authenticator config array'
-					);
-				}
-
-				return new SimpleAuthenticator( $config['password'] );
-			}
-		);
 
 		$this->plugin[ Storage_Factory::class ] = static function () {
 			return new Storage_Factory();

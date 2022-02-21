@@ -25,9 +25,7 @@ describe('Auth API (POST /__clockwork/auth)', () => {
             authentication: {
                 enabled: 1,
                 drivers: {
-                    simple: {
-                        config: { password },
-                    },
+                    simple: { password },
                 },
             },
         };

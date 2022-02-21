@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use Clockwork\Authentication\SimpleAuthenticator;
-
 return [
 
 	// bool. Enable or disable clockwork.
@@ -402,14 +400,8 @@ return [
 
 			'simple' => [
 
-				'class' => SimpleAuthenticator::class,
-
-				'config' => [
-
-					// string. Password used for simple auth.
-					'password' => 'VerySecretPassword',
-
-				],
+				// string. Password used for simple auth.
+				'password' => 'VerySecretPassword',
 
 			],
 
