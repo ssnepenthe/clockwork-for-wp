@@ -23,7 +23,7 @@ final class Clockwork_Provider extends Base_Provider {
 			// Clockwork instance is resolved even when we are not collecting data in order to take
 			// advantage of helper methods like shouldCollect.
 			// This ensures data sources are only registered on plugins_loaded when enabled.
-			$this->add_data_sources();
+			$this->plugin[ Clockwork_Support::class ]->add_data_sources();
 
 			parent::boot();
 		}
@@ -32,6 +32,13 @@ final class Clockwork_Provider extends Base_Provider {
 	public function register(): void {
 		$this->plugin[ Clockwork_Subscriber::class ] = function () {
 			return new Clockwork_Subscriber( $this->plugin );
+		};
+
+		$this->plugin[ Clockwork_Support::class ] = function() {
+			return new Clockwork_Support(
+				$this->plugin[ Clockwork::class ],
+				$this->plugin[ Data_Source_Factory::class ]
+			);
 		};
 
 		$this->plugin[ Clockwork::class ] = function () {

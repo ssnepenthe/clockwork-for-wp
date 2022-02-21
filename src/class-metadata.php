@@ -10,12 +10,12 @@ use Clockwork\Storage\Search;
 use Clockwork\Storage\StorageInterface;
 
 final class Metadata {
-	private $clockwork;
 	private $storage;
+	private $support;
 
-	public function __construct( Clockwork $clockwork, StorageInterface $storage ) {
-		$this->clockwork = $clockwork;
+	public function __construct( Clockwork_Support $support, StorageInterface $storage ) {
 		$this->storage = $storage;
+		$this->support = $support;
 	}
 
 	public function get( $id = null, $direction = null, $count = null ) {
@@ -37,7 +37,7 @@ final class Metadata {
 	public function get_extended( $id = null, $direction = null, $count = null ) {
 		$data = $this->get( $id, $direction, $count );
 
-		$this->clockwork->extendRequest( $data );
+		$this->support->extend_request( $data );
 
 		return $data;
 	}

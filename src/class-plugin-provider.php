@@ -46,9 +46,10 @@ final class Plugin_Provider extends Base_Provider {
 		};
 
 		$this->plugin[ Metadata::class ] = function () {
-			$clockwork = $this->plugin[ Clockwork::class ];
-
-			return new Metadata( $clockwork, $clockwork->storage() );
+			return new Metadata(
+				$this->plugin[ Clockwork_Support::class ],
+				$this->plugin[ Clockwork::class ]->storage()
+			);
 		};
 	}
 }
