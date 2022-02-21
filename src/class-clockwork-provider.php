@@ -122,17 +122,6 @@ final class Clockwork_Provider extends Base_Provider {
 		return [ Clockwork_Subscriber::class ];
 	}
 
-	private function add_data_sources(): void {
-		$clockwork = $this->plugin[ Clockwork::class ];
-		$data_source_factory = $this->plugin[ Data_Source_Factory::class ];
-
-		$clockwork->addDataSource( $data_source_factory->create( 'php' ) );
-
-		foreach ( $data_source_factory->get_enabled_data_sources() as $data_source ) {
-			$clockwork->addDataSource( $data_source );
-		}
-	}
-
 	private function configure_serializer(): void {
 		Serializer::defaults(
 			[
