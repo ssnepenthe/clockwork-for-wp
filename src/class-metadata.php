@@ -11,6 +11,7 @@ use Clockwork\Storage\StorageInterface;
 
 final class Metadata {
 	private $storage;
+
 	private $support;
 
 	public function __construct( Clockwork_Support $support, StorageInterface $storage ) {
