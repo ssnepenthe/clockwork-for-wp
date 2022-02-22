@@ -133,11 +133,14 @@ final class Data_Source_Factory {
 		return Errors::get_instance();
 	}
 
-	private function create_php_data_source(): Php {
-		$cookies = \implode( '|', [ AUTH_COOKIE, SECURE_AUTH_COOKIE, LOGGED_IN_COOKIE ] );
+	private function create_php_data_source( array $config ): Php {
+		if ( ! \array_key_exists( 'sensitive_patterns', $config ) ) {
+			throw new InvalidArgumentException(
+				'Missing required configuration key "sensitive_patterns" in php data source config'
+			);
+		}
 
-		// @todo Option in plugin config for additional patterns?
-		return new Php( '/pass|pwd/i', "/{$cookies}/i" );
+		return new Php( ...$config['sensitive_patterns'] );
 	}
 
 	private function create_rest_api_data_source(): Rest_Api {

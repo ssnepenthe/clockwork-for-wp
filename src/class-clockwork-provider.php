@@ -37,7 +37,8 @@ final class Clockwork_Provider extends Base_Provider {
 		$this->plugin[ Clockwork_Support::class ] = function () {
 			return new Clockwork_Support(
 				$this->plugin[ Clockwork::class ],
-				$this->plugin[ Data_Source_Factory::class ]
+				$this->plugin[ Data_Source_Factory::class ],
+				$this->plugin[ Config::class ]
 			);
 		};
 

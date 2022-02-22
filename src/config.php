@@ -46,6 +46,14 @@ return [
 		// bool. True prevents data collection on OPTIONS requests.
 		'except_preflight' => true,
 
+		// string[]. List of patterns indicating sensitive data that should be redacted from request input (get, post, cookies, session, etc.).
+		'sensitive_patterns' => [
+
+			'/' . \implode( '|', [ AUTH_COOKIE, SECURE_AUTH_COOKIE, LOGGED_IN_COOKIE ] ) . '/i',
+			'/pass|pwd/i',
+
+		],
+
 	],
 
 	// Configure data sources. Enable or disable any data source by setting the corresponding "enabled" value.
