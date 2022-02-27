@@ -16,7 +16,7 @@ class Plugin_Test extends TestCase {
 	public function it_passes_constructor_values_to_container() {
 		$plugin = new Plugin( [], [ 'a' => 'b' ] );
 
-		$this->assertEquals( 'b', $plugin['a'] );
+		$this->assertEquals( 'b', $plugin->get_container()->get( 'a' ) );
 	}
 
 	/** @test */
@@ -114,9 +114,12 @@ class Plugin_Test extends TestCase {
 			] ),
 		] );
 		$plugin->register( new Clockwork_Provider( $plugin ) );
-		$plugin[ Storage_Factory::class ]->register_custom_factory( 'null', function() {
-			return new Null_Storage_For_Tests();
-		} );
+		$plugin->get_container()->get( Storage_Factory::class )->register_custom_factory(
+			'null',
+			function() {
+				return new Null_Storage_For_Tests();
+			}
+		);
 		$plugin->lock();
 
 		$request = function( $uri ) {
@@ -126,7 +129,7 @@ class Plugin_Test extends TestCase {
 			] );
 		};
 
-		$should_collect = $plugin[ Clockwork::class ]->shouldCollect();
+		$should_collect = $plugin->get_container()->get( Clockwork::class )->shouldCollect();
 
 		$this->assertTrue( $should_collect->filter( $request( 'blog/some-post-slug' ) ) );
 		$this->assertTrue( $should_collect->filter( $request( 'blog/clockwork-rocks' ) ) );
@@ -157,9 +160,12 @@ class Plugin_Test extends TestCase {
 			] ),
 		] );
 		$plugin->register( new Clockwork_Provider( $plugin ) );
-		$plugin[ Storage_Factory::class ]->register_custom_factory( 'null', function() {
-			return new Null_Storage_For_Tests();
-		} );
+		$plugin->get_container()->get( Storage_Factory::class )->register_custom_factory(
+			'null',
+			function() {
+				return new Null_Storage_For_Tests();
+			}
+		);
 		$plugin->lock();
 
 		$request = function( $uri ) {
@@ -169,7 +175,7 @@ class Plugin_Test extends TestCase {
 			] );
 		};
 
-		$should_collect = $plugin[ Clockwork::class ]->shouldCollect();
+		$should_collect = $plugin->get_container()->get( Clockwork::class )->shouldCollect();
 
 		$this->assertTrue( $should_collect->filter( $request( 'blog/some-post-slug' ) ) );
 		$this->assertTrue( $should_collect->filter( $request( 'a-specific-slug' ) ) );
@@ -195,12 +201,15 @@ class Plugin_Test extends TestCase {
 				] ),
 			] );
 			$plugin->register( new Clockwork_Provider( $plugin ) );
-			$plugin[ Storage_Factory::class ]->register_custom_factory( 'null', function() {
-				return new Null_Storage_For_Tests();
-			} );
+			$plugin->get_container()->get( Storage_Factory::class )->register_custom_factory(
+				'null',
+				function() {
+					return new Null_Storage_For_Tests();
+				}
+			);
 			$plugin->lock();
 
-			return $plugin[ Clockwork::class ]->shouldCollect();
+			return $plugin->get_container()->get( Clockwork::class )->shouldCollect();
 		};
 
 		$request = function( $uri ) {

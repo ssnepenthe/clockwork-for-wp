@@ -6,17 +6,23 @@ namespace Clockwork_For_Wp\Routing;
 
 use Clockwork_For_Wp\Base_Provider;
 use Invoker\Invoker;
+use Pimple\Container;
 
+/**
+ * @internal
+ */
 final class Routing_Provider extends Base_Provider {
 	public function register(): void {
-		$this->plugin[ Route_Collection::class ] = static function () {
+		$pimple = $this->plugin->get_pimple();
+
+		$pimple[ Route_Collection::class ] = static function () {
 			// @todo Configurable prefix?
 			return new Route_Collection( 'cfw_' );
 		};
 
-		$this->plugin[ Route_Handler_Invoker::class ] = function () {
+		$pimple[ Route_Handler_Invoker::class ] = function ( Container $pimple ) {
 			return new Route_Handler_Invoker(
-				$this->plugin[ Invoker::class ],
+				$pimple[ Invoker::class ],
 				// @todo Configurable prefix?
 				'cfw_',
 				function ( Route $route ) {
@@ -39,7 +45,7 @@ final class Routing_Provider extends Base_Provider {
 			);
 		};
 
-		$this->plugin[ Routing_Subscriber::class ] = static function () {
+		$pimple[ Routing_Subscriber::class ] = static function () {
 			return new Routing_Subscriber();
 		};
 	}

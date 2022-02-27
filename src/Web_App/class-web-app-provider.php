@@ -6,8 +6,12 @@ namespace Clockwork_For_Wp\Web_App;
 
 use Clockwork\Web\Web;
 use Clockwork_For_Wp\Base_Provider;
+use Pimple\Container;
 use WP_Query;
 
+/**
+ * @internal
+ */
 final class Web_App_Provider extends Base_Provider {
 	public function boot(): void {
 		if ( $this->plugin->is_web_enabled() ) {
@@ -16,11 +20,13 @@ final class Web_App_Provider extends Base_Provider {
 	}
 
 	public function register(): void {
-		$this->plugin[ Web_App_Controller::class ] = function () {
-			return new Web_App_Controller( new Web(), $this->plugin[ WP_Query::class ] );
+		$pimple = $this->plugin->get_pimple();
+
+		$pimple[ Web_App_Controller::class ] = static function ( Container $pimple ) {
+			return new Web_App_Controller( new Web(), $pimple[ WP_Query::class ] );
 		};
 
-		$this->plugin[ Web_App_Subscriber::class ] = static function () {
+		$pimple[ Web_App_Subscriber::class ] = static function () {
 			return new Web_App_Subscriber();
 		};
 	}

@@ -35,7 +35,9 @@ function create_requests() {
 	$requests = [];
 
 	$clockwork = ( new \Clockwork\Clockwork() )
-		->storage( _cfw_instance()[ \Clockwork\Storage\StorageInterface::class ] );
+		->storage(
+			_cfw_instance()->get_container()->get( \Clockwork\Storage\StorageInterface::class )
+		);
 
 	for ( $i = 0; $i < $qty; $i++ ) {
 		$request = new \Clockwork\Request\Request();

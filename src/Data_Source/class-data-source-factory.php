@@ -9,6 +9,9 @@ use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Plugin;
 use InvalidArgumentException;
 
+/**
+ * @internal
+ */
 final class Data_Source_Factory {
 	private $custom_factories = [];
 
@@ -126,7 +129,9 @@ final class Data_Source_Factory {
 	}
 
 	private function create_core_data_source(): Core {
-		return new Core( $this->plugin['wp_version'], $this->plugin['timestart'] );
+		$container = $this->plugin->get_container();
+
+		return new Core( $container->get( 'wp_version' ), $container->get( 'timestart' ) );
 	}
 
 	private function create_errors_data_source(): Errors {
@@ -220,7 +225,7 @@ final class Data_Source_Factory {
 			);
 		}
 
-		$this->plugin[ Event_Manager::class ]->trigger(
+		$this->plugin->get_container()->get( Event_Manager::class )->trigger(
 			'cfw_data_sources_wpdb_init',
 			$data_source
 		);

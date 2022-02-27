@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Clockwork_For_Wp;
 
-use ArrayAccess;
 use Clockwork\Clockwork;
 use Clockwork\Request\IncomingRequest;
 use Clockwork_For_Wp\Api\Api_Provider;
@@ -19,9 +18,13 @@ use Clockwork_For_Wp\Web_App\Web_App_Provider;
 use Clockwork_For_Wp\Wp_Cli\Wp_Cli_Provider;
 use InvalidArgumentException;
 use Pimple\Container;
+use Pimple\Psr11\Container as Psr11Container;
 use RuntimeException;
 
-final class Plugin implements ArrayAccess {
+/**
+ * @internal
+ */
+final class Plugin {
 	private $booted = false;
 
 	private $container;
@@ -47,9 +50,10 @@ final class Plugin implements ArrayAccess {
 			];
 		}
 
-		$this->container = new Container( $values ?: [] );
+		$this->pimple = new Container( $values ?: [] );
+		$this->container = new Psr11Container( $this->pimple );
 
-		$this[ self::class ] = $this;
+		$this->pimple[ self::class ] = $this;
 
 		foreach ( $providers as $provider ) {
 			if ( \is_string( $provider ) && \is_subclass_of( $provider, Base_Provider::class ) ) {
@@ -77,19 +81,19 @@ final class Plugin implements ArrayAccess {
 	}
 
 	public function config( $path, $default = null ) {
-		if ( ! isset( $this[ Config::class ] ) ) {
+		if ( ! $this->container->has( Config::class  ) ) {
 			return $default;
 		}
 
-		return $this[ Config::class ]->get( $path, $default );
-	}
-
-	public function factory( $callable ) {
-		return $this->container->factory( $callable );
+		return $this->container->get( Config::class )->get( $path, $default );
 	}
 
 	public function get_container() {
 		return $this->container;
+	}
+
+	public function get_pimple() {
+		return $this->pimple;
 	}
 
 	public function is_collecting_client_metrics() {
@@ -111,13 +115,13 @@ final class Plugin implements ArrayAccess {
 	}
 
 	public function is_collecting_requests() {
+		$clockwork = $this->container->get( Clockwork::class );
+		$request = $this->container->get( IncomingRequest::class );
+
 		return ( $this->is_enabled() || $this->config( 'collect_data_always', false ) )
 			&& ! $this->is_running_in_console()
-			&& $this[ Clockwork::class ]->shouldCollect()->filter( $this[ IncomingRequest::class ] )
-			&& (
-				! $this[ Incoming_Request::class ]->is_heartbeat()
-				|| $this->is_collecting_heartbeat_requests()
-			);
+			&& $clockwork->shouldCollect()->filter( $request )
+			&& ( ! $request->is_heartbeat() || $this->is_collecting_heartbeat_requests() );
 	}
 
 	public function is_command_filtered( $command ) {
@@ -191,27 +195,6 @@ final class Plugin implements ArrayAccess {
 		$this->locked = true;
 	}
 
-	public function offsetExists( $offset ) {
-		return $this->container->offsetExists( $offset );
-	}
-
-	public function offsetGet( $offset ) {
-		return $this->container->offsetGet( $offset );
-	}
-
-	public function offsetSet( $offset, $value ): void {
-		$this->container->offsetSet( $offset, $value );
-	}
-
-	public function offsetUnset( $offset ): void {
-		$this->container->offsetUnset( $offset );
-	}
-
-	// @todo extend method?
-	public function protect( $callable ) {
-		return $this->container->protect( $callable );
-	}
-
 	public function register( Provider $provider ) {
 		if ( $this->locked ) {
 			throw new RuntimeException( 'Cannot register providers after plugin has been locked' );
@@ -229,11 +212,11 @@ final class Plugin implements ArrayAccess {
 		// @todo Move to plugin constructor?
 		Errors::get_instance()->register();
 
-		$this[ Event_Manager::class ]
+		$this->container->get( Event_Manager::class )
 			->on(
 				'plugin_loaded',
 				function ( $file ): void {
-					if ( $this['file'] !== \realpath( $file ) ) {
+					if ( $this->container->get( 'file' ) !== \realpath( $file ) ) {
 						return;
 					}
 

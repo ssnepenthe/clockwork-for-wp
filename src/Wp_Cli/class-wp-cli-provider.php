@@ -6,18 +6,19 @@ namespace Clockwork_For_Wp\Wp_Cli;
 
 use Clockwork_For_Wp\Base_Provider;
 use Invoker\Invoker;
+use Pimple\Container;
 
 /**
  * @internal
  */
 final class Wp_Cli_Provider extends Base_Provider {
 	public function boot(): void {
-		$this->plugin[ Command_Registry::class ]->initialize();
+		$this->plugin->get_container()->get( Command_Registry::class )->initialize();
 	}
 
 	public function register(): void {
-		$this->plugin[ Command_Registry::class ] = function () {
-			return new Command_Registry( $this->plugin[ Invoker::class ] );
+		$this->plugin->get_pimple()[ Command_Registry::class ] = static function ( Container $pimple ) {
+			return new Command_Registry( $pimple[ Invoker::class ] );
 		};
 	}
 
@@ -26,7 +27,7 @@ final class Wp_Cli_Provider extends Base_Provider {
 			return;
 		}
 
-		$this->plugin[ Command_Registry::class ]->namespace(
+		$this->plugin->get_container()->get( Command_Registry::class )->namespace(
 			'clockwork',
 			'Manages the Clockwork for WP plugin.',
 			static function ( Command_Registry $scoped_registry ): void {

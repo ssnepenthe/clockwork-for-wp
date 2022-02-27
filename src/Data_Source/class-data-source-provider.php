@@ -6,11 +6,16 @@ namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork_For_Wp\Base_Provider;
 use Clockwork_For_Wp\Event_Management\Subscriber;
+use Clockwork_For_Wp\Plugin;
+use Pimple\Container;
 
+/**
+ * @internal
+ */
 final class Data_Source_Provider extends Base_Provider {
 	public function register(): void {
-		$this->plugin[ Data_Source_Factory::class ] = function () {
-			return new Data_Source_Factory( $this->plugin );
+		$this->plugin->get_pimple()[ Data_Source_Factory::class ] = static function ( Container $pimple ) {
+			return new Data_Source_Factory( $pimple[ Plugin::class ] );
 		};
 	}
 
@@ -27,19 +32,17 @@ final class Data_Source_Provider extends Base_Provider {
 			$only_types = $config['only_types'] ?? false;
 
 			// Filter errors by type.
-			$errors->addFilter(
-				static function ( $error ) use ( $except_types, $only_types ) {
-					if ( \is_int( $only_types ) ) {
-						return ( $error['type'] & $only_types ) > 0;
-					}
-
-					if ( \is_int( $except_types ) ) {
-						return ( $error['type'] & $except_types ) < 1;
-					}
-
-					return true;
+			$errors->addFilter( static function ( $error ) use ( $except_types, $only_types ) {
+				if ( \is_int( $only_types ) ) {
+					return ( $error['type'] & $only_types ) > 0;
 				}
-			);
+
+				if ( \is_int( $except_types ) ) {
+					return ( $error['type'] & $except_types ) < 1;
+				}
+
+				return true;
+			} );
 
 			// Filter errors by message pattern.
 			$errors->addFilter(
@@ -60,11 +63,9 @@ final class Data_Source_Provider extends Base_Provider {
 			// Filter suppressed errors.
 			$include_suppressed = $config['include_suppressed_errors'] ?? false;
 
-			$errors->addFilter(
-				static function ( $error ) use ( $include_suppressed ) {
-					return ! $error['suppressed'] || $include_suppressed;
-				}
-			);
+			$errors->addFilter( static function ( $error ) use ( $include_suppressed ) {
+				return ! $error['suppressed'] || $include_suppressed;
+			} );
 
 			$errors->reapply_filters();
 		} else {
@@ -73,8 +74,10 @@ final class Data_Source_Provider extends Base_Provider {
 	}
 
 	protected function subscribers(): array {
+		$data_source_factory = $this->plugin->get_container()->get( Data_Source_Factory::class );
+
 		return \array_filter(
-			$this->plugin[ Data_Source_Factory::class ]->get_enabled_data_sources(),
+			$data_source_factory->get_enabled_data_sources(),
 			static function ( $data_source ) {
 				return $data_source instanceof Subscriber;
 			}

@@ -13,23 +13,25 @@ use Invoker\ParameterResolver\Container\TypeHintContainerResolver;
 use Invoker\ParameterResolver\DefaultValueResolver;
 use Invoker\ParameterResolver\NumericArrayResolver;
 use Invoker\ParameterResolver\ResolverChain;
-use Pimple\Psr11\Container;
+use Pimple\Container;
 
 final class Plugin_Provider extends Base_Provider {
 	public function register(): void {
 		require_once __DIR__ . '/plugin-helpers.php';
 
-		$this->plugin[ Config::class ] = function () {
+		$pimple = $this->plugin->get_pimple();
+
+		$pimple[ Config::class ] = function ( Container $pimple ) {
 			$values = include __DIR__ . '/config.php';
 			$config = new Config( $values );
 
-			$this->plugin[ Event_Manager::class ]->trigger( 'cfw_config_init', $config );
+			$pimple[ Event_Manager::class ]->trigger( 'cfw_config_init', $config );
 
 			return $config;
 		};
 
-		$this->plugin[ Invoker::class ] = function () {
-			$psr_container = new Container( $this->plugin->get_container() );
+		$pimple[ Invoker::class ] = function () {
+			$psr_container = $this->plugin->get_container();
 
 			return new Invoker(
 				new ResolverChain(
@@ -45,10 +47,10 @@ final class Plugin_Provider extends Base_Provider {
 			);
 		};
 
-		$this->plugin[ Metadata::class ] = function () {
+		$pimple[ Metadata::class ] = static function ( Container $pimple ) {
 			return new Metadata(
-				$this->plugin[ Clockwork_Support::class ],
-				$this->plugin[ Clockwork::class ]->storage()
+				$pimple[ Clockwork_Support::class ],
+				$pimple[ Clockwork::class ]->storage()
 			);
 		};
 	}

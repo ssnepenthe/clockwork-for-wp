@@ -7,7 +7,7 @@ namespace Cfw_Test_Helper;
 //       https://github.com/itsgoingd/clockwork/issues/510
 class Metadata {
 	public static function dir() {
-		$config = \_cfw_instance()[ \Clockwork_For_Wp\Config::class ];
+		$config = \_cfw_instance()->get_container()->get( \Clockwork_For_Wp\Config::class );
 
 		if ( 'file' !== $config->get( 'storage.driver' ) ) {
 			throw new \RuntimeException(

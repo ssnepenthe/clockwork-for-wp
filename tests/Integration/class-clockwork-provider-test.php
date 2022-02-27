@@ -26,9 +26,12 @@ class Clockwork_Provider_Test extends TestCase {
 			] ),
 		] );
 		$plugin->register( new Clockwork_Provider( $plugin ) );
-		$plugin[ Storage_Factory::class ]->register_custom_factory( 'null', function() {
-			return new Null_Storage_For_Tests();
-		} );
+		$plugin->get_container()->get( Storage_Factory::class )->register_custom_factory(
+			'null',
+			function() {
+				return new Null_Storage_For_Tests();
+			}
+		);
 
 		$plugin->lock();
 
@@ -48,9 +51,12 @@ class Clockwork_Provider_Test extends TestCase {
 			] ),
 		] );
 		$plugin->register( new Clockwork_Provider( $plugin ) );
-		$plugin[ Storage_Factory::class ]->register_custom_factory( 'null', function() {
-			return new Null_Storage_For_Tests();
-		} );
+		$plugin->get_container()->get( Storage_Factory::class )->register_custom_factory(
+			'null',
+			function() {
+				return new Null_Storage_For_Tests();
+			}
+		);
 		$plugin->lock();
 
 		$this->assertTrue( \function_exists( 'clock' ) );

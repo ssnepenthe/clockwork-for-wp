@@ -13,6 +13,7 @@ use Clockwork\Request\Log;
 use Clockwork\Request\Request;
 use Clockwork\Storage\StorageInterface;
 use Clockwork_For_Wp\Data_Source\Data_Source_Factory;
+use Pimple\Container;
 
 /**
  * @internal
@@ -23,39 +24,41 @@ final class Clockwork_Provider extends Base_Provider {
 			// Clockwork instance is resolved even when we are not collecting data in order to take
 			// advantage of helper methods like shouldCollect.
 			// This ensures data sources are only registered on plugins_loaded when enabled.
-			$this->plugin[ Clockwork_Support::class ]->add_data_sources();
+			$this->plugin->get_container()->get( Clockwork_Support::class )->add_data_sources();
 
 			parent::boot();
 		}
 	}
 
 	public function register(): void {
-		$this->plugin[ Clockwork_Subscriber::class ] = function () {
-			return new Clockwork_Subscriber( $this->plugin );
+		$pimple = $this->plugin->get_pimple();
+
+		$pimple[ Clockwork_Subscriber::class ] = static function ( Container $pimple ) {
+			return new Clockwork_Subscriber( $pimple[ Plugin::class ] );
 		};
 
-		$this->plugin[ Clockwork_Support::class ] = function () {
+		$pimple[ Clockwork_Support::class ] = static function ( Container $pimple ) {
 			return new Clockwork_Support(
-				$this->plugin[ Clockwork::class ],
-				$this->plugin[ Data_Source_Factory::class ],
-				$this->plugin[ Config::class ]
+				$pimple[ Clockwork::class ],
+				$pimple[ Data_Source_Factory::class ],
+				$pimple[ Config::class ]
 			);
 		};
 
-		$this->plugin[ Clockwork::class ] = function () {
+		$pimple[ Clockwork::class ] = static function ( Container $pimple ) {
 			return ( new Clockwork() )
-				->authenticator( $this->plugin[ AuthenticatorInterface::class ] )
-				->request( $this->plugin[ Request::class ] )
-				->storage( $this->plugin[ StorageInterface::class ] );
+				->authenticator( $pimple[ AuthenticatorInterface::class ] )
+				->request( $pimple[ Request::class ] )
+				->storage( $pimple[ StorageInterface::class ] );
 		};
 
-		$this->plugin[ Authenticator_Factory::class ] = static function () {
+		$pimple[ Authenticator_Factory::class ] = static function () {
 			return new Authenticator_Factory();
 		};
 
-		$this->plugin[ AuthenticatorInterface::class ] = function () {
-			$config = $this->plugin[ Config::class ]->get( 'authentication', [] );
-			$factory = $this->plugin[ Authenticator_Factory::class ];
+		$pimple[ AuthenticatorInterface::class ] = static function ( Container $pimple ) {
+			$config = $pimple[ Config::class ]->get( 'authentication', [] );
+			$factory = $pimple[ Authenticator_Factory::class ];
 
 			if ( ! ( $config['enabled'] ?? false ) ) {
 				return $factory->create( 'null' );
@@ -66,46 +69,42 @@ final class Clockwork_Provider extends Base_Provider {
 			return $factory->create( $driver, $config['drivers'][ $driver ] ?? [] );
 		};
 
-		$this->plugin[ Storage_Factory::class ] = static function () {
+		$pimple[ Storage_Factory::class ] = static function () {
 			return new Storage_Factory();
 		};
 
-		$this->plugin[ StorageInterface::class ] = $this->plugin->factory(
-			function () {
-				$storage_config = $this->plugin[ Config::class ]->get( 'storage', [] );
-				$driver = $storage_config['driver'] ?? 'file';
-				$driver_config = $storage_config['drivers'][ $driver ] ?? [];
+		$pimple[ StorageInterface::class ] = $pimple->factory( static function ( Container $pimple ) {
+			$storage_config = $pimple[ Config::class ]->get( 'storage', [] );
+			$driver = $storage_config['driver'] ?? 'file';
+			$driver_config = $storage_config['drivers'][ $driver ] ?? [];
 
-				if (
-					! \array_key_exists( 'expiration', $driver_config )
-					&& \array_key_exists( 'expiration', $storage_config )
-				) {
-					$driver_config['expiration'] = $storage_config['expiration'];
-				}
-
-				return $this->plugin[ Storage_Factory::class ]->create( $driver, $driver_config );
+			if (
+				! \array_key_exists( 'expiration', $driver_config )
+				&& \array_key_exists( 'expiration', $storage_config )
+			) {
+				$driver_config['expiration'] = $storage_config['expiration'];
 			}
-		);
 
-		$this->plugin[ Log::class ] = static function () {
+			return $pimple[ Storage_Factory::class ]->create( $driver, $driver_config );
+		} );
+
+		$pimple[ Log::class ] = static function () {
 			return new Log();
 		};
 
-		$this->plugin[ Request::class ] = static function () {
+		$pimple[ Request::class ] = static function () {
 			return new Request();
 		};
 
 		// Create request so we have id and start time available immediately.
 		// Could probably even create it within Plugin::__construct() and save it to container.
-		$this->plugin[ Request::class ];
+		$pimple[ Request::class ];
 
-		$this->plugin[ IncomingRequest::class ] = $this->plugin->factory(
-			function () {
-				return $this->plugin[ Incoming_Request::class ];
-			}
-		);
+		$pimple[ IncomingRequest::class ] = $pimple->factory( static function ( Container $pimple ) {
+			return $pimple[ Incoming_Request::class ];
+		} );
 
-		$this->plugin[ Incoming_Request::class ] = static function () {
+		$pimple[ Incoming_Request::class ] = static function () {
 			return Incoming_Request::from_globals();
 		};
 	}
@@ -151,7 +150,7 @@ final class Clockwork_Provider extends Base_Provider {
 	}
 
 	private function configure_should_collect(): void {
-		$should_collect = $this->plugin[ Clockwork::class ]->shouldCollect();
+		$should_collect = $this->plugin->get_container()->get( Clockwork::class )->shouldCollect();
 
 		$should_collect->merge(
 			[
