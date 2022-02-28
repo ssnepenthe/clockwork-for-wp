@@ -151,7 +151,6 @@ return [
 		],
 
 		// The errors data source records PHP errors to the clockwork log.
-		// @todo Disabling this data source doesn't currently prevent the error handler from being registered.
 		'errors' => [
 
 			'enabled' => false,

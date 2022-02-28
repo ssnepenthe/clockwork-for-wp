@@ -71,8 +71,6 @@ final class Command_Registry {
 	}
 
 	public function namespace( string $namespace, string $description, callable $callback ): void {
-		// @todo track previously registered namespaces?
-		// @todo Examples?
 		$command = new Command();
 		$command->set_name( $namespace );
 		$command->set_handler( Namespace_Identifier::class );
@@ -92,7 +90,6 @@ final class Command_Registry {
 	}
 
 	private function wrap_callback( $callback ): Closure {
-		// @todo accept ...$args?
 		return function () use ( $callback ) {
 			return $this->invoker->call( $callback );
 		};

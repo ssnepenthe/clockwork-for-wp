@@ -31,6 +31,8 @@ final class Plugin {
 
 	private $locked = false;
 
+	private $pimple;
+
 	private $providers = [];
 
 	public function __construct( ?array $providers = null, ?array $values = null ) {
