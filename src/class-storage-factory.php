@@ -47,31 +47,29 @@ final class Storage_Factory {
 	}
 
 	private function create_file_storage( array $config ): FileStorage {
-		if ( ! \array_key_exists( 'path', $config ) ) {
-			throw new InvalidArgumentException(
-				'Missing "path" key from file storage config array'
-			);
+		if ( '' === $config['path'] ) {
+			throw new InvalidArgumentException( '@todo' );
 		}
 
 		return new FileStorage(
 			$config['path'],
-			$config['dir_permissions'] ?? 0700,
-			$config['expiration'] ?? null,
-			$config['compress'] ?? false
+			$config['dir_permissions'],
+			$config['expiration'],
+			$config['compress']
 		);
 	}
 
 	private function create_sql_storage( array $config ): SqlStorage {
-		if ( ! \array_key_exists( 'dsn', $config ) ) {
-			throw new InvalidArgumentException( 'Missing "dsn" key from sql storage config array' );
+		if ( '' === $config['dsn'] ) {
+			throw new InvalidArgumentException( '@todo' );
 		}
 
 		return new SqlStorage(
 			$config['dsn'],
-			$config['table'] ?? 'clockwork',
-			$config['username'] ?? null,
-			$config['password'] ?? null,
-			$config['expiration'] ?? null
+			$config['table'],
+			$config['username'],
+			$config['password'],
+			$config['expiration']
 		);
 	}
 

@@ -5,13 +5,18 @@ namespace Clockwork_For_Wp\Tests\Integration;
 use Clockwork\Clockwork;
 use Clockwork\Request\IncomingRequest;
 use Clockwork_For_Wp\Clockwork_Provider;
-use Clockwork_For_Wp\Config;
 use Clockwork_For_Wp\Plugin;
 use Clockwork_For_Wp\Storage_Factory;
+use Clockwork_For_Wp\Tests\Creates_Config;
+use League\Config\Configuration;
+use League\Config\ConfigurationInterface;
+use Nette\Schema\Expect;
 use Null_Storage_For_Tests;
 use PHPUnit\Framework\TestCase;
 
 class Plugin_Test extends TestCase {
+	use Creates_Config;
+
 	/** @test */
 	public function it_passes_constructor_values_to_container() {
 		$plugin = new Plugin( [], [ 'a' => 'b' ] );
@@ -21,8 +26,10 @@ class Plugin_Test extends TestCase {
 
 	/** @test */
 	public function it_provides_access_to_config_object() {
+		$config = new Configuration( [ 'a' => Expect::string() ] );
+		$config->merge( [ 'a' => 'b' ] );
 		$plugin = new Plugin( [], [
-			Config::class => new Config( [ 'a' => 'b' ] ),
+			ConfigurationInterface::class => $config,
 		] );
 
 		$this->assertEquals( 'b', $plugin->config( 'a' ) );
@@ -31,13 +38,11 @@ class Plugin_Test extends TestCase {
 
 	/** @test */
 	public function it_can_check_if_a_feature_is_enabled() {
-		$plugin = new Plugin( [], [
-			Config::class => new Config( [
-				'data_sources' => [
-					'one' => [ 'enabled' => true ],
-					'two' => [ 'enabled' => false ],
-				],
-			] ),
+		$plugin = $this->create_plugin_with_configuration( [
+			'data_sources' => [
+				'one' => [ 'enabled' => true ],
+				'two' => [ 'enabled' => false ],
+			],
 		] );
 
 		$this->assertTrue( $plugin->is_feature_enabled( 'one' ) );
@@ -50,20 +55,17 @@ class Plugin_Test extends TestCase {
 	/** @test */
 	public function it_can_check_if_clockwork_is_enabled() {
 		// Default true.
-		$config = new Config( [] );
-		$plugin = new Plugin( [], [ Config::class => $config ] );
+		$plugin = $this->create_plugin_with_configuration( [] );
 
 		$this->assertTrue( $plugin->is_enabled() );
 
 		// Explicitly enabled.
-		$config = new Config( [ 'enable' => true ] );
-		$plugin = new Plugin( [], [ Config::class => $config ] );
+		$plugin = $this->create_plugin_with_configuration( [ 'enable' => true ] );
 
 		$this->assertTrue( $plugin->is_enabled() );
 
 		// Explicitly disabled.
-		$config = new Config( [ 'enable' => false ] );
-		$plugin = new Plugin( [], [ Config::class => $config ] );
+		$plugin = $this->create_plugin_with_configuration( [ 'enable' => false ] );
 
 		$this->assertFalse( $plugin->is_enabled() );
 	}
@@ -71,55 +73,43 @@ class Plugin_Test extends TestCase {
 	/** @test */
 	public function it_can_check_if_web_app_is_enabled() {
 		// Default true.
-		$config = new Config( [] );
-		$plugin = new Plugin( [], [ Config::class => $config ] );
+		$plugin = $this->create_plugin_with_configuration( [] );
 
 		$this->assertTrue( $plugin->is_web_enabled() );
 
 		// Enabled and web enabled.
-		$config = new Config( [ 'enable' => true, 'web' => true ] );
-		$plugin = new Plugin( [], [ Config::class => $config ] );
+		$plugin = $this->create_plugin_with_configuration( [ 'enable' => true, 'web' => true ] );
 
 		$this->assertTrue( $plugin->is_web_enabled() );
 
 		// Enabled, not web enabled.
-		$config = new Config( [ 'enable' => true, 'web' => false ] );
-		$plugin = new Plugin( [], [ Config::class => $config ] );
+		$plugin = $this->create_plugin_with_configuration( [ 'enable' => true, 'web' => false ] );
 
 		$this->assertFalse( $plugin->is_web_enabled() );
 
 		// Disabled, web enabled.
-		$config = new Config( [ 'enable' => false, 'web' => true ] );
-		$plugin = new Plugin( [], [ Config::class => $config ] );
+		$plugin = $this->create_plugin_with_configuration( [ 'enable' => false, 'web' => true ] );
 
 		$this->assertFalse( $plugin->is_web_enabled() );
 	}
 
 	/** @test */
 	public function it_can_filter_data_collection_using_except_uri_list() {
-		$plugin = new Plugin( [], [
-			Config::class => new Config( [
-				'requests' => [
-					'except' => [
-						'^clockwork',
-						'^something',
-						'^another',
-						'a-specific-slug#with_hash'
-					],
+		$plugin = $this->create_plugin_with_configuration( [
+			'requests' => [
+				'except' => [
+					'^clockwork',
+					'^something',
+					'^another',
+					'a-specific-slug#with_hash'
 				],
-				'storage' => [
-					'driver' => 'null',
-				],
-				'register_helpers' => false,
-			] ),
+			],
+			'storage' => [
+				'driver' => 'null',
+			],
+			'register_helpers' => false,
 		] );
-		$plugin->register( new Clockwork_Provider( $plugin ) );
-		$plugin->get_container()->get( Storage_Factory::class )->register_custom_factory(
-			'null',
-			function() {
-				return new Null_Storage_For_Tests();
-			}
-		);
+		$this->add_null_storage_to_storage_factory_on_plugin( $plugin );
 		$plugin->lock();
 
 		$request = function( $uri ) {
@@ -144,28 +134,20 @@ class Plugin_Test extends TestCase {
 
 	/** @test */
 	public function it_can_filter_data_collection_using_only_uri_list() {
-		$plugin = new Plugin( [], [
-			Config::class => new Config( [
-				'requests' => [
-					'only' => [
-						'^blog',
-						'^a-specific-slug$',
-						'#with_hash'
-					],
+		$plugin = $this->create_plugin_with_configuration( [
+			'requests' => [
+				'only' => [
+					'^blog',
+					'^a-specific-slug$',
+					'#with_hash'
 				],
-				'storage' => [
-					'driver' => 'null',
-				],
-				'register_helpers' => false,
-			] ),
+			],
+			'storage' => [
+				'driver' => 'null',
+			],
+			'register_helpers' => false,
 		] );
-		$plugin->register( new Clockwork_Provider( $plugin ) );
-		$plugin->get_container()->get( Storage_Factory::class )->register_custom_factory(
-			'null',
-			function() {
-				return new Null_Storage_For_Tests();
-			}
-		);
+		$this->add_null_storage_to_storage_factory_on_plugin( $plugin );
 		$plugin->lock();
 
 		$request = function( $uri ) {
@@ -189,24 +171,16 @@ class Plugin_Test extends TestCase {
 	/** @test */
 	public function it_can_filter_data_collection_for_preflight_requests() {
 		$should_collect = function( $except_preflight ) {
-			$plugin = new Plugin( [], [
-				Config::class => new Config( [
-					'requests' => [
-						'except_preflight' => $except_preflight,
-					],
-					'storage' => [
-						'driver' => 'null',
-					],
-					'register_helpers' => false,
-				] ),
+			$plugin = $this->create_plugin_with_configuration( [
+				'requests' => [
+					'except_preflight' => $except_preflight,
+				],
+				'storage' => [
+					'driver' => 'null',
+				],
+				'register_helpers' => false,
 			] );
-			$plugin->register( new Clockwork_Provider( $plugin ) );
-			$plugin->get_container()->get( Storage_Factory::class )->register_custom_factory(
-				'null',
-				function() {
-					return new Null_Storage_For_Tests();
-				}
-			);
+			$this->add_null_storage_to_storage_factory_on_plugin( $plugin );
 			$plugin->lock();
 
 			return $plugin->get_container()->get( Clockwork::class )->shouldCollect();
@@ -221,5 +195,25 @@ class Plugin_Test extends TestCase {
 
 		$this->assertFalse( $should_collect( true )->filter( $request( '/' ) ) );
 		$this->assertTrue( $should_collect( false )->filter( $request( '/' ) ) );
+	}
+
+	private function create_plugin_with_configuration( array $user_config = [] ) {
+		$plugin = new Plugin( [], [
+			ConfigurationInterface::class => $this->create_config( $user_config ),
+		] );
+
+		return $plugin;
+	}
+
+	private function add_null_storage_to_storage_factory_on_plugin( $plugin ) {
+		$plugin->register( new Clockwork_Provider( $plugin ) );
+
+		$plugin->get_pimple()->extend( Storage_Factory::class, function( $factory ) {
+			$factory->register_custom_factory( 'null', function() {
+				return new Null_Storage_For_Tests();
+			} );
+
+			return $factory;
+		} );
 	}
 }

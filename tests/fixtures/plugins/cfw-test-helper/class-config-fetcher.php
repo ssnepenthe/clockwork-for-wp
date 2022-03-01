@@ -2,24 +2,24 @@
 
 namespace Cfw_Test_Helper;
 
+use Dflydev\DotAccessData\Data;
+
 class Config_Fetcher {
 	protected $input;
 
 	public function __construct( array $input = [] ) {
-		$this->input = $input;
+		$this->input = new Data( $input );
 	}
 
 	public function get_config() {
 		$config = [];
 
 		foreach ( $this->config_caster_map() as $key => $caster ) {
-			$value = \Clockwork_For_Wp\array_get( $this->input, $key );
-
-			if ( null === $value ) {
+			if ( ! $this->input->has( $key ) ) {
 				continue;
 			}
 
-			$value = $caster( $value );
+			$value = $caster( $this->input->get( $key ) );
 
 			if ( null === $value ) {
 				continue;

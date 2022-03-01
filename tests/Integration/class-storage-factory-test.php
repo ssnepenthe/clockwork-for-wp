@@ -41,7 +41,27 @@ class Storage_Factory_Test extends TestCase {
 	}
 
 	public function provide_test_create() {
-		yield [ 'file', [ 'path' => vfsStream::setup()->url() ], FileStorage::class ];
-		yield [ 'sql', [ 'dsn' => $this->createMock( \PDO::class ) ], SqlStorage::class ];
+		yield [
+			'file',
+			[
+				'compress' => false,
+				'dir_permissions' => 0700,
+				'expiration' => null,
+				'path' => vfsStream::setup()->url(),
+			],
+			FileStorage::class
+		];
+
+		yield [
+			'sql',
+			[
+				'dsn' => $this->createMock( \PDO::class ),
+				'expiration' => null,
+				'password' => null,
+				'table' => 'clockwork',
+				'username' => null,
+			],
+			SqlStorage::class
+		];
 	}
 }

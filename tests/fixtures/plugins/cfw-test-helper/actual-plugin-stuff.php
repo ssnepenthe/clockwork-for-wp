@@ -13,7 +13,7 @@ function apply_config( $config ) {
 		$config->set( $key, $value );
 	}
 
-	$requests_except = $config->get( 'requests.except', [] );
+	$requests_except = $config->get( 'requests.except' );
 	$requests_except[] = 'action=cfwth_';
 
 	$config->set( 'requests.except', $requests_except );

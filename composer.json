@@ -4,10 +4,11 @@
     "type": "wordpress-plugin",
     "license": "MIT",
     "require": {
-        "php": ">=7.1",
+        "php": "^7.4 || ^8.0",
         "itsgoingd/clockwork": "^5.0",
         "pimple/pimple": "^3.2",
-        "php-di/invoker": "^2.0"
+        "php-di/invoker": "^2.0",
+        "league/config": "^1.1"
     },
     "require-dev": {
         "psy/psysh": "^0.9.7",
