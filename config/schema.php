@@ -313,7 +313,7 @@ return [
 		// Enable or disable collection of data for built-in WP-CLI commands.
 		'except_built_in_commands' => Expect::bool()->default( true ),
 
-	]),
+	] ),
 
 	// Configure how metadata is stored.
 	'storage' => Expect::structure( [
