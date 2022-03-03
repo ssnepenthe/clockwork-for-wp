@@ -7,64 +7,8 @@ namespace Clockwork_For_Wp;
 use Closure;
 use ReflectionFunction;
 
-/**
- * Adapted from Illuminate\Support\Arr.
- *
- * @param null|mixed $default
- */
-function array_get( array $array, string $path, $default = null ) {
-	if ( \array_key_exists( $path, $array ) ) {
-		return $array[ $path ];
-	}
-
-	if ( false === \mb_strpos( $path, '.' ) ) {
-		return $default;
-	}
-
-	foreach ( \explode( '.', $path ) as $segment ) {
-		if ( \is_array( $array ) && \array_key_exists( $segment, $array ) ) {
-			$array = $array[ $segment ];
-		} else {
-			return $default;
-		}
-	}
-
-	return $array;
-}
-
-function array_has( array $array, string $path ) {
-	$default = '__CFW__hopefully_unique_enough_default__CFW__';
-
-	return array_get( $array, $path, $default ) !== $default;
-}
-
 function array_only( $array, $keys ) {
 	return \array_intersect_key( $array, \array_flip( $keys ) );
-}
-
-/**
- * Adapted from Illuminate\Support\Arr.
- */
-function array_set( array &$array, string $path, $value ) {
-	$segments = \explode( '.', $path );
-
-	foreach ( $segments as $i => $segment ) {
-		if ( 1 === \count( $segments ) ) {
-			break;
-		}
-
-		unset( $segments[ $i ] );
-
-		if ( ! isset( $array[ $segment ] ) || ! \is_array( $array[ $segment ] ) ) {
-			$array[ $segment ] = [];
-		}
-
-		$array = &$array[ $segment ];
-	}
-
-	$array[ \array_shift( $segments ) ] = $value;
-
-	return $array;
 }
 
 // @todo Name? Or maybe just merge into describe_callable()?

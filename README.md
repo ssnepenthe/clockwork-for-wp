@@ -39,20 +39,47 @@ Note that if you are trying to debug outside of an HTML context (e.g. wp-cron, r
 ## Configuration
 By default, all data sources are disabled. You can configure data sources and various other Clockwork settings using the `cfw_config_init` action from within a must-use plugin.
 
-Your callback should accept an instance of `\Clockwork_For_Wp\Config` which can be used to change any of the configuration options found in `src/config.php`. Options are set using dot notation.
+Your callback will receive an instance of `\Clockwork_For_Wp\Private_Schema_Configuration` which implements both `\League\Config\ConfigurationInterface` and `\League\Config\MutableConfigurationInterface`.
+
+This config instance can be used to change any of the configuration options found in `config/schema.php`.
+
+Note that while most config defaults are set directly in the schema, some are set separately in `config/defaults.php` - please check both files.
 
 For example, consider the following must-use plugin at `wp-content/mu-plugins/cfw-config.php`:
 
 ```php
-\add_action( 'cfw_config_init', function( \Clockwork_For_Wp\Config $config ) {
+\add_action( 'cfw_config_init', function( $config ) {
+    // Modify existing options using the get and set method:
+
+    // Enable all data sources at once:
+    $data_sources = array_map( function( $data_source ) {
+        $data_source['enabled'] = true;
+
+        return $data_source;
+    }, $config->get( 'data_sources' ) );
+
+    $config->set( 'data_sources', $data_sources );
+
+    // OR set individual options using the set method with dot notation:
+
     // Disables the Clockwork webapp.
     $config->set( 'web', false );
 
-    // Enables the WP_Rewrite data source.
-    $config->set( 'data_sources.wp_rewrite.enabled', true );
-
     // Sets the metadata expiration to one day (in minutes).
     $config->set( 'storage.expiration', 60 * 24 );
+
+    // OR set multiple options at once using the merge method:
+
+    $config->merge( [
+        'requests' => [
+            // Enables collection of data on OPTIONS requests.
+            'except_preflight' => false,
+        ],
+        'wp_cli' => [
+            // Enables collection of data when running WP-CLI.
+            'collect' => true,
+        ],
+    ] );
 } );
 ```
 

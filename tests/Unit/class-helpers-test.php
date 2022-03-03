@@ -4,10 +4,7 @@ namespace Clockwork_For_Wp\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 
-use function Clockwork_For_Wp\array_get;
-use function Clockwork_For_Wp\array_has;
 use function Clockwork_For_Wp\array_only;
-use function Clockwork_For_Wp\array_set;
 use function Clockwork_For_Wp\describe_callable;
 use function Clockwork_For_Wp\describe_unavailable_callable;
 use function Clockwork_For_Wp\describe_value;
@@ -16,92 +13,11 @@ use function Clockwork_For_Wp\prepare_wpdb_query;
 
 class Helpers_Test extends TestCase {
 	/** @test */
-	public function test_array_get() {
-		// Key exists at top level.
-		$array = [ 'a' => 'b', 'c' => [ 'd' => 'e' ] ];
-		$this->assertEquals( 'b', array_get( $array, 'a' ) );
-
-		// Key has dot but exists at top level.
-		$array = [ 'a' => 'b', 'c.d' => 'e' ];
-		$this->assertEquals( 'e', array_get( $array, 'c.d' ) );
-
-		// Key not at top level and no dot returns default.
-		$array = [ 'a' => 'b', 'c' => [ 'd' => 'e' ] ];
-		$this->assertNull( array_get( $array, 'b' ) );
-
-		// Arbitrary depth.
-		$array = [ 'a' => [ 'b' => [ 'c' => [ 'd' => [ 'e' => 'f' ] ] ] ] ];
-		$this->assertEquals(
-			[ 'b' => [ 'c' => [ 'd' => [ 'e' => 'f' ] ] ] ],
-			array_get( $array, 'a' )
-		);
-		$this->assertEquals( [ 'c' => [ 'd' => [ 'e' => 'f' ] ] ], array_get( $array, 'a.b' ) );
-		$this->assertEquals( [ 'd' => [ 'e' => 'f' ] ], array_get( $array, 'a.b.c' ) );
-		$this->assertEquals( [ 'e' => 'f' ], array_get( $array, 'a.b.c.d' ) );
-		$this->assertEquals( 'f', array_get( $array, 'a.b.c.d.e' ) );
-		$this->assertNull( array_get( $array, 'e.d.c.b.a' ) );
-
-		// Arbitrary default value.
-		$array = [ 'a' => 'b' ];
-		$this->assertEquals( 'defaultvalue', array_get( $array, 'c.d', 'defaultvalue' ) );
-
-		// Null values.
-		$array = [ 'a' => null, 'b' => [ 'c' => null ] ];
-		$this->assertNull( array_get( $array, 'a', 'defaultvalue' ) );
-		$this->assertNull( array_get( $array, 'b.c', 'defaultvalue' ) );
-
-		// Numeric keys.
-		$array = [ 'a' => [
-			[ 'b' => 'c' ],
-			[ 'd' => 'e' ],
-		] ];
-		$this->assertEquals( 'c', array_get( $array, 'a.0.b' ) );
-		$this->assertEquals( 'e', array_get( $array, 'a.1.d' ) );
-	}
-
-	/** @test */
-	public function test_array_has() {
-		$array = [ 'a' => 'b', 'c' => [ 'd' => 'e', 'f' => [ 'g' => 'h' ] ] ];
-
-		$this->assertTrue( array_has( $array, 'a' ) );
-		$this->assertTrue( array_has( $array, 'c' ) );
-		$this->assertTrue( array_has( $array, 'c.d' ) );
-		$this->assertTrue( array_has( $array, 'c.f' ) );
-		$this->assertTrue( array_has( $array, 'c.f.g' ) );
-
-		$this->assertFalse( array_has( $array, 'b' ) );
-		$this->assertFalse( array_has( $array, 'd.c' ) );
-	}
-
-	/** @test */
 	public function test_array_only() {
 		$array = [ 'a' => 'b', 'c' => 'd', 'e' => 'f' ];
 
 		$this->assertSame( [ 'a' => 'b', 'c' => 'd' ], array_only( $array, [ 'a', 'c' ] ) );
 		$this->assertEmpty( array_only( $array, [ 'g' ] ) );
-	}
-
-	/** @test */
-	public function test_array_set() {
-		$array = [ 'a' => [ 'b' => [ 'c' => 'd' ] ] ];
-		array_set( $array, 'a.b.c', 'e' );
-		$this->assertEquals( [ 'a' => [ 'b' => [ 'c' => 'e' ] ] ], $array );
-
-		$array = [ 'a' => 'b' ];
-		array_set( $array, 'a.b.c', 'd' );
-		$this->assertEquals( [ 'a' => [ 'b' => [ 'c' => 'd' ] ] ], $array );
-
-		$array = [ 'a' => [ 'b' => [ 'c' => 'd' ] ] ];
-		array_set( $array, 'e', 'f' );
-		$this->assertEquals( [ 'a' => [ 'b' => [ 'c' => 'd' ] ], 'e' => 'f' ], $array );
-
-		$array = [ 'a' => [ 'b' => [ 'c' => 'd' ] ] ];
-		array_set( $array, 'e.f', 'g' );
-		$this->assertEquals( [ 'a' => [ 'b' => [ 'c' => 'd' ] ], 'e' => [ 'f' => 'g' ] ], $array );
-
-		$array = [];
-		array_set( $array, 'a.b.c', 'd' );
-		$this->assertEquals( [ 'a' => [ 'b' => [ 'c' => 'd' ] ] ], $array );
 	}
 
 	/** @test */

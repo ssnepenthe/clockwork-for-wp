@@ -6,6 +6,7 @@ namespace Clockwork_For_Wp;
 
 use Clockwork\Clockwork;
 use Clockwork_For_Wp\Data_Source\Data_Source_Factory;
+use League\Config\ConfigurationInterface;
 
 /**
  * @internal
@@ -20,7 +21,7 @@ final class Clockwork_Support {
 	public function __construct(
 		Clockwork $clockwork,
 		Data_Source_Factory $factory,
-		Config $config
+		ConfigurationInterface $config
 	) {
 		$this->clockwork = $clockwork;
 		$this->factory = $factory;
@@ -28,7 +29,7 @@ final class Clockwork_Support {
 	}
 
 	public function add_data_sources(): void {
-		$sensitive_patterns = $this->config->get( 'requests.sensitive_patterns', [] );
+		$sensitive_patterns = $this->config->get( 'requests.sensitive_patterns' );
 
 		$this->clockwork->addDataSource(
 			$this->factory->create( 'php', \compact( 'sensitive_patterns' ) )

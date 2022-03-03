@@ -139,10 +139,11 @@ final class Data_Source_Factory {
 	}
 
 	private function create_php_data_source( array $config ): Php {
-		if ( ! \array_key_exists( 'sensitive_patterns', $config ) ) {
-			throw new InvalidArgumentException(
-				'Missing required configuration key "sensitive_patterns" in php data source config'
-			);
+		if ( ! (
+			\array_key_exists( 'sensitive_patterns', $config )
+			&& \is_array( $config['sensitive_patterns'] )
+		) ) {
+			$config['sensitive_patterns'] = [];
 		}
 
 		return new Php( ...$config['sensitive_patterns'] );

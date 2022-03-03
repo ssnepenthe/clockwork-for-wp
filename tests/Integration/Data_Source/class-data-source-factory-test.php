@@ -3,14 +3,17 @@
 namespace Clockwork_For_Wp\Tests\Integration\Data_Source;
 
 use Clockwork\DataSource\DataSource;
-use Clockwork_For_Wp\Config;
 use Clockwork_For_Wp\Data_Source;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Plugin;
+use Clockwork_For_Wp\Tests\Creates_Config;
 use InvalidArgumentException;
+use League\Config\ConfigurationInterface;
 use PHPUnit\Framework\TestCase;
 
 class Data_Source_Factory_Test extends TestCase {
+	use Creates_Config;
+
 	/** @dataProvider provide_test_create */
 	public function test_create( $name, $class ) {
 		$factory = $this->create_factory();
@@ -71,7 +74,7 @@ class Data_Source_Factory_Test extends TestCase {
 		yield [ 'core', Data_Source\Core::class ];
 		yield [ 'errors', Data_Source\Errors::class ];
 		// @todo Move patterns to config
-		// yield [ 'php', Data_Source\Php::class ];
+		yield [ 'php', Data_Source\Php::class ];
 		yield [ 'rest_api', Data_Source\Rest_Api::class ];
 		yield [ 'theme', Data_Source\Theme::class ];
 		yield [ 'transients', Data_Source\Transients::class ];
@@ -91,7 +94,7 @@ class Data_Source_Factory_Test extends TestCase {
 		return new Data_Source\Data_Source_Factory( new Plugin( [], [
 			'wp_version' => 'irrelevant',
 			'timestart' => 'irrelevant',
-			Config::class => new Config( [
+			ConfigurationInterface::class => $this->create_config( [
 				'data_sources' => [
 					'rest_api' => [ 'enabled' => true ],
 					'theme' => [ 'enabled' => false ],
