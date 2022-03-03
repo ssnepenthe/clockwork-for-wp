@@ -30,22 +30,23 @@ final class Clean_Command extends Command {
 
 	public function handle( $all = false, $expiration = null ): void {
 		$force = true;
+		$container = \_cfw_instance()->get_container();
 
 		if ( $all ) {
-			\_cfw_instance()[ ConfigurationBuilderInterface::class ]->set( 'storage.expiration', 0 );
+			$container->get( ConfigurationBuilderInterface::class )->set( 'storage.expiration', 0 );
 		} elseif ( null !== $expiration ) {
 			// @todo Should we allow float?
-			\_cfw_instance()[ ConfigurationBuilderInterface::class ]->set(
+			$container->get( ConfigurationBuilderInterface::class )->set(
 				'storage.expiration',
 				\abs( (int) $expiration )
 			);
 		}
 
-		\_cfw_instance()[ StorageInterface::class ]->cleanup( $force );
+		$container->get( StorageInterface::class )->cleanup( $force );
 
 		// See https://github.com/itsgoingd/clockwork/issues/510
 		// @todo Revisit after the release of Clockwork v6.
-		$config = \_cfw_instance()[ ConfigurationInterface::class ];
+		$config = $container->get( ConfigurationInterface::class );
 
 		if ( $all && 'file' === $config->get( 'storage.driver', 'file' ) ) {
 			$path = $config->get( 'storage.drivers.file.path' );

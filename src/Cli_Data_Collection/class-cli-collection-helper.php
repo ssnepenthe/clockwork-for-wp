@@ -7,6 +7,9 @@ namespace Clockwork_For_Wp\Cli_Data_Collection;
 use ReflectionProperty;
 use WP_CLI;
 
+/**
+ * @internal
+ */
 final class Cli_Collection_Helper {
 	private static $logger;
 
@@ -19,7 +22,9 @@ final class Cli_Collection_Helper {
 	}
 
 	public static function get_core_command_list_path(): string {
-		return \dirname( \_cfw_instance()['file'] ) . '/generated/wp-cli-core-command-list.php';
+		$dir = \dirname( \_cfw_instance()->get_container()->get( 'file' ) );
+
+		return "{$dir}/generated/wp-cli-core-command-list.php";
 	}
 
 	public static function get_plugin_logger() {
