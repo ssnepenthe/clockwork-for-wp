@@ -22,7 +22,7 @@ final class Wordpress_Provider extends Base_Provider {
 
 		// @todo consider prefixing params that are not type-hintable to avoid accidental injections.
 		$pimple['content_width'] = $pimple->factory( static function () {
-			return $GLOBALS['content_width'];
+			return $GLOBALS['content_width'] ?? 0;
 		} );
 
 		$pimple['timestart'] = $pimple->factory( static function () {
