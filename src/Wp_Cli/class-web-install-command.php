@@ -16,17 +16,28 @@ use WP_CLI;
 final class Web_Install_Command extends Command {
 	public function configure(): void {
 		$this->set_name( 'web-install' )
-			->set_description( 'Installs the Clockwork web app to the project web root' );
+			->set_description( 'Installs the Clockwork web app to the project web root' )
+			->add_flag(
+				( new Flag( 'force' ) )
+					->set_description( 'Uninstall web app if it is already installed' )
+			);
 	}
 
-	public function handle( Plugin $plugin ): void {
+	public function handle( Plugin $plugin, $force = false ): void {
 		// @todo Use wp filesystem classes?
-		// @todo Force/overwrite option?
 		if ( $plugin->is_web_installed() ) {
-			WP_CLI::error(
-				'Clockwork web app is already installed'
-				. ' - If you want to reinstall please run clockwork web-uninstall first'
-			);
+			if ( $force ) {
+				WP_CLI::log(
+					'Clockwork web app is already installed - running "wp clockwork web-uninstall"'
+				);
+
+				WP_CLI::runcommand( 'clockwork web-uninstall --yes' );
+			} else {
+				WP_CLI::error(
+					'Clockwork web app is already installed - Please re-run with the "--force" flag'
+					. ' or manually run "clockwork web-uninstall"'
+				);
+			}
 		}
 
 		$source_path = \dirname( (new Web())->asset( 'index.html' )['path'] );
@@ -38,7 +49,7 @@ final class Web_Install_Command extends Command {
 		WP_CLI::log( '' );
 
 		if ( \file_exists( $destination_path ) ) {
-			// @todo Prompt to delete/overwrite?
+			// @todo Prompt to delete/overwrite? Or overwrite flag?
 			WP_CLI::error(
 				'Destination path already exists but does not contain a Clockwork web app install'
 				. ' - please delete manually and run clockwork web-install again'
