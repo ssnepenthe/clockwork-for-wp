@@ -85,7 +85,7 @@ For example, consider the following must-use plugin at `wp-content/mu-plugins/cf
 
 ## Special Considerations
 
-## Web App
+### Web App
 In order for this plugin to be able to serve the Clockwork web app, your server must be configured to pass requests for css, js and png files to the main WordPress index.php file. Many server configurations will not do this by default.
 
 If you are able to modify your server configuration, ensure all requests for css, js and png files under the `__clockwork` path go through `index.php`.
