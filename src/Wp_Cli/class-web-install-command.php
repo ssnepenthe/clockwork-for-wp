@@ -27,9 +27,8 @@ final class Web_Install_Command extends Command {
 		// @todo Use wp filesystem classes?
 		if ( $plugin->is_web_installed() ) {
 			if ( $force ) {
-				WP_CLI::log(
-					'Clockwork web app is already installed - running "wp clockwork web-uninstall"'
-				);
+				WP_CLI::log( 'Removing previous Clockwork web app installation...' );
+				WP_CLI::debug( 'Running "clockwork web-uninstall"', 'clockwork' );
 
 				WP_CLI::runcommand( 'clockwork web-uninstall --yes' );
 			} else {
@@ -44,9 +43,9 @@ final class Web_Install_Command extends Command {
 		$destination_path = \get_home_path() . '__clockwork';
 		$installed_count = 0;
 
-		WP_CLI::log( "Source path: {$source_path}" );
-		WP_CLI::log( "Destination path: {$destination_path}" );
-		WP_CLI::log( '' );
+		WP_CLI::debug( 'Installing Clockwork web app', 'clockwork' );
+		WP_CLI::debug( "Source path: {$source_path}", 'clockwork' );
+		WP_CLI::debug( "Destination path: {$destination_path}", 'clockwork' );
 
 		if ( \file_exists( $destination_path ) ) {
 			// @todo Prompt to delete/overwrite? Or overwrite flag?

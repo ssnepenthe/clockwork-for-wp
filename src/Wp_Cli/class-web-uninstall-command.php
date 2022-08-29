@@ -32,6 +32,8 @@ final class Web_Uninstall_Command extends Command {
 			$assoc_args
 		);
 
+		WP_CLI::debug( "Uninstalling Clockwork web app from {$install_path}", 'clockwork' );
+
 		$it = new RecursiveIteratorIterator(
 			new RecursiveDirectoryIterator( $install_path, RecursiveDirectoryIterator::SKIP_DOTS ),
 			RecursiveIteratorIterator::CHILD_FIRST
