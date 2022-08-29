@@ -28,13 +28,13 @@ As this plugin is not meant to run on production servers, you must configure you
 ## Usage
 Once the plugin has been activated, there are three primary options for usage:
 
-1. If you have installed the browser extension, open developer tools and browse to the Clockwork tab.
+1. Install the browser extension, visit your site, open developer tools, and browse to the Clockwork tab.
 
-2. Open a new browser tab and navigate to the `__clockwork` endpoint (e.g. https://example.com/__clockwork).
+2. Make sure the Clockwork web app is enabled (see considerations section below), open a new browser tab, and navigate to the `__clockwork` endpoint (e.g. https://example.com/__clockwork).
 
-3. Enable the browser toolbar (refer to 'configuration' below). This will provide some minimal data for every request along with a link to view more in the web view.
+3. Make sure the Clockwork browser toolbar is enabled, visit your site, and you should see a bar across the bottom with some minimal data from Clockwork.
 
-Note that if you are trying to debug outside of an HTML context (e.g. wp-cron, rest api, admin-ajax, wp-cli), you must use the web view instead of the browser extension and may need to enable data collection for that specific context (see 'configuration' below).
+Note that if you are trying to debug outside of an HTML context (e.g. wp-cron, rest api, admin-ajax, wp-cli), you must use the web app view instead of the browser extension and may need to enable data collection for that specific context (see 'configuration' below).
 
 ## Configuration
 By default, all data sources are disabled. You can configure data sources and various other Clockwork settings using the `cfw_config_init` action from within a must-use plugin.
