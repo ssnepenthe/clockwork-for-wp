@@ -28,7 +28,7 @@ final class Web_Uninstall_Command extends Command {
 		$deleted_count = 0;
 
 		WP_CLI::confirm(
-			"Please confirm recursive deletion of {$install_path}",
+			"Do you wish to remove {$install_path} and all files contained within?",
 			$assoc_args
 		);
 
