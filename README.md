@@ -105,5 +105,5 @@ By default the errors data source will log all errors that occur after the plugi
 
 If you want to capture earlier errors, you can manually register the clockwork error handler by requiring the "initialize-error-logger.php" file early on in the WordPress bootstrap (e.g. from a must-use plugin).
 
-## WP-CLI Output Collection
+### WP-CLI Output Collection
 If you would like to collect WP-CLI output, it can be beneficial (but not necessary) to add the "initialize-wp-cli-logger.php" file to the list of requires in your [WP-CLI config](https://make.wordpress.org/cli/handbook/references/config/) to ensure as much output as possible is captured.
