@@ -39,7 +39,7 @@ final class Web_Install_Command extends Command {
 			}
 		}
 
-		$source_path = \dirname( (new Web())->asset( 'index.html' )['path'] );
+		$source_path = \dirname( ( new Web() )->asset( 'index.html' )['path'] );
 		$destination_path = \get_home_path() . '__clockwork';
 		$installed_count = 0;
 
