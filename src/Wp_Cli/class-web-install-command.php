@@ -31,6 +31,7 @@ final class Web_Install_Command extends Command {
 
 		$source_path = \dirname( (new Web())->asset( 'index.html' )['path'] );
 		$destination_path = \get_home_path() . '__clockwork';
+		$installed_count = 0;
 
 		WP_CLI::log( "Source path: {$source_path}" );
 		WP_CLI::log( "Destination path: {$destination_path}" );
@@ -44,11 +45,11 @@ final class Web_Install_Command extends Command {
 			);
 		}
 
-		$installed = [];
-
 		\wp_mkdir_p( $destination_path );
 
-		$installed[] = $destination_path;
+		WP_CLI::debug( "Created directory {$destination_path}", 'clockwork' );
+
+		$installed_count++;
 
 		$it = new RecursiveIteratorIterator(
 			new RecursiveDirectoryIterator( $source_path, RecursiveDirectoryIterator::SKIP_DOTS ),
@@ -63,19 +64,22 @@ final class Web_Install_Command extends Command {
 				if ( ! \wp_mkdir_p( $destination_file_path ) ) {
 					WP_CLI::error( "Unable to create directory {$destination_file_path}" );
 				}
+
+				WP_CLI::debug( "Created directory {$destination_file_path}", 'clockwork' );
 			} else {
 				if ( ! \copy( $file->getRealPath(), $destination_file_path ) ) {
 					WP_CLI::error( "Unable to copy file {$destination_file_path}" );
 				}
+
+				WP_CLI::debug(
+					"Copied file {$inner->getSubPathName()} to {$destination_file_path}",
+					'clockwork'
+				);
 			}
 
-			$installed[] = $destination_file_path;
+			$installed_count++;
 		}
 
-		$installed_count = \count( $installed );
-
 		WP_CLI::success( "Installed {$installed_count} files" );
-
-		// @todo List all installed files via WP_CLI::debug()?
 	}
 }

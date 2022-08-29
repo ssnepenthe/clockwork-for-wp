@@ -25,13 +25,13 @@ final class Web_Uninstall_Command extends Command {
 		}
 
 		$install_path = \get_home_path() . '__clockwork';
+		$deleted_count = 0;
 
 		WP_CLI::confirm(
 			"Please confirm recursive deletion of {$install_path}",
 			$assoc_args
 		);
 
-		$deleted = [];
 		$it = new RecursiveIteratorIterator(
 			new RecursiveDirectoryIterator( $install_path, RecursiveDirectoryIterator::SKIP_DOTS ),
 			RecursiveIteratorIterator::CHILD_FIRST
@@ -44,24 +44,27 @@ final class Web_Uninstall_Command extends Command {
 				if ( ! \rmdir( $real_path ) ) {
 					WP_CLI::error( "Unable to delete directory {$file->getPathName()}" );
 				}
+
+				WP_CLI::debug( "Deleted directory {$real_path}", 'clockwork' );
 			} else {
 				if ( ! \unlink( $real_path ) ) {
 					WP_CLI::error( "Unable to delete file {$file->getPathName()}" );
 				}
+
+				WP_CLI::debug( "Deleted file {$real_path}", 'clockwork' );
 			}
 
-			$deleted[] = $real_path;
+			$deleted_count++;
 		}
 
 		if ( ! \rmdir( $install_path ) ) {
 			WP_CLI::error( "Unable to delete directory {$install_path}" );
 		}
 
-		$deleted[] = $install_path;
-		$deleted_count = \count( $deleted );
+		WP_CLI::debug( "Deleted directory {$install_path}", 'clockwork' );
+
+		$deleted_count++;
 
 		WP_CLI::success( "Deleted {$deleted_count} files" );
-
-		// @todo List all files via WP_CLI::debug()?
 	}
 }
