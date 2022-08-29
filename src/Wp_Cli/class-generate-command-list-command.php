@@ -21,7 +21,15 @@ final class Generate_Command_List_Command extends Command {
 	}
 
 	public function handle(): void {
-		$this->enumerate_commands( WP_CLI::get_root_command() );
+		$root_command = WP_CLI::runcommand(
+			'cli cmd-dump --skip-packages --skip-plugins --skip-themes',
+			[
+				'parse' => 'json',
+				'return' => true,
+			]
+		);
+
+		$this->add_command_to_commands_list( $root_command );
 
 		\file_put_contents(
 			Cli_Collection_Helper::get_core_command_list_path(),
@@ -31,17 +39,17 @@ final class Generate_Command_List_Command extends Command {
 		WP_CLI::success( 'Successfully wrote command lists' );
 	}
 
-	private function enumerate_commands( $command, $parent = '' ): void {
-		foreach ( $command->get_subcommands() as $subcommand ) {
-			$command_string = empty( $parent )
-				? $subcommand->get_name()
-				: "{$parent} {$subcommand->get_name()}";
+	private function add_command_to_commands_list( $command, $parent = '' ): void {
+		if ( \array_key_exists( 'subcommands', $command ) ) {
+			foreach ( $command['subcommands'] as $subcommand ) {
+				$command_string = empty( $parent )
+					? $subcommand['name']
+					: "{$parent} {$subcommand['name']}";
 
-			if ( 0 !== \mb_strpos( $command_string, 'clockwork' ) ) {
 				$this->commands[] = $command_string;
-			}
 
-			$this->enumerate_commands( $subcommand, $command_string );
+				$this->add_command_to_commands_list( $subcommand, $command_string );
+			}
 		}
 	}
 
