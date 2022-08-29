@@ -28,13 +28,13 @@ As this plugin is not meant to run on production servers, you must configure you
 ## Usage
 Once the plugin has been activated, there are three primary options for usage:
 
-1. If you have installed the browser extension, open developer tools and browse to the Clockwork tab.
+1. Install the browser extension, visit your site, open developer tools, and browse to the Clockwork tab.
 
-2. Open a new browser tab and navigate to the `__clockwork/app` endpoint (e.g. https://example.com/__clockwork/app).
+2. Make sure the Clockwork web app is enabled (see considerations section below), open a new browser tab, and navigate to the `__clockwork` endpoint (e.g. https://example.com/__clockwork).
 
-3. Enable the browser toolbar (refer to 'configuration' below). This will provide some minimal data for every request along with a link to view more in the web view.
+3. Make sure the Clockwork browser toolbar is enabled, visit your site, and you should see a bar across the bottom with some minimal data from Clockwork.
 
-Note that if you are trying to debug outside of an HTML context (e.g. wp-cron, rest api, admin-ajax, wp-cli), you must use the web view instead of the browser extension and may need to enable data collection for that specific context (see 'configuration' below).
+Note that if you are trying to debug outside of an HTML context (e.g. wp-cron, rest api, admin-ajax, wp-cli), you must use the web app view instead of the browser extension and may need to enable data collection for that specific context (see 'configuration' below).
 
 ## Configuration
 By default, all data sources are disabled. You can configure data sources and various other Clockwork settings using the `cfw_config_init` action from within a must-use plugin.
@@ -83,21 +83,27 @@ For example, consider the following must-use plugin at `wp-content/mu-plugins/cf
 } );
 ```
 
-## Data source requirements
-Some data sources have special requirements for use:
+## Special Considerations
 
-### wpdb
+### Web App
+In order for this plugin to be able to serve the Clockwork web app, your server must be configured to pass requests for css, js and png files to the main WordPress index.php file. Many server configurations will not do this by default.
+
+If you are able to modify your server configuration, ensure all requests for css, js and png files under the `__clockwork` path go through `index.php`.
+
+If you are unable to modify your server configuration, you can instead install the web app to your site's web root by running `wp clockwork web-install`. Make sure to re-install after every plugin update by running `wp clockwork web-install --force`.
+
+### Wpdb Data Source
 In order to use the wpdb data source the SAVEQUERIES constant must be defined and truthy.
 
 https://wordpress.org/support/article/debugging-in-wordpress/#savequeries
 
-### xdebug
+### Xdebug Data Source
 In order to use the xdebug data source the xdebug extension must be loaded.
 
-### errors
+### Errors Data Source
 By default the errors data source will log all errors that occur after the plugin has loaded as well as the last error that occurred before the plugin loaded.
 
 If you want to capture earlier errors, you can manually register the clockwork error handler by requiring the "initialize-error-logger.php" file early on in the WordPress bootstrap (e.g. from a must-use plugin).
 
-## WP-CLI
+### WP-CLI Output Collection
 If you would like to collect WP-CLI output, it can be beneficial (but not necessary) to add the "initialize-wp-cli-logger.php" file to the list of requires in your [WP-CLI config](https://make.wordpress.org/cli/handbook/references/config/) to ensure as much output as possible is captured.

@@ -22,6 +22,16 @@ use Pimple\Container;
  * @internal
  */
 final class Plugin_Provider extends Base_Provider {
+	public function boot(): void {
+		if (
+			$this->plugin->is_enabled()
+			|| $this->plugin->is_web_enabled()
+			|| $this->plugin->is_web_installed()
+		) {
+			parent::boot();
+		}
+	}
+
 	public function register(): void {
 		require_once __DIR__ . '/plugin-helpers.php';
 
@@ -70,5 +80,13 @@ final class Plugin_Provider extends Base_Provider {
 				$pimple[ Clockwork::class ]->storage()
 			);
 		};
+
+		$pimple[ Plugin_Subscriber::class ] = static function () {
+			return new Plugin_Subscriber();
+		};
+	}
+
+	protected function subscribers(): array {
+		return [ Plugin_Subscriber::class ];
 	}
 }

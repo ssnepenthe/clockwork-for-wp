@@ -1,5 +1,6 @@
 /// <reference types="cypress" />
 
+// @todo Differentiate between installed web app and web app served by WP.
 describe('Clockwork Webapp', () => {
 
     context('Default configuration', () => {
