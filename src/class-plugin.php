@@ -191,6 +191,15 @@ final class Plugin {
 		return $this->config( 'enable', true ) && $this->config( 'web', true );
 	}
 
+	public function is_web_installed() {
+		// @todo Don't use wp functions in plugin class?
+		if ( ! \function_exists( 'get_home_path' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
+
+		return \file_exists( \get_home_path() . '__clockwork/index.html' );
+	}
+
 	// @todo Method name?
 	public function lock(): void {
 		if ( $this->locked ) {

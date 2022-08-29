@@ -14,18 +14,7 @@ final class Web_App_Subscriber implements Subscriber {
 			'init' => 'register_routes',
 			// @todo Move to redirect canonical?
 			'template_redirect' => 'redirect_shortcut',
-			'redirect_canonical' => 'prevent_canonical_redirect',
 		];
-	}
-
-	public function prevent_canonical_redirect( $redirect, $requested ) {
-		$clockwork = \home_url( '__clockwork' );
-
-		if ( \mb_substr( $requested, 0, \mb_strlen( $clockwork ) ) === $clockwork ) {
-			return $requested;
-		}
-
-		return $redirect;
 	}
 
 	public function redirect_shortcut( Incoming_Request $request ): void {

@@ -132,7 +132,7 @@ final class Clockwork_Subscriber implements Subscriber {
 					'requestId' => $request->id,
 					'version' => Clockwork::VERSION,
 					'path' => '/__clockwork/',
-					'webPath' => '/__clockwork/app',
+					'webPath' => $this->plugin->is_web_installed() ? '/__clockwork' : '/__clockwork/app',
 					'token' => $request->updateToken,
 					'metrics' => $this->plugin->is_collecting_client_metrics(),
 					'toolbar' => $this->plugin->is_toolbar_enabled(),

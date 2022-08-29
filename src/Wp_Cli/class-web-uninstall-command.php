@@ -1,0 +1,67 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Clockwork_For_Wp\Wp_Cli;
+
+use Clockwork_For_Wp\Plugin;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use WP_CLI;
+
+/**
+ * @internal
+ */
+final class Web_Uninstall_Command extends Command {
+	public function configure(): void {
+		$this->set_name( 'web-uninstall' )
+			->set_description( 'Uninstalls the Clockwork web app from the project web root' );
+	}
+
+	public function handle( $assoc_args, Plugin $plugin ): void {
+		// @todo Use wp filesystem classes?
+		if ( ! $plugin->is_web_installed() ) {
+			WP_CLI::error( 'Clockwork web app does not appear to be installed' );
+		}
+
+		$install_path = \get_home_path() . '__clockwork';
+
+		WP_CLI::confirm(
+			"Please confirm recursive deletion of {$install_path}",
+			$assoc_args
+		);
+
+		$deleted = [];
+		$it = new RecursiveIteratorIterator(
+			new RecursiveDirectoryIterator( $install_path, RecursiveDirectoryIterator::SKIP_DOTS ),
+			RecursiveIteratorIterator::CHILD_FIRST
+		);
+
+		foreach ( $it as $file ) {
+			$real_path = $file->getRealPath();
+
+			if ( $file->isDir() ) {
+				if ( ! \rmdir( $real_path ) ) {
+					WP_CLI::error( "Unable to delete directory {$file->getPathName()}" );
+				}
+			} else {
+				if ( ! \unlink( $real_path ) ) {
+					WP_CLI::error( "Unable to delete file {$file->getPathName()}" );
+				}
+			}
+
+			$deleted[] = $real_path;
+		}
+
+		if ( ! \rmdir( $install_path ) ) {
+			WP_CLI::error( "Unable to delete directory {$install_path}" );
+		}
+
+		$deleted[] = $install_path;
+		$deleted_count = \count( $deleted );
+
+		WP_CLI::success( "Deleted {$deleted_count} files" );
+
+		// @todo List all files via WP_CLI::debug()?
+	}
+}

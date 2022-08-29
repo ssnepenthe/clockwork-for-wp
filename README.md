@@ -30,7 +30,7 @@ Once the plugin has been activated, there are three primary options for usage:
 
 1. If you have installed the browser extension, open developer tools and browse to the Clockwork tab.
 
-2. Open a new browser tab and navigate to the `__clockwork/app` endpoint (e.g. https://example.com/__clockwork/app).
+2. Open a new browser tab and navigate to the `__clockwork` endpoint (e.g. https://example.com/__clockwork).
 
 3. Enable the browser toolbar (refer to 'configuration' below). This will provide some minimal data for every request along with a link to view more in the web view.
 
@@ -83,21 +83,27 @@ For example, consider the following must-use plugin at `wp-content/mu-plugins/cf
 } );
 ```
 
-## Data source requirements
-Some data sources have special requirements for use:
+## Special Considerations
 
-### wpdb
+## Web App
+In order for this plugin to be able to serve the Clockwork web app, your server must be configured to pass requests for css, js and png files to the main WordPress index.php file. Many server configurations will not do this by default.
+
+If you are able to modify your server configuration, ensure all requests for css, js and png files under the `__clockwork` path go through `index.php`.
+
+If you are unable to modify your server configuration, you can instead install the web app to your site's web root by running `wp clockwork web-install`.
+
+### Wpdb Data Source
 In order to use the wpdb data source the SAVEQUERIES constant must be defined and truthy.
 
 https://wordpress.org/support/article/debugging-in-wordpress/#savequeries
 
-### xdebug
+### Xdebug Data Source
 In order to use the xdebug data source the xdebug extension must be loaded.
 
-### errors
+### Errors Data Source
 By default the errors data source will log all errors that occur after the plugin has loaded as well as the last error that occurred before the plugin loaded.
 
 If you want to capture earlier errors, you can manually register the clockwork error handler by requiring the "initialize-error-logger.php" file early on in the WordPress bootstrap (e.g. from a must-use plugin).
 
-## WP-CLI
+## WP-CLI Output Collection
 If you would like to collect WP-CLI output, it can be beneficial (but not necessary) to add the "initialize-wp-cli-logger.php" file to the list of requires in your [WP-CLI config](https://make.wordpress.org/cli/handbook/references/config/) to ensure as much output as possible is captured.

@@ -14,7 +14,7 @@ use WP_Query;
  */
 final class Web_App_Provider extends Base_Provider {
 	public function boot(): void {
-		if ( $this->plugin->is_web_enabled() ) {
+		if ( $this->plugin->is_web_enabled() && ! $this->plugin->is_web_installed() ) {
 			parent::boot();
 		}
 	}

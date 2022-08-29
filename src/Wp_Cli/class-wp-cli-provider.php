@@ -33,7 +33,9 @@ final class Wp_Cli_Provider extends Base_Provider {
 			static function ( Command_Registry $scoped_registry ): void {
 				$scoped_registry
 					->add( new Clean_Command() )
-					->add( new Generate_Command_List_Command() );
+					->add( new Generate_Command_List_Command() )
+					->add( new Web_Install_Command() )
+					->add( new Web_Uninstall_Command() );
 			}
 		);
 	}
