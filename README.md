@@ -90,7 +90,7 @@ In order for this plugin to be able to serve the Clockwork web app, your server 
 
 If you are able to modify your server configuration, ensure all requests for css, js and png files under the `__clockwork` path go through `index.php`.
 
-If you are unable to modify your server configuration, you can instead install the web app to your site's web root by running `wp clockwork web-install`.
+If you are unable to modify your server configuration, you can instead install the web app to your site's web root by running `wp clockwork web-install`. Make sure to re-install after every plugin update by running `wp clockwork web-install --force`.
 
 ### Wpdb Data Source
 In order to use the wpdb data source the SAVEQUERIES constant must be defined and truthy.
