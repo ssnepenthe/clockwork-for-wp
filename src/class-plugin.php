@@ -11,76 +11,122 @@ use Clockwork_For_Wp\Cli_Data_Collection\Cli_Collection_Helper;
 use Clockwork_For_Wp\Cli_Data_Collection\Cli_Data_Collection_Provider;
 use Clockwork_For_Wp\Data_Source\Data_Source_Provider;
 use Clockwork_For_Wp\Data_Source\Errors;
-use Clockwork_For_Wp\Event_Management\Event_Management_Provider;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Routing\Routing_Provider;
 use Clockwork_For_Wp\Web_App\Web_App_Provider;
 use Clockwork_For_Wp\Wp_Cli\Wp_Cli_Provider;
-use InvalidArgumentException;
+use Closure;
+use Daedalus\Pimple\PimpleConfigurator;
+use Daedalus\Plugin\ContainerConfiguratorInterface;
+use Daedalus\Plugin\EventDispatcher;
+use Daedalus\Plugin\EventManagementModule;
+use Daedalus\Plugin\Plugin as DaedalusPlugin;
+use Daedalus\Plugin\PluginEvent;
+use Daedalus\Plugin\PluginInitializationModule;
+use Daedalus\Plugin\PluginInterface;
+use Invoker\Invoker;
+use Invoker\InvokerInterface;
+use Invoker\ParameterResolver\AssociativeArrayResolver;
+use Invoker\ParameterResolver\Container\ParameterNameContainerResolver;
+use Invoker\ParameterResolver\Container\TypeHintContainerResolver;
+use Invoker\ParameterResolver\DefaultValueResolver;
+use Invoker\ParameterResolver\NumericArrayResolver;
+use Invoker\ParameterResolver\ResolverChain;
 use League\Config\ConfigurationInterface;
-use Pimple\Container;
-use Pimple\Psr11\Container as Psr11Container;
-use RuntimeException;
+use ToyWpEventManagement\EventDispatcherInterface;
+use ToyWpEventManagement\EventManagerInterface;
+use ToyWpEventManagement\Priority;
 
 /**
  * @internal
  */
-final class Plugin {
-	private $booted = false;
+final class Plugin extends DaedalusPlugin {
+	protected ?InvokerInterface $invoker = null;
 
-	private $container;
+	protected function configure(): void {
+		// @todo separate method from configure()? initialize()?
+		Errors::get_instance()->register();
 
-	private $locked = false;
-
-	private $pimple;
-
-	private $providers = [];
-
-	public function __construct( ?array $providers = null, ?array $values = null ) {
-		if ( null === $providers ) {
-			$providers = [
-				Clockwork_Provider::class,
-				Plugin_Provider::class,
-				Wordpress_Provider::class,
-
-				Api_Provider::class,
-				Cli_Data_Collection_Provider::class,
-				Data_Source_Provider::class,
-				Event_Management_Provider::class,
-				Routing_Provider::class,
-				Web_App_Provider::class,
-				Wp_Cli_Provider::class,
-			];
-		}
-
-		$this->pimple = new Container( $values ?: [] );
-		$this->container = new Psr11Container( $this->pimple );
-
-		$this->pimple[ self::class ] = $this;
-
-		foreach ( $providers as $provider ) {
-			if ( \is_string( $provider ) && \is_subclass_of( $provider, Base_Provider::class ) ) {
-				$provider = new $provider( $this );
-			}
-
-			if ( ! $provider instanceof Provider ) {
-				throw new InvalidArgumentException( 'Invalid provider type in plugin constructor' );
-			}
-
-			$this->register( $provider );
-		}
+		$this->setName('Clockwork for WP');
+		$this->setFile(__DIR__ . '/../clockwork-for-wp.php');
+		$this->setPrefix('cfw_');
+		$this->setCacheDir(__DIR__ . '/../generated');
 	}
 
-	public function boot(): void {
-		if ( $this->booted ) {
-			return;
+	protected function createModules(): array
+	{
+		// @todo provider -> module
+		return [
+			new Clockwork_Provider(),
+			new Plugin_Provider(),
+			new Api_Provider(),
+			new Cli_Data_Collection_Provider(),
+			new Data_Source_Provider(),
+			new Routing_Provider(),
+			new Web_App_Provider(),
+			new Wp_Cli_Provider(),
+		];
+	}
+
+	protected function createDefaultModules(): array
+	{
+		// @todo Probably not necessary? Default priorities should be fine...
+		return [
+			new PluginInitializationModule(Priority::EARLY, Priority::EARLY, Priority::EARLY),
+			new EventManagementModule(),
+		];
+	}
+
+	protected function createContainerConfigurator(): ?ContainerConfiguratorInterface
+	{
+		return new PimpleConfigurator();
+	}
+
+	public function getInvoker(): InvokerInterface {
+		if ( ! $this->invoker instanceof InvokerInterface ) {
+			$this->invoker = new Invoker(
+				new ResolverChain(
+					[
+						new TypeHintContainerResolver( $this->getContainer() ),
+						new ParameterNameContainerResolver( $this->getContainer() ),
+						new NumericArrayResolver(),
+						new AssociativeArrayResolver(),
+						new DefaultValueResolver(),
+					]
+				),
+				$this->getContainer()
+			);
 		}
 
-		foreach ( $this->providers as $provider ) {
-			$provider->boot();
-		}
+		return $this->invoker;
+	}
 
-		$this->booted = true;
+	protected function createDefaultEventDispatcher(): EventDispatcherInterface
+	{
+		return new class($this->getEventManager(), $this, $this->getInvoker()) extends EventDispatcher {
+			private $invoker;
+
+			public function __construct(EventManagerInterface $eventManager, PluginInterface $plugin, InvokerInterface $invoker)
+			{
+				parent::__construct($eventManager, $plugin);
+
+				$this->invoker = $invoker;
+			}
+
+			protected function wrapCallback($callback): Closure
+			{
+				return function (...$args) use ($callback) {
+					if (
+						isset($args[0])
+						&& $args[0] instanceof PluginEvent
+						&& $this->plugin !== $args[0]->getPlugin()
+					) {
+						return;
+					}
+
+					return $this->invoker->call($callback, $args);
+				};
+			}
+		};
 	}
 
 	public function config( $path, $default = null ) {
@@ -95,14 +141,6 @@ final class Plugin {
 		}
 
 		return $config->get( $path );
-	}
-
-	public function get_container() {
-		return $this->container;
-	}
-
-	public function get_pimple() {
-		return $this->pimple;
 	}
 
 	public function is_collecting_client_metrics() {
@@ -198,50 +236,5 @@ final class Plugin {
 		}
 
 		return \file_exists( \get_home_path() . '__clockwork/index.html' );
-	}
-
-	// @todo Method name?
-	public function lock(): void {
-		if ( $this->locked ) {
-			return;
-		}
-
-		foreach ( $this->providers as $provider ) {
-			$provider->registered();
-		}
-
-		$this->locked = true;
-	}
-
-	public function register( Provider $provider ) {
-		if ( $this->locked ) {
-			throw new RuntimeException( 'Cannot register providers after plugin has been locked' );
-		}
-
-		$provider->register();
-
-		$this->providers[ \get_class( $provider ) ] = $provider;
-
-		return $this;
-	}
-
-	public function run(): void {
-		// Resolve error handler immediately so we catch as many errors as possible.
-		// @todo Move to plugin constructor?
-		Errors::get_instance()->register();
-
-		$this->container->get( Event_Manager::class )
-			->on(
-				'plugin_loaded',
-				function ( $file ): void {
-					if ( $this->container->get( 'file' ) !== \realpath( $file ) ) {
-						return;
-					}
-
-					$this->lock();
-				},
-				Event_Manager::EARLY_EVENT
-			)
-			->on( 'plugins_loaded', [ $this, 'boot' ], Event_Manager::EARLY_EVENT );
 	}
 }

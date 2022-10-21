@@ -22,7 +22,7 @@ final class Cli_Collection_Helper {
 	}
 
 	public static function get_core_command_list_path(): string {
-		$dir = \dirname( \_cfw_instance()->get_container()->get( 'file' ) );
+		$dir = \dirname( \_cfw_instance()->getFile() );
 
 		return "{$dir}/generated/wp-cli-core-command-list.php";
 	}

@@ -5,33 +5,40 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Web_App;
 
 use Clockwork\Web\Web;
-use Clockwork_For_Wp\Base_Provider;
-use Pimple\Container;
+use Daedalus\Pimple\Events\AddingContainerDefinitions;
+use Daedalus\Plugin\Events\ManagingSubscribers;
+use Daedalus\Plugin\ModuleInterface;
+use Daedalus\Plugin\PluginInterface;
+use Psr\Container\ContainerInterface;
 use WP_Query;
 
 /**
  * @internal
  */
-final class Web_App_Provider extends Base_Provider {
-	public function boot(): void {
-		if ( $this->plugin->is_web_enabled() && ! $this->plugin->is_web_installed() ) {
-			parent::boot();
+final class Web_App_Provider implements ModuleInterface {
+	public function register( PluginInterface $plugin ): void {
+		$eventDispatcher = $plugin->getEventDispatcher();
+
+		$eventDispatcher->addListener( AddingContainerDefinitions::class, [ $this, 'onAddingContainerDefinitions' ] );
+		$eventDispatcher->addListener( ManagingSubscribers::class, [ $this, 'onManagingSubscribers' ] );
+	}
+
+	public function onAddingContainerDefinitions( AddingContainerDefinitions $event ): void {
+		$event->addDefinitions([
+			Web_App_Controller::class => static function ( ContainerInterface $container ) {
+				return new Web_App_Controller( new Web(), $container->get( WP_Query::class ) );
+			},
+			Web_App_Subscriber::class => static function () {
+				return new Web_App_Subscriber();
+			},
+		]);
+	}
+
+	public function onManagingSubscribers( ManagingSubscribers $event ): void {
+		$plugin = $event->getPlugin();
+
+		if ($plugin->is_web_enabled() && ! $plugin->is_web_installed()) {
+			$event->addSubscriber( Web_App_Subscriber::class );
 		}
-	}
-
-	public function register(): void {
-		$pimple = $this->plugin->get_pimple();
-
-		$pimple[ Web_App_Controller::class ] = static function ( Container $pimple ) {
-			return new Web_App_Controller( new Web(), $pimple[ WP_Query::class ] );
-		};
-
-		$pimple[ Web_App_Subscriber::class ] = static function () {
-			return new Web_App_Subscriber();
-		};
-	}
-
-	protected function subscribers(): array {
-		return [ Web_App_Subscriber::class ];
 	}
 }

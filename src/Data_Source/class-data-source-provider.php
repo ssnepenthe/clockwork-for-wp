@@ -4,29 +4,44 @@ declare(strict_types=1);
 
 namespace Clockwork_For_Wp\Data_Source;
 
-use Clockwork_For_Wp\Base_Provider;
-use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Plugin;
-use Pimple\Container;
+use Daedalus\Pimple\Events\AddingContainerDefinitions;
+use Daedalus\Plugin\Events\ManagingSubscribers;
+use Daedalus\Plugin\Events\PluginLocking;
+use Daedalus\Plugin\ModuleInterface;
+use Daedalus\Plugin\PluginInterface;
+use Psr\Container\ContainerInterface;
+use ToyWpEventManagement\SubscriberInterface;
 
 /**
  * @internal
  */
-final class Data_Source_Provider extends Base_Provider {
-	public function register(): void {
-		$this->plugin->get_pimple()[ Data_Source_Factory::class ] = static function ( Container $pimple ) {
-			return new Data_Source_Factory( $pimple[ Plugin::class ] );
-		};
+final class Data_Source_Provider implements ModuleInterface {
+	public function register( PluginInterface $plugin ): void {
+		$eventDispatcher = $plugin->getEventDispatcher();
+
+		$eventDispatcher->addListener( AddingContainerDefinitions::class, [ $this, 'onAddingContainerDefinitions' ] );
+		$eventDispatcher->addListener( ManagingSubscribers::class, [ $this, 'onManagingSubscribers' ] );
+		$eventDispatcher->addListener( PluginLocking::class, [ $this, 'onPluginLocking' ] );
 	}
 
-	public function registered(): void {
+	public function onAddingContainerDefinitions( AddingContainerDefinitions $event ): void {
+		$event->addDefinitions([
+			Data_Source_Factory::class => static function ( ContainerInterface $container ) {
+				return new Data_Source_Factory( $container->get( Plugin::class ) );
+			},
+		]);
+	}
+
+	public function onPluginLocking( PluginLocking $event ): void {
 		// We have registered our error handler as early as possible in order to collect as many
 		// errors as possible. However our config is not available that early so let's apply our
 		// configuration now.
 		$errors = Errors::get_instance();
+		$plugin = $event->getPlugin();
 
-		if ( $this->plugin->is_feature_enabled( 'errors' ) ) {
-			$config = $this->plugin->config( 'data_sources.errors.config', [] );
+		if ( $plugin->is_feature_enabled( 'errors' ) ) {
+			$config = $plugin->config( 'data_sources.errors.config', [] );
 
 			$except_types = $config['except_types'] ?? false;
 			$only_types = $config['only_types'] ?? false;
@@ -73,14 +88,16 @@ final class Data_Source_Provider extends Base_Provider {
 		}
 	}
 
-	protected function subscribers(): array {
-		$data_source_factory = $this->plugin->get_container()->get( Data_Source_Factory::class );
+	public function onManagingSubscribers( ManagingSubscribers $event ): void {
+		$data_source_factory = $event->getPlugin()->getContainer()->get( Data_Source_Factory::class );
 
-		return \array_filter(
-			$data_source_factory->get_enabled_data_sources(),
-			static function ( $data_source ) {
-				return $data_source instanceof Subscriber;
-			}
+		$event->addSubscribers(
+			\array_filter(
+				$data_source_factory->get_enabled_data_sources(),
+				static function ( $data_source ) {
+					return $data_source instanceof SubscriberInterface;
+				}
+			)
 		);
 	}
 }

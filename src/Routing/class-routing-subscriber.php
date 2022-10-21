@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Clockwork_For_Wp\Routing;
 
-use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Incoming_Request;
+use ToyWpEventManagement\SubscriberInterface;
 use WP;
 
-final class Routing_Subscriber implements Subscriber {
+final class Routing_Subscriber implements SubscriberInterface {
 	public function call_matched_handler(
 		Route_Collection $routes,
 		WP $wp,
@@ -34,7 +34,7 @@ final class Routing_Subscriber implements Subscriber {
 	}
 
 	// @todo route collection via constructor?
-	public function get_subscribed_events(): array {
+	public function getSubscribedEvents(): array {
 		return [
 			'option_rewrite_rules' => 'merge_rules',
 			'rewrite_rules_array' => 'merge_rules',

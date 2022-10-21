@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Plugin;
 use InvalidArgumentException;
 
@@ -129,7 +128,7 @@ final class Data_Source_Factory {
 	}
 
 	private function create_core_data_source(): Core {
-		$container = $this->plugin->get_container();
+		$container = $this->plugin->getContainer();
 
 		return new Core( $container->get( 'wp_version' ), $container->get( 'timestart' ) );
 	}
@@ -226,7 +225,7 @@ final class Data_Source_Factory {
 			);
 		}
 
-		$this->plugin->get_container()->get( Event_Manager::class )->trigger(
+		$this->plugin->getEventManager()->trigger(
 			'cfw_data_sources_wpdb_init',
 			$data_source
 		);

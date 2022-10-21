@@ -7,10 +7,11 @@ namespace Clockwork_For_Wp;
 use Clockwork\Clockwork;
 use Clockwork\Request\Request;
 use Clockwork_For_Wp\Cli_Data_Collection\Command_Context;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
-use Clockwork_For_Wp\Event_Management\Subscriber;
+use ToyWpEventManagement\EventManagerInterface;
+use ToyWpEventManagement\Priority;
+use ToyWpEventManagement\SubscriberInterface;
 
-final class Clockwork_Subscriber implements Subscriber {
+final class Clockwork_Subscriber implements SubscriberInterface {
 	private $plugin;
 
 	public function __construct( Plugin $plugin ) {
@@ -44,7 +45,7 @@ final class Clockwork_Subscriber implements Subscriber {
 		}
 	}
 
-	public function finalize_command( Clockwork $clockwork, Event_Manager $event_manager ): void {
+	public function finalize_command( Clockwork $clockwork, EventManagerInterface $event_manager ): void {
 		$command = Command_Context::current();
 
 		if (
@@ -69,7 +70,7 @@ final class Clockwork_Subscriber implements Subscriber {
 			->storeRequest();
 	}
 
-	public function finalize_request( Clockwork $clockwork, Event_Manager $event_manager ): void {
+	public function finalize_request( Clockwork $clockwork, EventManagerInterface $event_manager ): void {
 		$event_manager->trigger( 'cfw_pre_resolve' ); // @todo pass $clockwork? $container?
 
 		$clockwork
@@ -77,7 +78,7 @@ final class Clockwork_Subscriber implements Subscriber {
 			->storeRequest();
 	}
 
-	public function get_subscribed_events(): array {
+	public function getSubscribedEvents(): array {
 		$events = [
 			'wp_enqueue_scripts' => 'enqueue_scripts',
 		];
@@ -88,15 +89,15 @@ final class Clockwork_Subscriber implements Subscriber {
 			&& $this->plugin->is_collecting_requests()
 		) {
 			// wp_loaded fires on frontend but also login, admin, etc.
-			$events['wp_loaded'] = [ 'initialize_request', Event_Manager::LATE_EVENT ];
+			$events['wp_loaded'] = [ 'initialize_request', Priority::LATE ];
 		}
 
 		// @todo Redundant conditions?
 		if ( $this->plugin->is_recording() ) {
 			if ( $this->plugin->is_collecting_commands() ) {
-				$events['shutdown'] = [ 'finalize_command', Event_Manager::LATE_EVENT ];
+				$events['shutdown'] = [ 'finalize_command', Priority::LATE ];
 			} elseif ( $this->plugin->is_collecting_requests() ) {
-				$events['shutdown'] = [ 'finalize_request', Event_Manager::LATE_EVENT ];
+				$events['shutdown'] = [ 'finalize_request', Priority::LATE ];
 			}
 		}
 

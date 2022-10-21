@@ -30,7 +30,7 @@ final class Clean_Command extends Command {
 
 	public function handle( $all = false, $expiration = null ): void {
 		$force = true;
-		$container = \_cfw_instance()->get_container();
+		$container = \_cfw_instance()->getContainer();
 
 		if ( $all ) {
 			$container->get( ConfigurationBuilderInterface::class )->set( 'storage.expiration', 0 );

@@ -6,9 +6,10 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "itsgoingd/clockwork": "^5.0",
-        "pimple/pimple": "^3.2",
         "php-di/invoker": "^2.0",
-        "league/config": "^1.1"
+        "league/config": "^1.1",
+        "ssnepenthe/daedalus": "dev-main",
+        "ssnepenthe/daedalus-pimple": "dev-master"
     },
     "require-dev": {
         "psy/psysh": "^0.9.7",
@@ -31,5 +32,19 @@
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../daedalus"
+        },
+        {
+            "type": "path",
+            "url": "../daedalus-pimple"
+        },
+        {
+            "type": "path",
+            "url": "../toy-wp-event-management"
+        }
+    ]
 }

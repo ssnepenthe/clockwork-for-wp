@@ -8,10 +8,11 @@ use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Log;
 use Clockwork\Request\Request;
 use Clockwork\Request\Timeline\Timeline;
-use Clockwork_For_Wp\Event_Management\Subscriber;
+use ToyWpEventManagement\SubscriberInterface;
+
 use function Clockwork_For_Wp\prepare_http_response;
 
-final class Wp_Http extends DataSource implements Subscriber {
+final class Wp_Http extends DataSource implements SubscriberInterface {
 	private $log;
 	private $timeline;
 
@@ -45,27 +46,33 @@ final class Wp_Http extends DataSource implements Subscriber {
 		}
 	}
 
-	public function get_subscribed_events(): array {
+	public function onHttpApiDebug( $response, $_, $_2, $args ): void {
+		$this->finish_request( prepare_http_response( $response ), $args );
+	}
+
+	public function onHttpRequestArgs( $args, $url ) {
+		$args = $this->ensure_args_have_meta( $args, $url );
+
+		$this->start_request( $args );
+
+		return $args;
+	}
+
+	public function onPreHttpRequest( $preempt, $args ) {
+		if ( false === $preempt ) {
+			return $preempt;
+		}
+
+		$this->finish_request( prepare_http_response( $preempt ), $args );
+
+		return $preempt;
+	}
+
+	public function getSubscribedEvents(): array {
 		return [
-			'http_api_debug' => function ( $response, $_, $_2, $args ): void {
-				$this->finish_request( prepare_http_response( $response ), $args );
-			},
-			'http_request_args' => function ( $args, $url ) {
-				$args = $this->ensure_args_have_meta( $args, $url );
-
-				$this->start_request( $args );
-
-				return $args;
-			},
-			'pre_http_request' => function ( $preempt, $args ) {
-				if ( false === $preempt ) {
-					return $preempt;
-				}
-
-				$this->finish_request( prepare_http_response( $preempt ), $args );
-
-				return $preempt;
-			},
+			'http_api_debug' => 'onHttpApiDebug',
+			'http_request_args' => 'onHttpRequestArgs',
+			'pre_http_request' => 'OnPreHttpRequest',
 		];
 	}
 

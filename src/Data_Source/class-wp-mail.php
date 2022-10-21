@@ -8,12 +8,12 @@ use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Log;
 use Clockwork\Request\Request;
 use Clockwork\Request\Timeline\Timeline;
-use Clockwork_For_Wp\Event_Management\Subscriber;
+use ToyWpEventManagement\SubscriberInterface;
 use WP_Error;
 use function Clockwork_For_Wp\wp_error_to_array;
 
 // @todo Use phpmailer_init hook to get more details?
-final class Wp_Mail extends DataSource implements Subscriber {
+final class Wp_Mail extends DataSource implements SubscriberInterface {
 	private $emails;
 	private $log;
 
@@ -22,20 +22,24 @@ final class Wp_Mail extends DataSource implements Subscriber {
 		$this->log = $log ?: new Log();
 	}
 
-	public function get_subscribed_events(): array {
+	public function onWpMailFailed( WP_Error $error ): void {
+		// @todo Truncate field within error_data.
+		$data = wp_error_to_array( $error );
+
+		$this->record_failure( $data );
+	}
+
+	public function onWpMail( $args ) {
+		// @todo Prepare mail args helper?
+		$this->record_send( $args );
+
+		return $args;
+	}
+
+	public function getSubscribedEvents(): array {
 		return [
-			'wp_mail_failed' => function ( WP_Error $error ): void {
-				// @todo Truncate field within error_data.
-				$data = wp_error_to_array( $error );
-
-				$this->record_failure( $data );
-			},
-			'wp_mail' => function ( $args ) {
-				// @todo Prepare mail args helper?
-				$this->record_send( $args );
-
-				return $args;
-			},
+			'wp_mail_failed' => 'onWpMailFailed',
+			'wp_mail' => 'onWpMail',
 		];
 	}
 

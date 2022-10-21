@@ -6,11 +6,12 @@ namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Request;
-use Clockwork_For_Wp\Event_Management\Subscriber;
+use ToyWpEventManagement\SubscriberInterface;
+
 use function Clockwork_For_Wp\describe_callable;
 use function Clockwork_For_Wp\describe_unavailable_callable;
 
-final class Wp_Hook extends DataSource implements Subscriber {
+final class Wp_Hook extends DataSource implements SubscriberInterface {
 	private $all_hooks;
 	private $hooks = [];
 
@@ -47,28 +48,30 @@ final class Wp_Hook extends DataSource implements Subscriber {
 		$this->hooks[] = $hook;
 	}
 
-	public function get_subscribed_events(): array {
-		return [
-			'cfw_pre_resolve' => function ( $wp_filter, $wp_actions ): void {
-				$tags = $this->all_hooks ? \array_keys( $wp_filter ) : \array_keys( $wp_actions );
+	public function onCfwPreResolve( $wp_filter, $wp_actions ): void {
+		$tags = $this->all_hooks ? \array_keys( $wp_filter ) : \array_keys( $wp_actions );
 
-				foreach ( $tags as $tag ) {
-					if ( isset( $wp_filter[ $tag ] ) ) {
-						foreach ( $wp_filter[ $tag ] as $priority => $callbacks ) {
-							foreach ( $callbacks as $callback ) {
-								$this->add_hook(
-									$tag,
-									$priority,
-									$callback['function'],
-									$callback['accepted_args']
-								);
-							}
-						}
-					} else {
-						$this->add_hook( $tag );
+		foreach ( $tags as $tag ) {
+			if ( isset( $wp_filter[ $tag ] ) ) {
+				foreach ( $wp_filter[ $tag ] as $priority => $callbacks ) {
+					foreach ( $callbacks as $callback ) {
+						$this->add_hook(
+							$tag,
+							$priority,
+							$callback['function'],
+							$callback['accepted_args']
+						);
 					}
 				}
-			},
+			} else {
+				$this->add_hook( $tag );
+			}
+		}
+	}
+
+	public function getSubscribedEvents(): array {
+		return [
+			'cfw_pre_resolve' => 'onCfwPreResolve',
 		];
 	}
 

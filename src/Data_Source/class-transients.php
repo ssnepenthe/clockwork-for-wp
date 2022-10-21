@@ -6,10 +6,10 @@ namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Request;
-use Clockwork_For_Wp\Event_Management\Subscriber;
 use InvalidArgumentException;
+use ToyWpEventManagement\SubscriberInterface;
 
-final class Transients extends DataSource implements Subscriber {
+final class Transients extends DataSource implements SubscriberInterface {
 	private $deleted = [];
 	private $setted = [];
 
@@ -19,20 +19,28 @@ final class Transients extends DataSource implements Subscriber {
 		return $this;
 	}
 
-	public function get_subscribed_events(): array {
+	public function onSettedTransient( $transient, $value, $expiration ): void {
+		$this->setted( $transient, $value, $expiration );
+	}
+
+	public function onSettedSiteTransient( $transient, $value, $expiration ): void {
+		$this->setted( $transient, $value, $expiration, $is_site = true );
+	}
+
+	public function onDeletedTransient( $transient ): void {
+		$this->deleted( $transient );
+	}
+
+	public function onDeletedSiteTransient( $transient ): void {
+		$this->deleted( $transient, $is_site = true );
+	}
+
+	public function getSubscribedEvents(): array {
 		return [
-			'setted_transient' => function ( $transient, $value, $expiration ): void {
-				$this->setted( $transient, $value, $expiration );
-			},
-			'setted_site_transient' => function ( $transient, $value, $expiration ): void {
-				$this->setted( $transient, $value, $expiration, $is_site = true );
-			},
-			'deleted_transient' => function ( $transient ): void {
-				$this->deleted( $transient );
-			},
-			'deleted_site_transient' => function ( $transient ): void {
-				$this->deleted( $transient, $is_site = true );
-			},
+			'setted_transient' => 'onSettedTransient',
+			'setted_site_transient' => 'onSettedSiteTransient',
+			'deleted_transient' => 'onDeletedTransient',
+			'deleted_site_transient' => 'onDeletedSiteTransient',
 		];
 	}
 

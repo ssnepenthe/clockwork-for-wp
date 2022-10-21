@@ -6,37 +6,46 @@ namespace Clockwork_For_Wp\Api;
 
 use Clockwork\Authentication\AuthenticatorInterface;
 use Clockwork\Request\IncomingRequest;
-use Clockwork_For_Wp\Base_Provider;
 use Clockwork_For_Wp\Metadata;
-use Pimple\Container;
+use Daedalus\Pimple\Events\AddingContainerDefinitions;
+use Daedalus\Plugin\Events\ManagingSubscribers;
+use Daedalus\Plugin\ModuleInterface;
+use Daedalus\Plugin\PluginInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * @internal
  */
-final class Api_Provider extends Base_Provider {
-	public function boot(): void {
-		if ( $this->plugin->is_enabled() ) {
-			parent::boot();
+final class Api_Provider implements ModuleInterface {
+	public function register( PluginInterface $plugin ): void {
+		$eventDispatcher = $plugin->getEventDispatcher();
+
+		$eventDispatcher->addListener( AddingContainerDefinitions::class, [ $this, 'onAddingContainerDefinitions' ] );
+		$eventDispatcher->addListener( ManagingSubscribers::class, [ $this, 'onManagingSubscribers'] );
+	}
+
+	public function onAddingContainerDefinitions( AddingContainerDefinitions $event ): void {
+		$event->addDefinitions([
+			Api_Controller::class => static function ( ContainerInterface $container ) {
+				return new Api_Controller(
+					$container->get( AuthenticatorInterface::class ),
+					$container->get( Metadata::class ),
+					$container->get( IncomingRequest::class )
+				);
+			},
+			Api_Subscriber::class => static function () {
+				return new Api_Subscriber();
+			},
+		]);
+	}
+
+	public function onManagingSubscribers( ManagingSubscribers $event ): void {
+		if (! $event->getPlugin()->is_enabled()) {
+			return;
 		}
-	}
 
-	public function register(): void {
-		$pimple = $this->plugin->get_pimple();
-
-		$pimple[ Api_Controller::class ] = static function ( Container $pimple ) {
-			return new Api_Controller(
-				$pimple[ AuthenticatorInterface::class ],
-				$pimple[ Metadata::class ],
-				$pimple[ IncomingRequest::class ]
-			);
-		};
-
-		$pimple[ Api_Subscriber::class ] = static function () {
-			return new Api_Subscriber();
-		};
-	}
-
-	protected function subscribers(): array {
-		return [ Api_Subscriber::class ];
+		$event->addSubscribers([
+			Api_Subscriber::class,
+		]);
 	}
 }

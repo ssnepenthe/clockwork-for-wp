@@ -4,30 +4,44 @@ declare(strict_types=1);
 
 namespace Clockwork_For_Wp\Wp_Cli;
 
-use Clockwork_For_Wp\Base_Provider;
+use Daedalus\Pimple\Events\AddingContainerDefinitions;
+use Daedalus\Plugin\Events\PluginBooting;
+use Daedalus\Plugin\Events\PluginLocking;
+use Daedalus\Plugin\ModuleInterface;
+use Daedalus\Plugin\PluginInterface;
 use Invoker\Invoker;
-use Pimple\Container;
+use Psr\Container\ContainerInterface;
 
 /**
  * @internal
  */
-final class Wp_Cli_Provider extends Base_Provider {
-	public function boot(): void {
-		$this->plugin->get_container()->get( Command_Registry::class )->initialize();
+final class Wp_Cli_Provider implements ModuleInterface {
+	public function register( PluginInterface $plugin ): void {
+		$eventDispatcher = $plugin->getEventDispatcher();
+
+		$eventDispatcher->addListener( AddingContainerDefinitions::class, [ $this, 'onAddingContainerDefinitions' ] );
+		$eventDispatcher->addListener( PluginBooting::class, [ $this, 'onPluginBooting' ] );
+		$eventDispatcher->addListener( PluginLocking::class, [ $this, 'onPluginLocking' ] );
 	}
 
-	public function register(): void {
-		$this->plugin->get_pimple()[ Command_Registry::class ] = static function ( Container $pimple ) {
-			return new Command_Registry( $pimple[ Invoker::class ] );
-		};
+	public function onAddingContainerDefinitions( AddingContainerDefinitions $event ): void {
+		$event->addDefinitions([
+			Command_Registry::class => static function ( ContainerInterface $container ) {
+				return new Command_Registry( $container->get( Invoker::class ) );
+			},
+		]);
 	}
 
-	public function registered(): void {
+	public function onPluginBooting( PluginBooting $event ): void {
+		$event->getPlugin()->getContainer()->get( Command_Registry::class )->initialize();
+	}
+
+	public function onPluginLocking( PluginLocking $event ): void {
 		if ( ! ( \defined( 'WP_CLI' ) && WP_CLI ) ) {
 			return;
 		}
 
-		$this->plugin->get_container()->get( Command_Registry::class )->namespace(
+		$event->getPlugin()->getContainer()->get( Command_Registry::class )->namespace(
 			'clockwork',
 			'Manages the Clockwork for WP plugin.',
 			static function ( Command_Registry $scoped_registry ): void {

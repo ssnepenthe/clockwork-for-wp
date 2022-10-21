@@ -8,12 +8,12 @@ use Clockwork\DataSource\DataSource;
 use Clockwork\Helpers\StackFilter;
 use Clockwork\Helpers\StackTrace;
 use Clockwork\Request\Request;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
-use Clockwork_For_Wp\Event_Management\Subscriber;
 use InvalidArgumentException;
+use ToyWpEventManagement\Priority;
+use ToyWpEventManagement\SubscriberInterface;
 
 // @todo Would be nice to get this tested by our browser tests.
-final class Wp_Redirect extends DataSource implements Subscriber {
+final class Wp_Redirect extends DataSource implements SubscriberInterface {
 	private $filtered = [
 		'location' => null,
 		'status' => null,
@@ -31,34 +31,32 @@ final class Wp_Redirect extends DataSource implements Subscriber {
 		$this->finalized = true;
 	}
 
-	public function get_subscribed_events(): array {
+	public function onWpRedirect( $location ) {
+		$this->record_wp_redirect_call();
+		$this->set_filtered( 'location', $location );
+
+		return $location;
+	}
+
+	public function onWpRedirectStatus( $status ) {
+		$this->set_filtered( 'status', $status );
+
+		return $status;
+	}
+
+	public function onXRedirectBy( $x_redirect_by ) {
+		$this->set_filtered( 'x-redirect-by', $x_redirect_by );
+		$this->finalize_wp_redirect_call();
+
+		return $x_redirect_by;
+	}
+
+	public function getSubscribedEvents(): array
+	{
 		return [
-			'wp_redirect' => [
-				function ( $location ) {
-					$this->record_wp_redirect_call();
-					$this->set_filtered( 'location', $location );
-
-					return $location;
-				},
-				Event_Manager::LATE_EVENT,
-			],
-			'wp_redirect_status' => [
-				function ( $status ) {
-					$this->set_filtered( 'status', $status );
-
-					return $status;
-				},
-				Event_Manager::LATE_EVENT,
-			],
-			'x_redirect_by' => [
-				function ( $x_redirect_by ) {
-					$this->set_filtered( 'x-redirect-by', $x_redirect_by );
-					$this->finalize_wp_redirect_call();
-
-					return $x_redirect_by;
-				},
-				Event_Manager::LATE_EVENT,
-			],
+			'wp_redirect' => [ 'onWpRedirect', Priority::LATE ],
+			'wp_redirect_status' => [ 'onWpRedirectStatus', Priority::LATE ],
+			'x_redirect_by' => [ 'onXRedirectBy', Priority::LATE ],
 		];
 	}
 

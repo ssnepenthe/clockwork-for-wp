@@ -9,10 +9,11 @@ use Clockwork\Helpers\StackFilter;
 use Clockwork\Helpers\StackFrame;
 use Clockwork\Helpers\StackTrace;
 use Clockwork\Request\Request;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
-use Clockwork_For_Wp\Event_Management\Subscriber;
+use ToyWpEventManagement\EventManagerInterface;
+use ToyWpEventManagement\Priority;
+use ToyWpEventManagement\SubscriberInterface;
 
-final class Theme extends DataSource implements Subscriber {
+final class Theme extends DataSource implements SubscriberInterface {
 	/**
 	 * @var string[]
 	 */
@@ -107,105 +108,106 @@ final class Theme extends DataSource implements Subscriber {
 		return $this;
 	}
 
-	public function get_subscribed_events(): array {
+	/**
+	 * @param int $content_width
+	 */
+	public function onCfwPreResolve( $content_width ): void {
+		/**
+		 * @psalm-suppress RedundantCastGivenDocblockType
+		 */
+		$recorded_content_width = (int) $content_width;
+
+		$this
+			->set_theme_root( \get_theme_root() )
+			->set_is_child_theme( \is_child_theme() )
+			->set_template( \get_template() )
+			->set_stylesheet( \get_stylesheet() )
+			->set_content_width( $recorded_content_width );
+	}
+
+	/**
+	 * @param array $classes
+	 *
+	 * @return array
+	 */
+	public function onBodyClass( $classes ) {
+		/**
+		 * @psalm-suppress RedundantConditionGivenDocblockType
+		 * @psalm-suppress DocblockTypeContradiction
+		 */
+		$recorded_classes = \is_array( $classes ) ? $classes : [];
+
+		$this->set_body_classes( $recorded_classes );
+
+		return $classes;
+	}
+
+	/**
+	 * @param string[] $templates
+	 */
+	public function onGetTemplatePart( string $slug, string $name, array $templates, array $args ): void {
+		$this->add_requested_template_part(
+			$slug,
+			$name,
+			$templates,
+			$args,
+			\locate_template( $templates )
+		);
+	}
+
+	/**
+	 * @param string $template
+	 *
+	 * @return string
+	 */
+	public function onTemplateInclude( $template ) {
+		/**
+		 * @psalm-suppress RedundantCastGivenDocblockType
+		 */
+		$recorded_template = (string) $template;
+
+		$this->set_included_template( $recorded_template );
+
+		return $template;
+	}
+
+	public function onTemplateRedirect( EventManagerInterface $events ): void {
+		foreach (
+			$this->hierarchy_conditional_filter_map() as $conditional => $filter
+		) {
+			if ( \function_exists( $conditional ) && $conditional() ) {
+				$events->add(
+					$filter,
+					/**
+					 * @param array $templates
+					 *
+					 * @return array
+					 */
+					function ( $templates ) {
+						/**
+						 * @psalm-suppress RedundantConditionGivenDocblockType
+						 * @psalm-suppress DocblockTypeContradiction
+						 */
+						$recorded_templates = \is_array( $templates ) ? $templates : [];
+
+						$this->add_hierarchy_templates( $recorded_templates );
+
+						return $templates;
+					},
+					Priority::LATE
+				);
+			}
+		}
+	}
+
+	public function getSubscribedEvents(): array
+	{
 		return [
-			'cfw_pre_resolve' => [
-				/**
-				 * @param int $content_width
-				 */
-				function ( $content_width ): void {
-					/**
-					 * @psalm-suppress RedundantCastGivenDocblockType
-					 */
-					$recorded_content_width = (int) $content_width;
-
-					$this
-						->set_theme_root( \get_theme_root() )
-						->set_is_child_theme( \is_child_theme() )
-						->set_template( \get_template() )
-						->set_stylesheet( \get_stylesheet() )
-						->set_content_width( $recorded_content_width );
-				},
-			],
-			'body_class' => [
-				/**
-				 * @param array $classes
-				 *
-				 * @return array $classes
-				 */
-				function ( $classes ) {
-					/**
-					 * @psalm-suppress RedundantConditionGivenDocblockType
-					 * @psalm-suppress DocblockTypeContradiction
-					 */
-					$recorded_classes = \is_array( $classes ) ? $classes : [];
-
-					$this->set_body_classes( $recorded_classes );
-
-					return $classes;
-				},
-				Event_Manager::LATE_EVENT,
-			],
-			'get_template_part' => [
-				/**
-				 * @param string[] $templates
-				 */
-				function ( string $slug, string $name, array $templates, array $args ): void {
-					$this->add_requested_template_part(
-						$slug,
-						$name,
-						$templates,
-						$args,
-						\locate_template( $templates )
-					);
-				},
-			],
-			'template_include' => [
-				/**
-				 * @param string $template
-				 *
-				 * @return string
-				 */
-				function ( $template ) {
-					/**
-					 * @psalm-suppress RedundantCastGivenDocblockType
-					 */
-					$recorded_template = (string) $template;
-
-					$this->set_included_template( $recorded_template );
-
-					return $template;
-				},
-				Event_Manager::LATE_EVENT,
-			],
-			'template_redirect' => function ( Event_Manager $events ): void {
-				foreach (
-					$this->hierarchy_conditional_filter_map() as $conditional => $filter
-				) {
-					if ( \function_exists( $conditional ) && $conditional() ) {
-						$events->on(
-							$filter,
-							/**
-							 * @param array $templates
-							 *
-							 * @return array
-							 */
-							function ( $templates ) {
-								/**
-								 * @psalm-suppress RedundantConditionGivenDocblockType
-								 * @psalm-suppress DocblockTypeContradiction
-								 */
-								$recorded_templates = \is_array( $templates ) ? $templates : [];
-
-								$this->add_hierarchy_templates( $recorded_templates );
-
-								return $templates;
-							},
-							Event_Manager::LATE_EVENT
-						);
-					}
-				}
-			},
+			'cfw_pre_resolve' => 'onCfwPreResolve',
+			'body_class' => [ 'onBodyClass', Priority::LATE ],
+			'get_template_part' => 'onGetTemplatePart',
+			'template_include' => [ 'onTemplateInclude', Priority::LATE ],
+			'template_redirect' => 'onTemplateRedirect',
 		];
 	}
 

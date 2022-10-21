@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Clockwork_For_Wp;
 
-use Clockwork_For_Wp\Event_Management\Subscriber;
+use ToyWpEventManagement\SubscriberInterface;
 
-final class Plugin_Subscriber implements Subscriber {
-	public function get_subscribed_events(): array {
+final class Plugin_Subscriber implements SubscriberInterface {
+	public function getSubscribedEvents(): array {
 		return [
 			'redirect_canonical' => 'prevent_trailing_slash_redirect',
 		];

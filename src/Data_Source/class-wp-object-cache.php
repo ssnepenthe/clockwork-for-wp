@@ -6,9 +6,9 @@ namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Request;
-use Clockwork_For_Wp\Event_Management\Subscriber;
+use ToyWpEventManagement\SubscriberInterface;
 
-final class Wp_Object_Cache extends DataSource implements Subscriber {
+final class Wp_Object_Cache extends DataSource implements SubscriberInterface {
 	private $deletes = 0;
 	private $hits = 0;
 	private $misses = 0;
@@ -20,40 +20,43 @@ final class Wp_Object_Cache extends DataSource implements Subscriber {
 		return $this;
 	}
 
-	public function get_subscribed_events(): array {
+	public function onCfwPreResolve( \WP_Object_Cache $wp_object_cache ): void {
+		// @todo Include hit percentage?
+		if ( \property_exists( $wp_object_cache, 'cache_hits' ) ) {
+			$this->hit( (int) $wp_object_cache->cache_hits );
+		}
+
+		if ( \property_exists( $wp_object_cache, 'cache_misses' ) ) {
+			$this->miss( (int) $wp_object_cache->cache_misses );
+		}
+
+		if ( \property_exists( $wp_object_cache, 'redis_calls' ) ) {
+			foreach ( [ 'hIncrBy', 'decrBy', 'incrBy', 'hSet', 'set', 'setex' ] as $method ) {
+				if ( isset( $wp_object_cache->redis_calls[ $method ] ) ) {
+					$this->write( (int) $wp_object_cache->redis_calls[ $method ] );
+				}
+			}
+
+			foreach ( [ 'hDel', 'del', 'flushAll' ] as $method ) {
+				if ( isset( $wp_object_cache->redis_calls[ $method ] ) ) {
+					$this->delete( (int) $wp_object_cache->redis_calls[ $method ] );
+				}
+			}
+		} elseif ( \property_exists( $wp_object_cache, 'stats' ) ) {
+			if ( isset( $wp_object_cache->stats['add'] ) ) {
+				$this->write( (int) $wp_object_cache->stats['add'] );
+			}
+
+			if ( isset( $wp_object_cache->stats['deletes'] ) ) {
+				$this->delete( (int) $wp_object_cache->stats['deletes'] );
+			}
+		}
+	}
+
+	public function getSubscribedEvents(): array
+	{
 		return [
-			'cfw_pre_resolve' => function ( \WP_Object_Cache $wp_object_cache ): void {
-				// @todo Include hit percentage?
-				if ( \property_exists( $wp_object_cache, 'cache_hits' ) ) {
-					$this->hit( (int) $wp_object_cache->cache_hits );
-				}
-
-				if ( \property_exists( $wp_object_cache, 'cache_misses' ) ) {
-					$this->miss( (int) $wp_object_cache->cache_misses );
-				}
-
-				if ( \property_exists( $wp_object_cache, 'redis_calls' ) ) {
-					foreach ( [ 'hIncrBy', 'decrBy', 'incrBy', 'hSet', 'set', 'setex' ] as $method ) {
-						if ( isset( $wp_object_cache->redis_calls[ $method ] ) ) {
-							$this->write( (int) $wp_object_cache->redis_calls[ $method ] );
-						}
-					}
-
-					foreach ( [ 'hDel', 'del', 'flushAll' ] as $method ) {
-						if ( isset( $wp_object_cache->redis_calls[ $method ] ) ) {
-							$this->delete( (int) $wp_object_cache->redis_calls[ $method ] );
-						}
-					}
-				} elseif ( \property_exists( $wp_object_cache, 'stats' ) ) {
-					if ( isset( $wp_object_cache->stats['add'] ) ) {
-						$this->write( (int) $wp_object_cache->stats['add'] );
-					}
-
-					if ( isset( $wp_object_cache->stats['deletes'] ) ) {
-						$this->delete( (int) $wp_object_cache->stats['deletes'] );
-					}
-				}
-			},
+			'cfw_pre_resolve' => 'onCfwPreResolve',
 		];
 	}
 
