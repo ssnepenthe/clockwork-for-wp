@@ -28,6 +28,6 @@ function print_test_context() {
 	printf(
 		'<span data-cy="test-context">%s</span><span data-cy="request-id">%s</span>',
 		json_encode( $context ),
-		\esc_html( \_cfw_instance()->get_container()->get( \Clockwork\Request\Request::class )->id )
+		\esc_html( \_cfw_instance()->getContainer()->get( \Clockwork\Request\Request::class )->id )
 	);
 };

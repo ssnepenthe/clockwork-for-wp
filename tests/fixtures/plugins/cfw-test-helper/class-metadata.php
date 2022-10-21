@@ -9,7 +9,7 @@ use League\Config\ConfigurationInterface;
 //       https://github.com/itsgoingd/clockwork/issues/510
 class Metadata {
 	public static function dir() {
-		$config = \_cfw_instance()->get_container()->get( ConfigurationInterface::class );
+		$config = \_cfw_instance()->getContainer()->get( ConfigurationInterface::class );
 
 		if ( 'file' !== $config->get( 'storage.driver' ) ) {
 			throw new \RuntimeException(

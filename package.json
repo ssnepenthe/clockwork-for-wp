@@ -21,7 +21,7 @@
   "homepage": "https://github.com/ssnepenthe/clockwork-for-wp#readme",
   "devDependencies": {
     "base64url": "^3.0.1",
-    "cypress": "^9.1.1",
+    "cypress": "^10.10.0",
     "qs": "^6.10.2"
   }
 }
