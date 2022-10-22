@@ -16,6 +16,10 @@ use PHPUnit\Framework\TestCase;
 class Clockwork_Provider_Test extends TestCase {
 	use Creates_Config;
 
+	protected function setUp(): void {
+		$this->markTestSkipped();
+	}
+
 	/** @test */
 	public function the_clock_function_can_be_disabled() {
 		$this->assertFalse( function_exists( 'clock' ) );

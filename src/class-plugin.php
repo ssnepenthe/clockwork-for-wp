@@ -39,7 +39,7 @@ use ToyWpEventManagement\Priority;
 /**
  * @internal
  */
-final class Plugin extends DaedalusPlugin {
+class Plugin extends DaedalusPlugin {
 	protected ?InvokerInterface $invoker = null;
 
 	protected function configure(): void {

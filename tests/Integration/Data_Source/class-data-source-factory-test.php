@@ -10,6 +10,10 @@ use Clockwork_For_Wp\Tests\Creates_Config;
 use InvalidArgumentException;
 use League\Config\ConfigurationInterface;
 use PHPUnit\Framework\TestCase;
+use Pimple\Container;
+use Pimple\Psr11\Container as Psr11Container;
+use ToyWpEventManagement\EventDispatcherInterface;
+use ToyWpEventManagement\EventManagerInterface;
 
 class Data_Source_Factory_Test extends TestCase {
 	use Creates_Config;
@@ -91,19 +95,43 @@ class Data_Source_Factory_Test extends TestCase {
 	}
 
 	protected function create_factory() {
-		return new Data_Source\Data_Source_Factory( new Plugin( [], [
-			'wp_version' => 'irrelevant',
-			'timestart' => 'irrelevant',
-			ConfigurationInterface::class => $this->create_config( [
-				'data_sources' => [
-					'rest_api' => [ 'enabled' => true ],
-					'theme' => [ 'enabled' => false ],
-					'transients' => [ 'enabled' => true ],
-				],
-			] ),
-			Event_Manager::class => new class {
-				public function trigger() { /** irrelevant */ }
+		$em = $this->createMock( EventManagerInterface::class );
+		$ed = $this->createMock( EventDispatcherInterface::class );
+		$config = $this->create_config( [
+			'data_sources' => [
+				'rest_api' => [ 'enabled' => true ],
+				'theme' => [ 'enabled' => false ],
+				'transients' => [ 'enabled' => true ],
+			],
+		] );
+
+		$plugin = new class( $em, $ed, $config ) extends Plugin {
+			private $config;
+
+			public function __construct( $eventManager, $eventDispatcher, $config ) {
+				parent::__construct();
+
+				$this->eventManager = $eventManager;
+				$this->eventDispatcher = $eventDispatcher;
+				$this->config = $config;
 			}
-		] ) );
+
+			protected function initializeContainer(): void {
+				$pimple = new Container( [
+					'wp_version' => 'irrelevant',
+					'timestart' => 'irrelevant',
+					ConfigurationInterface::class => $this->config,
+					Event_Manager::class => new class {
+						public function trigger() { /** irrelevant */ }
+					}
+				] );
+
+				$this->setContainer( new Psr11Container( $pimple ) );
+			}
+		};
+
+		$plugin->run();
+
+		return new Data_Source\Data_Source_Factory( $plugin );
 	}
 }

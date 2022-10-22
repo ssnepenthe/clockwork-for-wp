@@ -2,14 +2,13 @@
 
 namespace Clockwork_For_Wp\Tests\Integration\Data_Source;
 
-use Clockwork_For_Wp\Config;
-use Clockwork_For_Wp\Data_Source\Data_Source_Provider;
 use Clockwork_For_Wp\Data_Source\Wpdb;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Plugin;
 use Clockwork\Request\Request;
 use Clockwork_For_Wp\Data_Source\Data_Source_Factory;
 use PHPUnit\Framework\TestCase;
+use ToyWpEventManagement\EventDispatcherInterface;
+use ToyWpEventManagement\EventManagerInterface;
 
 class Wpdb_Test extends TestCase {
 	protected function pattern_model_map() {
@@ -183,13 +182,19 @@ class Wpdb_Test extends TestCase {
 	}
 
 	protected function create_data_source_via_factory( $config = [] ) {
-		return ( new Data_Source_Factory( new Plugin( [], [
-			Event_Manager::class => new class {
-				public function trigger( ...$args ) {
-					// Not important...
-				}
-			},
-		] ) ) )->create( 'wpdb', [
+		$em = $this->createMock( EventManagerInterface::class );
+		$ed = $this->createMock( EventDispatcherInterface::class );
+
+		$plugin = new class( $em, $ed ) extends Plugin {
+			public function __construct( $eventManager, $eventDispatcher ) {
+				parent::__construct();
+
+				$this->eventManager = $eventManager;
+				$this->eventDispatcher = $eventDispatcher;
+			}
+		};
+
+		return ( new Data_Source_Factory( $plugin ) )->create( 'wpdb', [
 			'pattern_model_map' => $config['pattern_model_map'] ?? $this->pattern_model_map(),
 			'slow_only' => $config['slow_only'] ?? false,
 			'slow_threshold' => $config['slow_threshold'] ?? 50

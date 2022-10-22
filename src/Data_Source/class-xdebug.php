@@ -6,7 +6,7 @@ namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\XdebugDataSource;
 use Clockwork\Request\Request;
-use Clockwork_For_Wp\Event_Management\Subscriber;
+use ToyWpEventManagement\SubscriberInterface;
 
 /**
  * Adapted from the Xdebug datasource bundled with Clockwork.
@@ -19,23 +19,26 @@ use Clockwork_For_Wp\Event_Management\Subscriber;
  *
  * @todo Need to look into this more - is it a bug or intended behavior?
  */
-final class Xdebug extends XdebugDataSource implements Subscriber {
+final class Xdebug extends XdebugDataSource implements SubscriberInterface {
 	private $profiler_filename;
 
-	public function get_subscribed_events(): array {
-		return [
-			'init' => function (): void {
-				$filename = \xdebug_get_profiler_filename();
+	public function onInit(): void {
+		$filename = \xdebug_get_profiler_filename();
 
-				/**
-				 * @psalm-suppress RedundantCondition
-				 *
-				 * @see https://github.com/vimeo/psalm/issues/6484
-				 */
-				if ( \is_string( $filename ) ) {
-					$this->set_profiler_filename( $filename );
-				}
-			},
+		/**
+		 * @psalm-suppress RedundantCondition
+		 *
+		 * @see https://github.com/vimeo/psalm/issues/6484
+		 */
+		if ( \is_string( $filename ) ) {
+			$this->set_profiler_filename( $filename );
+		}
+	}
+
+	public function getSubscribedEvents(): array
+	{
+		return [
+			'init' => 'onInit',
 		];
 	}
 

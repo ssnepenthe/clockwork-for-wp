@@ -7,10 +7,11 @@ namespace Clockwork_For_Wp\Data_Source;
 use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Log;
 use Clockwork\Request\Request;
-use Clockwork_For_Wp\Event_Management\Subscriber;
+use ToyWpEventManagement\SubscriberInterface;
+
 use function Clockwork_For_Wp\prepare_wpdb_query;
 
-final class Wpdb extends DataSource implements Subscriber {
+final class Wpdb extends DataSource implements SubscriberInterface {
 	private $custom_model_identifiers = [];
 	private $detect_duplicate_queries;
 	private $duplicates = [];
@@ -52,19 +53,22 @@ final class Wpdb extends DataSource implements Subscriber {
 		return $this;
 	}
 
-	public function get_subscribed_events(): array {
+	public function onCfwPreResolve( \wpdb $wpdb ): void {
+		if ( ! \is_array( $wpdb->queries ) || \count( $wpdb->queries ) < 1 ) {
+			return;
+		}
+
+		foreach ( $wpdb->queries as $query_array ) {
+			$query = prepare_wpdb_query( $query_array );
+
+			$this->add_query( $query[0], $query[1], $query[2] );
+		}
+	}
+
+	public function getSubscribedEvents(): array
+	{
 		return [
-			'cfw_pre_resolve' => function ( \wpdb $wpdb ): void {
-				if ( ! \is_array( $wpdb->queries ) || \count( $wpdb->queries ) < 1 ) {
-					return;
-				}
-
-				foreach ( $wpdb->queries as $query_array ) {
-					$query = prepare_wpdb_query( $query_array );
-
-					$this->add_query( $query[0], $query[1], $query[2] );
-				}
-			},
+			'cfw_pre_resolve' => 'onCfwPreResolve',
 		];
 	}
 
