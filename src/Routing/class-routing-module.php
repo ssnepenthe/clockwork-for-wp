@@ -8,7 +8,7 @@ use Daedalus\Pimple\Events\AddingContainerDefinitions;
 use Daedalus\Plugin\Events\ManagingSubscribers;
 use Daedalus\Plugin\ModuleInterface;
 use Daedalus\Plugin\PluginInterface;
-use Invoker\Invoker;
+use Invoker\InvokerInterface;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -30,7 +30,7 @@ final class Routing_Module implements ModuleInterface {
 			},
 			Route_Handler_Invoker::class => function ( ContainerInterface $container ) {
 				return new Route_Handler_Invoker(
-					$container->get( Invoker::class ),
+					$container->get( InvokerInterface::class ),
 					// @todo Configurable prefix?
 					'cfw_',
 					function ( Route $route ) {

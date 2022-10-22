@@ -9,7 +9,7 @@ use Daedalus\ApheleiaCli\Events\AddingCommands;
 use Daedalus\ApheleiaCli\Events\CreatingCommandRegistry;
 use Daedalus\Plugin\ModuleInterface;
 use Daedalus\Plugin\PluginInterface;
-use Invoker\Invoker;
+use Invoker\InvokerInterface;
 
 /**
  * @internal
@@ -41,7 +41,7 @@ final class Wp_Cli_Module implements ModuleInterface {
 		$invoker = $event->assertPluginIsAvailable()
 			->getPlugin()
 			->getContainer()
-			->get( Invoker::class );
+			->get( InvokerInterface::class );
 
 		$event->setInvocationStrategy( new InvokerBackedInvocationStrategy( $invoker ) );
 	}

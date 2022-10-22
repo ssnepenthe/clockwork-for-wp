@@ -9,7 +9,7 @@ use Daedalus\Pimple\Events\AddingContainerDefinitions;
 use Daedalus\Plugin\Events\ManagingSubscribers;
 use Daedalus\Plugin\ModuleInterface;
 use Daedalus\Plugin\PluginInterface;
-use Invoker\Invoker;
+use Invoker\InvokerInterface;
 use League\Config\Configuration;
 use League\Config\ConfigurationBuilderInterface;
 use League\Config\ConfigurationInterface;
@@ -58,7 +58,7 @@ final class Plugin_Module implements ModuleInterface {
 			ConfigurationInterface::class => static function ( ContainerInterface $container ) {
 				return $container->get( ConfigurationBuilderInterface::class )->reader();
 			},
-			Invoker::class => function ( ContainerInterface $container ) {
+			InvokerInterface::class => function ( ContainerInterface $container ) {
 				return $container->get( Plugin::class )->getInvoker();
 			},
 			Metadata::class => static function ( ContainerInterface $container ) {
