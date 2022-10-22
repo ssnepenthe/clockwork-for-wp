@@ -50,6 +50,7 @@ class Plugin extends DaedalusPlugin {
 		$this->setFile(__DIR__ . '/../clockwork-for-wp.php');
 		$this->setPrefix('cfw_');
 		$this->setCacheDir(__DIR__ . '/../generated');
+		$this->enableModuleDiscovery();
 	}
 
 	protected function createModules(): array

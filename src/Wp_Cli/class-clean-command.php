@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Clockwork_For_Wp\Wp_Cli;
 
+use ApheleiaCli\Command;
+use ApheleiaCli\Flag;
+use ApheleiaCli\Option;
 use Clockwork\Storage\StorageInterface;
 use League\Config\ConfigurationBuilderInterface;
 use League\Config\ConfigurationInterface;
@@ -14,15 +17,15 @@ use WP_CLI;
  */
 final class Clean_Command extends Command {
 	public function configure(): void {
-		$this->set_name( 'clean' )
-			->set_description( 'Cleans Clockwork request metadata.' )
-			->add_flag(
+		$this->setName( 'clean' )
+			->setDescription( 'Cleans Clockwork request metadata.' )
+			->addFlag(
 				( new Flag( 'all' ) )
-					->set_description( 'Cleans all data.' )
+					->setDescription( 'Cleans all data.' )
 			)
-			->add_option(
+			->addOption(
 				( new Option( 'expiration' ) )
-					->set_description(
+					->setDescription(
 						'Cleans data older than specified value in minutes. Does nothing if "--all" is also set.'
 					)
 			);

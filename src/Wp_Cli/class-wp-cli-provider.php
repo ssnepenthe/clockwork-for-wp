@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Clockwork_For_Wp\Wp_Cli;
 
-use Daedalus\Pimple\Events\AddingContainerDefinitions;
-use Daedalus\Plugin\Events\PluginBooting;
-use Daedalus\Plugin\Events\PluginLocking;
+use ApheleiaCli\InvokerBackedInvocationStrategy;
+use Daedalus\ApheleiaCli\Events\AddingCommands;
+use Daedalus\ApheleiaCli\Events\CreatingCommandRegistry;
 use Daedalus\Plugin\ModuleInterface;
 use Daedalus\Plugin\PluginInterface;
 use Invoker\Invoker;
-use Psr\Container\ContainerInterface;
 
 /**
  * @internal
@@ -19,38 +18,31 @@ final class Wp_Cli_Provider implements ModuleInterface {
 	public function register( PluginInterface $plugin ): void {
 		$eventDispatcher = $plugin->getEventDispatcher();
 
-		$eventDispatcher->addListener( AddingContainerDefinitions::class, [ $this, 'onAddingContainerDefinitions' ] );
-		$eventDispatcher->addListener( PluginBooting::class, [ $this, 'onPluginBooting' ] );
-		$eventDispatcher->addListener( PluginLocking::class, [ $this, 'onPluginLocking' ] );
+		$eventDispatcher->addListener( AddingCommands::class, [ $this, 'onAddingCommands' ] );
+		$eventDispatcher->addListener( CreatingCommandRegistry::class, [ $this, 'onCreatingCommandRegistry' ] );
 	}
 
-	public function onAddingContainerDefinitions( AddingContainerDefinitions $event ): void {
-		$event->addDefinitions([
-			Command_Registry::class => static function ( ContainerInterface $container ) {
-				return new Command_Registry( $container->get( Invoker::class ) );
-			},
-		]);
-	}
-
-	public function onPluginBooting( PluginBooting $event ): void {
-		$event->getPlugin()->getContainer()->get( Command_Registry::class )->initialize();
-	}
-
-	public function onPluginLocking( PluginLocking $event ): void {
-		if ( ! ( \defined( 'WP_CLI' ) && WP_CLI ) ) {
-			return;
-		}
-
-		$event->getPlugin()->getContainer()->get( Command_Registry::class )->namespace(
+	public function onAddingCommands( AddingCommands $event ): void {
+		$event->group(
 			'clockwork',
-			'Manages the Clockwork for WP plugin.',
-			static function ( Command_Registry $scoped_registry ): void {
-				$scoped_registry
-					->add( new Clean_Command() )
-					->add( new Generate_Command_List_Command() )
-					->add( new Web_Install_Command() )
-					->add( new Web_Uninstall_Command() );
+			'Manages the Clockwork for WP plugin',
+			function ( AddingCommands $event ) {
+				$event->addCommands( [
+					new Clean_Command(),
+					new Generate_Command_List_Command(),
+					new Web_Install_Command(),
+					new Web_Uninstall_Command(),
+				] );
 			}
 		);
+	}
+
+	public function onCreatingCommandRegistry( CreatingCommandRegistry $event ): void {
+		$invoker = $event->assertPluginIsAvailable()
+			->getPlugin()
+			->getContainer()
+			->get( Invoker::class );
+
+		$event->setInvocationStrategy( new InvokerBackedInvocationStrategy( $invoker ) );
 	}
 }

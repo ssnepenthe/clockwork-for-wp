@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Clockwork_For_Wp\Wp_Cli;
 
+use ApheleiaCli\Command;
+use ApheleiaCli\Flag;
 use Clockwork\Web\Web;
 use Clockwork_For_Wp\Plugin;
 use RecursiveDirectoryIterator;
@@ -15,11 +17,11 @@ use WP_CLI;
  */
 final class Web_Install_Command extends Command {
 	public function configure(): void {
-		$this->set_name( 'web-install' )
-			->set_description( 'Installs the Clockwork web app to the project web root' )
-			->add_flag(
+		$this->setName( 'web-install' )
+			->setDescription( 'Installs the Clockwork web app to the project web root' )
+			->addFlag(
 				( new Flag( 'force' ) )
-					->set_description( 'Uninstall web app if it is already installed' )
+					->setDescription( 'Uninstall web app if it is already installed' )
 			);
 	}
 
