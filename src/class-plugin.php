@@ -14,15 +14,11 @@ use Clockwork_For_Wp\Data_Source\Errors;
 use Clockwork_For_Wp\Routing\Routing_Module;
 use Clockwork_For_Wp\Web_App\Web_App_Module;
 use Clockwork_For_Wp\Wp_Cli\Wp_Cli_Module;
-use Closure;
 use Daedalus\Pimple\PimpleConfigurator;
 use Daedalus\Plugin\ContainerConfiguratorInterface;
-use Daedalus\Plugin\EventDispatcher;
 use Daedalus\Plugin\EventManagementModule;
 use Daedalus\Plugin\Plugin as DaedalusPlugin;
-use Daedalus\Plugin\PluginEvent;
 use Daedalus\Plugin\PluginInitializationModule;
-use Daedalus\Plugin\PluginInterface;
 use Invoker\Invoker;
 use Invoker\InvokerInterface;
 use Invoker\ParameterResolver\AssociativeArrayResolver;
@@ -33,7 +29,6 @@ use Invoker\ParameterResolver\NumericArrayResolver;
 use Invoker\ParameterResolver\ResolverChain;
 use League\Config\ConfigurationInterface;
 use ToyWpEventManagement\EventDispatcherInterface;
-use ToyWpEventManagement\EventManagerInterface;
 use ToyWpEventManagement\Priority;
 
 /**
@@ -100,33 +95,8 @@ class Plugin extends DaedalusPlugin {
 		return $this->invoker;
 	}
 
-	protected function createDefaultEventDispatcher(): EventDispatcherInterface
-	{
-		return new class($this->getEventManager(), $this, $this->getInvoker()) extends EventDispatcher {
-			private $invoker;
-
-			public function __construct(EventManagerInterface $eventManager, PluginInterface $plugin, InvokerInterface $invoker)
-			{
-				parent::__construct($eventManager, $plugin);
-
-				$this->invoker = $invoker;
-			}
-
-			protected function wrapCallback($callback): Closure
-			{
-				return function (...$args) use ($callback) {
-					if (
-						isset($args[0])
-						&& $args[0] instanceof PluginEvent
-						&& $this->plugin !== $args[0]->getPlugin()
-					) {
-						return;
-					}
-
-					return $this->invoker->call($callback, $args);
-				};
-			}
-		};
+	protected function createDefaultEventDispatcher(): EventDispatcherInterface {
+		return new Event_Dispatcher( $this->getEventManager(), $this, $this->getInvoker() );
 	}
 
 	public function config( $path, $default = null ) {
