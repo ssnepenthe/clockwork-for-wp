@@ -15,7 +15,7 @@ use WP_Query;
 /**
  * @internal
  */
-final class Web_App_Provider implements ModuleInterface {
+final class Web_App_Module implements ModuleInterface {
 	public function register( PluginInterface $plugin ): void {
 		$eventDispatcher = $plugin->getEventDispatcher();
 

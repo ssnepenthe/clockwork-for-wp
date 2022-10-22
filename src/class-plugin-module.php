@@ -19,7 +19,7 @@ use ToyWpEventManagement\EventManagerInterface;
 /**
  * @internal
  */
-final class Plugin_Provider implements ModuleInterface {
+final class Plugin_Module implements ModuleInterface {
 	public function register( PluginInterface $plugin ): void {
 		require_once __DIR__ . '/plugin-helpers.php';
 		require_once __DIR__ . '/wordpress-helpers.php';

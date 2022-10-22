@@ -16,7 +16,7 @@ use ToyWpEventManagement\SubscriberInterface;
 /**
  * @internal
  */
-final class Data_Source_Provider implements ModuleInterface {
+final class Data_Source_Module implements ModuleInterface {
 	public function register( PluginInterface $plugin ): void {
 		$eventDispatcher = $plugin->getEventDispatcher();
 

@@ -7,9 +7,8 @@ namespace Clockwork_For_Wp\Cli_Data_Collection;
 use Daedalus\Plugin\ModuleInterface;
 use Daedalus\Plugin\PluginInterface;
 
-final class Cli_Data_Collection_Provider implements ModuleInterface {
-	public function register( PluginInterface $plugin ): void
-	{
+final class Cli_Data_Collection_Module implements ModuleInterface {
+	public function register( PluginInterface $plugin ): void {
 		$plugin->getEventDispatcher()->addListener(PluginLocking::class, [$this, 'onPluginLocking']);
 	}
 

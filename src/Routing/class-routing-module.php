@@ -14,7 +14,7 @@ use Psr\Container\ContainerInterface;
 /**
  * @internal
  */
-final class Routing_Provider implements ModuleInterface {
+final class Routing_Module implements ModuleInterface {
 	public function register( PluginInterface $plugin ): void {
 		$eventDispatcher = $plugin->getEventDispatcher();
 

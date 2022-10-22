@@ -6,14 +6,14 @@ namespace Clockwork_For_Wp;
 
 use Clockwork\Clockwork;
 use Clockwork\Request\IncomingRequest;
-use Clockwork_For_Wp\Api\Api_Provider;
+use Clockwork_For_Wp\Api\Api_Module;
 use Clockwork_For_Wp\Cli_Data_Collection\Cli_Collection_Helper;
-use Clockwork_For_Wp\Cli_Data_Collection\Cli_Data_Collection_Provider;
-use Clockwork_For_Wp\Data_Source\Data_Source_Provider;
+use Clockwork_For_Wp\Cli_Data_Collection\Cli_Data_Collection_Module;
+use Clockwork_For_Wp\Data_Source\Data_Source_Module;
 use Clockwork_For_Wp\Data_Source\Errors;
-use Clockwork_For_Wp\Routing\Routing_Provider;
-use Clockwork_For_Wp\Web_App\Web_App_Provider;
-use Clockwork_For_Wp\Wp_Cli\Wp_Cli_Provider;
+use Clockwork_For_Wp\Routing\Routing_Module;
+use Clockwork_For_Wp\Web_App\Web_App_Module;
+use Clockwork_For_Wp\Wp_Cli\Wp_Cli_Module;
 use Closure;
 use Daedalus\Pimple\PimpleConfigurator;
 use Daedalus\Plugin\ContainerConfiguratorInterface;
@@ -57,14 +57,14 @@ class Plugin extends DaedalusPlugin {
 	{
 		// @todo provider -> module
 		return [
-			new Clockwork_Provider(),
-			new Plugin_Provider(),
-			new Api_Provider(),
-			new Cli_Data_Collection_Provider(),
-			new Data_Source_Provider(),
-			new Routing_Provider(),
-			new Web_App_Provider(),
-			new Wp_Cli_Provider(),
+			new Clockwork_Module(),
+			new Plugin_Module(),
+			new Api_Module(),
+			new Cli_Data_Collection_Module(),
+			new Data_Source_Module(),
+			new Routing_Module(),
+			new Web_App_Module(),
+			new Wp_Cli_Module(),
 		];
 	}
 
@@ -77,8 +77,7 @@ class Plugin extends DaedalusPlugin {
 		];
 	}
 
-	protected function createContainerConfigurator(): ?ContainerConfiguratorInterface
-	{
+	protected function createContainerConfigurator(): ?ContainerConfiguratorInterface {
 		return new PimpleConfigurator();
 	}
 

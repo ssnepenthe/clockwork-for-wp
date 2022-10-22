@@ -14,7 +14,7 @@ use Invoker\Invoker;
 /**
  * @internal
  */
-final class Wp_Cli_Provider implements ModuleInterface {
+final class Wp_Cli_Module implements ModuleInterface {
 	public function register( PluginInterface $plugin ): void {
 		$eventDispatcher = $plugin->getEventDispatcher();
 

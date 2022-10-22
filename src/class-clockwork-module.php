@@ -27,7 +27,7 @@ use function Daedalus\Pimple\factory;
 /**
  * @internal
  */
-final class Clockwork_Provider implements ModuleInterface {
+final class Clockwork_Module implements ModuleInterface {
 	public function onPluginBooting( PluginBooting $event ): void {
 		// Clockwork instance is resolved even when we are not collecting data in order to take
 		// advantage of helper methods like shouldCollect.

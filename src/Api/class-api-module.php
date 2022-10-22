@@ -16,7 +16,7 @@ use Psr\Container\ContainerInterface;
 /**
  * @internal
  */
-final class Api_Provider implements ModuleInterface {
+final class Api_Module implements ModuleInterface {
 	public function register( PluginInterface $plugin ): void {
 		$eventDispatcher = $plugin->getEventDispatcher();
 
