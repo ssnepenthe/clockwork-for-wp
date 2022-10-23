@@ -24,15 +24,13 @@ final class Routing_Module implements ModuleInterface {
 
 	public function onAddingContainerDefinitions( AddingContainerDefinitions $event ): void {
 		$event->addDefinitions([
-			Route_Collection::class => static function () {
-				// @todo Configurable prefix?
-				return new Route_Collection( 'cfw_' );
+			Route_Collection::class => static function ( ContainerInterface $container ) {
+				return new Route_Collection( $container->get( 'plugin.prefix' ) );
 			},
 			Route_Handler_Invoker::class => function ( ContainerInterface $container ) {
 				return new Route_Handler_Invoker(
 					$container->get( InvokerInterface::class ),
-					// @todo Configurable prefix?
-					'cfw_',
+					$container->get( 'plugin.prefix' ),
 					function ( Route $route ) {
 						$params = [];
 
