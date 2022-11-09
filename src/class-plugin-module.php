@@ -5,16 +5,15 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp;
 
 use Clockwork\Clockwork;
+use Daedalus\Configuration\Events\PreparingBaseSchemas;
+use Daedalus\Configuration\Events\SettingConfigurationValues;
 use Daedalus\Pimple\Events\AddingContainerDefinitions;
 use Daedalus\Plugin\Events\ManagingSubscribers;
 use Daedalus\Plugin\ModuleInterface;
 use Daedalus\Plugin\PluginInterface;
 use Invoker\InvokerInterface;
-use League\Config\Configuration;
-use League\Config\ConfigurationBuilderInterface;
-use League\Config\ConfigurationInterface;
 use Psr\Container\ContainerInterface;
-use ToyWpEventManagement\EventManagerInterface;
+use ToyWpEventManagement\Priority;
 
 /**
  * @internal
@@ -28,6 +27,8 @@ final class Plugin_Module implements ModuleInterface {
 
 		$eventDispatcher->addListener(ManagingSubscribers::class, [$this, 'onManagingSubscribers']);
 		$eventDispatcher->addListener(AddingContainerDefinitions::class, [$this, 'onAddingContainerDefinitions']);
+		$eventDispatcher->addListener( PreparingBaseSchemas::class, [ $this, 'onPreparingBaseSchemas' ] );
+		$eventDispatcher->addListener( SettingConfigurationValues::class, [ $this, 'onSettingConfigurationValues' ] );
 	}
 
 	public function onManagingSubscribers( ManagingSubscribers $event ): void {
@@ -38,26 +39,38 @@ final class Plugin_Module implements ModuleInterface {
 		}
 	}
 
+	public function onPreparingBaseSchemas( PreparingBaseSchemas $event ): void {
+		$plugin = $event->assertPluginIsAvailable()->getPlugin();
+
+		// @todo ?
+		// $event->loadBaseSchemaFromFile( "{$plugin->getDir()}/config/schema.php" );
+
+		$schemaPath = "{$plugin->getDir()}/config/schema.php";
+		$schema = include $schemaPath;
+
+		$event->setBaseSchemas( $schema );
+	}
+
+	public function onSettingConfigurationValues( SettingConfigurationValues $event ): void {
+		$plugin = $event->assertPluginIsAvailable()->getPlugin();
+
+		// @todo ?
+		// $event->loadDefaultsFromFile( "{$plugin->getDir()}/config/defaults.php" );
+
+		$defaultsPath = "{$plugin->getDir()}/config/defaults.php";
+		$defaults = include $defaultsPath;
+
+		$event->mergeValues( $defaults );
+
+		$plugin->getEventManager()->trigger(
+			'cfw_config_init',
+			// @todo type mismatch between private config and event config?
+			new Private_Schema_Configuration( $event->getConfiguration() )
+		);
+	}
+
 	public function onAddingContainerDefinitions( AddingContainerDefinitions $event ): void {
 		$event->addDefinitions([
-			ConfigurationBuilderInterface::class => static function ( ContainerInterface $container ) {
-				$schema = include \dirname( __DIR__ ) . '/config/schema.php';
-				$defaults = include \dirname( __DIR__ ) . '/config/defaults.php';
-
-				$config = new Configuration( $schema );
-
-				$config->merge( $defaults );
-
-				$container->get( EventManagerInterface::class )->trigger(
-					'cfw_config_init',
-					new Private_Schema_Configuration( $config )
-				);
-
-				return $config;
-			},
-			ConfigurationInterface::class => static function ( ContainerInterface $container ) {
-				return $container->get( ConfigurationBuilderInterface::class )->reader();
-			},
 			InvokerInterface::class => function ( ContainerInterface $container ) {
 				return $container->get( Plugin::class )->getInvoker();
 			},

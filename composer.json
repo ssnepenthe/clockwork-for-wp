@@ -10,6 +10,7 @@
         "league/config": "^1.1",
         "ssnepenthe/daedalus": "dev-main",
         "ssnepenthe/daedalus-apheleia-cli": "dev-main",
+        "ssnepenthe/daedalus-configuration": "dev-main",
         "ssnepenthe/daedalus-pimple": "dev-master"
     },
     "require-dev": {
@@ -42,6 +43,10 @@
         {
             "type": "path",
             "url": "../daedalus-apheleia-cli"
+        },
+        {
+            "type": "path",
+            "url": "../daedalus-configuration"
         },
         {
             "type": "path",
