@@ -11,7 +11,8 @@
         "ssnepenthe/daedalus": "dev-main",
         "ssnepenthe/daedalus-apheleia-cli": "dev-main",
         "ssnepenthe/daedalus-configuration": "dev-main",
-        "ssnepenthe/daedalus-pimple": "dev-master"
+        "ssnepenthe/daedalus-pimple": "dev-master",
+        "ssnepenthe/daedalus-routing": "dev-master"
     },
     "require-dev": {
         "psy/psysh": "^0.9.7",
@@ -54,7 +55,15 @@
         },
         {
             "type": "path",
+            "url": "../daedalus-routing"
+        },
+        {
+            "type": "path",
             "url": "../toy-wp-event-management"
+        },
+        {
+            "type": "path",
+            "url": "../toy-wp-routing"
         }
     ]
 }

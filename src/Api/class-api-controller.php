@@ -7,32 +7,49 @@ namespace Clockwork_For_Wp\Api;
 use Clockwork\Authentication\AuthenticatorInterface;
 use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Metadata;
+use Clockwork_For_Wp\Plugin;
+use ToyWpRouting\Exception\NotFoundHttpException;
+use ToyWpRouting\Responder\JsonResponder;
+
 use function Clockwork_For_Wp\array_only;
 
 final class Api_Controller {
 	private $authenticator;
 	private $metadata;
 	private $request;
+	private $plugin;
 
 	public function __construct(
 		AuthenticatorInterface $authenticator,
 		Metadata $metadata,
-		Incoming_Request $request
+		Incoming_Request $request,
+		Plugin $plugin
 	) {
 		$this->authenticator = $authenticator;
 		$this->metadata = $metadata;
 		$this->request = $request;
+		$this->plugin = $plugin;
 	}
 
-	public function authenticate(): void {
+	public function authenticate() {
+		$this->assert_clockwork_is_enabled();
+
 		$token = $this->authenticator->attempt(
 			\array_filter( $this->extract_credentials() ) // @todo Filter necessary?
 		);
 
-		\wp_send_json( [ 'token' => $token ], $token ? 200 : 403 );
+		return (new JsonResponder( [ 'token' => $token ], $token ? 200 : 403 ))
+			->json()
+			->dontEnvelopeResponse();
 	}
 
-	public function serve_json( $id, $direction = null, $count = null, $extended = null ): void {
+	public function serve_extended_json( $id ) {
+		return $this->serve_json( $id, null, null, true );
+	}
+
+	public function serve_json( $id, $direction = null, $count = null, $extended = null ) {
+		$this->assert_clockwork_is_enabled();
+
 		// @todo Handle 404s.
 		// @todo Is this really necessary?
 		if ( null === $id ) {
@@ -45,13 +62,10 @@ final class Api_Controller {
 		);
 
 		if ( true !== $authenticated ) {
-			\wp_send_json(
-				[
-					'message' => $authenticated,
-					'requires' => $this->authenticator->requires(),
-				],
-				403
-			);
+			return (new JsonResponder( [
+				'message' => $authenticated,
+				'requires' => $this->authenticator->requires(),
+			], 403 ))->json()->dontEnvelopeResponse();
 		}
 
 		if ( null !== $extended ) {
@@ -60,23 +74,33 @@ final class Api_Controller {
 			$data = $this->metadata->get( $id, $direction, $count );
 		}
 
+		if ( ! $data ) {
+			throw new NotFoundHttpException();
+		}
+
 		$data = $this->apply_filters( $data );
 
-		\wp_send_json( $data ); // @todo
+		return (new JsonResponder( $data ))->json()->dontEnvelopeResponse();
 	}
 
-	public function update_data( $id ): void {
+	public function update_data( $id ) {
+		$this->assert_clockwork_is_enabled();
+
 		$request = $this->metadata->get( $id );
 
 		if ( ! $request ) {
-			\wp_send_json( [ 'message' => 'Request not found.' ], 404 );
+			return (new JsonResponder( [ 'message' => 'Request not found' ], 404 ))
+				->json()
+				->dontEnvelopeResponse();
 		}
 
 		$content = $this->request->json();
 		$token = $content['_token'] ?? '';
 
 		if ( ! $request->updateToken || ! \hash_equals( $request->updateToken, $token ) ) {
-			\wp_send_json( [ 'message' => 'Invalid update token.' ], 403 );
+			return (new JsonResponder( [ 'message' => 'Invalid update token' ], 403 ))
+				->json()
+				->dontEnvelopeResponse();
 		}
 
 		foreach ( array_only( $content, [ 'clientMetrics', 'webVitals' ] ) as $key => $value ) {
@@ -107,6 +131,12 @@ final class Api_Controller {
 		}
 
 		return $data;
+	}
+
+	private function assert_clockwork_is_enabled(): void {
+		if ( ! $this->plugin->is_enabled() ) {
+			throw new NotFoundHttpException();
+		}
 	}
 
 	// @todo Move to route handler invoker?
