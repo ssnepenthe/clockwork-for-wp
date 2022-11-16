@@ -21,7 +21,10 @@ final class Api_Module implements ModuleInterface {
 	public function register( PluginInterface $plugin ): void {
 		$eventDispatcher = $plugin->getEventDispatcher();
 
-		$eventDispatcher->addListener( AddingContainerDefinitions::class, [ $this, 'onAddingContainerDefinitions' ] );
+		$eventDispatcher->addListener(
+			AddingContainerDefinitions::class,
+			[ $this, 'onAddingContainerDefinitions' ]
+		);
 		$eventDispatcher->addListener( AddingRoutes::class, [ $this, 'onAddingRoutes'] );
 	}
 

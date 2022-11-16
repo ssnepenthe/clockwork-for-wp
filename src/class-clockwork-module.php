@@ -34,19 +34,19 @@ final class Clockwork_Module implements ModuleInterface {
 		// This ensures data sources are only registered on plugins_loaded when enabled.
 		$plugin = $event->getPlugin();
 
-		if ($plugin->is_collecting_data()) {
+		if ( $plugin->is_collecting_data() ) {
 			$plugin->getContainer()->get( Clockwork_Support::class )->add_data_sources();
 		}
 	}
 
 	public function onManagingSubscribers( ManagingSubscribers $event ): void {
-		if ($event->getPlugin()->is_collecting_data()) {
-			$event->addSubscriber(Clockwork_Subscriber::class);
+		if ( $event->getPlugin()->is_collecting_data() ) {
+			$event->addSubscriber( Clockwork_Subscriber::class );
 		}
 	}
 
 	public function onAddingContainerDefinitions( AddingContainerDefinitions $event ): void {
-		$event->addDefinitions([
+		$event->addDefinitions( [
 			Clockwork_Subscriber::class => static function ( ContainerInterface $container ) {
 				return new Clockwork_Subscriber( $container->get( Plugin::class ) );
 			},
@@ -131,10 +131,16 @@ final class Clockwork_Module implements ModuleInterface {
 		$eventDispatcher = $plugin->getEventDispatcher();
 
 		// @todo conditional plugin booting and managing subscribers?
-		$eventDispatcher->addListener(AddingContainerDefinitions::class, [$this, 'onAddingContainerDefinitions']);
-		$eventDispatcher->addListener(ManagingSubscribers::class, [$this, 'onManagingSubscribers']);
-		$eventDispatcher->addListener(PluginBooting::class, [$this, 'onPluginBooting']);
-		$eventDispatcher->addListener(PluginLocking::class, [$this, 'onPluginLocking']);
+		$eventDispatcher->addListener(
+			AddingContainerDefinitions::class,
+			[ $this, 'onAddingContainerDefinitions' ]
+		);
+		$eventDispatcher->addListener(
+			ManagingSubscribers::class,
+			[ $this, 'onManagingSubscribers' ]
+		);
+		$eventDispatcher->addListener( PluginBooting::class, [ $this, 'onPluginBooting' ] );
+		$eventDispatcher->addListener( PluginLocking::class, [ $this, 'onPluginLocking' ] );
 	}
 
 	private function configure_serializer( Plugin $plugin ): void {

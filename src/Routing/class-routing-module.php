@@ -8,8 +8,7 @@ use Daedalus\Routing\Events\RoutingModuleInitializing;
 use Invoker\InvokerInterface;
 use ToyWpRouting\InvokerBackedInvocationStrategy;
 
-class Routing_Module implements ModuleInterface
-{
+class Routing_Module implements ModuleInterface {
     public function register( PluginInterface $plugin ): void {
         $plugin->getEventDispatcher()->addListener(
             RoutingModuleInitializing::class,

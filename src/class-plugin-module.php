@@ -13,7 +13,6 @@ use Daedalus\Plugin\ModuleInterface;
 use Daedalus\Plugin\PluginInterface;
 use Invoker\InvokerInterface;
 use Psr\Container\ContainerInterface;
-use ToyWpEventManagement\Priority;
 
 /**
  * @internal
@@ -25,17 +24,29 @@ final class Plugin_Module implements ModuleInterface {
 
 		$eventDispatcher = $plugin->getEventDispatcher();
 
-		$eventDispatcher->addListener(ManagingSubscribers::class, [$this, 'onManagingSubscribers']);
-		$eventDispatcher->addListener(AddingContainerDefinitions::class, [$this, 'onAddingContainerDefinitions']);
-		$eventDispatcher->addListener( PreparingBaseSchemas::class, [ $this, 'onPreparingBaseSchemas' ] );
-		$eventDispatcher->addListener( SettingConfigurationValues::class, [ $this, 'onSettingConfigurationValues' ] );
+		$eventDispatcher->addListener(
+			ManagingSubscribers::class,
+			[ $this, 'onManagingSubscribers' ]
+		);
+		$eventDispatcher->addListener(
+			AddingContainerDefinitions::class,
+			[ $this, 'onAddingContainerDefinitions' ]
+		);
+		$eventDispatcher->addListener(
+			PreparingBaseSchemas::class,
+			[ $this, 'onPreparingBaseSchemas' ]
+		);
+		$eventDispatcher->addListener(
+			SettingConfigurationValues::class,
+			[ $this, 'onSettingConfigurationValues' ]
+		);
 	}
 
 	public function onManagingSubscribers( ManagingSubscribers $event ): void {
 		$plugin = $event->getPlugin();
 
-		if ($plugin->is_enabled() || $plugin->is_web_enabled() || $plugin->is_web_installed()) {
-			$event->addSubscriber(Plugin_Subscriber::class);
+		if ( $plugin->is_enabled() || $plugin->is_web_enabled() || $plugin->is_web_installed() ) {
+			$event->addSubscriber( Plugin_Subscriber::class );
 		}
 	}
 
@@ -70,8 +81,8 @@ final class Plugin_Module implements ModuleInterface {
 	}
 
 	public function onAddingContainerDefinitions( AddingContainerDefinitions $event ): void {
-		$event->addDefinitions([
-			InvokerInterface::class => function ( ContainerInterface $container ) {
+		$event->addDefinitions( [
+			InvokerInterface::class => static function ( ContainerInterface $container ) {
 				return $container->get( Plugin::class )->getInvoker();
 			},
 			Metadata::class => static function ( ContainerInterface $container ) {
@@ -83,6 +94,6 @@ final class Plugin_Module implements ModuleInterface {
 			Plugin_Subscriber::class => static function () {
 				return new Plugin_Subscriber();
 			},
-		]);
+		] );
 	}
 }

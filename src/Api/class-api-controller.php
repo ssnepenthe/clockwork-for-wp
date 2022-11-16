@@ -38,7 +38,7 @@ final class Api_Controller {
 			\array_filter( $this->extract_credentials() ) // @todo Filter necessary?
 		);
 
-		return (new JsonResponder( [ 'token' => $token ], $token ? 200 : 403 ))
+		return ( new JsonResponder( [ 'token' => $token ], $token ? 200 : 403 ) )
 			->json()
 			->dontEnvelopeResponse();
 	}
@@ -62,10 +62,10 @@ final class Api_Controller {
 		);
 
 		if ( true !== $authenticated ) {
-			return (new JsonResponder( [
+			return ( new JsonResponder( [
 				'message' => $authenticated,
 				'requires' => $this->authenticator->requires(),
-			], 403 ))->json()->dontEnvelopeResponse();
+			], 403 ) )->json()->dontEnvelopeResponse();
 		}
 
 		if ( null !== $extended ) {
@@ -80,7 +80,7 @@ final class Api_Controller {
 
 		$data = $this->apply_filters( $data );
 
-		return (new JsonResponder( $data ))->json()->dontEnvelopeResponse();
+		return ( new JsonResponder( $data ) )->json()->dontEnvelopeResponse();
 	}
 
 	public function update_data( $id ) {
@@ -89,7 +89,7 @@ final class Api_Controller {
 		$request = $this->metadata->get( $id );
 
 		if ( ! $request ) {
-			return (new JsonResponder( [ 'message' => 'Request not found' ], 404 ))
+			return ( new JsonResponder( [ 'message' => 'Request not found' ], 404 ) )
 				->json()
 				->dontEnvelopeResponse();
 		}
@@ -98,7 +98,7 @@ final class Api_Controller {
 		$token = $content['_token'] ?? '';
 
 		if ( ! $request->updateToken || ! \hash_equals( $request->updateToken, $token ) ) {
-			return (new JsonResponder( [ 'message' => 'Invalid update token' ], 403 ))
+			return ( new JsonResponder( [ 'message' => 'Invalid update token' ], 403 ) )
 				->json()
 				->dontEnvelopeResponse();
 		}

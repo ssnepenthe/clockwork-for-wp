@@ -20,17 +20,23 @@ final class Data_Source_Module implements ModuleInterface {
 	public function register( PluginInterface $plugin ): void {
 		$eventDispatcher = $plugin->getEventDispatcher();
 
-		$eventDispatcher->addListener( AddingContainerDefinitions::class, [ $this, 'onAddingContainerDefinitions' ] );
-		$eventDispatcher->addListener( ManagingSubscribers::class, [ $this, 'onManagingSubscribers' ] );
+		$eventDispatcher->addListener(
+			AddingContainerDefinitions::class,
+			[ $this, 'onAddingContainerDefinitions' ]
+		);
+		$eventDispatcher->addListener(
+			ManagingSubscribers::class,
+			[ $this, 'onManagingSubscribers' ]
+		);
 		$eventDispatcher->addListener( PluginLocking::class, [ $this, 'onPluginLocking' ] );
 	}
 
 	public function onAddingContainerDefinitions( AddingContainerDefinitions $event ): void {
-		$event->addDefinitions([
+		$event->addDefinitions( [
 			Data_Source_Factory::class => static function ( ContainerInterface $container ) {
 				return new Data_Source_Factory( $container->get( Plugin::class ) );
 			},
-		]);
+		] );
 	}
 
 	public function onPluginLocking( PluginLocking $event ): void {
@@ -89,7 +95,10 @@ final class Data_Source_Module implements ModuleInterface {
 	}
 
 	public function onManagingSubscribers( ManagingSubscribers $event ): void {
-		$data_source_factory = $event->getPlugin()->getContainer()->get( Data_Source_Factory::class );
+		$data_source_factory = $event->assertPluginIsAvailable()
+			->getPlugin()
+			->getContainer()
+			->get( Data_Source_Factory::class );
 
 		$event->addSubscribers(
 			\array_filter(

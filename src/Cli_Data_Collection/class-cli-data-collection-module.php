@@ -9,11 +9,14 @@ use Daedalus\Plugin\PluginInterface;
 
 final class Cli_Data_Collection_Module implements ModuleInterface {
 	public function register( PluginInterface $plugin ): void {
-		$plugin->getEventDispatcher()->addListener(PluginLocking::class, [$this, 'onPluginLocking']);
+		$plugin->getEventDispatcher()->addListener(
+			PluginLocking::class,
+			[ $this, 'onPluginLocking' ]
+		);
 	}
 
 	public function onPluginLocking(): void {
-		if ( ! ( \defined( 'WP_CLI' ) &&  WP_CLI ) ) {
+		if ( ! ( \defined( 'WP_CLI' ) && WP_CLI ) ) {
 			return;
 		}
 

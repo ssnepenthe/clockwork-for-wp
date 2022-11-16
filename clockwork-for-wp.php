@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use Clockwork_For_Wp\Plugin;
-
 /*
  * A basic Clockwork integration for WordPress.
  *

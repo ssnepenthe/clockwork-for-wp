@@ -19,16 +19,22 @@ final class Web_App_Module implements ModuleInterface {
 	public function register( PluginInterface $plugin ): void {
 		$eventDispatcher = $plugin->getEventDispatcher();
 
-		$eventDispatcher->addListener( AddingContainerDefinitions::class, [ $this, 'onAddingContainerDefinitions' ] );
-		$eventDispatcher->addListener( AddingRoutes::class, [ $this, 'onAddingRoutes' ] );
+		$eventDispatcher->addListener(
+			AddingContainerDefinitions::class,
+			[ $this, 'onAddingContainerDefinitions' ]
+		);
+		$eventDispatcher->addListener(
+			AddingRoutes::class,
+			[ $this, 'onAddingRoutes' ]
+		);
 	}
 
 	public function onAddingContainerDefinitions( AddingContainerDefinitions $event ): void {
-		$event->addDefinitions([
+		$event->addDefinitions( [
 			Web_App_Controller::class => static function ( ContainerInterface $container ) {
 				return new Web_App_Controller( new Web(), $container->get( Plugin::class ) );
 			},
-		]);
+		] );
 	}
 
 	public function onAddingRoutes( AddingRoutes $event ): void {

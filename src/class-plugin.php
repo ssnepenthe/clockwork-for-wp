@@ -41,10 +41,10 @@ class Plugin extends DaedalusPlugin {
 		// @todo separate method from configure()? initialize()?
 		Errors::get_instance()->register();
 
-		$this->setName('Clockwork for WP');
-		$this->setFile(__DIR__ . '/../clockwork-for-wp.php');
-		$this->setPrefix('cfw_');
-		$this->setCacheDir(__DIR__ . '/../generated');
+		$this->setName( 'Clockwork for WP' );
+		$this->setFile( __DIR__ . '/../clockwork-for-wp.php' );
+		$this->setPrefix( 'cfw_' );
+		$this->setCacheDir( __DIR__ . '/../generated' );
 		$this->enableModuleDiscovery();
 	}
 
@@ -63,11 +63,10 @@ class Plugin extends DaedalusPlugin {
 		];
 	}
 
-	protected function createDefaultModules(): array
-	{
+	protected function createDefaultModules(): array {
 		// @todo Probably not necessary? Default priorities should be fine...
 		return [
-			new PluginInitializationModule(Priority::EARLY, Priority::EARLY, Priority::EARLY),
+			new PluginInitializationModule( Priority::EARLY, Priority::EARLY, Priority::EARLY ),
 			new EventManagementModule(),
 		];
 	}

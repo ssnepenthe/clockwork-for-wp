@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Clockwork_For_Wp;
 
-use Clockwork\Clockwork;
 use Clockwork\Request\Request;
 use Clockwork\Storage\Search;
 use Clockwork\Storage\StorageInterface;

@@ -17,22 +17,22 @@ class Event_Dispatcher extends EventDispatcher {
         PluginInterface $plugin,
         InvokerInterface $invoker
     ) {
-        parent::__construct($eventManager, $plugin);
+        parent::__construct( $eventManager, $plugin );
 
         $this->invoker = $invoker;
     }
 
-    protected function wrapCallback($callback): Closure {
-        return function (...$args) use ($callback) {
+    protected function wrapCallback( $callback ): Closure {
+        return function ( ...$args ) use ( $callback ) {
             if (
-                isset($args[0])
+                isset( $args[0] )
                 && $args[0] instanceof PluginEvent
                 && $this->plugin !== $args[0]->getPlugin()
             ) {
                 return;
             }
 
-            return $this->invoker->call($callback, $args);
+            return $this->invoker->call( $callback, $args );
         };
     }
 };

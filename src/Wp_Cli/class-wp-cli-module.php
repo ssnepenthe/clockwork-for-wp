@@ -19,7 +19,10 @@ final class Wp_Cli_Module implements ModuleInterface {
 		$eventDispatcher = $plugin->getEventDispatcher();
 
 		$eventDispatcher->addListener( AddingCommands::class, [ $this, 'onAddingCommands' ] );
-		$eventDispatcher->addListener( CreatingCommandRegistry::class, [ $this, 'onCreatingCommandRegistry' ] );
+		$eventDispatcher->addListener(
+			CreatingCommandRegistry::class,
+			[ $this, 'onCreatingCommandRegistry' ]
+		);
 	}
 
 	public function onAddingCommands( AddingCommands $event ): void {
