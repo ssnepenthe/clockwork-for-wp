@@ -13,10 +13,7 @@ use Clockwork_For_Wp\Web_App\Web_App_Module;
 use Clockwork_For_Wp\Wp_Cli\Wp_Cli_Module;
 use Daedalus\Pimple\PimpleConfigurator;
 use Daedalus\Plugin\ContainerConfiguratorInterface;
-use Daedalus\Plugin\EventManagementModule;
 use Daedalus\Plugin\Plugin as DaedalusPlugin;
-use Daedalus\Plugin\PluginInitializationModule;
-use Daedalus\Plugin\WpCliModule;
 use Invoker\Invoker;
 use Invoker\InvokerInterface;
 use Invoker\ParameterResolver\AssociativeArrayResolver;
@@ -26,7 +23,6 @@ use Invoker\ParameterResolver\DefaultValueResolver;
 use Invoker\ParameterResolver\NumericArrayResolver;
 use Invoker\ParameterResolver\ResolverChain;
 use ToyWpEventManagement\EventDispatcherInterface;
-use ToyWpEventManagement\Priority;
 
 /**
  * @internal
@@ -58,15 +54,6 @@ class Plugin extends DaedalusPlugin {
 			new Routing_Module(),
 			new Web_App_Module(),
 			new Wp_Cli_Module(),
-		];
-	}
-
-	protected function createDefaultModules(): array {
-		// @todo Probably not necessary? Default priorities should be fine...
-		return [
-			new PluginInitializationModule( Priority::EARLY, Priority::EARLY, Priority::EARLY ),
-			new EventManagementModule(),
-			new WpCliModule(),
 		];
 	}
 
