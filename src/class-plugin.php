@@ -19,6 +19,7 @@ use Daedalus\Plugin\ContainerConfiguratorInterface;
 use Daedalus\Plugin\EventManagementModule;
 use Daedalus\Plugin\Plugin as DaedalusPlugin;
 use Daedalus\Plugin\PluginInitializationModule;
+use Daedalus\Plugin\WpCliModule;
 use Invoker\Invoker;
 use Invoker\InvokerInterface;
 use Invoker\ParameterResolver\AssociativeArrayResolver;
@@ -45,6 +46,7 @@ class Plugin extends DaedalusPlugin {
 		$this->setFile( __DIR__ . '/../clockwork-for-wp.php' );
 		$this->setPrefix( 'cfw_' );
 		$this->setCacheDir( __DIR__ . '/../generated' );
+		$this->setTopLevelCommandName( 'clockwork' );
 		$this->enableModuleDiscovery();
 	}
 
@@ -68,6 +70,7 @@ class Plugin extends DaedalusPlugin {
 		return [
 			new PluginInitializationModule( Priority::EARLY, Priority::EARLY, Priority::EARLY ),
 			new EventManagementModule(),
+			new WpCliModule(),
 		];
 	}
 
