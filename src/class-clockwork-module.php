@@ -108,22 +108,15 @@ final class Clockwork_Module implements ModuleInterface {
 			Log::class => static function () {
 				return new Log();
 			},
-			Request::class => static function () {
-				// @todo move out to plugin class with Errors::register()
-				return new Request();
-			},
+			// Create request immediately so we have access to id, time, etc.
+			Request::class => new Request(),
 			IncomingRequest::class => factory( static function ( ContainerInterface $container ) {
 				return $container->get( Incoming_Request::class );
 			} ),
 			Incoming_Request::class => static function () {
 				return Incoming_Request::from_globals();
 			},
-		]);
-
-		// @todo !!!!!!!!!!!!!
-		// Create request so we have id and start time available immediately.
-		// Could probably even create it within Plugin::__construct() and save it to container.
-		// Request::class;
+		] );
 	}
 
 	public function onPluginLocking( PluginLocking $event ): void {
