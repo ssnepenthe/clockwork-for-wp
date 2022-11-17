@@ -8,8 +8,8 @@ use Clockwork\Authentication\AuthenticatorInterface;
 use Clockwork_For_Wp\Clockwork_Support;
 use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Metadata;
+use Clockwork_For_Wp\Routing\Json_Responder;
 use ToyWpRouting\Exception\NotFoundHttpException;
-use ToyWpRouting\Responder\JsonResponder;
 
 use function Clockwork_For_Wp\array_only;
 
@@ -38,9 +38,7 @@ final class Api_Controller {
 			\array_filter( $this->extract_credentials() ) // @todo Filter necessary?
 		);
 
-		return ( new JsonResponder( [ 'token' => $token ], $token ? 200 : 403 ) )
-			->json()
-			->dontEnvelopeResponse();
+		return new Json_Responder( [ 'token' => $token ], $token ? 200 : 403 );
 	}
 
 	public function serve_extended_json( $id ) {
@@ -50,22 +48,16 @@ final class Api_Controller {
 	public function serve_json( $id, $direction = null, $count = null, $extended = null ) {
 		$this->assert_clockwork_is_enabled();
 
-		// @todo Handle 404s.
-		// @todo Is this really necessary?
-		if ( null === $id ) {
-			return; // @todo
-		}
-
 		$authenticated = $this->authenticator->check(
 			// @todo Move to route handler invoker?
 			$this->request->header( 'X_CLOCKWORK_AUTH' )
 		);
 
 		if ( true !== $authenticated ) {
-			return ( new JsonResponder( [
+			return new Json_Responder( [
 				'message' => $authenticated,
 				'requires' => $this->authenticator->requires(),
-			], 403 ) )->json()->dontEnvelopeResponse();
+			], 403 );
 		}
 
 		if ( null !== $extended ) {
@@ -80,7 +72,7 @@ final class Api_Controller {
 
 		$data = $this->apply_filters( $data );
 
-		return ( new JsonResponder( $data ) )->json()->dontEnvelopeResponse();
+		return new Json_Responder( $data );
 	}
 
 	public function update_data( $id ) {
@@ -89,18 +81,14 @@ final class Api_Controller {
 		$request = $this->metadata->get( $id );
 
 		if ( ! $request ) {
-			return ( new JsonResponder( [ 'message' => 'Request not found' ], 404 ) )
-				->json()
-				->dontEnvelopeResponse();
+			return new Json_Responder( [ 'message' => 'Request not found' ], 404 );
 		}
 
 		$content = $this->request->json();
 		$token = $content['_token'] ?? '';
 
 		if ( ! $request->updateToken || ! \hash_equals( $request->updateToken, $token ) ) {
-			return ( new JsonResponder( [ 'message' => 'Invalid update token' ], 403 ) )
-				->json()
-				->dontEnvelopeResponse();
+			return new Json_Responder( [ 'message' => 'Invalid update token' ], 403 );
 		}
 
 		foreach ( array_only( $content, [ 'clientMetrics', 'webVitals' ] ) as $key => $value ) {
