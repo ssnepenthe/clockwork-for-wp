@@ -43,9 +43,12 @@ final class Plugin_Module implements ModuleInterface {
 	}
 
 	public function onManagingSubscribers( ManagingSubscribers $event ): void {
-		$plugin = $event->getPlugin();
+		$support = $event->assertPluginIsAvailable()
+			->getPlugin()
+			->getContainer()
+			->get( Clockwork_Support::class );
 
-		if ( $plugin->is_enabled() || $plugin->is_web_enabled() || $plugin->is_web_installed() ) {
+		if ( $support->is_enabled() || $support->is_web_enabled() || $support->is_web_installed() ) {
 			$event->addSubscriber( Plugin_Subscriber::class );
 		}
 	}

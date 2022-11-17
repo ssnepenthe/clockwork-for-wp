@@ -60,7 +60,7 @@ $rewrite2 = new \ToyWpRouting\Compiler\OptimizedRewrite(array (
   0 => 'Clockwork_For_Wp\\Api\\Api_Controller',
   1 => 'update_data',
 ), array (
-  0 => 'Clockwork_For_Wp\\Plugin',
+  0 => 'Clockwork_For_Wp\\Clockwork_Support',
   1 => 'is_collecting_client_metrics',
 ));
 $rewrite3 = new \ToyWpRouting\Compiler\OptimizedRewrite(array (
@@ -107,42 +107,42 @@ $this->rewrites->attach($rewrite4);
 $this->rewrites->attach($rewrite5);
 $this->rewrites->attach($rewrite6);
 $this->rewritesByHashAndMethod = array (
-  'fc55b9a72b60021c5bdcc9afeeb39a07' =>
+  'fc55b9a72b60021c5bdcc9afeeb39a07' => 
   array (
     'GET' => $rewrite0,
     'HEAD' => $rewrite0,
   ),
-  'a94084cf934d45a3f6f5599a8065efee' =>
+  'a94084cf934d45a3f6f5599a8065efee' => 
   array (
     'GET' => $rewrite1,
     'HEAD' => $rewrite1,
     'PUT' => $rewrite2,
   ),
-  '48ac342b9f10651fa222e1f30d3e38e6' =>
+  '48ac342b9f10651fa222e1f30d3e38e6' => 
   array (
     'GET' => $rewrite1,
     'HEAD' => $rewrite1,
   ),
-  'e297e7951cec4885654daaeded55a69a' =>
+  'e297e7951cec4885654daaeded55a69a' => 
   array (
     'GET' => $rewrite1,
     'HEAD' => $rewrite1,
   ),
-  '1cc470a4e2f705b422610d830eee6443' =>
+  '1cc470a4e2f705b422610d830eee6443' => 
   array (
     'POST' => $rewrite3,
   ),
-  '96dbc7c3844768158c5c3ad16158a7b9' =>
+  '96dbc7c3844768158c5c3ad16158a7b9' => 
   array (
     'GET' => $rewrite4,
     'HEAD' => $rewrite4,
   ),
-  '1a7b5a96f01bcdd46e9c55ea26afbe5b' =>
+  '1a7b5a96f01bcdd46e9c55ea26afbe5b' => 
   array (
     'GET' => $rewrite5,
     'HEAD' => $rewrite5,
   ),
-  'e820c72227fa53b89aba03fb4459e578' =>
+  'e820c72227fa53b89aba03fb4459e578' => 
   array (
     'GET' => $rewrite6,
     'HEAD' => $rewrite6,

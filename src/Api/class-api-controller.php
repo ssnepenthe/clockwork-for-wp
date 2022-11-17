@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Api;
 
 use Clockwork\Authentication\AuthenticatorInterface;
+use Clockwork_For_Wp\Clockwork_Support;
 use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Metadata;
-use Clockwork_For_Wp\Plugin;
 use ToyWpRouting\Exception\NotFoundHttpException;
 use ToyWpRouting\Responder\JsonResponder;
 
@@ -17,18 +17,18 @@ final class Api_Controller {
 	private $authenticator;
 	private $metadata;
 	private $request;
-	private $plugin;
+	private $support;
 
 	public function __construct(
 		AuthenticatorInterface $authenticator,
 		Metadata $metadata,
 		Incoming_Request $request,
-		Plugin $plugin
+		Clockwork_Support $support
 	) {
 		$this->authenticator = $authenticator;
 		$this->metadata = $metadata;
 		$this->request = $request;
-		$this->plugin = $plugin;
+		$this->support = $support;
 	}
 
 	public function authenticate() {
@@ -134,7 +134,7 @@ final class Api_Controller {
 	}
 
 	private function assert_clockwork_is_enabled(): void {
-		if ( ! $this->plugin->is_enabled() ) {
+		if ( ! $this->support->is_enabled() ) {
 			throw new NotFoundHttpException();
 		}
 	}

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Web_App;
 
 use Clockwork\Web\Web;
-use Clockwork_For_Wp\Plugin;
+use Clockwork_For_Wp\Clockwork_Support;
 use Daedalus\Pimple\Events\AddingContainerDefinitions;
 use Daedalus\Plugin\ModuleInterface;
 use Daedalus\Plugin\PluginInterface;
@@ -32,7 +32,10 @@ final class Web_App_Module implements ModuleInterface {
 	public function onAddingContainerDefinitions( AddingContainerDefinitions $event ): void {
 		$event->addDefinitions( [
 			Web_App_Controller::class => static function ( ContainerInterface $container ) {
-				return new Web_App_Controller( new Web(), $container->get( Plugin::class ) );
+				return new Web_App_Controller(
+					new Web(),
+					$container->get( Clockwork_Support::class )
+				);
 			},
 		] );
 	}

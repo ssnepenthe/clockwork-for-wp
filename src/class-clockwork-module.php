@@ -11,6 +11,7 @@ use Clockwork\Helpers\StackFilter;
 use Clockwork\Request\IncomingRequest;
 use Clockwork\Request\Log;
 use Clockwork\Request\Request;
+use Clockwork\Request\ShouldCollect;
 use Clockwork\Storage\StorageInterface;
 use Clockwork_For_Wp\Data_Source\Data_Source_Factory;
 use Daedalus\Pimple\Events\AddingContainerDefinitions;
@@ -32,15 +33,23 @@ final class Clockwork_Module implements ModuleInterface {
 		// Clockwork instance is resolved even when we are not collecting data in order to take
 		// advantage of helper methods like shouldCollect.
 		// This ensures data sources are only registered on plugins_loaded when enabled.
-		$plugin = $event->getPlugin();
+		$support = $event->assertPluginIsAvailable()
+			->getPlugin()
+			->getContainer()
+			->get( Clockwork_Support::class );
 
-		if ( $plugin->is_collecting_data() ) {
-			$plugin->getContainer()->get( Clockwork_Support::class )->add_data_sources();
+		if ( $support->is_collecting_data() ) {
+			$support->add_data_sources();
 		}
 	}
 
 	public function onManagingSubscribers( ManagingSubscribers $event ): void {
-		if ( $event->getPlugin()->is_collecting_data() ) {
+		$support = $event->assertPluginIsAvailable()
+			->getPlugin()
+			->getContainer()
+			->get( Clockwork_Support::class );
+
+		if ( $support->is_collecting_data() ) {
 			$event->addSubscriber( Clockwork_Subscriber::class );
 		}
 	}
@@ -48,13 +57,14 @@ final class Clockwork_Module implements ModuleInterface {
 	public function onAddingContainerDefinitions( AddingContainerDefinitions $event ): void {
 		$event->addDefinitions( [
 			Clockwork_Subscriber::class => static function ( ContainerInterface $container ) {
-				return new Clockwork_Subscriber( $container->get( Plugin::class ) );
+				return new Clockwork_Subscriber( $container->get( Clockwork_Support::class ) );
 			},
 			Clockwork_Support::class => static function ( ContainerInterface $container ) {
 				return new Clockwork_Support(
 					$container->get( Clockwork::class ),
 					$container->get( Data_Source_Factory::class ),
-					$container->get( ConfigurationInterface::class )
+					$container->get( ConfigurationInterface::class ),
+					$container->get( Incoming_Request::class )
 				);
 			},
 			Clockwork::class => static function ( ContainerInterface $container ) {
@@ -117,12 +127,14 @@ final class Clockwork_Module implements ModuleInterface {
 	}
 
 	public function onPluginLocking( PluginLocking $event ): void {
-		$plugin = $event->assertPluginIsAvailable()->getPlugin();
+		$container = $event->assertPluginIsAvailable()->getPlugin()->getContainer();
+		$support = $container->get( Clockwork_Support::class );
+		$should_collect = $container->get( Clockwork::class )->shouldCollect();
 
-		$this->configure_serializer( $plugin );
-		$this->configure_should_collect( $plugin );
+		$this->configure_serializer( $support );
+		$this->configure_should_collect( $should_collect, $support );
 
-		if ( $plugin->config( 'register_helpers', true ) ) {
+		if ( $support->config( 'register_helpers', true ) ) {
 			require_once __DIR__ . '/clock.php';
 		}
 	}
@@ -143,43 +155,41 @@ final class Clockwork_Module implements ModuleInterface {
 		$eventDispatcher->addListener( PluginLocking::class, [ $this, 'onPluginLocking' ] );
 	}
 
-	private function configure_serializer( Plugin $plugin ): void {
+	private function configure_serializer( Clockwork_Support $support ): void {
 		Serializer::defaults(
 			[
-				'limit' => $plugin->config( 'serialization.depth', 10 ),
-				'blackbox' => $plugin->config(
+				'limit' => $support->config( 'serialization.depth', 10 ),
+				'blackbox' => $support->config(
 					'serialization.blackbox',
 					[
 						\Pimple\Container::class,
 						\Pimple\Psr11\Container::class,
 					]
 				),
-				'traces' => $plugin->config( 'stack_traces.enabled', true ),
+				'traces' => $support->config( 'stack_traces.enabled', true ),
 				'tracesSkip' => StackFilter::make()
 					->isNotVendor(
 						\array_merge(
-							$plugin->config( 'stack_traces.skip_vendors', [] ),
+							$support->config( 'stack_traces.skip_vendors', [] ),
 							[ 'itsgoingd' ]
 						)
 					)
-					->isNotNamespace( $plugin->config( 'stack_traces.skip_namespaces', [] ) )
+					->isNotNamespace( $support->config( 'stack_traces.skip_namespaces', [] ) )
 					->isNotFunction( [ 'call_user_func', 'call_user_func_array' ] )
-					->isNotClass( $plugin->config( 'stack_traces.skip_classes', [] ) ),
-				'tracesLimit' => $plugin->config( 'stack_traces.limit', 10 ),
+					->isNotClass( $support->config( 'stack_traces.skip_classes', [] ) ),
+				'tracesLimit' => $support->config( 'stack_traces.limit', 10 ),
 			]
 		);
 	}
 
-	private function configure_should_collect( Plugin $plugin ): void {
-		$should_collect = $plugin->getContainer()->get( Clockwork::class )->shouldCollect();
-
+	private function configure_should_collect( ShouldCollect $should_collect, Clockwork_Support $support ): void {
 		$should_collect->merge(
 			[
-				'onDemand' => $plugin->config( 'requests.on_demand', false ),
-				'sample' => $plugin->config( 'requests.sample', false ),
-				'except' => $plugin->config( 'requests.except', [] ),
-				'only' => $plugin->config( 'requests.only', [] ),
-				'exceptPreflight' => $plugin->config( 'requests.except_preflight', true ),
+				'onDemand' => $support->config( 'requests.on_demand', false ),
+				'sample' => $support->config( 'requests.sample', false ),
+				'except' => $support->config( 'requests.except', [] ),
+				'only' => $support->config( 'requests.only', [] ),
+				'exceptPreflight' => $support->config( 'requests.except_preflight', true ),
 			]
 		);
 

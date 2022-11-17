@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Clockwork_For_Wp\Data_Source;
 
+use Clockwork_For_Wp\Clockwork_Support;
 use Clockwork_For_Wp\Plugin;
 use Daedalus\Pimple\Events\AddingContainerDefinitions;
 use Daedalus\Plugin\Events\ManagingSubscribers;
@@ -44,10 +45,13 @@ final class Data_Source_Module implements ModuleInterface {
 		// errors as possible. However our config is not available that early so let's apply our
 		// configuration now.
 		$errors = Errors::get_instance();
-		$plugin = $event->getPlugin();
+		$support = $event->assertPluginIsAvailable()
+			->getPlugin()
+			->getContainer()
+			->get( Clockwork_Support::class );
 
-		if ( $plugin->is_feature_enabled( 'errors' ) ) {
-			$config = $plugin->config( 'data_sources.errors.config', [] );
+		if ( $support->is_feature_enabled( 'errors' ) ) {
+			$config = $support->config( 'data_sources.errors.config', [] );
 
 			$except_types = $config['except_types'] ?? false;
 			$only_types = $config['only_types'] ?? false;
@@ -95,14 +99,14 @@ final class Data_Source_Module implements ModuleInterface {
 	}
 
 	public function onManagingSubscribers( ManagingSubscribers $event ): void {
-		$data_source_factory = $event->assertPluginIsAvailable()
+		$support = $event->assertPluginIsAvailable()
 			->getPlugin()
 			->getContainer()
-			->get( Data_Source_Factory::class );
+			->get( Clockwork_Support::class );
 
 		$event->addSubscribers(
 			\array_filter(
-				$data_source_factory->get_enabled_data_sources(),
+				$support->get_enabled_data_sources(),
 				static function ( $data_source ) {
 					return $data_source instanceof SubscriberInterface;
 				}

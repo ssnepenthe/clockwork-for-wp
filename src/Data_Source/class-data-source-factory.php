@@ -40,20 +40,6 @@ final class Data_Source_Factory {
 		throw new InvalidArgumentException( "Unrecognized data source: {$name}" );
 	}
 
-	public function get_enabled_data_sources(): array {
-		$data_sources = [];
-
-		foreach ( $this->plugin->config( 'data_sources', [] ) as $name => $data_source ) {
-			if (
-				( $data_source['enabled'] ?? false ) && $this->plugin->is_feature_available( $name )
-			) {
-				$data_sources[] = $this->create( $name, $data_source['config'] ?? [] );
-			}
-		}
-
-		return $data_sources;
-	}
-
 	public function register_custom_factory( string $name, callable $factory ) {
 		$this->custom_factories[ $name ] = $factory;
 

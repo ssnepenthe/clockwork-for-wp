@@ -12,10 +12,10 @@ use ToyWpEventManagement\Priority;
 use ToyWpEventManagement\SubscriberInterface;
 
 final class Clockwork_Subscriber implements SubscriberInterface {
-	private $plugin;
+	private $support;
 
-	public function __construct( Plugin $plugin ) {
-		$this->plugin = $plugin;
+	public function __construct( Clockwork_Support $support ) {
+		$this->support = $support;
 	}
 
 	public function enqueue_scripts(): void {
@@ -36,11 +36,11 @@ final class Clockwork_Subscriber implements SubscriberInterface {
 			true
 		);
 
-		if ( $this->plugin->is_collecting_client_metrics() ) {
+		if ( $this->support->is_collecting_client_metrics() ) {
 			\wp_enqueue_script( 'clockwork-metrics' );
 		}
 
-		if ( $this->plugin->is_toolbar_enabled() ) {
+		if ( $this->support->is_toolbar_enabled() ) {
 			\wp_enqueue_script( 'clockwork-toolbar' );
 		}
 	}
@@ -50,7 +50,7 @@ final class Clockwork_Subscriber implements SubscriberInterface {
 
 		if (
 			! $command instanceof Command_Context
-			|| $this->plugin->is_command_filtered( $command->name() )
+			|| $this->support->is_command_filtered( $command->name() )
 		) {
 			return;
 		}
@@ -65,7 +65,7 @@ final class Clockwork_Subscriber implements SubscriberInterface {
 				$command->options(),
 				$command->default_arguments(), // @todo Only defaults that aren't set by user???
 				$command->default_options(), // @todo Only defaults that aren't set by user???
-				$this->plugin->config( 'wp_cli.collect_output', false ) ? $command->output() : ''
+				$this->support->config( 'wp_cli.collect_output', false ) ? $command->output() : ''
 			)
 			->storeRequest();
 	}
@@ -85,18 +85,18 @@ final class Clockwork_Subscriber implements SubscriberInterface {
 
 		if (
 			// @todo Redundant conditions?
-			( $this->plugin->is_enabled() && $this->plugin->is_recording() )
-			&& $this->plugin->is_collecting_requests()
+			( $this->support->is_enabled() && $this->support->is_recording() )
+			&& $this->support->is_collecting_requests()
 		) {
 			// wp_loaded fires on frontend but also login, admin, etc.
 			$events['wp_loaded'] = [ 'initialize_request', Priority::LATE ];
 		}
 
 		// @todo Redundant conditions?
-		if ( $this->plugin->is_recording() ) {
-			if ( $this->plugin->is_collecting_commands() ) {
+		if ( $this->support->is_recording() ) {
+			if ( $this->support->is_collecting_commands() ) {
 				$events['shutdown'] = [ 'finalize_command', Priority::LATE ];
-			} elseif ( $this->plugin->is_collecting_requests() ) {
+			} elseif ( $this->support->is_collecting_requests() ) {
 				$events['shutdown'] = [ 'finalize_request', Priority::LATE ];
 			}
 		}
@@ -116,7 +116,7 @@ final class Clockwork_Subscriber implements SubscriberInterface {
 
 		// @todo Set clockwork path header?
 
-		$extra_headers = $this->plugin->config( 'headers' );
+		$extra_headers = $this->support->config( 'headers' );
 
 		foreach ( $extra_headers as $header_name => $header_value ) {
 			\header( "X-Clockwork-Header-{$header_name}: {$header_value}" );
@@ -125,18 +125,18 @@ final class Clockwork_Subscriber implements SubscriberInterface {
 		// @todo Set subrequest headers?
 
 		if (
-			$this->plugin->is_collecting_client_metrics()
-			|| $this->plugin->is_toolbar_enabled()
+			$this->support->is_collecting_client_metrics()
+			|| $this->support->is_toolbar_enabled()
 		) {
 			$cookie = \json_encode(
 				[
 					'requestId' => $request->id,
 					'version' => Clockwork::VERSION,
 					'path' => '/__clockwork/',
-					'webPath' => $this->plugin->is_web_installed() ? '/__clockwork' : '/__clockwork/app',
+					'webPath' => $this->support->is_web_installed() ? '/__clockwork' : '/__clockwork/app',
 					'token' => $request->updateToken,
-					'metrics' => $this->plugin->is_collecting_client_metrics(),
-					'toolbar' => $this->plugin->is_toolbar_enabled(),
+					'metrics' => $this->support->is_collecting_client_metrics(),
+					'toolbar' => $this->support->is_toolbar_enabled(),
 				]
 			);
 

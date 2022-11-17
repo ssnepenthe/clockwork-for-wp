@@ -6,8 +6,8 @@ namespace Clockwork_For_Wp\Api;
 
 use Clockwork\Authentication\AuthenticatorInterface;
 use Clockwork\Request\IncomingRequest;
+use Clockwork_For_Wp\Clockwork_Support;
 use Clockwork_For_Wp\Metadata;
-use Clockwork_For_Wp\Plugin;
 use Daedalus\Pimple\Events\AddingContainerDefinitions;
 use Daedalus\Plugin\ModuleInterface;
 use Daedalus\Plugin\PluginInterface;
@@ -35,7 +35,7 @@ final class Api_Module implements ModuleInterface {
 					$container->get( AuthenticatorInterface::class ),
 					$container->get( Metadata::class ),
 					$container->get( IncomingRequest::class ),
-					$container->get( Plugin::class )
+					$container->get( Clockwork_Support::class )
 				);
 			},
 		] );

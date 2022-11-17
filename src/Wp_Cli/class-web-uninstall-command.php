@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Wp_Cli;
 
 use ApheleiaCli\Command;
-use Clockwork_For_Wp\Plugin;
+use Clockwork_For_Wp\Clockwork_Support;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use WP_CLI;
@@ -19,9 +19,9 @@ final class Web_Uninstall_Command extends Command {
 			->setDescription( 'Uninstalls the Clockwork web app from the project web root' );
 	}
 
-	public function handle( $assocArgs, Plugin $plugin ): void {
+	public function handle( $assocArgs, Clockwork_Support $support ): void {
 		// @todo Use wp filesystem classes?
-		if ( ! $plugin->is_web_installed() ) {
+		if ( ! $support->is_web_installed() ) {
 			WP_CLI::error( 'Clockwork web app does not appear to be installed' );
 		}
 

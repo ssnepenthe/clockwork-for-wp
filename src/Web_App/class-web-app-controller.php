@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Web_App;
 
 use Clockwork\Web\Web;
-use Clockwork_For_Wp\Plugin;
+use Clockwork_For_Wp\Clockwork_Support;
 use Daedalus\Routing\Responder\FileResponder;
 use ToyWpRouting\Exception\NotFoundHttpException;
 use ToyWpRouting\Responder\RedirectResponder;
 
 final class Web_App_Controller {
 	private $web_helper;
-	private $plugin;
+	private $support;
 
-	public function __construct( Web $web_helper, Plugin $plugin ) {
+	public function __construct( Web $web_helper, Clockwork_Support $support ) {
 		$this->web_helper = $web_helper;
-		$this->plugin = $plugin;
+		$this->support = $support;
 	}
 
 	public function serve_asset( $asset ) {
@@ -60,8 +60,8 @@ final class Web_App_Controller {
 	private function assert_clockwork_is_enabled(): void {
 		// @todo might need to rethink - we should never hit this if web installed...
 		if (
-			! $this->plugin->is_web_enabled()
-			|| $this->plugin->is_web_installed()
+			! $this->support->is_web_enabled()
+			|| $this->support->is_web_installed()
 		) {
 			throw new NotFoundHttpException();
 		}
