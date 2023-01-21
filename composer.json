@@ -7,13 +7,13 @@
         "php": "^7.4 || ^8.0",
         "itsgoingd/clockwork": "^5.0",
         "pimple/pimple": "^3.2",
-        "php-di/invoker": "^2.0",
+        "php-di/invoker": "^2.3",
         "league/config": "^1.1"
     },
     "require-dev": {
         "psy/psysh": "^0.9.7",
         "symfony/var-dumper": "^4.1",
-        "phpunit/phpunit": "^8.5",
+        "phpunit/phpunit": "^9.5",
         "spomky-labs/base64url": "^2.0",
         "wp-cli/wp-cli-bundle": "^2.5",
         "friendsofphp/php-cs-fixer": "^3.1",
@@ -21,7 +21,7 @@
         "humanmade/psalm-plugin-wordpress": "dev-master",
         "wp-coding-standards/wpcs": "^2.3",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
-        "mikey179/vfsstream": "^1.6"
+        "mikey179/vfsstream": "^1.6.7"
     },
     "autoload": { "classmap": ["src/"] },
     "autoload-dev": { "classmap": ["tests/"] },
