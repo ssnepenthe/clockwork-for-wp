@@ -72,7 +72,7 @@ jobs:
           echo "Current WP version"
           npx wp-env run tests-cli "wp core version"
           echo "Current WP environment type"
-          npx wp-env run tests-cli "wp eval 'echo wp_get_environment_type() . PHP_EOL;'""
+          npx wp-env run tests-cli "wp eval 'echo wp_get_environment_type() . PHP_EOL;'"
           echo "Current WP-CLI version"
           npx wp-env run tests-cli "wp cli version"
           echo "Plugin list"
