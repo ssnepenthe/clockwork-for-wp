@@ -40,7 +40,7 @@ final class Incoming_Request extends IncomingRequest {
 	}
 
 	public function is_json() {
-		return 0 === \mb_strpos( $this->header( 'CONTENT_TYPE' ), 'application/json' );
+		return 0 === \mb_strpos( $this->header( 'CONTENT_TYPE', '' ), 'application/json' );
 	}
 
 	public function is_put() {
