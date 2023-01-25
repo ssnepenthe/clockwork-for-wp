@@ -1,5 +1,7 @@
 /// <reference types="cypress" />
 
+import { urlWithQuery } from '../support/utils';
+
 // @todo Differentiate between installed web app and web app served by WP.
 describe('Clockwork Webapp', () => {
 
@@ -130,14 +132,6 @@ describe('Clockwork Webapp', () => {
                 },
             },
         };
-        const hideWhatsNewModal = win => {
-            const app = win.document.querySelector('body > div');
-
-            app.__vue__.$nextTick(() => {
-                app.__vue__.$parent.$whatsNew.seen();
-            });
-            app.__vue__.$forceUpdate();
-        };
 
         before(() => {
             cy.setConfig(config);
@@ -160,12 +154,10 @@ describe('Clockwork Webapp', () => {
 
             cy.intercept('/__clockwork/auth').as('auth');
 
-            cy.visit({
-                url: '/__clockwork/app',
-                onLoad: hideWhatsNewModal,
-            });
+            cy.visit('/__clockwork/app');
 
-            // This isn't working on FF dev edition on Windows 11...
+            cy.get('.application > .modal-backdrop a.header-close').click();
+
             cy.get('input[type="password"]')
                 .type('wrong-password{enter}');
 
@@ -180,10 +172,9 @@ describe('Clockwork Webapp', () => {
 
             cy.intercept('/__clockwork/auth').as('auth');
 
-            cy.visit({
-                url: '/__clockwork/app',
-                onLoad: hideWhatsNewModal,
-            });
+            cy.visit('/__clockwork/app');
+
+            cy.get('.application > .modal-backdrop a.header-close').click();
 
             cy.get('input[type="password"]')
                 .type(`${password}{enter}`);
@@ -204,8 +195,7 @@ describe('Clockwork Webapp', () => {
         it('Returns 404 response for app requests', () => {
 
             cy.request({
-                url: '/__clockwork/app',
-                qs: config,
+                url: urlWithQuery('/__clockwork/app', config),
                 failOnStatusCode: false,
             })
                 .its('status')
@@ -216,16 +206,14 @@ describe('Clockwork Webapp', () => {
         it('Returns 404 for asset requests', () => {
 
             cy.request({
-                url: '/__clockwork/manifest.json',
-                qs: config,
+                url: urlWithQuery('/__clockwork/manifest.json', config),
                 failOnStatusCode: false,
             })
                 .its('status')
                 .should('equal', 404);
 
             cy.request({
-                url: '/__clockwork/img/icons/apple-touch-icon-60x60.png',
-                qs: config,
+                url: urlWithQuery('/__clockwork/img/icons/apple-touch-icon-60x60.png', config),
                 failOnStatusCode: false,
             })
                 .its('status')
@@ -236,8 +224,7 @@ describe('Clockwork Webapp', () => {
         it('Does not provide shortcut redirect', () => {
 
             cy.request({
-                url: '/__clockwork',
-                qs: config,
+                url: urlWithQuery('/__clockwork', config),
                 failOnStatusCode: false,
             })
                 .its('status')
@@ -260,8 +247,7 @@ describe('Clockwork Webapp', () => {
         it('Returns 404 response for app requests', () => {
 
             cy.request({
-                url: '/__clockwork/app',
-                qs: config,
+                url: urlWithQuery('/__clockwork/app', config),
                 failOnStatusCode: false,
             })
                 .its('status')
@@ -272,16 +258,14 @@ describe('Clockwork Webapp', () => {
         it('Returns 404 for asset requests', () => {
 
             cy.request({
-                url: '/__clockwork/manifest.json',
-                qs: config,
+                url: urlWithQuery('/__clockwork/manifest.json', config),
                 failOnStatusCode: false,
             })
                 .its('status')
                 .should('equal', 404);
 
             cy.request({
-                url: '/__clockwork/img/icons/apple-touch-icon-60x60.png',
-                qs: config,
+                url: urlWithQuery('/__clockwork/img/icons/apple-touch-icon-60x60.png', config),
                 failOnStatusCode: false,
             })
                 .its('status')
@@ -292,8 +276,7 @@ describe('Clockwork Webapp', () => {
         it('Does not provide shortcut redirect', () => {
 
             cy.request({
-                url: '/__clockwork',
-                qs: config,
+                url: urlWithQuery('/__clockwork', config),
                 failOnStatusCode: false,
             })
                 .its('status')

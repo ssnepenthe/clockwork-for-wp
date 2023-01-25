@@ -1,5 +1,7 @@
 /// <reference types="cypress" />
 
+import { urlWithQuery } from '../support/utils';
+
 describe('Request API', () => {
 
     it('Does not require authentication by default', () => {
@@ -115,9 +117,8 @@ describe('Request API', () => {
                 const fakeId = '123-456-789';
 
                 cy.request({
-                    url: `/__clockwork/${fakeId}`,
+                    url: urlWithQuery(`/__clockwork/${fakeId}`, config),
                     method: 'PUT',
-                    qs: config,
                     failOnStatusCode: false,
                 })
                     .its('status')
@@ -132,9 +133,8 @@ describe('Request API', () => {
             cy.createRequests(1)
                 .then(([request]) => {
                     cy.request({
-                        url: `/__clockwork/${request.id}`,
+                        url: urlWithQuery(`/__clockwork/${request.id}`, config),
                         method: 'PUT',
-                        qs: config,
                         body: { _token: fakeToken },
                         failOnStatusCode: false,
                     })
@@ -155,9 +155,8 @@ describe('Request API', () => {
                         });
 
                     cy.request({
-                        url: `/__clockwork/${request.id}`,
+                        url: urlWithQuery(`/__clockwork/${request.id}`, config),
                         method: 'PUT',
-                        qs: config,
                         body: {
                             _token: request.updateToken,
                             clientMetrics: { connection: 5, waiting: 10 },
@@ -183,9 +182,8 @@ describe('Request API', () => {
                         .should('be.null');
 
                     cy.request({
-                        url: `/__clockwork/${request.id}`,
+                        url: urlWithQuery(`/__clockwork/${request.id}`, config),
                         method: 'PUT',
-                        qs: config,
                         body: {
                             _token: request.updateToken,
                             url: 'https://www.example.com'
@@ -318,40 +316,35 @@ describe('Request API', () => {
             cy.createRequests(2)
                 .then(([one, two]) => {
                     cy.request({
-                        url: `/__clockwork/${two.id}`,
-                        qs: config,
+                        url: urlWithQuery(`/__clockwork/${two.id}`, config),
                         failOnStatusCode: false,
                     })
                         .its('status')
                         .should('equal', 403);
 
                     cy.request({
-                        url: '/__clockwork/latest',
-                        qs: config,
+                        url: urlWithQuery('/__clockwork/latest', config),
                         failOnStatusCode: false,
                     })
                         .its('status')
                         .should('equal', 403);
 
                     cy.request({
-                        url: `/__clockwork/${two.id}/extended`,
-                        qs: config,
+                        url: urlWithQuery(`/__clockwork/${two.id}/extended`, config),
                         failOnStatusCode: false,
                     })
                         .its('status')
                         .should('equal', 403);
 
                     cy.request({
-                        url: `/__clockwork/${two.id}/previous`,
-                        qs: config,
+                        url: urlWithQuery(`/__clockwork/${two.id}/previous`, config),
                         failOnStatusCode: false,
                     })
                         .its('status')
                         .should('equal', 403);
 
                     cy.request({
-                        url: `/__clockwork/${two.id}/previous/1`,
-                        qs: config,
+                        url: urlWithQuery(`/__clockwork/${two.id}/previous/1`, config),
                         failOnStatusCode: false,
                     })
                         .its('status')
@@ -363,9 +356,8 @@ describe('Request API', () => {
         it('Serves all API requests when authenticated', () => {
 
             cy.request({
-                url: '/__clockwork/auth',
+                url: urlWithQuery('/__clockwork/auth', config),
                 method: 'POST',
-                qs: config,
                 body: { password }
             })
                 .its('body.token')
@@ -374,8 +366,7 @@ describe('Request API', () => {
             cy.createRequests(2)
                 .then(function([one, two]) {
                     cy.request({
-                        url: `/__clockwork/${two.id}`,
-                        qs: config,
+                        url: urlWithQuery(`/__clockwork/${two.id}`, config),
                         headers: { 'x-clockwork-auth': this.token },
                     })
                         .should(response => {
@@ -384,8 +375,7 @@ describe('Request API', () => {
                         });
 
                     cy.request({
-                        url: '/__clockwork/latest',
-                        qs: config,
+                        url: urlWithQuery('/__clockwork/latest', config),
                         headers: { 'x-clockwork-auth': this.token },
                     })
                         .should(response => {
@@ -394,8 +384,7 @@ describe('Request API', () => {
                         });
 
                     cy.request({
-                        url: `/__clockwork/${two.id}/extended`,
-                        qs: config,
+                        url: urlWithQuery(`/__clockwork/${two.id}/extended`, config),
                         headers: { 'x-clockwork-auth': this.token },
                     })
                         .should(response => {
@@ -404,8 +393,7 @@ describe('Request API', () => {
                         });
 
                     cy.request({
-                        url: `/__clockwork/${two.id}/previous`,
-                        qs: config,
+                        url: urlWithQuery(`/__clockwork/${two.id}/previous`, config),
                         headers: { 'x-clockwork-auth': this.token },
                     })
                         .should(response => {
@@ -414,8 +402,7 @@ describe('Request API', () => {
                         });
 
                     cy.request({
-                        url: `/__clockwork/${two.id}/previous/1`,
-                        qs: config,
+                        url: urlWithQuery(`/__clockwork/${two.id}/previous/1`, config),
                         headers: { 'x-clockwork-auth': this.token },
                     })
                         .should(response => {
@@ -437,49 +424,43 @@ describe('Request API', () => {
             cy.createRequests(2)
                 .then(([one, two]) => {
                     cy.request({
-                        url: `/__clockwork/${two.id}`,
-                        qs: config,
+                        url: urlWithQuery(`/__clockwork/${two.id}`, config),
                         failOnStatusCode: false,
                     })
                         .its('status')
                         .should('equal', 404);
 
                     cy.request({
-                        url: '/__clockwork/latest',
-                        qs: config,
+                        url: urlWithQuery('/__clockwork/latest', config),
                         failOnStatusCode: false,
                     })
                         .its('status')
                         .should('equal', 404);
 
                     cy.request({
-                        url: `/__clockwork/${two.id}/extended`,
-                        qs: config,
+                        url: urlWithQuery(`/__clockwork/${two.id}/extended`, config),
                         failOnStatusCode: false,
                     })
                         .its('status')
                         .should('equal', 404);
 
                     cy.request({
-                        url: `/__clockwork/${two.id}/previous`,
-                        qs: config,
+                        url: urlWithQuery(`/__clockwork/${two.id}/previous`, config),
                         failOnStatusCode: false,
                     })
                         .its('status')
                         .should('equal', 404);
 
                     cy.request({
-                        url: `/__clockwork/${two.id}/previous/1`,
-                        qs: config,
+                        url: urlWithQuery(`/__clockwork/${two.id}/previous/1`, config),
                         failOnStatusCode: false,
                     })
                         .its('status')
                         .should('equal', 404);
 
                     cy.request({
-                        url: `/__clockwork/${two.id}`,
+                        url: urlWithQuery(`/__clockwork/${two.id}`, { collect_client_metrics: 1, ...config }),
                         method: 'PUT',
-                        qs: { collect_client_metrics: 1, ...config },
                         failOnStatusCode: false,
                     })
                         .its('status')

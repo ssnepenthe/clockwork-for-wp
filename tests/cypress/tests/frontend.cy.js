@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 import base64url from 'base64url';
-import qs from 'qs';
+import { urlWithQuery } from '../support/utils';
 
 describe('Frontend', () => {
 
@@ -79,10 +79,7 @@ describe('Frontend', () => {
 
         it('Sends additional headers', () => {
 
-            cy.request({
-                url: '/',
-                qs: config,
-            })
+            cy.request(urlWithQuery('/', config))
                 .its('headers')
                 .should(headers => {
                     expect(headers).to.have.property('x-clockwork-header-apples');
@@ -95,10 +92,7 @@ describe('Frontend', () => {
 
         it('Does not send additional headers on filtered requests', () => {
 
-            cy.request({
-                url: '/sample-page/',
-                qs: config,
-            })
+            cy.request(urlWithQuery('/sample-page/', config))
                 .its('headers')
                 .should(headers => {
                     expect(headers).to.not.have.property('x-clockwork-header-apples');
@@ -109,10 +103,7 @@ describe('Frontend', () => {
 
         it('Does not send additional headers when clockwork is disabled', () => {
 
-            cy.request({
-                url: '/',
-                qs: {enable: 0, ...config},
-            })
+            cy.request(urlWithQuery('/', {enable: 0, ...config}))
                 .its('headers')
                 .should(headers => {
                     expect(headers).to.not.have.property('x-clockwork-header-apples');
@@ -132,10 +123,7 @@ describe('Frontend', () => {
 
         it('Does not send clockwork headers', () => {
 
-            cy.request({
-                url: '/',
-                qs: config,
-            })
+            cy.request(urlWithQuery('/', config))
                 .its('headers')
                 .should(headers => {
                     expect(headers).to.not.have.property('x-clockwork-id');
@@ -146,10 +134,7 @@ describe('Frontend', () => {
 
         it('Continues to store request data', () => {
 
-            cy.visit({
-                url: '/',
-                qs: config,
-            })
+            cy.visit(urlWithQuery('/', config))
                 .get('[data-cy="request-id"]')
                 .invoke('text')
                 .then(id => {
@@ -159,8 +144,7 @@ describe('Frontend', () => {
 
                     // Not available when disabled but collecting data always.
                     cy.request({
-                        url: `/__clockwork/${id}`,
-                        qs: config,
+                        url: urlWithQuery(`/__clockwork/${id}`, config),
                         failOnStatusCode: false,
                     })
                         .its('status')
@@ -183,10 +167,7 @@ describe('Frontend', () => {
 
         it('Does not send clockwork headers', () => {
 
-            cy.request({
-                url: '/',
-                qs: config,
-            })
+            cy.request(urlWithQuery('/', config))
                 .its('headers')
                 .should(headers => {
                     expect(headers).to.not.have.property('x-clockwork-id');
@@ -197,10 +178,7 @@ describe('Frontend', () => {
 
         it('Does not store request data', () => {
 
-            cy.visit({
-                url: '/',
-                qs: config,
-            })
+            cy.visit(urlWithQuery('/', config))
                 .get('[data-cy="request-id"]')
                 .invoke('text')
                 .then(id => {
@@ -240,20 +218,14 @@ describe('Frontend', () => {
 
         it('Does not send clockwork headers for filtered URIs', () => {
 
-            cy.request({
-                url: '/',
-                qs: config,
-            })
+            cy.request(urlWithQuery('/', config))
                 .its('headers')
                 .should(headers => {
                     expect(headers).to.have.property('x-clockwork-id');
                     expect(headers).to.have.property('x-clockwork-version');
                 });
 
-            cy.request({
-                url: '/sample-page/',
-                qs: config,
-            })
+            cy.request(urlWithQuery('/sample-page/', config))
                 .its('headers')
                 .should(headers => {
                     expect(headers).to.not.have.property('x-clockwork-id');
@@ -264,10 +236,7 @@ describe('Frontend', () => {
 
         it('Does not store request data for filtered URIs', () => {
 
-            // passing config as qs in visit results in request to
-            // http://one.wordpress.test/sample-page/?requests=%5Bobject%20Object%5D
-            // @see https://github.com/cypress-io/cypress/issues/19407
-            cy.visit('/sample-page/?' + qs.stringify(config))
+            cy.visit(urlWithQuery('/sample-page/', config))
                 .get('[data-cy="request-id"]')
                 .invoke('text')
                 .then(id => {

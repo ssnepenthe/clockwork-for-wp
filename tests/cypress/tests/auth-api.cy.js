@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const authUrl = '/__clockwork/auth';
+import { authUrl, authUrlWithQuery } from '../support/utils';
 
 describe('Auth API (POST /__clockwork/auth)', () => {
 
@@ -33,9 +33,8 @@ describe('Auth API (POST /__clockwork/auth)', () => {
         it('Handles form requests', () => {
 
             cy.request({
-                url: authUrl,
+                url: authUrlWithQuery(config),
                 method: 'POST',
-                qs: config,
                 body: { password },
                 form: true,
             })
@@ -47,9 +46,8 @@ describe('Auth API (POST /__clockwork/auth)', () => {
         it('Handles form requests with incorrect credentials', () => {
 
             cy.request({
-                url: authUrl,
+                url: authUrlWithQuery(config),
                 method: 'POST',
-                qs: config,
                 body: { password: 'wrong-password' },
                 form: true,
                 failOnStatusCode: false,
@@ -62,9 +60,8 @@ describe('Auth API (POST /__clockwork/auth)', () => {
         it('Handles form requests with no credentials', () => {
 
             cy.request({
-                url: authUrl,
+                url: authUrlWithQuery(config),
                 method: 'POST',
-                qs: config,
                 form: true,
                 failOnStatusCode: false,
             })
@@ -76,9 +73,8 @@ describe('Auth API (POST /__clockwork/auth)', () => {
         it('Handles JSON requests', () => {
 
             cy.request({
-                url: authUrl,
+                url: authUrlWithQuery(config),
                 method: 'POST',
-                qs: config,
                 body: { password },
             })
                 .its('status')
@@ -89,9 +85,8 @@ describe('Auth API (POST /__clockwork/auth)', () => {
         it('Handles JSON requests with incorrect credentials', () => {
 
             cy.request({
-                url: authUrl,
+                url: authUrlWithQuery(config),
                 method: 'POST',
-                qs: config,
                 body: { password: 'wrong-password' },
                 failOnStatusCode: false
             })
@@ -103,9 +98,8 @@ describe('Auth API (POST /__clockwork/auth)', () => {
         it('Handles JSON requests with no credentials', () => {
 
             cy.request({
-                url: authUrl,
+                url: authUrlWithQuery(config),
                 method: 'POST',
-                qs: config,
                 failOnStatusCode: false,
             })
                 .its('status')
@@ -116,9 +110,8 @@ describe('Auth API (POST /__clockwork/auth)', () => {
         it('Handles JSON requests with invalid JSON body', () => {
 
             cy.request({
-                url: authUrl,
+                url: authUrlWithQuery(config),
                 method: 'POST',
-                qs: config,
                 body: '{"password":"nothing-to-see-here-folks"}}',
                 headers: {
                     'content-type': 'application/json',
@@ -141,9 +134,8 @@ describe('Auth API (POST /__clockwork/auth)', () => {
         it('Returns 404 response', () => {
 
             cy.request({
-                url: authUrl,
+                url: authUrlWithQuery(config),
                 method: 'POST',
-                qs: config,
                 failOnStatusCode: false
             })
                 .its('status')
