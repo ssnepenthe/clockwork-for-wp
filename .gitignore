@@ -7,5 +7,4 @@ vendor/
 .php-cs-fixer.cache
 .phpunit.result.cache
 composer.lock
-package-lock.json
 wp-cli.local.yml

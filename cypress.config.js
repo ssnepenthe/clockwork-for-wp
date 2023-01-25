@@ -6,12 +6,22 @@ module.exports = defineConfig({
   screenshotsFolder: 'tests/cypress/screenshots',
   videosFolder: 'tests/cypress/videos',
   e2e: {
-    // We've imported your old cypress plugins here.
-    // You may want to clean this up later by importing these.
-    setupNodeEvents(on, config) {
-      return require('./tests/cypress/plugins/index.js')(on, config)
+    async setupNodeEvents(on, config) {
+      let baseUrl = 'http://localhost:8889/';
+
+      const { readConfig } = require('@wordpress/env/lib/config');
+      const wpEnvConfig = await readConfig('.wp-env.json');
+
+      if (wpEnvConfig) {
+        baseUrl = wpEnvConfig.env.tests.config.WP_SITEURL;
+      }
+
+      config.baseUrl = baseUrl;
+
+      require('./tests/cypress/plugins/index.js')(on, config);
+
+      return config;
     },
-    baseUrl: 'http://localhost:8888',
     specPattern: 'tests/cypress/tests/**/*.cy.{js,jsx,ts,tsx}',
     supportFile: 'tests/cypress/support/index.js',
   },

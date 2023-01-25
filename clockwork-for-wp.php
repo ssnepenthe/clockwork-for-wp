@@ -35,7 +35,7 @@ function _cfw_deactivate_self(): void {
 function _cfw_admin_error_notice( $message ): void {
 	$notice = <<<'EOD'
 <div class="notice notice-error">
-	<p>Clockwork for WP deactivated: %s</p>
+	<p>Clockwork for WP: %s</p>
 </div>
 EOD;
 
@@ -47,7 +47,7 @@ if ( ! \function_exists( 'wp_get_environment_type' ) ) {
 	\add_action(
 		'admin_notices',
 		static function (): void {
-			\_cfw_admin_error_notice( 'This plugin requires WordPress version 5.5.0 or greater.' );
+			\_cfw_admin_error_notice( 'Plugin deactivated: This plugin requires WordPress version 5.5.0 or greater.' );
 		}
 	);
 
@@ -62,16 +62,25 @@ if (
 	\add_action(
 		'admin_notices',
 		static function (): void {
-			\_cfw_admin_error_notice( 'This plugin can only run on non-production environments.' );
+			\_cfw_admin_error_notice( 'Plugin deactivated: This plugin can only run on non-production environments.' );
 		}
 	);
 
 	return;
 }
 
-if ( \file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
-	require_once __DIR__ . '/vendor/autoload.php';
+if ( ! \file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+	\add_action(
+		'admin_notices',
+		static function (): void {
+			\_cfw_admin_error_notice( 'Plugin not loaded: Unable to locate Composer autoloader.' );
+		}
+	);
+
+	return;
 }
+
+require_once __DIR__ . '/vendor/autoload.php';
 
 // @todo Check for minimum php version.
 // @todo Check that dependencies have been installed.
