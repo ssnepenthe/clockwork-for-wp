@@ -21,17 +21,15 @@ jobs:
     strategy:
       matrix:
         php:
-          # @todo uncomment when workflow is finalized
-          # - '7.4'
-          # - '8.0'
-          # - '8.1'
+          - '7.4'
+          - '8.0'
+          - '8.1'
           - '8.2'
         wordpress:
           - 'latest'
-        # @todo uncomment when workflow is finalized
-        # include:
-        #   - php: '7.4'
-        #     wordpress: '5.5'
+        include:
+          - php: '7.4'
+            wordpress: '5.5'
 
     steps:
       - name: Checkout
