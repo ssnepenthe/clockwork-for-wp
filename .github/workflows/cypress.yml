@@ -60,6 +60,23 @@ jobs:
       - name: Ensure plugins are active
         run: npx wp-env run tests-cli "wp plugin activate clockwork-for-wp cfw-test-helper"
 
+      - name: Debug info
+        run: |
+          echo ".wp-env-json"
+          cat .wp-env.json | jq
+          echo ".wp-env.overrides.json"
+          cat .wp-env.override.json | jq
+          echo "Full WP-Env config"
+          wp-env/print-config.js | jq
+          echo "Current PHP version"
+          npx wp-env run tests-wordpress "php -v"
+          echo "Current WP version"
+          npx wp-env run tests-cli "wp core version"
+          echo "Current WP-CLI version"
+          npx wp-env run tests-cli "wp cli version"
+          echo "Plugin list"
+          npx wp-env run tests-cli "wp plugin list"
+
       - name: Run e2e tests
         run: npx cypress run
 
