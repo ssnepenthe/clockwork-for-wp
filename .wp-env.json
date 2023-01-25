@@ -1,0 +1,6 @@
+{
+    "plugins": [
+        ".",
+        "./tests/fixtures/plugins/cfw-test-helper"
+    ]
+}
