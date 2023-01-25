@@ -44,12 +44,13 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
+      # By default WP_ENVIRONMENT_TYPE is set to local but this wasn't a valid option until WP 5.5.1
       - name: Prepare WP environment overrides
         run: |
           if [[ ${{ matrix.wordpress }} == "latest" ]]; then
             echo "{ \"phpVersion\": \"${{ matrix.php }}\" }" > .wp-env.override.json
           else
-            echo "{ \"core\": \"WordPress/WordPress#${{ matrix.wordpress }}\", \"phpVersion\": \"${{ matrix.php }}\" }" > .wp-env.override.json
+            echo "{ \"core\": \"WordPress/WordPress#${{ matrix.wordpress }}\", \"phpVersion\": \"${{ matrix.php }}\", \"config\": { \"WP_ENVIRONMENT_TYPE\": \"development\" } }" > .wp-env.override.json
           fi
 
       - name: Start WP environment
@@ -70,6 +71,8 @@ jobs:
           npx wp-env run tests-wordpress "php -v"
           echo "Current WP version"
           npx wp-env run tests-cli "wp core version"
+          echo "Current WP environment type"
+          npx wp-env run tests-cli "wp eval 'echo wp_get_environment_type() . PHP_EOL;'""
           echo "Current WP-CLI version"
           npx wp-env run tests-cli "wp cli version"
           echo "Plugin list"
