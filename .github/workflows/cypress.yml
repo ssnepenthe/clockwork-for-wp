@@ -57,6 +57,9 @@ jobs:
       - name: Start WP environment
         run: wp-env/prepare.sh
 
+      - name: Ensure plugins are active
+        run: npx wp-env run tests-cli "wp plugin activate clockwork-for-wp cfw-test-plugin"
+
       - name: Run e2e tests
         run: npx cypress run
 
