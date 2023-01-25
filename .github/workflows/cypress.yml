@@ -59,3 +59,13 @@ jobs:
 
       - name: Run e2e tests
         run: npx cypress run
+
+      - name: Upload Cypress artifacts on failure
+        uses: actions/upload-artifact@v3
+        if: ${{ failure() }}
+        with:
+          name: cypress-artifact
+          retention-days: 2
+          path: |
+            tests/cypress/screenshots/
+            tests/cypress/videos/
