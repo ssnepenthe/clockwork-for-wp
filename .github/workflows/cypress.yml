@@ -1,0 +1,92 @@
+name: Cypress
+
+on:
+
+  push:
+    branches: [main]
+
+  pull_request:
+
+permissions:
+
+  contents: read
+
+jobs:
+
+  tests:
+    name: Cypress Tests
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php:
+          - '7.4'
+          - '8.0'
+          - '8.1'
+          - '8.2'
+        wordpress:
+          - 'latest'
+        include:
+          - php: '7.4'
+            wordpress: '5.5'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      # By default WP_ENVIRONMENT_TYPE is set to local but this wasn't a valid option until WP 5.5.1
+      - name: Prepare WP environment overrides
+        run: |
+          if [[ ${{ matrix.wordpress }} == "latest" ]]; then
+            echo "{ \"phpVersion\": \"${{ matrix.php }}\" }" > .wp-env.override.json
+          else
+            echo "{ \"core\": \"WordPress/WordPress#${{ matrix.wordpress }}\", \"phpVersion\": \"${{ matrix.php }}\", \"config\": { \"WP_ENVIRONMENT_TYPE\": \"development\" } }" > .wp-env.override.json
+          fi
+
+      - name: Start WP environment
+        run: wp-env/prepare.sh
+
+      - name: Ensure plugins are active
+        run: npx wp-env run tests-cli "wp plugin activate clockwork-for-wp cfw-test-helper"
+
+      - name: Debug info
+        run: |
+          echo ".wp-env-json"
+          cat .wp-env.json | jq
+          echo ".wp-env.overrides.json"
+          cat .wp-env.override.json | jq
+          echo "Full WP-Env config"
+          wp-env/print-config.js | jq
+          echo "Current PHP version"
+          npx wp-env run tests-wordpress "php -v"
+          echo "Current WP version"
+          npx wp-env run tests-cli "wp core version"
+          echo "Current WP environment type"
+          npx wp-env run tests-cli "wp eval 'echo wp_get_environment_type() . PHP_EOL;'"
+          echo "Current WP-CLI version"
+          npx wp-env run tests-cli "wp cli version"
+          echo "Plugin list"
+          npx wp-env run tests-cli "wp plugin list"
+
+      - name: Run e2e tests
+        run: npx cypress run
+
+      - name: Upload Cypress artifacts on failure
+        uses: actions/upload-artifact@v3
+        if: ${{ failure() }}
+        with:
+          name: cypress-artifact
+          retention-days: 2
+          path: |
+            tests/cypress/screenshots/
+            tests/cypress/videos/

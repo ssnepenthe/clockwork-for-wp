@@ -1,0 +1,13 @@
+{
+    "plugins": [
+        ".",
+        "./tests/fixtures/plugins/cfw-test-helper"
+    ],
+    "env": {
+        "tests": {
+            "mappings": {
+                "wp-cli.yml": "./wp-env/wp-cli.yml"
+            }
+        }
+    }
+}

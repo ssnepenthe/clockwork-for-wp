@@ -20,8 +20,9 @@
   },
   "homepage": "https://github.com/ssnepenthe/clockwork-for-wp#readme",
   "devDependencies": {
+    "@wordpress/env": "^5.10.0",
     "base64url": "^3.0.1",
-    "cypress": "^9.1.1",
+    "cypress": "^12.4.0",
     "qs": "^6.10.2"
   }
 }
