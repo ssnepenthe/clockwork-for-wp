@@ -54,7 +54,7 @@ jobs:
           fi
 
       - name: Start WP environment
-        run: wp-env/prepare.sh
+        run: wp-env/start.sh
 
       - name: Ensure plugins are active
         run: npx wp-env run tests-cli "wp plugin activate clockwork-for-wp cfw-test-helper"
