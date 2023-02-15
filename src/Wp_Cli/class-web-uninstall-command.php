@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Clockwork_For_Wp\Wp_Cli;
 
+use ApheleiaCli\Command;
 use Clockwork_For_Wp\Plugin;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -14,8 +15,8 @@ use WP_CLI;
  */
 final class Web_Uninstall_Command extends Command {
 	public function configure(): void {
-		$this->set_name( 'web-uninstall' )
-			->set_description( 'Uninstalls the Clockwork web app from the project web root' );
+		$this->setName( 'web-uninstall' )
+			->setDescription( 'Uninstalls the Clockwork web app from the project web root' );
 	}
 
 	public function handle( $assoc_args, Plugin $plugin ): void {

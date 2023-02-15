@@ -8,7 +8,8 @@
         "itsgoingd/clockwork": "^5.0",
         "pimple/pimple": "^3.2",
         "php-di/invoker": "^2.3",
-        "league/config": "^1.1"
+        "league/config": "^1.1",
+        "ssnepenthe/apheleia-cli": "^0.1"
     },
     "require-dev": {
         "psy/psysh": "^0.9.7",
