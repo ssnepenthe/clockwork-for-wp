@@ -16,7 +16,7 @@ Query Monitor continues to support much older versions of both PHP and WordPress
 The primary reasons I would recommend using this plugin over Query Monitor would be when you want to store request metadata for later review or are trying to debug issues in a non-html context (wp-cli, cron, etc.).
 
 ## Requirements
-PHP 7.1 or greater, WP 5.5 or greater and Composer.
+PHP 7.4 or greater, WP 5.5 or greater and Composer.
 
 ## Installation
 For now either [require dev-master via Composer using a vcs repository](https://getcomposer.org/doc/05-repositories.md#vcs) or clone this repo into your plugins directory and manually run `composer install`.
