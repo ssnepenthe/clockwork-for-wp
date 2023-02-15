@@ -14,14 +14,22 @@ use WP_CLI;
  * @internal
  */
 final class Web_Uninstall_Command extends Command {
+	private Plugin $plugin;
+
+	public function __construct( Plugin $plugin ) {
+		$this->plugin = $plugin;
+
+		parent::__construct();
+	}
+
 	public function configure(): void {
 		$this->setName( 'web-uninstall' )
 			->setDescription( 'Uninstalls the Clockwork web app from the project web root' );
 	}
 
-	public function handle( $assoc_args, Plugin $plugin ): void {
+	public function handle( $_, $assoc_args ): void {
 		// @todo Use wp filesystem classes?
-		if ( ! $plugin->is_web_installed() ) {
+		if ( ! $this->plugin->is_web_installed() ) {
 			WP_CLI::error( 'Clockwork web app does not appear to be installed' );
 		}
 

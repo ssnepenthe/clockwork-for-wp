@@ -16,6 +16,14 @@ use WP_CLI;
  * @internal
  */
 final class Web_Install_Command extends Command {
+	private Plugin $plugin;
+
+	public function __construct( Plugin $plugin ) {
+		$this->plugin = $plugin;
+
+		parent::__construct();
+	}
+
 	public function configure(): void {
 		$this->setName( 'web-install' )
 			->setDescription( 'Installs the Clockwork web app to the project web root' )
@@ -25,9 +33,11 @@ final class Web_Install_Command extends Command {
 			);
 	}
 
-	public function handle( Plugin $plugin, $force = false ): void {
+	public function handle( $_, $assoc_args ): void {
+		$force = $assoc_args['force'] ?? false;
+
 		// @todo Use wp filesystem classes?
-		if ( $plugin->is_web_installed() ) {
+		if ( $this->plugin->is_web_installed() ) {
 			if ( $force ) {
 				WP_CLI::log( 'Removing previous Clockwork web app installation...' );
 				WP_CLI::debug( 'Running "clockwork web-uninstall"', 'clockwork' );
