@@ -69,7 +69,7 @@ jobs:
 
       - name: Install Composer dependencies
         run: |
-          npx wp-env run composer "config platorm.php ${{ matrix.php }}"
+          npx wp-env run composer "config platform.php ${{ matrix.php }}"
           npx wp-env run composer "update --ansi --no-interaction --no-progress --prefer-dist"
 
       - name: Set rewrite structure
