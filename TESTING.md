@@ -4,12 +4,8 @@ PHPUnit is used for unit testing and rough integration testing. Cypress is used 
 
 ## Cypress Details
 
-The cypress test suite assumes a fresh VVV install available at `http://one.wordpress.test`.
-
-There must be a page with the slug `sample-page`.
-
-The `cfw-test-helper` plugin within the `tests/fixtures/plugins` directory must be symlinked or copied into the site plugin directory and activated. Before you will be able to activate the plugin you must set the WP environment type to something other than `production` using the `WP_ENVIRONMENT_TYPE` environment variable or `WP_ENVIRONMENT_TYPE` constant.
+The cypress test suite expects a running test environment provided by wp-env (localhost:8889) with some manual modifications. Refer to the script at `wp-env/start.sh` to understand what is needed. Additionally, a page with the slug `sample-page` must be present.
 
 ## IMPORTANT!!!
 
-Do not run the `cfw-test-helper` plugin on a machine that is publicly accessible. It allows `clockwork-for-wp` to be configured on-the-fly via query string params without any authentication or authorization checks. It could be used by attackers to expose sensitive information about the server and/or WordPress install.
+The `cfw-test-helper` plugin is installed and activated by default by wp-env, but it is important that this plugin is never installed on a machine that is publicly accessible. It allows `clockwork-for-wp` to be configured on-the-fly via query string params without any authentication or authorization checks. It could be used by attackers to expose sensitive information about the server and/or WordPress install.
