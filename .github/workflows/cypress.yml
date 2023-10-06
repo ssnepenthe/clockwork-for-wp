@@ -81,7 +81,7 @@ jobs:
 
       - name: Debug info
         run: |
-          echo ".wp-env-json"
+          echo ".wp-env.json"
           cat .wp-env.json | jq
           echo ".wp-env.overrides.json"
           cat .wp-env.override.json | jq
