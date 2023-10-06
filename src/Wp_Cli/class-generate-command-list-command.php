@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Clockwork_For_Wp\Wp_Cli;
 
+use ApheleiaCli\Command;
 use Clockwork_For_Wp\Cli_Data_Collection\Cli_Collection_Helper;
 use WP_CLI;
 
@@ -14,8 +15,8 @@ final class Generate_Command_List_Command extends Command {
 	private $commands = [];
 
 	public function configure(): void {
-		$this->set_name( 'generate-command-list' )
-			->set_description(
+		$this->setName( 'generate-command-list' )
+			->setDescription(
 				'Generates list of core commands to be ignored by Clockwork. Used for development only.'
 			);
 	}

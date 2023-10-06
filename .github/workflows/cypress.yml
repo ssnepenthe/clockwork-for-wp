@@ -54,14 +54,34 @@ jobs:
           fi
 
       - name: Start WP environment
-        run: wp-env/start.sh
+        run: |
+          npx wp-env start
+          npx wp-env clean all
+
+      - name: Prepare necessary container directories
+        run: |
+          npx wp-env run wordpress "chmod -c ugo+w /var/www/html"
+          npx wp-env run wordpress "mkdir -p /var/www/html/wp-content/cfw-data"
+          npx wp-env run wordpress "chmod -c ugo+w /var/www/html/wp-content/cfw-data"
+          npx wp-env run tests-wordpress "chmod -c ugo+w /var/www/html"
+          npx wp-env run tests-wordpress "mkdir -p /var/www/html/wp-content/cfw-data"
+          npx wp-env run tests-wordpress "chmod -c ugo+w /var/www/html/wp-content/cfw-data"
+
+      - name: Install Composer dependencies
+        run: |
+          npx wp-env run composer "config platform.php ${{ matrix.php }}"
+          npx wp-env run composer "update --ansi --no-interaction --no-progress --prefer-dist"
+
+      - name: Set rewrite structure
+        run: |
+          npx wp-env run tests-cli "wp rewrite structure '/%postname%/' --hard"
 
       - name: Ensure plugins are active
         run: npx wp-env run tests-cli "wp plugin activate clockwork-for-wp cfw-test-helper"
 
       - name: Debug info
         run: |
-          echo ".wp-env-json"
+          echo ".wp-env.json"
           cat .wp-env.json | jq
           echo ".wp-env.overrides.json"
           cat .wp-env.override.json | jq
@@ -69,6 +89,8 @@ jobs:
           wp-env/print-config.js | jq
           echo "Current PHP version"
           npx wp-env run tests-wordpress "php -v"
+          echo "Composer platform overrides"
+          cat composer.json | jq .config.platform
           echo "Current WP version"
           npx wp-env run tests-cli "wp core version"
           echo "Current WP environment type"

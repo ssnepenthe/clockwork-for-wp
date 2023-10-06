@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Clockwork_For_Wp\Wp_Cli;
 
+use ApheleiaCli\Command;
+use ApheleiaCli\Flag;
 use Clockwork\Web\Web;
 use Clockwork_For_Wp\Plugin;
 use RecursiveDirectoryIterator;
@@ -14,18 +16,28 @@ use WP_CLI;
  * @internal
  */
 final class Web_Install_Command extends Command {
+	private Plugin $plugin;
+
+	public function __construct( Plugin $plugin ) {
+		$this->plugin = $plugin;
+
+		parent::__construct();
+	}
+
 	public function configure(): void {
-		$this->set_name( 'web-install' )
-			->set_description( 'Installs the Clockwork web app to the project web root' )
-			->add_flag(
+		$this->setName( 'web-install' )
+			->setDescription( 'Installs the Clockwork web app to the project web root' )
+			->addFlag(
 				( new Flag( 'force' ) )
-					->set_description( 'Uninstall web app if it is already installed' )
+					->setDescription( 'Uninstall web app if it is already installed' )
 			);
 	}
 
-	public function handle( Plugin $plugin, $force = false ): void {
+	public function handle( $_, $assoc_args ): void {
+		$force = $assoc_args['force'] ?? false;
+
 		// @todo Use wp filesystem classes?
-		if ( $plugin->is_web_installed() ) {
+		if ( $this->plugin->is_web_installed() ) {
 			if ( $force ) {
 				WP_CLI::log( 'Removing previous Clockwork web app installation...' );
 				WP_CLI::debug( 'Running "clockwork web-uninstall"', 'clockwork' );
