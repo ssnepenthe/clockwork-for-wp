@@ -108,7 +108,7 @@ final class Wp_Redirect extends DataSource implements Subscriber {
 
 		if ( ! $this->finalized ) {
 			if ( ! $this->filtered['location'] ) {
-				$message .= ' returned without redirecting user: "wp_redirect" filter returned a falsey value';
+				$message .= ' returned without redirecting user: "wp_redirect" filter returned a falsy value';
 			} elseif ( $this->filtered['status'] < 300 || 399 < $this->filtered['status'] ) {
 				$message .= ' caused call to "wp_die": "wp_redirect_status" filter returned an invalid status code';
 			} else {

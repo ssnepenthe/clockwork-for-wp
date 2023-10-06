@@ -12,7 +12,7 @@ class Conditionals_Test extends TestCase {
 
 		$data_source = new Conditionals( [
 			[ 'conditional' => "{$namespace}\\boolean_truthy", 'when' => function() { return false; } ],
-			[ 'conditional' => "{$namespace}\\boolean_falsey", 'when' => function() { return true; } ],
+			[ 'conditional' => "{$namespace}\\boolean_falsy", 'when' => function() { return true; } ],
 		] );
 		$request = $data_source->resolve( new Request() );
 		$data = $request->userData( 'WordPress' )->toArray()[0];
@@ -40,17 +40,17 @@ class Conditionals_Test extends TestCase {
 
 		$data_source = new Conditionals( [
 			[ 'conditional' => "{$namespace}\\string_truthy" ],
-			[ 'conditional' => "{$namespace}\\string_falsey" ],
+			[ 'conditional' => "{$namespace}\\string_falsy" ],
 			[ 'conditional' => "{$namespace}\\integer_truthy" ],
-			[ 'conditional' => "{$namespace}\\integer_falsey" ],
+			[ 'conditional' => "{$namespace}\\integer_falsy" ],
 		] );
 		$request = $data_source->resolve( new Request() );
 		$data = $request->userData( 'WordPress' )->toArray()[0];
 
 		$this->assertSame( 'TRUTHY (1)', $data[0]['value'] );
 		$this->assertSame( 'TRUTHY ("a")', $data[1]['value'] );
-		$this->assertSame( 'FALSEY (0)', $data[2]['value'] );
-		$this->assertSame( 'FALSEY ("")', $data[3]['value'] );
+		$this->assertSame( 'FALSY (0)', $data[2]['value'] );
+		$this->assertSame( 'FALSY ("")', $data[3]['value'] );
 	}
 
 	public function test_resolve_boolean_descriptions() {
@@ -58,7 +58,7 @@ class Conditionals_Test extends TestCase {
 
 		$data_source = new Conditionals( [
 			[ 'conditional' => "{$namespace}\\boolean_truthy" ],
-			[ 'conditional' => "{$namespace}\\boolean_falsey" ],
+			[ 'conditional' => "{$namespace}\\boolean_falsy" ],
 		] );
 		$request = $data_source->resolve( new Request() );
 		$data = $request->userData( 'WordPress' )->toArray()[0];
@@ -72,11 +72,11 @@ class Conditionals_Test extends TestCase {
 
 		$data_source = new Conditionals( [
 			[ 'conditional' => "{$namespace}\\boolean_truthy" ],
-			[ 'conditional' => "{$namespace}\\boolean_falsey" ],
+			[ 'conditional' => "{$namespace}\\boolean_falsy" ],
 			[ 'conditional' => "{$namespace}\\string_truthy" ],
-			[ 'conditional' => "{$namespace}\\string_falsey" ],
+			[ 'conditional' => "{$namespace}\\string_falsy" ],
 			[ 'conditional' => "{$namespace}\\integer_truthy" ],
-			[ 'conditional' => "{$namespace}\\integer_falsey" ],
+			[ 'conditional' => "{$namespace}\\integer_falsy" ],
 		] );
 		$request = $data_source->resolve( new Request() );
 		$data = $request->userData( 'WordPress' )->toArray()[0];
@@ -84,27 +84,27 @@ class Conditionals_Test extends TestCase {
 		$this->assertSame( "{$namespace}\\integer_truthy()", $data[0]['conditional'] );
 		$this->assertSame( "{$namespace}\\string_truthy()", $data[1]['conditional'] );
 		$this->assertSame( "{$namespace}\\boolean_truthy()", $data[2]['conditional'] );
-		$this->assertSame( "{$namespace}\\integer_falsey()", $data[3]['conditional'] );
-		$this->assertSame( "{$namespace}\\string_falsey()", $data[4]['conditional'] );
-		$this->assertSame( "{$namespace}\\boolean_falsey()", $data[5]['conditional'] );
+		$this->assertSame( "{$namespace}\\integer_falsy()", $data[3]['conditional'] );
+		$this->assertSame( "{$namespace}\\string_falsy()", $data[4]['conditional'] );
+		$this->assertSame( "{$namespace}\\boolean_falsy()", $data[5]['conditional'] );
 	}
 }
 
 function boolean_truthy() {
 	return true;
 }
-function boolean_falsey() {
+function boolean_falsy() {
 	return false;
 }
 function string_truthy() {
 	return 'a';
 }
-function string_falsey() {
+function string_falsy() {
 	return '';
 }
 function integer_truthy() {
 	return 1;
 }
-function integer_falsey() {
+function integer_falsy() {
 	return 0;
 }

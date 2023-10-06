@@ -85,7 +85,7 @@ final class Conditionals extends DataSource {
 				if ( $value ) {
 					$description = "TRUTHY ({$description})";
 				} else {
-					$description = "FALSEY ({$description})";
+					$description = "FALSY ({$description})";
 				}
 			}
 

@@ -132,7 +132,7 @@ class Wp_Redirect_Test extends TestCase {
 
 	/** @test */
 	public function it_can_detect_when_wp_redirect_call_bails() {
-		// Falsey filtered location.
+		// Falsy filtered location.
 		$data_source = new Wp_Redirect();
 
 		$data_source->set_initial( 'location', 'test-location' );
@@ -142,7 +142,7 @@ class Wp_Redirect_Test extends TestCase {
 		$data_source->resolve( $request );
 
 		$this->assertSame(
-			'Call to "wp_redirect" returned without redirecting user: "wp_redirect" filter returned a falsey value',
+			'Call to "wp_redirect" returned without redirecting user: "wp_redirect" filter returned a falsy value',
 			$request->log()->messages[0]['message']
 		);
 
