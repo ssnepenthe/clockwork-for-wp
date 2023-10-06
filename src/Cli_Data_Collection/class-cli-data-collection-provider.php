@@ -8,7 +8,7 @@ use Clockwork_For_Wp\Base_Provider;
 
 final class Cli_Data_Collection_Provider extends Base_Provider {
 	public function registered(): void {
-		if ( ! ( \defined( 'WP_CLI' ) &&  WP_CLI ) ) {
+		if ( ! ( \defined( 'WP_CLI' ) && WP_CLI ) ) {
 			return;
 		}
 

@@ -35,7 +35,7 @@ final class Clean_Command extends Command {
 			->addOption(
 				( new Option( 'expiration' ) )
 					->setDescription( 'Cleans data older than specified value in minutes. Does nothing if "--all" is also set.' )
-			);;
+			);
 	}
 
 	public function handle( $_, $assoc_args ): void {
