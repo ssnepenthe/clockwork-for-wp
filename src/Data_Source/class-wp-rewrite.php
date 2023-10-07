@@ -6,10 +6,13 @@ namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Request;
+use Clockwork_For_Wp\Data_Source\Subscriber\Wp_Rewrite_Subscriber;
 use Clockwork_For_Wp\Event_Management\Subscriber;
+use Clockwork_For_Wp\Provides_Subscriber;
+
 use function Clockwork_For_Wp\describe_value;
 
-final class Wp_Rewrite extends DataSource implements Subscriber {
+final class Wp_Rewrite extends DataSource implements Provides_Subscriber {
 	private $front = '';
 	private $rules = [];
 	private $structure = '';
@@ -24,16 +27,8 @@ final class Wp_Rewrite extends DataSource implements Subscriber {
 		return $this;
 	}
 
-	public function get_subscribed_events(): array {
-		return [
-			'cfw_pre_resolve' => function ( \WP_Rewrite $wp_rewrite ): void {
-				$this
-					->set_structure( $wp_rewrite->permalink_structure )
-					->set_trailing_slash( $wp_rewrite->use_trailing_slashes )
-					->set_front( $wp_rewrite->front )
-					->set_rules( $wp_rewrite->wp_rewrite_rules() );
-			},
-		];
+	public function create_subscriber(): Subscriber {
+		return new Wp_Rewrite_Subscriber( $this );
 	}
 
 	public function resolve( Request $request ) {

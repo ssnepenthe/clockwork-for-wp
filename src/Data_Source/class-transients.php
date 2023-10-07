@@ -6,34 +6,23 @@ namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Request;
+use Clockwork_For_Wp\Data_Source\Subscriber\Transients_Subscriber;
 use Clockwork_For_Wp\Event_Management\Subscriber;
+use Clockwork_For_Wp\Provides_Subscriber;
 use InvalidArgumentException;
 
-final class Transients extends DataSource implements Subscriber {
+final class Transients extends DataSource implements Provides_Subscriber {
 	private $deleted = [];
 	private $setted = [];
+
+	public function create_subscriber(): Subscriber {
+		return new Transients_Subscriber( $this );
+	}
 
 	public function deleted( $key, $is_site = false ) {
 		$this->deleted[] = $this->prepare( 'deleted', $key, null, null, $is_site );
 
 		return $this;
-	}
-
-	public function get_subscribed_events(): array {
-		return [
-			'setted_transient' => function ( $transient, $value, $expiration ): void {
-				$this->setted( $transient, $value, $expiration );
-			},
-			'setted_site_transient' => function ( $transient, $value, $expiration ): void {
-				$this->setted( $transient, $value, $expiration, $is_site = true );
-			},
-			'deleted_transient' => function ( $transient ): void {
-				$this->deleted( $transient );
-			},
-			'deleted_site_transient' => function ( $transient ): void {
-				$this->deleted( $transient, $is_site = true );
-			},
-		];
 	}
 
 	public function resolve( Request $request ) {

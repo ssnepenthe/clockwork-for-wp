@@ -6,9 +6,11 @@ namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Request;
+use Clockwork_For_Wp\Data_Source\Subscriber\Wp_Subscriber;
 use Clockwork_For_Wp\Event_Management\Subscriber;
+use Clockwork_For_Wp\Provides_Subscriber;
 
-final class Wp extends DataSource implements Subscriber {
+final class Wp extends DataSource implements Provides_Subscriber {
 	private $variables = [];
 
 	// @todo Records_Variables trait to share with Wp_Query data source?
@@ -21,17 +23,8 @@ final class Wp extends DataSource implements Subscriber {
 		return $this;
 	}
 
-	public function get_subscribed_events(): array {
-		return [
-			'cfw_pre_resolve' => function ( \WP $wp ): void {
-				// @todo Move to rewrite?
-				foreach ( [ 'request', 'query_string', 'matched_rule', 'matched_query' ] as $var ) {
-					if ( \property_exists( $wp, $var ) && $wp->{$var} ) {
-						$this->add_variable( $var, $wp->{$var} );
-					}
-				}
-			},
-		];
+	public function create_subscriber(): Subscriber {
+		return new Wp_Subscriber( $this );
 	}
 
 	public function resolve( Request $request ) {

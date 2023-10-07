@@ -9,10 +9,11 @@ use Clockwork\Helpers\StackFilter;
 use Clockwork\Helpers\StackFrame;
 use Clockwork\Helpers\StackTrace;
 use Clockwork\Request\Request;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
+use Clockwork_For_Wp\Data_Source\Subscriber\Theme_Subscriber;
 use Clockwork_For_Wp\Event_Management\Subscriber;
+use Clockwork_For_Wp\Provides_Subscriber;
 
-final class Theme extends DataSource implements Subscriber {
+final class Theme extends DataSource implements Provides_Subscriber {
 	/**
 	 * @var string[]
 	 */
@@ -107,106 +108,8 @@ final class Theme extends DataSource implements Subscriber {
 		return $this;
 	}
 
-	public function get_subscribed_events(): array {
-		return [
-			'cfw_pre_resolve' => [
-				/**
-				 * @param int $content_width
-				 */
-				function ( $content_width ): void {
-					/**
-					 * @psalm-suppress RedundantCastGivenDocblockType
-					 */
-					$recorded_content_width = (int) $content_width;
-
-					$this
-						->set_theme_root( \get_theme_root() )
-						->set_is_child_theme( \is_child_theme() )
-						->set_template( \get_template() )
-						->set_stylesheet( \get_stylesheet() )
-						->set_content_width( $recorded_content_width );
-				},
-			],
-			'body_class' => [
-				/**
-				 * @param array $classes
-				 *
-				 * @return array $classes
-				 */
-				function ( $classes ) {
-					/**
-					 * @psalm-suppress RedundantConditionGivenDocblockType
-					 * @psalm-suppress DocblockTypeContradiction
-					 */
-					$recorded_classes = \is_array( $classes ) ? $classes : [];
-
-					$this->set_body_classes( $recorded_classes );
-
-					return $classes;
-				},
-				Event_Manager::LATE_EVENT,
-			],
-			'get_template_part' => [
-				/**
-				 * @param string[] $templates
-				 */
-				function ( string $slug, string $name, array $templates, array $args ): void {
-					$this->add_requested_template_part(
-						$slug,
-						$name,
-						$templates,
-						$args,
-						\locate_template( $templates )
-					);
-				},
-			],
-			'template_include' => [
-				/**
-				 * @param string $template
-				 *
-				 * @return string
-				 */
-				function ( $template ) {
-					/**
-					 * @psalm-suppress RedundantCastGivenDocblockType
-					 */
-					$recorded_template = (string) $template;
-
-					$this->set_included_template( $recorded_template );
-
-					return $template;
-				},
-				Event_Manager::LATE_EVENT,
-			],
-			'template_redirect' => function ( Event_Manager $events ): void {
-				foreach (
-					$this->hierarchy_conditional_filter_map() as $conditional => $filter
-				) {
-					if ( \function_exists( $conditional ) && $conditional() ) {
-						$events->on(
-							$filter,
-							/**
-							 * @param array $templates
-							 *
-							 * @return array
-							 */
-							function ( $templates ) {
-								/**
-								 * @psalm-suppress RedundantConditionGivenDocblockType
-								 * @psalm-suppress DocblockTypeContradiction
-								 */
-								$recorded_templates = \is_array( $templates ) ? $templates : [];
-
-								$this->add_hierarchy_templates( $recorded_templates );
-
-								return $templates;
-							},
-							Event_Manager::LATE_EVENT
-						);
-					}
-				}
-			},
-		];
+	public function create_subscriber(): Subscriber {
+		return new Theme_Subscriber( $this );
 	}
 
 	public function resolve( Request $request ): Request {
@@ -337,33 +240,6 @@ final class Theme extends DataSource implements Subscriber {
 		$this->theme_root = $theme_root;
 
 		return $this;
-	}
-
-	/**
-	 * @return array<string, string>
-	 */
-	private function hierarchy_conditional_filter_map(): array {
-		// @todo Should this be configurable?
-		return [
-			'is_embed' => 'embed_template_hierarchy',
-			'is_404' => '404_template_hierarchy',
-			'is_search' => 'search_template_hierarchy',
-			'is_front_page' => 'frontpage_template_hierarchy',
-			'is_home' => 'home_template_hierarchy',
-			'is_privacy_policy' => 'privacypolicy_template_hierarchy',
-			'is_post_type_archive' => 'archive_template_hierarchy',
-			'is_tax' => 'taxonomy_template_hierarchy',
-			'is_attachment' => 'attachment_template_hierarchy',
-			'is_single' => 'single_template_hierarchy',
-			'is_page' => 'page_template_hierarchy',
-			'is_singular' => 'singular_template_hierarchy',
-			'is_category' => 'category_template_hierarchy',
-			'is_tag' => 'tag_template_hierarchy',
-			'is_author' => 'author_template_hierarchy',
-			'is_date' => 'date_template_hierarchy',
-			'is_archive' => 'archive_template_hierarchy',
-			'__return_true' => 'index_template_hierarchy',
-		];
 	}
 
 	private function theme_relative_path( string $path ): string {

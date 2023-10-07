@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork_For_Wp\Base_Provider;
-use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Plugin;
+use Clockwork_For_Wp\Provides_Subscriber;
 use Pimple\Container;
 
 /**
@@ -75,12 +75,14 @@ final class Data_Source_Provider extends Base_Provider {
 
 	protected function subscribers(): array {
 		$data_source_factory = $this->plugin->get_container()->get( Data_Source_Factory::class );
+		$subscribers = [];
 
-		return \array_filter(
-			$data_source_factory->get_enabled_data_sources(),
-			static function ( $data_source ) {
-				return $data_source instanceof Subscriber;
+		foreach ( $data_source_factory->get_enabled_data_sources() as $data_source ) {
+			if ( $data_source instanceof Provides_Subscriber ) {
+				$subscribers[] = $data_source->create_subscriber();
 			}
-		);
+		}
+
+		return $subscribers;
 	}
 }

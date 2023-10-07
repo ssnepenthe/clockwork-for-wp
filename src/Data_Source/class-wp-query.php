@@ -6,9 +6,11 @@ namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Request;
+use Clockwork_For_Wp\Data_Source\Subscriber\Wp_Query_Subscriber;
 use Clockwork_For_Wp\Event_Management\Subscriber;
+use Clockwork_For_Wp\Provides_Subscriber;
 
-final class Wp_Query extends DataSource implements Subscriber {
+final class Wp_Query extends DataSource implements Provides_Subscriber {
 	private $query_vars = [];
 
 	public function add_query_var( $key, $value ) {
@@ -20,24 +22,8 @@ final class Wp_Query extends DataSource implements Subscriber {
 		return $this;
 	}
 
-	public function get_subscribed_events(): array {
-		return [
-			'cfw_pre_resolve' => function ( \WP_Query $wp_query ): void {
-				// @todo I think there is a flaw in this logic... It is poorly adapted from query monitor.
-				// @todo Move to event manager?
-				$plugin_vars = \apply_filters( 'query_vars', [] );
-
-				$query_vars = \array_filter(
-					$wp_query->query_vars,
-					static function ( $value, $key ) use ( $plugin_vars ) {
-						return ( isset( $plugin_vars[ $key ] ) && '' !== $value ) || ! empty( $value );
-					},
-					\ARRAY_FILTER_USE_BOTH
-				);
-
-				$this->set_query_vars( $query_vars );
-			},
-		];
+	public function create_subscriber(): Subscriber {
+		return new Wp_Query_Subscriber( $this );
 	}
 
 	public function resolve( Request $request ) {
