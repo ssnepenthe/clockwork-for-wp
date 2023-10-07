@@ -9,8 +9,11 @@ use Clockwork_For_Wp\Event_Management\Subscriber;
 
 use function Clockwork_For_Wp\prepare_http_response;
 
-class Wp_Http_Subscriber implements Subscriber {
-	protected Wp_Http $data_source;
+/**
+ * @internal
+ */
+final class Wp_Http_Subscriber implements Subscriber {
+	private Wp_Http $data_source;
 
 	public function __construct( Wp_Http $data_source ) {
 		$this->data_source = $data_source;

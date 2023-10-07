@@ -9,8 +9,11 @@ use Clockwork_For_Wp\Event_Management\Subscriber;
 
 use function Clockwork_For_Wp\prepare_wpdb_query;
 
-class Wpdb_Subscriber implements Subscriber {
-	protected Wpdb $data_source;
+/**
+ * @internal
+ */
+final class Wpdb_Subscriber implements Subscriber {
+	private Wpdb $data_source;
 
 	public function __construct( Wpdb $data_source ) {
 		$this->data_source = $data_source;

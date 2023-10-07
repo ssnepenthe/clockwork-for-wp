@@ -7,8 +7,11 @@ namespace Clockwork_For_Wp\Data_Source\Subscriber;
 use Clockwork_For_Wp\Data_Source\Xdebug;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
-class Xdebug_Subscriber implements Subscriber {
-	protected Xdebug $data_source;
+/**
+ * @internal
+ */
+final class Xdebug_Subscriber implements Subscriber {
+	private Xdebug $data_source;
 
 	public function __construct( Xdebug $data_source ) {
 		$this->data_source = $data_source;

@@ -7,8 +7,11 @@ namespace Clockwork_For_Wp\Data_Source\Subscriber;
 use Clockwork_For_Wp\Data_Source\Transients;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
-class Transients_Subscriber implements Subscriber {
-	protected Transients $data_source;
+/**
+ * @internal
+ */
+final class Transients_Subscriber implements Subscriber {
+	private Transients $data_source;
 
 	public function __construct( Transients $data_source ) {
 		$this->data_source = $data_source;

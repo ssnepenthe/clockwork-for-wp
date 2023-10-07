@@ -9,8 +9,11 @@ use Clockwork_For_Wp\Event_Management\Subscriber;
 use WP_REST_Server;
 use function Clockwork_For_Wp\prepare_rest_route;
 
-class Rest_Api_Subscriber implements Subscriber {
-	protected Rest_Api $data_source;
+/**
+ * @internal
+ */
+final class Rest_Api_Subscriber implements Subscriber {
+	private Rest_Api $data_source;
 
 	public function __construct( Rest_Api $data_source ) {
 		$this->data_source = $data_source;

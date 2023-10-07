@@ -8,8 +8,11 @@ use Clockwork_For_Wp\Data_Source\Wp_Redirect;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
-class Wp_Redirect_Subscriber implements Subscriber {
-	protected Wp_Redirect $data_source;
+/**
+ * @internal
+ */
+final class Wp_Redirect_Subscriber implements Subscriber {
+	private Wp_Redirect $data_source;
 
 	public function __construct( Wp_Redirect $data_source ) {
 		$this->data_source = $data_source;

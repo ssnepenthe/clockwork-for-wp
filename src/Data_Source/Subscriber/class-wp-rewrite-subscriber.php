@@ -7,8 +7,11 @@ namespace Clockwork_For_Wp\Data_Source\Subscriber;
 use Clockwork_For_Wp\Data_Source\Wp_Rewrite;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
-class Wp_Rewrite_Subscriber implements Subscriber {
-	protected Wp_Rewrite $data_source;
+/**
+ * @internal
+ */
+final class Wp_Rewrite_Subscriber implements Subscriber {
+	private Wp_Rewrite $data_source;
 
 	public function __construct( Wp_Rewrite $data_source ) {
 		$this->data_source = $data_source;

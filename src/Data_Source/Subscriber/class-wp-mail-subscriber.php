@@ -10,8 +10,11 @@ use WP_Error;
 
 use function Clockwork_For_Wp\wp_error_to_array;
 
-class Wp_Mail_Subscriber implements Subscriber {
-	protected Wp_Mail $data_source;
+/**
+ * @internal
+ */
+final class Wp_Mail_Subscriber implements Subscriber {
+	private Wp_Mail $data_source;
 
 	public function __construct( Wp_Mail $data_source ) {
 		$this->data_source = $data_source;

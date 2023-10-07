@@ -8,8 +8,11 @@ use Clockwork_For_Wp\Data_Source\Theme;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
-class Theme_Subscriber implements Subscriber {
-	protected Theme $data_source;
+/**
+ * @internal
+ */
+final class Theme_Subscriber implements Subscriber {
+	private Theme $data_source;
 
 	public function __construct( Theme $data_source ) {
 		$this->data_source = $data_source;

@@ -7,8 +7,11 @@ namespace Clockwork_For_Wp\Data_Source\Subscriber;
 use Clockwork_For_Wp\Data_Source\Wp_Object_Cache;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
-class Wp_Object_Cache_Subscriber implements Subscriber {
-	protected Wp_Object_Cache $data_source;
+/**
+ * @internal
+ */
+final class Wp_Object_Cache_Subscriber implements Subscriber {
+	private Wp_Object_Cache $data_source;
 
 	public function __construct( Wp_Object_Cache $data_source ) {
 		$this->data_source = $data_source;
