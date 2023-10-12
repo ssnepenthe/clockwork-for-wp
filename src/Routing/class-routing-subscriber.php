@@ -8,29 +8,38 @@ use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Incoming_Request;
 use WP;
 
+use function Clockwork_For_Wp\container;
+
 final class Routing_Subscriber implements Subscriber {
-	public function call_matched_handler(
-		Route_Collection $routes,
-		WP $wp,
-		Route_Handler_Invoker $invoker,
-		Incoming_Request $request
-	): void {
-		// @todo $route = $routes->match( $request );?
-		$route = $routes->match( $request->intended_method(), $wp->matched_rule );
+	protected $routes;
+
+	protected $invoker;
+
+	protected $request;
+
+	public function __construct( Route_Collection $routes, Route_Handler_Invoker $invoker, Incoming_Request $request ) {
+		$this->routes = $routes;
+		$this->invoker = $invoker;
+		$this->request = $request;
+	}
+
+	public function call_matched_handler(): void {
+		// @todo $route = $this->routes->match( $request );?
+		$route = $this->routes->match( $this->request->intended_method(), container()->get( WP::class )->matched_rule );
 
 		if ( null === $route ) {
 			return;
-		}
-
-		$invoker->invoke_handler( $route );
 	}
 
-	public function diff_rules( $rules, Route_Collection $routes ) {
+		$this->invoker->invoke_handler( $route );
+	}
+
+	public function diff_rules( $rules ) {
 		if ( ! $this->should_modify_rules( $rules ) ) {
 			return $rules;
-		}
+	}
 
-		return \array_diff_key( $rules, $routes->get_rewrite_array() );
+		return \array_diff_key( $rules, $this->routes->get_rewrite_array() );
 	}
 
 	// @todo route collection via constructor?
@@ -46,17 +55,17 @@ final class Routing_Subscriber implements Subscriber {
 		];
 	}
 
-	public function merge_query_vars( $query_vars, Route_Collection $routes ) {
-		return \array_merge( $routes->get_query_vars(), $query_vars );
+	public function merge_query_vars( $query_vars ) {
+		return \array_merge( $this->routes->get_query_vars(), $query_vars );
 	}
 
-	public function merge_rules( $rules, Route_Collection $routes, Incoming_Request $request ) {
+	public function merge_rules( $rules ) {
 		if ( ! $this->should_modify_rules( $rules ) ) {
 			return $rules;
 		}
 
 		return \array_merge(
-			$routes->get_rewrite_array_for_method( $request->intended_method() ),
+			$this->routes->get_rewrite_array_for_method( $this->request->intended_method() ),
 			$rules
 		);
 	}

@@ -7,6 +7,8 @@ namespace Clockwork_For_Wp\Data_Source\Subscriber;
 use Clockwork_For_Wp\Data_Source\Wp_Query;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
+use function Clockwork_For_Wp\container;
+
 /**
  * @internal
  */
@@ -23,13 +25,13 @@ final class Wp_Query_Subscriber implements Subscriber {
 		];
 	}
 
-	public function on_cfw_pre_resolve( \WP_Query $wp_query ): void {
+	public function on_cfw_pre_resolve(): void {
 		// @todo I think there is a flaw in this logic... It is poorly adapted from query monitor.
 		// @todo Move to event manager?
 		$plugin_vars = \apply_filters( 'query_vars', [] );
 
 		$query_vars = \array_filter(
-			$wp_query->query_vars,
+			container()->get( \WP_Query::class )->query_vars,
 			static function ( $value, $key ) use ( $plugin_vars ) {
 				return ( isset( $plugin_vars[ $key ] ) && '' !== $value ) || ! empty( $value );
 			},

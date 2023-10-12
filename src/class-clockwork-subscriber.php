@@ -10,6 +10,7 @@ use Clockwork_For_Wp\Cli_Data_Collection\Command_Context;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
+// @todo Come back for proper constructor injection over $this->plugin->get_container()->get(...)
 final class Clockwork_Subscriber implements Subscriber {
 	private $plugin;
 
@@ -44,7 +45,7 @@ final class Clockwork_Subscriber implements Subscriber {
 		}
 	}
 
-	public function finalize_command( Clockwork $clockwork, Event_Manager $event_manager ): void {
+	public function finalize_command(): void {
 		$command = Command_Context::current();
 
 		if (
@@ -54,9 +55,11 @@ final class Clockwork_Subscriber implements Subscriber {
 			return;
 		}
 
-		$event_manager->trigger( 'cfw_pre_resolve' ); // @todo pass $clockwork? $container?
+		$container = $this->plugin->get_container();
 
-		$clockwork
+		$container->get( Event_Manager::class )->trigger( 'cfw_pre_resolve' ); // @todo pass $clockwork? $container?
+
+		$container->get( Clockwork::class )
 			->resolveAsCommand(
 				$command->name(),
 				$exit_code = null,
@@ -69,10 +72,12 @@ final class Clockwork_Subscriber implements Subscriber {
 			->storeRequest();
 	}
 
-	public function finalize_request( Clockwork $clockwork, Event_Manager $event_manager ): void {
-		$event_manager->trigger( 'cfw_pre_resolve' ); // @todo pass $clockwork? $container?
+	public function finalize_request(): void {
+		$container = $this->plugin->get_container();
 
-		$clockwork
+		$container->get( Event_Manager::class )->trigger( 'cfw_pre_resolve' ); // @todo pass $clockwork? $container?
+
+		$container->get( Clockwork::class )
 			->resolveRequest()
 			->storeRequest();
 	}
@@ -103,10 +108,12 @@ final class Clockwork_Subscriber implements Subscriber {
 		return $events;
 	}
 
-	public function initialize_request( Request $request ): void {
+	public function initialize_request(): void {
 		if ( \headers_sent() ) {
 			return;
 		}
+
+		$request = $this->plugin->get_container()->get( Request::class );
 
 		// @todo Any reason to suppress errors?
 		// @todo Use wp_headers filter of send_headers action? See WP::send_headers().

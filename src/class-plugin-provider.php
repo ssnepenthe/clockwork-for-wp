@@ -6,13 +6,6 @@ namespace Clockwork_For_Wp;
 
 use Clockwork\Clockwork;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
-use Invoker\Invoker;
-use Invoker\ParameterResolver\AssociativeArrayResolver;
-use Invoker\ParameterResolver\Container\ParameterNameContainerResolver;
-use Invoker\ParameterResolver\Container\TypeHintContainerResolver;
-use Invoker\ParameterResolver\DefaultValueResolver;
-use Invoker\ParameterResolver\NumericArrayResolver;
-use Invoker\ParameterResolver\ResolverChain;
 use League\Config\Configuration;
 use League\Config\ConfigurationBuilderInterface;
 use League\Config\ConfigurationInterface;
@@ -55,23 +48,6 @@ final class Plugin_Provider extends Base_Provider {
 
 		$pimple[ ConfigurationInterface::class ] = static function ( Container $pimple ) {
 			return $pimple[ ConfigurationBuilderInterface::class ]->reader();
-		};
-
-		$pimple[ Invoker::class ] = function () {
-			$psr_container = $this->plugin->get_container();
-
-			return new Invoker(
-				new ResolverChain(
-					[
-						new TypeHintContainerResolver( $psr_container ),
-						new ParameterNameContainerResolver( $psr_container ),
-						new NumericArrayResolver(),
-						new AssociativeArrayResolver(),
-						new DefaultValueResolver(),
-					]
-				),
-				$psr_container
-			);
 		};
 
 		$pimple[ Metadata::class ] = static function ( Container $pimple ) {

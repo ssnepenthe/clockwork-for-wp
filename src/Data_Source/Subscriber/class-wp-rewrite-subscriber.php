@@ -7,6 +7,8 @@ namespace Clockwork_For_Wp\Data_Source\Subscriber;
 use Clockwork_For_Wp\Data_Source\Wp_Rewrite;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
+use function Clockwork_For_Wp\container;
+
 /**
  * @internal
  */
@@ -23,7 +25,9 @@ final class Wp_Rewrite_Subscriber implements Subscriber {
 		];
 	}
 
-	public function on_cfw_pre_resolve( \WP_Rewrite $wp_rewrite ): void {
+	public function on_cfw_pre_resolve(): void {
+		$wp_rewrite = container()->get( \WP_Rewrite::class );
+
 		$this->data_source
 			->set_structure( $wp_rewrite->permalink_structure )
 			->set_trailing_slash( $wp_rewrite->use_trailing_slashes )
