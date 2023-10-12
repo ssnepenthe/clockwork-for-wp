@@ -8,12 +8,13 @@ use Clockwork\DataSource\DataSource;
 use Clockwork\Helpers\StackFilter;
 use Clockwork\Helpers\StackTrace;
 use Clockwork\Request\Request;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
+use Clockwork_For_Wp\Data_Source\Subscriber\Wp_Redirect_Subscriber;
 use Clockwork_For_Wp\Event_Management\Subscriber;
+use Clockwork_For_Wp\Provides_Subscriber;
 use InvalidArgumentException;
 
 // @todo Would be nice to get this tested by our browser tests.
-final class Wp_Redirect extends DataSource implements Subscriber {
+final class Wp_Redirect extends DataSource implements Provides_Subscriber {
 	private $filtered = [
 		'location' => null,
 		'status' => null,
@@ -27,39 +28,35 @@ final class Wp_Redirect extends DataSource implements Subscriber {
 	];
 	private $trace;
 
+	public function create_subscriber(): Subscriber {
+		return new Wp_Redirect_Subscriber( $this );
+	}
+
 	public function finalize_wp_redirect_call(): void {
 		$this->finalized = true;
 	}
 
-	public function get_subscribed_events(): array {
-		return [
-			'wp_redirect' => [
-				function ( $location ) {
-					$this->record_wp_redirect_call();
-					$this->set_filtered( 'location', $location );
+	public function record_wp_redirect_call(): void {
+		// @todo Set limit? Limit from config is only enforced by the serializer when the request is resolved.
+		// Seems like limitless trace with arguments might end up causing some memory issues...
+		$this->trace = StackTrace::get( [ 'arguments' => true ] )->skip(
+			// @todo Not sure this is the best/correct way to use this...
+			StackFilter::make()->isFunction( 'wp_redirect' )
+		);
 
-					return $location;
-				},
-				Event_Manager::LATE_EVENT,
-			],
-			'wp_redirect_status' => [
-				function ( $status ) {
-					$this->set_filtered( 'status', $status );
+		$initial_args = $this->trace->first()->args;
 
-					return $status;
-				},
-				Event_Manager::LATE_EVENT,
-			],
-			'x_redirect_by' => [
-				function ( $x_redirect_by ) {
-					$this->set_filtered( 'x-redirect-by', $x_redirect_by );
-					$this->finalize_wp_redirect_call();
+		if ( isset( $initial_args[0] ) ) {
+			$this->set_initial( 'location', $initial_args[0] );
+		}
 
-					return $x_redirect_by;
-				},
-				Event_Manager::LATE_EVENT,
-			],
-		];
+		if ( isset( $initial_args[1] ) ) {
+			$this->set_initial( 'status', $initial_args[1] );
+		}
+
+		if ( isset( $initial_args[2] ) ) {
+			$this->set_initial( 'x-redirect-by', $initial_args[2] );
+		}
 	}
 
 	public function resolve( Request $request ) {
@@ -117,28 +114,5 @@ final class Wp_Redirect extends DataSource implements Subscriber {
 		}
 
 		return $message;
-	}
-
-	private function record_wp_redirect_call(): void {
-		// @todo Set limit? Limit from config is only enforced by the serializer when the request is resolved.
-		// Seems like limitless trace with arguments might end up causing some memory issues...
-		$this->trace = StackTrace::get( [ 'arguments' => true ] )->skip(
-			// @todo Not sure this is the best/correct way to use this...
-			StackFilter::make()->isFunction( 'wp_redirect' )
-		);
-
-		$initial_args = $this->trace->first()->args;
-
-		if ( isset( $initial_args[0] ) ) {
-			$this->set_initial( 'location', $initial_args[0] );
-		}
-
-		if ( isset( $initial_args[1] ) ) {
-			$this->set_initial( 'status', $initial_args[1] );
-		}
-
-		if ( isset( $initial_args[2] ) ) {
-			$this->set_initial( 'x-redirect-by', $initial_args[2] );
-		}
 	}
 }
