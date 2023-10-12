@@ -30,7 +30,7 @@ final class Route_Handler_Invoker {
 	public function invoke_handler( Route $route ) {
 		// @todo Allow for default qv values?
 		// @todo Type juggling on qv values as well? e.g. "1" to true.
-		call_user_func(
+		return call_user_func(
 			( $this->callable_resolver )( $route->get_handler() ),
 			$this->get_additional_params( $route )
 		);

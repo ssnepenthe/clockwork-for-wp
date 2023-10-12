@@ -4,15 +4,14 @@ namespace Clockwork_For_Wp\Tests\Integration\Routing;
 
 use Clockwork_For_Wp\Routing\Route;
 use Clockwork_For_Wp\Routing\Route_Handler_Invoker;
-use Invoker\Invoker;
 use PHPUnit\Framework\TestCase;
 
 class Route_Handler_Invoker_Test extends TestCase {
 	/** @test */
 	public function it_does_not_inject_any_additional_params_by_default() {
-		$invoker = new Route_Handler_Invoker( new Invoker );
+		$invoker = new Route_Handler_Invoker();
 
-		$result = $invoker->invoke_handler( new Route( '', '', '', function( ...$params ) {
+		$result = $invoker->invoke_handler( new Route( '', '', '', function( $params ) {
 			return $params;
 		} ) );
 
@@ -21,33 +20,35 @@ class Route_Handler_Invoker_Test extends TestCase {
 
 	/** @test */
 	public function it_provides_additional_params_to_route_handler() {
-		$invoker = new Route_Handler_Invoker( new Invoker, '', function() {
-			return [ 'a' => 1, 'b' => 2, 'c' => 3 ];
+		$params = [ 'a' => 1, 'b' => 2, 'c' => 3 ];
+
+		$invoker = new Route_Handler_Invoker( '', function() use ( $params ) {
+			return $params;
 		} );
 
-		$result = $invoker->invoke_handler( new Route( '', '', '', function( $a, $b, $c ) {
-			return [ $c, $b, $a ];
+		$result = $invoker->invoke_handler( new Route( '', '', '', function( $params ) {
+			return $params;
 		} ) );
 
-		$this->assertSame( [ 3, 2, 1 ], $result );
+		$this->assertSame( $params, $result );
 	}
 
 	/** @test */
 	public function it_binds_param_resolver_to_invoker_instance() {
-		$invoker = new Route_Handler_Invoker( new Invoker, 'abc_', function() {
+		$invoker = new Route_Handler_Invoker( 'abc_', function() {
 			return [ $this->strip_param_prefix( 'abc_apples' ) => 'bananas' ];
 		} );
 
-		$result = $invoker->invoke_handler( new Route( '', '', '', function( $apples ) {
-			return $apples;
+		$result = $invoker->invoke_handler( new Route( '', '', '', function( $params ) {
+			return $params;
 		} ) );
 
-		$this->assertSame( 'bananas', $result );
+		$this->assertSame( [ 'apples' => 'bananas' ], $result );
 	}
 
 	/** @test */
 	public function it_correctly_strips_param_prefixes() {
-		$invoker = new Route_Handler_Invoker( new Invoker, 'pfx_' );
+		$invoker = new Route_Handler_Invoker( 'pfx_' );
 
 		$this->assertSame( 'apples', $invoker->strip_param_prefix( 'pfx_apples' ) );
 		$this->assertSame( 'app_pfx_les', $invoker->strip_param_prefix( 'app_pfx_les' ) );
