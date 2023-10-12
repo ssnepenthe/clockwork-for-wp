@@ -53,4 +53,21 @@ class Route_Handler_Invoker_Test extends TestCase {
 		$this->assertSame( 'apples', $invoker->strip_param_prefix( 'pfx_apples' ) );
 		$this->assertSame( 'app_pfx_les', $invoker->strip_param_prefix( 'app_pfx_les' ) );
 	}
+
+	/** @test */
+	public function it_can_resolve_non_callable_handlers() {
+		$handler = function( $params ) {
+			return 'called successfully';
+		};
+
+		$invoker = new Route_Handler_Invoker( '', null, function( $callable ) use ( $handler ) {
+			if ( 'handler' === $callable ) {
+				return $handler;
+			}
+
+			return $callable;
+		} );
+
+		$this->assertSame( 'called successfully', $invoker->invoke_handler( new Route( '', '', '', 'handler' ) ) );
+	}
 }
