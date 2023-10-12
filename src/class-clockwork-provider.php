@@ -13,6 +13,7 @@ use Clockwork\Request\Log;
 use Clockwork\Request\Request;
 use Clockwork\Storage\StorageInterface;
 use Clockwork_For_Wp\Data_Source\Data_Source_Factory;
+use Clockwork_For_Wp\Event_Management\Event_Manager;
 use League\Config\ConfigurationInterface;
 use Pimple\Container;
 
@@ -35,7 +36,12 @@ final class Clockwork_Provider extends Base_Provider {
 		$pimple = $this->plugin->get_pimple();
 
 		$pimple[ Clockwork_Subscriber::class ] = static function ( Container $pimple ) {
-			return new Clockwork_Subscriber( $pimple[ Plugin::class ] );
+			return new Clockwork_Subscriber(
+				$pimple[ Plugin::class ],
+				$pimple[ Event_Manager::class ],
+				$pimple[ Clockwork::class ],
+				$pimple[ Request::class ]
+			);
 		};
 
 		$pimple[ Clockwork_Support::class ] = static function ( Container $pimple ) {

@@ -10,12 +10,20 @@ use Clockwork_For_Wp\Cli_Data_Collection\Command_Context;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
-// @todo Come back for proper constructor injection over $this->plugin->get_container()->get(...)
 final class Clockwork_Subscriber implements Subscriber {
 	private $plugin;
 
-	public function __construct( Plugin $plugin ) {
+	protected $events;
+
+	protected $clockwork;
+
+	protected $request;
+
+	public function __construct( Plugin $plugin, Event_Manager $events, Clockwork $clockwork, Request $request ) {
 		$this->plugin = $plugin;
+		$this->events = $events;
+		$this->clockwork = $clockwork;
+		$this->request = $request;
 	}
 
 	public function enqueue_scripts(): void {
@@ -55,11 +63,9 @@ final class Clockwork_Subscriber implements Subscriber {
 			return;
 		}
 
-		$container = $this->plugin->get_container();
+		$this->events->trigger( 'cfw_pre_resolve' ); // @todo pass $clockwork? $container?
 
-		$container->get( Event_Manager::class )->trigger( 'cfw_pre_resolve' ); // @todo pass $clockwork? $container?
-
-		$container->get( Clockwork::class )
+		$this->clockwork
 			->resolveAsCommand(
 				$command->name(),
 				$exit_code = null,
@@ -73,11 +79,9 @@ final class Clockwork_Subscriber implements Subscriber {
 	}
 
 	public function finalize_request(): void {
-		$container = $this->plugin->get_container();
+		$this->events->trigger( 'cfw_pre_resolve' ); // @todo pass $clockwork? $container?
 
-		$container->get( Event_Manager::class )->trigger( 'cfw_pre_resolve' ); // @todo pass $clockwork? $container?
-
-		$container->get( Clockwork::class )
+		$this->clockwork
 			->resolveRequest()
 			->storeRequest();
 	}
@@ -113,11 +117,9 @@ final class Clockwork_Subscriber implements Subscriber {
 			return;
 		}
 
-		$request = $this->plugin->get_container()->get( Request::class );
-
 		// @todo Any reason to suppress errors?
 		// @todo Use wp_headers filter of send_headers action? See WP::send_headers().
-		\header( 'X-Clockwork-Id: ' . $request->id );
+		\header( 'X-Clockwork-Id: ' . $this->request->id );
 		\header( 'X-Clockwork-Version: ' . Clockwork::VERSION );
 
 		// @todo Set clockwork path header?
@@ -136,11 +138,11 @@ final class Clockwork_Subscriber implements Subscriber {
 		) {
 			$cookie = \json_encode(
 				[
-					'requestId' => $request->id,
+					'requestId' => $this->request->id,
 					'version' => Clockwork::VERSION,
 					'path' => '/__clockwork/',
 					'webPath' => $this->plugin->is_web_installed() ? '/__clockwork' : '/__clockwork/app',
-					'token' => $request->updateToken,
+					'token' => $this->request->updateToken,
 					'metrics' => $this->plugin->is_collecting_client_metrics(),
 					'toolbar' => $this->plugin->is_toolbar_enabled(),
 				]
