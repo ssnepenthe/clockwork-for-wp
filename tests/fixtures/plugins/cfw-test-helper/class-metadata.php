@@ -4,12 +4,14 @@ namespace Cfw_Test_Helper;
 
 use League\Config\ConfigurationInterface;
 
+use function Clockwork_For_Wp\service;
+
 // @todo Having some issues with the FileStorage implementation where oldest file is disregarded.
 //       Use a rough manual implementation for now and revisit after Clockwork v6 drops.
 //       https://github.com/itsgoingd/clockwork/issues/510
 class Metadata {
 	public static function dir() {
-		$config = \_cfw_instance()->get_container()->get( ConfigurationInterface::class );
+		$config = service( ConfigurationInterface::class );
 
 		if ( 'file' !== $config->get( 'storage.driver' ) ) {
 			throw new \RuntimeException(

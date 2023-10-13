@@ -21,7 +21,7 @@ class Plugin_Test extends TestCase {
 	public function it_passes_constructor_values_to_container() {
 		$plugin = new Plugin( [], [ 'a' => 'b' ] );
 
-		$this->assertEquals( 'b', $plugin->get_container()->get( 'a' ) );
+		$this->assertEquals( 'b', $plugin->get_pimple()[ 'a' ] );
 	}
 
 	/** @test */
@@ -119,7 +119,7 @@ class Plugin_Test extends TestCase {
 			] );
 		};
 
-		$should_collect = $plugin->get_container()->get( Clockwork::class )->shouldCollect();
+		$should_collect = $plugin->get_pimple()[ Clockwork::class ]->shouldCollect();
 
 		$this->assertTrue( $should_collect->filter( $request( 'blog/some-post-slug' ) ) );
 		$this->assertTrue( $should_collect->filter( $request( 'blog/clockwork-rocks' ) ) );
@@ -157,7 +157,7 @@ class Plugin_Test extends TestCase {
 			] );
 		};
 
-		$should_collect = $plugin->get_container()->get( Clockwork::class )->shouldCollect();
+		$should_collect = $plugin->get_pimple()[ Clockwork::class ]->shouldCollect();
 
 		$this->assertTrue( $should_collect->filter( $request( 'blog/some-post-slug' ) ) );
 		$this->assertTrue( $should_collect->filter( $request( 'a-specific-slug' ) ) );
@@ -183,7 +183,7 @@ class Plugin_Test extends TestCase {
 			$this->add_null_storage_to_storage_factory_on_plugin( $plugin );
 			$plugin->lock();
 
-			return $plugin->get_container()->get( Clockwork::class )->shouldCollect();
+			return $plugin->get_pimple()[ Clockwork::class ]->shouldCollect();
 		};
 
 		$request = function( $uri ) {

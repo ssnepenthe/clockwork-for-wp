@@ -7,7 +7,7 @@ namespace Clockwork_For_Wp\Data_Source\Subscriber;
 use Clockwork_For_Wp\Data_Source\Wp_Object_Cache;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
-use function Clockwork_For_Wp\container;
+use function Clockwork_For_Wp\service;
 
 /**
  * @internal
@@ -26,7 +26,7 @@ final class Wp_Object_Cache_Subscriber implements Subscriber {
 	}
 
 	public function on_cfw_pre_resolve(): void {
-		$wp_object_cache = container()->get( \WP_Object_Cache::class );
+		$wp_object_cache = service( \WP_Object_Cache::class );
 
 		// @todo Include hit percentage?
 		if ( \property_exists( $wp_object_cache, 'cache_hits' ) ) {

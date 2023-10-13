@@ -21,12 +21,12 @@ abstract class Base_Provider implements Provider {
 		$subscribers = $this->subscribers();
 
 		if ( \count( $subscribers ) > 0 ) {
-			$container = $this->plugin->get_container();
-			$events = $container->get( Event_Manager::class );
+			$container = $this->plugin->get_pimple();
+			$events = $container[ Event_Manager::class ];
 
 			foreach ( $subscribers as $subscriber ) {
 				if ( ! $subscriber instanceof Subscriber ) {
-					$subscriber = $container->get( $subscriber );
+					$subscriber = $container[ $subscriber ];
 				}
 
 				$events->attach( $subscriber );

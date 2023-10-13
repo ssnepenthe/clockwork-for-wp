@@ -2,6 +2,8 @@
 
 namespace Cfw_Test_Helper;
 
+use function Clockwork_For_Wp\service;
+
 function apply_config( $config ) {
 	$request_config = get_option( CONFIG_KEY, null );
 
@@ -28,6 +30,6 @@ function print_test_context() {
 	printf(
 		'<span data-cy="test-context">%s</span><span data-cy="request-id">%s</span>',
 		json_encode( $context ),
-		\esc_html( \_cfw_instance()->get_container()->get( \Clockwork\Request\Request::class )->id )
+		\esc_html( service( \Clockwork\Request\Request::class )->id )
 	);
 };

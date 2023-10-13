@@ -8,7 +8,7 @@ use Clockwork_For_Wp\Base_Provider;
 use Clockwork_For_Wp\Incoming_Request;
 use Pimple\Container;
 
-use function Clockwork_For_Wp\container;
+use function Clockwork_For_Wp\service;
 
 /**
  * @internal
@@ -39,7 +39,7 @@ final class Routing_Provider extends Base_Provider {
 					return $params;
 				},
 				function ( array $callable ) {
-					return [ container()->get( $callable[0] ), $callable[1] ];
+					return [ service( $callable[0] ), $callable[1] ];
 				}
 			);
 		};

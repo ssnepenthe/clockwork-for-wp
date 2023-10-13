@@ -8,7 +8,7 @@ use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Incoming_Request;
 use WP;
 
-use function Clockwork_For_Wp\container;
+use function Clockwork_For_Wp\service;
 
 final class Routing_Subscriber implements Subscriber {
 	protected $routes;
@@ -25,7 +25,7 @@ final class Routing_Subscriber implements Subscriber {
 
 	public function call_matched_handler(): void {
 		// @todo $route = $this->routes->match( $request );?
-		$route = $this->routes->match( $this->request->intended_method(), container()->get( WP::class )->matched_rule );
+		$route = $this->routes->match( $this->request->intended_method(), service( WP::class )->matched_rule );
 
 		if ( null === $route ) {
 			return;

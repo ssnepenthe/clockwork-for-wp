@@ -57,7 +57,7 @@ final class Theme_Subscriber implements Subscriber {
 			->set_is_child_theme( \is_child_theme() )
 			->set_template( \get_template() )
 			->set_stylesheet( \get_stylesheet() )
-			->set_content_width( (int) container()->get( 'content_width' ) );
+			->set_content_width( (int) container()[ 'content_width' ] );
 	}
 
 	/**

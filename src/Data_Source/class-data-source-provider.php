@@ -74,7 +74,7 @@ final class Data_Source_Provider extends Base_Provider {
 	}
 
 	protected function subscribers(): array {
-		$data_source_factory = $this->plugin->get_container()->get( Data_Source_Factory::class );
+		$data_source_factory = $this->plugin->get_pimple()[ Data_Source_Factory::class ];
 		$subscribers = [];
 
 		foreach ( $data_source_factory->get_enabled_data_sources() as $data_source ) {

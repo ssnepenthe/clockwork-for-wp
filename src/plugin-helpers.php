@@ -6,15 +6,15 @@ namespace Clockwork_For_Wp;
 
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Closure;
-use Psr\Container\ContainerInterface;
+use Pimple\Container;
 use ReflectionFunction;
 
 function array_only( $array, $keys ) {
 	return \array_intersect_key( $array, \array_flip( $keys ) );
 }
 
-function container(): ContainerInterface {
-	return _cfw_instance()->get_container();
+function container(): Container {
+	return _cfw_instance()->get_pimple();
 }
 
 // @todo Name? Or maybe just merge into describe_callable()?
@@ -103,5 +103,9 @@ function describe_value( $value ): string {
 }
 
 function events(): Event_Manager {
-	return _cfw_instance()->get_container()->get( Event_Manager::class );
+	return _cfw_instance()->get_pimple()[ Event_Manager::class ];
+}
+
+function service( string $id ) {
+	return _cfw_instance()->get_pimple()[ $id ];
 }

@@ -7,8 +7,8 @@ namespace Clockwork_For_Wp\Data_Source\Subscriber;
 use Clockwork_For_Wp\Data_Source\Wpdb;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
-use function Clockwork_For_Wp\container;
 use function Clockwork_For_Wp\prepare_wpdb_query;
+use function Clockwork_For_Wp\service;
 
 /**
  * @internal
@@ -27,7 +27,7 @@ final class Wpdb_Subscriber implements Subscriber {
 	}
 
 	public function on_cfw_pre_resolve(): void {
-		$wpdb = container()->get( \wpdb::class );
+		$wpdb = service( \wpdb::class );
 
 		if ( ! \is_array( $wpdb->queries ) || \count( $wpdb->queries ) < 1 ) {
 			return;

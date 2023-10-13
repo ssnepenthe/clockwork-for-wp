@@ -26,11 +26,11 @@ final class Wp_Hook_Subscriber implements Subscriber {
 	}
 
 	public function on_cfw_pre_resolve(): void {
-		$wp_filter = container()->get( 'wp_filter' );
+		$wp_filter = container()[ 'wp_filter' ];
 
 		$tags = $this->data_source->get_all_hooks()
 			? \array_keys( $wp_filter )
-			: \array_keys( container()->get( 'wp_actions' ) );
+			: \array_keys( container()[ 'wp_actions' ] );
 
 		foreach ( $tags as $tag ) {
 			if ( isset( $wp_filter[ $tag ] ) ) {

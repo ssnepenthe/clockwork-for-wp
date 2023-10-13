@@ -19,7 +19,6 @@ use Clockwork_For_Wp\Wp_Cli\Wp_Cli_Provider;
 use InvalidArgumentException;
 use League\Config\ConfigurationInterface;
 use Pimple\Container;
-use Pimple\Psr11\Container as Psr11Container;
 use RuntimeException;
 
 /**
@@ -27,8 +26,6 @@ use RuntimeException;
  */
 final class Plugin {
 	private $booted = false;
-
-	private $container;
 
 	private $locked = false;
 
@@ -54,8 +51,6 @@ final class Plugin {
 		}
 
 		$this->pimple = new Container( $values ?: [] );
-		$this->container = new Psr11Container( $this->pimple );
-
 		$this->pimple[ self::class ] = $this;
 
 		foreach ( $providers as $provider ) {
@@ -84,11 +79,11 @@ final class Plugin {
 	}
 
 	public function config( $path, $default = null ) {
-		if ( ! $this->container->has( ConfigurationInterface::class ) ) {
+		if ( ! isset( $this->pimple[ ConfigurationInterface::class ] ) ) {
 			return $default;
 		}
 
-		$config = $this->container->get( ConfigurationInterface::class );
+		$config = $this->pimple[ ConfigurationInterface::class ];
 
 		if ( ! $config->exists( $path ) ) {
 			return $default;
@@ -97,11 +92,7 @@ final class Plugin {
 		return $config->get( $path );
 	}
 
-	public function get_container() {
-		return $this->container;
-	}
-
-	public function get_pimple() {
+	public function get_pimple(): Container {
 		return $this->pimple;
 	}
 
@@ -124,8 +115,8 @@ final class Plugin {
 	}
 
 	public function is_collecting_requests() {
-		$clockwork = $this->container->get( Clockwork::class );
-		$request = $this->container->get( IncomingRequest::class );
+		$clockwork = $this->pimple[ Clockwork::class ];
+		$request = $this->pimple[ IncomingRequest::class ];
 
 		return ( $this->is_enabled() || $this->config( 'collect_data_always', false ) )
 			&& ! $this->is_running_in_console()
@@ -230,11 +221,11 @@ final class Plugin {
 		// @todo Move to plugin constructor?
 		Errors::get_instance()->register();
 
-		$this->container->get( Event_Manager::class )
+		$this->pimple[ Event_Manager::class ]
 			->on(
 				'plugin_loaded',
 				function ( $file ): void {
-					if ( $this->container->get( 'file' ) !== \realpath( $file ) ) {
+					if ( $this->pimple[ 'file' ] !== \realpath( $file ) ) {
 						return;
 					}
 
