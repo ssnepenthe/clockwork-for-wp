@@ -46,7 +46,7 @@ final class Data_Source_Factory {
 
 		foreach ( $this->plugin->config( 'data_sources', [] ) as $name => $data_source ) {
 			if (
-				( $data_source['enabled'] ?? false ) && $this->plugin->is_feature_available( $name )
+				( $data_source['enabled'] ?? false ) && $this->plugin->is()->feature_available( $name )
 			) {
 				$data_sources[] = $this->create( $name, $data_source['config'] ?? [] );
 			}

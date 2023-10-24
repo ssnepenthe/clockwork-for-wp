@@ -18,7 +18,7 @@ use WP_Query;
  */
 final class Web_App_Provider extends Base_Provider {
 	public function boot( Plugin $plugin ): void {
-		if ( $plugin->is_web_enabled() && ! $plugin->is_web_installed() ) {
+		if ( $plugin->is()->web_enabled() && ! $plugin->is()->web_installed() ) {
 			$pimple = $plugin->get_pimple();
 
 			$pimple[ Event_Manager::class ]->attach(

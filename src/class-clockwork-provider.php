@@ -22,7 +22,7 @@ use Pimple\Container;
  */
 final class Clockwork_Provider extends Base_Provider {
 	public function boot( Plugin $plugin ): void {
-		if ( $plugin->is_collecting_data() ) {
+		if ( $plugin->is()->collecting_data() ) {
 			$pimple = $plugin->get_pimple();
 
 			// Clockwork instance is resolved even when we are not collecting data in order to take
