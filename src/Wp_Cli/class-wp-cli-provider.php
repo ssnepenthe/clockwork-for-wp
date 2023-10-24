@@ -22,11 +22,11 @@ final class Wp_Cli_Provider extends Base_Provider {
 		$registry->group(
 			'clockwork',
 			'Manages the Clockwork for WP plugin',
-			function( CommandRegistry $registry ) {
-				$registry->add( new Clean_Command( $this->plugin->get_pimple() ) );
+			static function( CommandRegistry $registry ) use ( $plugin ) {
+				$registry->add( new Clean_Command( $plugin->get_pimple() ) );
 				$registry->add( new Generate_Command_List_Command() );
-				$registry->add( new Web_Install_Command( $this->plugin ) );
-				$registry->add( new Web_Uninstall_Command( $this->plugin ) );
+				$registry->add( new Web_Install_Command( $plugin ) );
+				$registry->add( new Web_Uninstall_Command( $plugin ) );
 			}
 		);
 
