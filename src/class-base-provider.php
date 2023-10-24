@@ -19,7 +19,7 @@ abstract class Base_Provider implements Provider {
 	public function boot( Plugin $plugin ): void {
 	}
 
-	public function register(): void {
+	public function register( Plugin $plugin ): void {
 	}
 
 	public function registered(): void {

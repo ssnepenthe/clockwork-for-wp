@@ -209,7 +209,7 @@ final class Plugin {
 			throw new RuntimeException( 'Cannot register providers after plugin has been locked' );
 		}
 
-		$provider->register();
+		$provider->register( $this );
 
 		$this->providers[ \get_class( $provider ) ] = $provider;
 

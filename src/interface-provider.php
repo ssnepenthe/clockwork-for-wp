@@ -7,7 +7,7 @@ namespace Clockwork_For_Wp;
 interface Provider {
 	public function boot( Plugin $plugin );
 
-	public function register();
+	public function register( Plugin $plugin );
 
 	public function registered();
 }

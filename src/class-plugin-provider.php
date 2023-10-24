@@ -21,10 +21,10 @@ final class Plugin_Provider extends Base_Provider {
 		}
 	}
 
-	public function register(): void {
+	public function register( Plugin $plugin ): void {
 		require_once __DIR__ . '/plugin-helpers.php';
 
-		$pimple = $this->plugin->get_pimple();
+		$pimple = $plugin->get_pimple();
 
 		$pimple[ ConfigurationBuilderInterface::class ] = static function ( Container $pimple ) {
 			$schema = include \dirname( __DIR__ ) . '/config/schema.php';

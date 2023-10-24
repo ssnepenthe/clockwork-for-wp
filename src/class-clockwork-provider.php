@@ -41,8 +41,8 @@ final class Clockwork_Provider extends Base_Provider {
 		}
 	}
 
-	public function register(): void {
-		$pimple = $this->plugin->get_pimple();
+	public function register( Plugin $plugin ): void {
+		$pimple = $plugin->get_pimple();
 
 		$pimple[ Clockwork_Support::class ] = static function ( Container $pimple ) {
 			return new Clockwork_Support(

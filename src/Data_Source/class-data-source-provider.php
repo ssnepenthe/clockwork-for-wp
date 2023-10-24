@@ -13,8 +13,8 @@ use Pimple\Container;
  * @internal
  */
 final class Data_Source_Provider extends Base_Provider {
-	public function register(): void {
-		$this->plugin->get_pimple()[ Data_Source_Factory::class ] = static function ( Container $pimple ) {
+	public function register( Plugin $plugin ): void {
+		$plugin->get_pimple()[ Data_Source_Factory::class ] = static function ( Container $pimple ) {
 			return new Data_Source_Factory( $pimple[ Plugin::class ] );
 		};
 	}

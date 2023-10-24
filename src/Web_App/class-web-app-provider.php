@@ -27,8 +27,8 @@ final class Web_App_Provider extends Base_Provider {
 		}
 	}
 
-	public function register(): void {
-		$pimple = $this->plugin->get_pimple();
+	public function register( Plugin $plugin ): void {
+		$pimple = $plugin->get_pimple();
 
 		$pimple[ Web_App_Controller::class ] = static function ( Container $pimple ) {
 			return new Web_App_Controller( new Web(), $pimple[ WP_Query::class ] );
