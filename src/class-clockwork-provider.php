@@ -21,28 +21,28 @@ use Pimple\Container;
  * @internal
  */
 final class Clockwork_Provider extends Base_Provider {
-	public function boot(): void {
+	public function boot( Event_Manager $events ): void {
 		if ( $this->plugin->is_collecting_data() ) {
+			$pimple = $this->plugin->get_pimple();
+
 			// Clockwork instance is resolved even when we are not collecting data in order to take
 			// advantage of helper methods like shouldCollect.
 			// This ensures data sources are only registered on plugins_loaded when enabled.
-			$this->plugin->get_pimple()[ Clockwork_Support::class ]->add_data_sources();
+			$pimple[ Clockwork_Support::class ]->add_data_sources();
 
-			parent::boot();
+			$events->attach(
+				new Clockwork_Subscriber(
+					$pimple[ Plugin::class ],
+					$pimple[ Event_Manager::class ],
+					$pimple[ Clockwork::class ],
+					$pimple[ Request::class ]
+				)
+			);
 		}
 	}
 
 	public function register(): void {
 		$pimple = $this->plugin->get_pimple();
-
-		$pimple[ Clockwork_Subscriber::class ] = static function ( Container $pimple ) {
-			return new Clockwork_Subscriber(
-				$pimple[ Plugin::class ],
-				$pimple[ Event_Manager::class ],
-				$pimple[ Clockwork::class ],
-				$pimple[ Request::class ]
-			);
-		};
 
 		$pimple[ Clockwork_Support::class ] = static function ( Container $pimple ) {
 			return new Clockwork_Support(
@@ -123,10 +123,6 @@ final class Clockwork_Provider extends Base_Provider {
 		if ( $this->plugin->config( 'register_helpers', true ) ) {
 			require_once __DIR__ . '/clock.php';
 		}
-	}
-
-	protected function subscribers(): array {
-		return [ Clockwork_Subscriber::class ];
 	}
 
 	private function configure_serializer(): void {

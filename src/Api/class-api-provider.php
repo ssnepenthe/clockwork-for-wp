@@ -7,6 +7,7 @@ namespace Clockwork_For_Wp\Api;
 use Clockwork\Authentication\AuthenticatorInterface;
 use Clockwork\Request\IncomingRequest;
 use Clockwork_For_Wp\Base_Provider;
+use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Metadata;
 use Clockwork_For_Wp\Plugin;
 use Clockwork_For_Wp\Routing\Route_Collection;
@@ -16,9 +17,11 @@ use Pimple\Container;
  * @internal
  */
 final class Api_Provider extends Base_Provider {
-	public function boot(): void {
+	public function boot( Event_Manager $events ): void {
 		if ( $this->plugin->is_enabled() ) {
-			parent::boot();
+			$pimple = $this->plugin->get_pimple();
+
+			$events->attach( new Api_Subscriber( $pimple[ Plugin::class ], $pimple[ Route_Collection::class ] ) );
 		}
 	}
 
@@ -32,13 +35,5 @@ final class Api_Provider extends Base_Provider {
 				$pimple[ IncomingRequest::class ]
 			);
 		};
-
-		$pimple[ Api_Subscriber::class ] = static function ( Container $pimple ) {
-			return new Api_Subscriber( $pimple[ Plugin::class ], $pimple[ Route_Collection::class ] );
-		};
-	}
-
-	protected function subscribers(): array {
-		return [ Api_Subscriber::class ];
 	}
 }

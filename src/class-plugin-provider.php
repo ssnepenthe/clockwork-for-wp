@@ -15,13 +15,13 @@ use Pimple\Container;
  * @internal
  */
 final class Plugin_Provider extends Base_Provider {
-	public function boot(): void {
+	public function boot( Event_Manager $events ): void {
 		if (
 			$this->plugin->is_enabled()
 			|| $this->plugin->is_web_enabled()
 			|| $this->plugin->is_web_installed()
 		) {
-			parent::boot();
+			$events->attach( new Plugin_Subscriber() );
 		}
 	}
 
@@ -56,13 +56,5 @@ final class Plugin_Provider extends Base_Provider {
 				$pimple[ Clockwork::class ]->storage()
 			);
 		};
-
-		$pimple[ Plugin_Subscriber::class ] = static function () {
-			return new Plugin_Subscriber();
-		};
-	}
-
-	protected function subscribers(): array {
-		return [ Plugin_Subscriber::class ];
 	}
 }
