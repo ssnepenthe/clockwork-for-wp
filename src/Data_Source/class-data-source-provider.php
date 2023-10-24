@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork_For_Wp\Base_Provider;
+use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Plugin;
 use Clockwork_For_Wp\Provides_Subscriber;
 use Pimple\Container;
@@ -13,20 +14,32 @@ use Pimple\Container;
  * @internal
  */
 final class Data_Source_Provider extends Base_Provider {
-	public function register(): void {
-		$this->plugin->get_pimple()[ Data_Source_Factory::class ] = static function ( Container $pimple ) {
+	public function boot( Plugin $plugin ): void {
+		$pimple = $plugin->get_pimple();
+		$data_source_factory = $pimple[ Data_Source_Factory::class ];
+		$events = $pimple[ Event_Manager::class ];
+
+		foreach ( $data_source_factory->get_enabled_data_sources() as $data_source ) {
+			if ( $data_source instanceof Provides_Subscriber ) {
+				$events->attach( $data_source->create_subscriber() );
+			}
+		}
+	}
+
+	public function register( Plugin $plugin ): void {
+		$plugin->get_pimple()[ Data_Source_Factory::class ] = static function ( Container $pimple ) {
 			return new Data_Source_Factory( $pimple[ Plugin::class ] );
 		};
 	}
 
-	public function registered(): void {
+	public function registered( Plugin $plugin ): void {
 		// We have registered our error handler as early as possible in order to collect as many
 		// errors as possible. However our config is not available that early so let's apply our
 		// configuration now.
 		$errors = Errors::get_instance();
 
-		if ( $this->plugin->is_feature_enabled( 'errors' ) ) {
-			$config = $this->plugin->config( 'data_sources.errors.config', [] );
+		if ( $plugin->is_feature_enabled( 'errors' ) ) {
+			$config = $plugin->config( 'data_sources.errors.config', [] );
 
 			$except_types = $config['except_types'] ?? false;
 			$only_types = $config['only_types'] ?? false;
@@ -71,18 +84,5 @@ final class Data_Source_Provider extends Base_Provider {
 		} else {
 			$errors->unregister();
 		}
-	}
-
-	protected function subscribers(): array {
-		$data_source_factory = $this->plugin->get_pimple()[ Data_Source_Factory::class ];
-		$subscribers = [];
-
-		foreach ( $data_source_factory->get_enabled_data_sources() as $data_source ) {
-			if ( $data_source instanceof Provides_Subscriber ) {
-				$subscribers[] = $data_source->create_subscriber();
-			}
-		}
-
-		return $subscribers;
 	}
 }

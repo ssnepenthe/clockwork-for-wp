@@ -36,17 +36,17 @@ final class Plugin {
 	public function __construct( ?array $providers = null, ?array $values = null ) {
 		if ( null === $providers ) {
 			$providers = [
-				Clockwork_Provider::class,
-				Plugin_Provider::class,
-				Wordpress_Provider::class,
+				new Clockwork_Provider(),
+				new Plugin_Provider(),
+				new Wordpress_Provider(),
 
-				Api_Provider::class,
-				Cli_Data_Collection_Provider::class,
-				Data_Source_Provider::class,
-				Event_Management_Provider::class,
-				Routing_Provider::class,
-				Web_App_Provider::class,
-				Wp_Cli_Provider::class,
+				new Api_Provider(),
+				new Cli_Data_Collection_Provider(),
+				new Data_Source_Provider(),
+				new Event_Management_Provider(),
+				new Routing_Provider(),
+				new Web_App_Provider(),
+				new Wp_Cli_Provider(),
 			];
 		}
 
@@ -54,10 +54,6 @@ final class Plugin {
 		$this->pimple[ self::class ] = $this;
 
 		foreach ( $providers as $provider ) {
-			if ( \is_string( $provider ) && \is_subclass_of( $provider, Base_Provider::class ) ) {
-				$provider = new $provider( $this );
-			}
-
 			if ( ! $provider instanceof Provider ) {
 				throw new InvalidArgumentException( 'Invalid provider type in plugin constructor' );
 			}
@@ -72,7 +68,7 @@ final class Plugin {
 		}
 
 		foreach ( $this->providers as $provider ) {
-			$provider->boot();
+			$provider->boot( $this );
 		}
 
 		$this->booted = true;
@@ -198,7 +194,7 @@ final class Plugin {
 		}
 
 		foreach ( $this->providers as $provider ) {
-			$provider->registered();
+			$provider->registered( $this );
 		}
 
 		$this->locked = true;
@@ -209,7 +205,7 @@ final class Plugin {
 			throw new RuntimeException( 'Cannot register providers after plugin has been locked' );
 		}
 
-		$provider->register();
+		$provider->register( $this );
 
 		$this->providers[ \get_class( $provider ) ] = $provider;
 

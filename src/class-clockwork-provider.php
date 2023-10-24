@@ -21,28 +21,28 @@ use Pimple\Container;
  * @internal
  */
 final class Clockwork_Provider extends Base_Provider {
-	public function boot(): void {
-		if ( $this->plugin->is_collecting_data() ) {
+	public function boot( Plugin $plugin ): void {
+		if ( $plugin->is_collecting_data() ) {
+			$pimple = $plugin->get_pimple();
+
 			// Clockwork instance is resolved even when we are not collecting data in order to take
 			// advantage of helper methods like shouldCollect.
 			// This ensures data sources are only registered on plugins_loaded when enabled.
-			$this->plugin->get_pimple()[ Clockwork_Support::class ]->add_data_sources();
+			$pimple[ Clockwork_Support::class ]->add_data_sources();
 
-			parent::boot();
+			$pimple[ Event_Manager::class ]->attach(
+				new Clockwork_Subscriber(
+					$pimple[ Plugin::class ],
+					$pimple[ Event_Manager::class ],
+					$pimple[ Clockwork::class ],
+					$pimple[ Request::class ]
+				)
+			);
 		}
 	}
 
-	public function register(): void {
-		$pimple = $this->plugin->get_pimple();
-
-		$pimple[ Clockwork_Subscriber::class ] = static function ( Container $pimple ) {
-			return new Clockwork_Subscriber(
-				$pimple[ Plugin::class ],
-				$pimple[ Event_Manager::class ],
-				$pimple[ Clockwork::class ],
-				$pimple[ Request::class ]
-			);
-		};
+	public function register( Plugin $plugin ): void {
+		$pimple = $plugin->get_pimple();
 
 		$pimple[ Clockwork_Support::class ] = static function ( Container $pimple ) {
 			return new Clockwork_Support(
@@ -116,56 +116,52 @@ final class Clockwork_Provider extends Base_Provider {
 		};
 	}
 
-	public function registered(): void {
-		$this->configure_serializer();
-		$this->configure_should_collect();
+	public function registered( Plugin $plugin ): void {
+		$this->configure_serializer( $plugin );
+		$this->configure_should_collect( $plugin );
 
-		if ( $this->plugin->config( 'register_helpers', true ) ) {
+		if ( $plugin->config( 'register_helpers', true ) ) {
 			require_once __DIR__ . '/clock.php';
 		}
 	}
 
-	protected function subscribers(): array {
-		return [ Clockwork_Subscriber::class ];
-	}
-
-	private function configure_serializer(): void {
+	private function configure_serializer( Plugin $plugin ): void {
 		Serializer::defaults(
 			[
-				'limit' => $this->plugin->config( 'serialization.depth', 10 ),
-				'blackbox' => $this->plugin->config(
+				'limit' => $plugin->config( 'serialization.depth', 10 ),
+				'blackbox' => $plugin->config(
 					'serialization.blackbox',
 					[
 						\Pimple\Container::class,
 						\Pimple\Psr11\Container::class,
 					]
 				),
-				'traces' => $this->plugin->config( 'stack_traces.enabled', true ),
+				'traces' => $plugin->config( 'stack_traces.enabled', true ),
 				'tracesSkip' => StackFilter::make()
 					->isNotVendor(
 						\array_merge(
-							$this->plugin->config( 'stack_traces.skip_vendors', [] ),
+							$plugin->config( 'stack_traces.skip_vendors', [] ),
 							[ 'itsgoingd' ]
 						)
 					)
-					->isNotNamespace( $this->plugin->config( 'stack_traces.skip_namespaces', [] ) )
+					->isNotNamespace( $plugin->config( 'stack_traces.skip_namespaces', [] ) )
 					->isNotFunction( [ 'call_user_func', 'call_user_func_array' ] )
-					->isNotClass( $this->plugin->config( 'stack_traces.skip_classes', [] ) ),
-				'tracesLimit' => $this->plugin->config( 'stack_traces.limit', 10 ),
+					->isNotClass( $plugin->config( 'stack_traces.skip_classes', [] ) ),
+				'tracesLimit' => $plugin->config( 'stack_traces.limit', 10 ),
 			]
 		);
 	}
 
-	private function configure_should_collect(): void {
-		$should_collect = $this->plugin->get_pimple()[ Clockwork::class ]->shouldCollect();
+	private function configure_should_collect( Plugin $plugin ): void {
+		$should_collect = $plugin->get_pimple()[ Clockwork::class ]->shouldCollect();
 
 		$should_collect->merge(
 			[
-				'onDemand' => $this->plugin->config( 'requests.on_demand', false ),
-				'sample' => $this->plugin->config( 'requests.sample', false ),
-				'except' => $this->plugin->config( 'requests.except', [] ),
-				'only' => $this->plugin->config( 'requests.only', [] ),
-				'exceptPreflight' => $this->plugin->config( 'requests.except_preflight', true ),
+				'onDemand' => $plugin->config( 'requests.on_demand', false ),
+				'sample' => $plugin->config( 'requests.sample', false ),
+				'except' => $plugin->config( 'requests.except', [] ),
+				'only' => $plugin->config( 'requests.only', [] ),
+				'exceptPreflight' => $plugin->config( 'requests.except_preflight', true ),
 			]
 		);
 

@@ -15,10 +15,10 @@ use wpdb;
  * @internal
  */
 final class Wordpress_Provider extends Base_Provider {
-	public function register(): void {
+	public function register( Plugin $plugin ): void {
 		require_once __DIR__ . '/wordpress-helpers.php';
 
-		$pimple = $this->plugin->get_pimple();
+		$pimple = $plugin->get_pimple();
 
 		$pimple['content_width'] = $pimple->factory( static function () {
 			return $GLOBALS['content_width'] ?? 0;

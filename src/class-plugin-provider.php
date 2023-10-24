@@ -15,20 +15,16 @@ use Pimple\Container;
  * @internal
  */
 final class Plugin_Provider extends Base_Provider {
-	public function boot(): void {
-		if (
-			$this->plugin->is_enabled()
-			|| $this->plugin->is_web_enabled()
-			|| $this->plugin->is_web_installed()
-		) {
-			parent::boot();
+	public function boot( Plugin $plugin ): void {
+		if ( $plugin->is_enabled() || $plugin->is_web_enabled() || $plugin->is_web_installed() ) {
+			$plugin->get_pimple()[ Event_Manager::class ]->attach( new Plugin_Subscriber() );
 		}
 	}
 
-	public function register(): void {
+	public function register( Plugin $plugin ): void {
 		require_once __DIR__ . '/plugin-helpers.php';
 
-		$pimple = $this->plugin->get_pimple();
+		$pimple = $plugin->get_pimple();
 
 		$pimple[ ConfigurationBuilderInterface::class ] = static function ( Container $pimple ) {
 			$schema = include \dirname( __DIR__ ) . '/config/schema.php';
@@ -56,13 +52,5 @@ final class Plugin_Provider extends Base_Provider {
 				$pimple[ Clockwork::class ]->storage()
 			);
 		};
-
-		$pimple[ Plugin_Subscriber::class ] = static function () {
-			return new Plugin_Subscriber();
-		};
-	}
-
-	protected function subscribers(): array {
-		return [ Plugin_Subscriber::class ];
 	}
 }

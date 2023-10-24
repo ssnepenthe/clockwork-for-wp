@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Routing;
 
 use Clockwork_For_Wp\Base_Provider;
+use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Incoming_Request;
-use Pimple\Container;
+use Clockwork_For_Wp\Plugin;
 
 use function Clockwork_For_Wp\service;
 
@@ -14,8 +15,20 @@ use function Clockwork_For_Wp\service;
  * @internal
  */
 final class Routing_Provider extends Base_Provider {
-	public function register(): void {
-		$pimple = $this->plugin->get_pimple();
+	public function boot( Plugin $plugin ): void {
+		$pimple = $plugin->get_pimple();
+
+		$pimple[ Event_Manager::class ]->attach(
+			new Routing_Subscriber(
+				$pimple[ Route_Collection::class ],
+				$pimple[ Route_Handler_Invoker::class ],
+				$pimple[ Incoming_Request::class ]
+			)
+		);
+	}
+
+	public function register( Plugin $plugin ): void {
+		$pimple = $plugin->get_pimple();
 
 		$pimple[ Route_Collection::class ] = static function () {
 			// @todo Configurable prefix?
@@ -43,17 +56,5 @@ final class Routing_Provider extends Base_Provider {
 				}
 			);
 		};
-
-		$pimple[ Routing_Subscriber::class ] = static function ( Container $pimple ) {
-			return new Routing_Subscriber(
-				$pimple[ Route_Collection::class ],
-				$pimple[ Route_Handler_Invoker::class ],
-				$pimple[ Incoming_Request::class ]
-			);
-		};
-	}
-
-	protected function subscribers(): array {
-		return [ Routing_Subscriber::class ];
 	}
 }
