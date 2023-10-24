@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Routing;
 
 use Clockwork_For_Wp\Base_Provider;
-use Invoker\Invoker;
+use Clockwork_For_Wp\Incoming_Request;
 use Pimple\Container;
+
+use function Clockwork_For_Wp\service;
 
 /**
  * @internal
@@ -20,9 +22,8 @@ final class Routing_Provider extends Base_Provider {
 			return new Route_Collection( 'cfw_' );
 		};
 
-		$pimple[ Route_Handler_Invoker::class ] = function ( Container $pimple ) {
+		$pimple[ Route_Handler_Invoker::class ] = function () {
 			return new Route_Handler_Invoker(
-				$pimple[ Invoker::class ],
 				// @todo Configurable prefix?
 				'cfw_',
 				function ( Route $route ) {
@@ -35,18 +36,20 @@ final class Routing_Provider extends Base_Provider {
 						$params[ $key ] = \get_query_var( $param_name );
 					}
 
-					return \array_filter(
-						$params,
-						static function ( $param ) {
-							return null !== $param;
-						}
-					);
+					return $params;
+				},
+				function ( array $callable ) {
+					return [ service( $callable[0] ), $callable[1] ];
 				}
 			);
 		};
 
-		$pimple[ Routing_Subscriber::class ] = static function () {
-			return new Routing_Subscriber();
+		$pimple[ Routing_Subscriber::class ] = static function ( Container $pimple ) {
+			return new Routing_Subscriber(
+				$pimple[ Route_Collection::class ],
+				$pimple[ Route_Handler_Invoker::class ],
+				$pimple[ Incoming_Request::class ]
+			);
 		};
 	}
 

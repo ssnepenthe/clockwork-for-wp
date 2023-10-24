@@ -2,6 +2,8 @@
 
 namespace Cfw_Test_Helper;
 
+use function Clockwork_For_Wp\service;
+
 function request_by_id() {
 	if ( ! \array_key_exists( 'id', $_REQUEST ) ) {
 		\wp_send_json_error();
@@ -36,7 +38,7 @@ function create_requests() {
 
 	$clockwork = ( new \Clockwork\Clockwork() )
 		->storage(
-			_cfw_instance()->get_container()->get( \Clockwork\Storage\StorageInterface::class )
+			service( \Clockwork\Storage\StorageInterface::class )
 		);
 
 	for ( $i = 0; $i < $qty; $i++ ) {

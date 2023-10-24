@@ -6,6 +6,8 @@ namespace Clockwork_For_Wp\Web_App;
 
 use Clockwork\Web\Web;
 use Clockwork_For_Wp\Base_Provider;
+use Clockwork_For_Wp\Incoming_Request;
+use Clockwork_For_Wp\Routing\Route_Collection;
 use Pimple\Container;
 use WP_Query;
 
@@ -26,8 +28,8 @@ final class Web_App_Provider extends Base_Provider {
 			return new Web_App_Controller( new Web(), $pimple[ WP_Query::class ] );
 		};
 
-		$pimple[ Web_App_Subscriber::class ] = static function () {
-			return new Web_App_Subscriber();
+		$pimple[ Web_App_Subscriber::class ] = static function ( Container $pimple ) {
+			return new Web_App_Subscriber( $pimple[ Incoming_Request::class ], $pimple[ Route_Collection::class ] );
 		};
 	}
 

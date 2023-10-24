@@ -129,9 +129,9 @@ final class Data_Source_Factory {
 	}
 
 	private function create_core_data_source(): Core {
-		$container = $this->plugin->get_container();
+		$container = $this->plugin->get_pimple();
 
-		return new Core( $container->get( 'wp_version' ), $container->get( 'timestart' ) );
+		return new Core( $container[ 'wp_version' ], $container[ 'timestart' ] );
 	}
 
 	private function create_errors_data_source(): Errors {
@@ -226,7 +226,7 @@ final class Data_Source_Factory {
 			);
 		}
 
-		$this->plugin->get_container()->get( Event_Manager::class )->trigger(
+		$this->plugin->get_pimple()[ Event_Manager::class ]->trigger(
 			'cfw_data_sources_wpdb_init',
 			$data_source
 		);

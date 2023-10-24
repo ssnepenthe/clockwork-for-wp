@@ -7,6 +7,8 @@ namespace Clockwork_For_Wp\Cli_Data_Collection;
 use ReflectionProperty;
 use WP_CLI;
 
+use function Clockwork_For_Wp\container;
+
 /**
  * @internal
  */
@@ -22,7 +24,7 @@ final class Cli_Collection_Helper {
 	}
 
 	public static function get_core_command_list_path(): string {
-		$dir = \dirname( \_cfw_instance()->get_container()->get( 'file' ) );
+		$dir = \dirname( container()[ 'file' ] );
 
 		return "{$dir}/generated/wp-cli-core-command-list.php";
 	}

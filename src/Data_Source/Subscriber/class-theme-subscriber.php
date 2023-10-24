@@ -8,6 +8,9 @@ use Clockwork_For_Wp\Data_Source\Theme;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
+use function Clockwork_For_Wp\container;
+use function Clockwork_For_Wp\events;
+
 /**
  * @internal
  */
@@ -48,18 +51,13 @@ final class Theme_Subscriber implements Subscriber {
 	/**
 	 * @param int $content_width
 	 */
-	public function on_cfw_pre_resolve( $content_width ): void {
-		/**
-		 * @psalm-suppress RedundantCastGivenDocblockType
-		 */
-		$recorded_content_width = (int) $content_width;
-
+	public function on_cfw_pre_resolve(): void {
 		$this->data_source
 			->set_theme_root( \get_theme_root() )
 			->set_is_child_theme( \is_child_theme() )
 			->set_template( \get_template() )
 			->set_stylesheet( \get_stylesheet() )
-			->set_content_width( $recorded_content_width );
+			->set_content_width( (int) container()[ 'content_width' ] );
 	}
 
 	/**
@@ -96,12 +94,12 @@ final class Theme_Subscriber implements Subscriber {
 		return $template;
 	}
 
-	public function on_template_redirect( Event_Manager $events ): void {
+	public function on_template_redirect(): void {
 		$conditional_filter_map = $this->hierarchy_conditional_filter_map();
 
 		foreach ( $conditional_filter_map as $conditional => $filter ) {
 			if ( \function_exists( $conditional ) && $conditional() ) {
-				$events->on(
+				events()->on(
 					$filter,
 					/**
 					 * @param array $templates

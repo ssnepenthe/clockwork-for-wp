@@ -9,6 +9,15 @@ use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Routing\Route_Collection;
 
 final class Web_App_Subscriber implements Subscriber {
+	private $request;
+
+	private $routes;
+
+	public function __construct( Incoming_Request $request, Route_Collection $routes ) {
+		$this->request = $request;
+		$this->routes = $routes;
+	}
+
 	public function get_subscribed_events(): array {
 		return [
 			'init' => 'register_routes',
@@ -17,27 +26,27 @@ final class Web_App_Subscriber implements Subscriber {
 		];
 	}
 
-	public function redirect_shortcut( Incoming_Request $request ): void {
+	public function redirect_shortcut(): void {
 		/**
 		 * @psalm-suppress InvalidArgument
 		 *
 		 * @see https://github.com/humanmade/psalm-plugin-wordpress/issues/13
 		 */
-		if ( \untrailingslashit( $request->uri ) !== \home_url( '__clockwork', 'relative' ) ) {
+		if ( \untrailingslashit( $this->request->uri ) !== \home_url( '__clockwork', 'relative' ) ) {
 			return;
-		}
+	}
 
 		\wp_safe_redirect( \home_url( '__clockwork/app' ) );
 		exit;
 	}
 
-	public function register_routes( Route_Collection $routes ): void {
-		$routes->get(
+	public function register_routes(): void {
+		$this->routes->get(
 			'^__clockwork/app$',
 			'index.php?app=1&asset=index.html',
 			[ Web_App_Controller::class, 'serve_assets' ]
 		);
-		$routes->get(
+		$this->routes->get(
 			'^__clockwork/(((?:css|img|js)/)?.*\.(?:css|html|js|json|png))$',
 			'index.php?app=1&asset=$matches[1]',
 			[ Web_App_Controller::class, 'serve_assets' ]

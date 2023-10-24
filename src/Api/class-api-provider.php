@@ -8,6 +8,8 @@ use Clockwork\Authentication\AuthenticatorInterface;
 use Clockwork\Request\IncomingRequest;
 use Clockwork_For_Wp\Base_Provider;
 use Clockwork_For_Wp\Metadata;
+use Clockwork_For_Wp\Plugin;
+use Clockwork_For_Wp\Routing\Route_Collection;
 use Pimple\Container;
 
 /**
@@ -31,8 +33,8 @@ final class Api_Provider extends Base_Provider {
 			);
 		};
 
-		$pimple[ Api_Subscriber::class ] = static function () {
-			return new Api_Subscriber();
+		$pimple[ Api_Subscriber::class ] = static function ( Container $pimple ) {
+			return new Api_Subscriber( $pimple[ Plugin::class ], $pimple[ Route_Collection::class ] );
 		};
 	}
 

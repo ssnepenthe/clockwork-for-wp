@@ -10,16 +10,16 @@ use ApheleiaCli\Option;
 use Clockwork\Storage\StorageInterface;
 use League\Config\ConfigurationBuilderInterface;
 use League\Config\ConfigurationInterface;
-use Psr\Container\ContainerInterface;
+use Pimple\Container;
 use WP_CLI;
 
 /**
  * @internal
  */
 final class Clean_Command extends Command {
-	private ContainerInterface $container;
+	private Container $container;
 
-	public function __construct( ContainerInterface $container ) {
+	public function __construct( Container $container ) {
 		$this->container = $container;
 
 		parent::__construct();
@@ -44,20 +44,20 @@ final class Clean_Command extends Command {
 		$expiration = $assoc_args['expiration'] ?? null;
 
 		if ( $all ) {
-			$this->container->get( ConfigurationBuilderInterface::class )->set( 'storage.expiration', 0 );
+			$this->container[ ConfigurationBuilderInterface::class ]->set( 'storage.expiration', 0 );
 		} elseif ( null !== $expiration ) {
 			// @todo Should we allow float?
-			$this->container->get( ConfigurationBuilderInterface::class )->set(
+			$this->container[ ConfigurationBuilderInterface::class ]->set(
 				'storage.expiration',
 				\abs( (int) $expiration )
 			);
 		}
 
-		$this->container->get( StorageInterface::class )->cleanup( $force );
+		$this->container[ StorageInterface::class ]->cleanup( $force );
 
 		// See https://github.com/itsgoingd/clockwork/issues/510
 		// @todo Revisit after the release of Clockwork v6.
-		$config = $this->container->get( ConfigurationInterface::class );
+		$config = $this->container[ ConfigurationInterface::class ];
 
 		if ( $all && 'file' === $config->get( 'storage.driver', 'file' ) ) {
 			$path = $config->get( 'storage.drivers.file.path' );

@@ -16,8 +16,8 @@ final class Web_App_Controller {
 		$this->wp_query = $wp_query;
 	}
 
-	public function serve_assets( $asset ): void {
-		$asset = \rtrim( $asset, '/\\' );
+	public function serve_assets( array $params ): void {
+		$asset = \rtrim( $params['asset'], '/\\' );
 		$file = $this->web_helper->asset( $asset );
 
 		if ( \is_array( $file ) && isset( $file['path'] ) && \is_file( $file['path'] ) ) {

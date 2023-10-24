@@ -32,12 +32,17 @@ final class Api_Controller {
 		\wp_send_json( [ 'token' => $token ], $token ? 200 : 403 );
 	}
 
-	public function serve_json( $id, $direction = null, $count = null, $extended = null ): void {
+	public function serve_json( array $params ): void {
 		// @todo Handle 404s.
 		// @todo Is this really necessary?
-		if ( null === $id ) {
+		if ( ! array_key_exists( 'id', $params ) || $params['id'] === null ) {
 			return; // @todo
 		}
+
+		$id = $params['id'];
+		$extended = $params['extended'] ?? null;
+		$direction = $params['direction'] ?? null;
+		$count = $params['count'] ?? null;
 
 		$authenticated = $this->authenticator->check(
 			// @todo Move to route handler invoker?
@@ -65,8 +70,8 @@ final class Api_Controller {
 		\wp_send_json( $data ); // @todo
 	}
 
-	public function update_data( $id ): void {
-		$request = $this->metadata->get( $id );
+	public function update_data( array $params ): void {
+		$request = $this->metadata->get( $params['id'] );
 
 		if ( ! $request ) {
 			\wp_send_json( [ 'message' => 'Request not found.' ], 404 );
