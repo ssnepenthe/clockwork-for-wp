@@ -24,8 +24,4 @@ abstract class Base_Provider implements Provider {
 
 	public function registered( Plugin $plugin ): void {
 	}
-
-	protected function subscribers(): array {
-		return [];
-	}
 }
