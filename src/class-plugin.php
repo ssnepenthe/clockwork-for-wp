@@ -73,20 +73,6 @@ final class Plugin {
 		$this->booted = true;
 	}
 
-	public function config( $path, $default = null ) {
-		if ( ! isset( $this->pimple[ Read_Only_Configuration::class ] ) ) {
-			return $default;
-		}
-
-		$config = $this->pimple[ Read_Only_Configuration::class ];
-
-		if ( ! $config->exists( $path ) ) {
-			return $default;
-		}
-
-		return $config->get( $path );
-	}
-
 	public function get_pimple(): Container {
 		return $this->pimple;
 	}

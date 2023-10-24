@@ -24,7 +24,11 @@ final class Configuration {
 		return $this->config->exists( $key );
 	}
 
-	public function get( string $key ) {
+	public function get( string $key, $default = null ) {
+		if ( ! $this->config->exists( $key ) ) {
+			return $default;
+		}
+
 		return $this->config->get( $key );
 	}
 

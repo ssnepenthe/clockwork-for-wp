@@ -2,15 +2,19 @@
 
 namespace Clockwork_For_Wp\Tests\Integration\Data_Source;
 
+use Clockwork\Clockwork;
 use Clockwork\Request\Request;
-use Clockwork_For_Wp\Config;
 use Clockwork_For_Wp\Data_Source\Data_Source_Factory;
-use Clockwork_For_Wp\Data_Source\Data_Source_Provider;
 use Clockwork_For_Wp\Data_Source\Wp_Hook;
-use Clockwork_For_Wp\Plugin;
+use Clockwork_For_Wp\Incoming_Request;
+use Clockwork_For_Wp\Is;
+use Clockwork_For_Wp\Tests\Creates_Config;
 use PHPUnit\Framework\TestCase;
+use Pimple\Container;
 
 class Wp_Hook_Test extends TestCase {
+	use Creates_Config;
+
 	/** @test */
 	public function it_correctly_records_hook_data() {
 		$data_source = new Wp_Hook();
@@ -233,7 +237,14 @@ class Wp_Hook_Test extends TestCase {
 	}
 
 	protected function create_data_source_via_factory( $filters = [] ) {
-		return ( new Data_Source_Factory( new Plugin() ) )->create(
+		$config = $this->create_config();
+		$factory = new Data_Source_Factory(
+			$config,
+			new Is( $config, new Clockwork(), new Incoming_Request() ),
+			new Container()
+		);
+
+		return $factory->create(
 			'wp_hook',
 			[
 				'except_callbacks' => $filters['except_callbacks'] ?? [],

@@ -5,13 +5,10 @@ namespace Clockwork_For_Wp\Tests\Integration;
 use Clockwork\Clockwork;
 use Clockwork\Request\IncomingRequest;
 use Clockwork_For_Wp\Clockwork_Provider;
-use Clockwork_For_Wp\Configuration;
 use Clockwork_For_Wp\Plugin;
 use Clockwork_For_Wp\Read_Only_Configuration;
 use Clockwork_For_Wp\Storage_Factory;
 use Clockwork_For_Wp\Tests\Creates_Config;
-use League\Config\Configuration as LeagueConfiguration;
-use Nette\Schema\Expect;
 use Null_Storage_For_Tests;
 use PHPUnit\Framework\TestCase;
 
@@ -23,18 +20,6 @@ class Plugin_Test extends TestCase {
 		$plugin = new Plugin( [], [ 'a' => 'b' ] );
 
 		$this->assertEquals( 'b', $plugin->get_pimple()[ 'a' ] );
-	}
-
-	/** @test */
-	public function it_provides_access_to_config_object() {
-		$config = new Configuration( new LeagueConfiguration( [ 'a' => Expect::string() ] ) );
-		$config->merge( [ 'a' => 'b' ] );
-		$plugin = new Plugin( [], [
-			Read_Only_Configuration::class => $config->reader(),
-		] );
-
-		$this->assertEquals( 'b', $plugin->config( 'a' ) );
-		$this->assertEquals( 'default', $plugin->config( 'b', 'default' ) );
 	}
 
 	/** @test */

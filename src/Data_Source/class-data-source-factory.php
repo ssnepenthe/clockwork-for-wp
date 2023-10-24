@@ -6,21 +6,29 @@ namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork\DataSource\DataSource;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
-use Clockwork_For_Wp\Plugin;
+use Clockwork_For_Wp\Is;
+use Clockwork_For_Wp\Read_Only_Configuration;
 use InvalidArgumentException;
+use Pimple\Container;
 
 /**
  * @internal
  */
 final class Data_Source_Factory {
+	private $config;
+
 	private $custom_factories = [];
 
 	private $instances = [];
 
-	private $plugin;
+	private $is;
 
-	public function __construct( Plugin $plugin ) {
-		$this->plugin = $plugin;
+	private $pimple;
+
+	public function __construct( Read_Only_Configuration $config, Is $is, Container $pimple ) {
+		$this->config = $config;
+		$this->is = $is;
+		$this->pimple = $pimple;
 	}
 
 	public function create( string $name, array $config = [] ): DataSource {
@@ -44,9 +52,9 @@ final class Data_Source_Factory {
 	public function get_enabled_data_sources(): array {
 		$data_sources = [];
 
-		foreach ( $this->plugin->config( 'data_sources', [] ) as $name => $data_source ) {
+		foreach ( $this->config->get( 'data_sources', [] ) as $name => $data_source ) {
 			if (
-				( $data_source['enabled'] ?? false ) && $this->plugin->is()->feature_available( $name )
+				( $data_source['enabled'] ?? false ) && $this->is->feature_available( $name )
 			) {
 				$data_sources[] = $this->create( $name, $data_source['config'] ?? [] );
 			}
@@ -129,9 +137,7 @@ final class Data_Source_Factory {
 	}
 
 	private function create_core_data_source(): Core {
-		$container = $this->plugin->get_pimple();
-
-		return new Core( $container[ 'wp_version' ], $container[ 'timestart' ] );
+		return new Core( $this->pimple[ 'wp_version' ], $this->pimple[ 'timestart' ] );
 	}
 
 	private function create_errors_data_source(): Errors {
@@ -226,7 +232,7 @@ final class Data_Source_Factory {
 			);
 		}
 
-		$this->plugin->get_pimple()[ Event_Manager::class ]->trigger(
+		$this->pimple[ Event_Manager::class ]->trigger(
 			'cfw_data_sources_wpdb_init',
 			$data_source
 		);

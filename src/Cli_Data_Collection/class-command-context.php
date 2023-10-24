@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Clockwork_For_Wp\Cli_Data_Collection;
 
+use Clockwork_For_Wp\Read_Only_Configuration;
 use WP_CLI;
 use WP_CLI\DocParser;
 use WP_CLI\SynopsisParser;
+
+use function Clockwork_For_Wp\service;
 
 final class Command_Context {
 	private $args;
@@ -120,11 +123,9 @@ final class Command_Context {
 			return;
 		}
 
-		$global = \_cfw_instance()->config( 'wp_cli.record_global_parameters', false );
-		$global_runtime = \_cfw_instance()->config(
-			'wp_cli.record_global_runtime_parameters',
-			true
-		);
+		$config = service( Read_Only_Configuration::class );
+		$global = $config->get( 'wp_cli.record_global_parameters', false );
+		$global_runtime = $config->get( 'wp_cli.record_global_runtime_parameters', true );
 		$global_filter = static function ( $option ) {
 			return null !== $option && '' !== $option && [] !== $option;
 		};
