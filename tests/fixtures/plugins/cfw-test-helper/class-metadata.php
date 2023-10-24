@@ -2,7 +2,7 @@
 
 namespace Cfw_Test_Helper;
 
-use League\Config\ConfigurationInterface;
+use Clockwork_For_Wp\Read_Only_Configuration;
 
 use function Clockwork_For_Wp\service;
 
@@ -11,7 +11,7 @@ use function Clockwork_For_Wp\service;
 //       https://github.com/itsgoingd/clockwork/issues/510
 class Metadata {
 	public static function dir() {
-		$config = service( ConfigurationInterface::class );
+		$config = service( Read_Only_Configuration::class );
 
 		if ( 'file' !== $config->get( 'storage.driver' ) ) {
 			throw new \RuntimeException(

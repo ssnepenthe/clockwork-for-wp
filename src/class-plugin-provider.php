@@ -6,9 +6,7 @@ namespace Clockwork_For_Wp;
 
 use Clockwork\Clockwork;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
-use League\Config\Configuration;
-use League\Config\ConfigurationBuilderInterface;
-use League\Config\ConfigurationInterface;
+use League\Config\Configuration as LeagueConfiguration;
 use Pimple\Container;
 
 /**
@@ -26,24 +24,21 @@ final class Plugin_Provider extends Base_Provider {
 
 		$pimple = $plugin->get_pimple();
 
-		$pimple[ ConfigurationBuilderInterface::class ] = static function ( Container $pimple ) {
+		$pimple[ Configuration::class ] = static function ( Container $pimple ) {
 			$schema = include \dirname( __DIR__ ) . '/config/schema.php';
 			$defaults = include \dirname( __DIR__ ) . '/config/defaults.php';
 
-			$config = new Configuration( $schema );
+			$config = new Configuration( new LeagueConfiguration( $schema ) );
 
 			$config->merge( $defaults );
 
-			$pimple[ Event_Manager::class ]->trigger(
-				'cfw_config_init',
-				new Private_Schema_Configuration( $config )
-			);
+			$pimple[ Event_Manager::class ]->trigger( 'cfw_config_init', $config );
 
 			return $config;
 		};
 
-		$pimple[ ConfigurationInterface::class ] = static function ( Container $pimple ) {
-			return $pimple[ ConfigurationBuilderInterface::class ]->reader();
+		$pimple[ Read_Only_Configuration::class ] = static function ( Container $pimple ) {
+			return $pimple[ Configuration::class ]->reader();
 		};
 
 		$pimple[ Metadata::class ] = static function ( Container $pimple ) {

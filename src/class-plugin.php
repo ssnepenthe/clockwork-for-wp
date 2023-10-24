@@ -15,7 +15,6 @@ use Clockwork_For_Wp\Routing\Routing_Provider;
 use Clockwork_For_Wp\Web_App\Web_App_Provider;
 use Clockwork_For_Wp\Wp_Cli\Wp_Cli_Provider;
 use InvalidArgumentException;
-use League\Config\ConfigurationInterface;
 use Pimple\Container;
 use RuntimeException;
 
@@ -75,11 +74,11 @@ final class Plugin {
 	}
 
 	public function config( $path, $default = null ) {
-		if ( ! isset( $this->pimple[ ConfigurationInterface::class ] ) ) {
+		if ( ! isset( $this->pimple[ Read_Only_Configuration::class ] ) ) {
 			return $default;
 		}
 
-		$config = $this->pimple[ ConfigurationInterface::class ];
+		$config = $this->pimple[ Read_Only_Configuration::class ];
 
 		if ( ! $config->exists( $path ) ) {
 			return $default;
@@ -95,7 +94,7 @@ final class Plugin {
 	public function is(): Is {
 		if ( ! $this->is instanceof Is ) {
 			$this->is = new Is(
-				$this->pimple[ ConfigurationInterface::class ],
+				$this->pimple[ Read_Only_Configuration::class ],
 				$this->pimple[ Clockwork::class ],
 				$this->pimple[ Incoming_Request::class ]
 			);

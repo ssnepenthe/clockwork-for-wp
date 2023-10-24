@@ -8,9 +8,9 @@ use Clockwork_For_Wp\Data_Source;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Plugin;
+use Clockwork_For_Wp\Read_Only_Configuration;
 use Clockwork_For_Wp\Tests\Creates_Config;
 use InvalidArgumentException;
-use League\Config\ConfigurationInterface;
 use PHPUnit\Framework\TestCase;
 
 class Data_Source_Factory_Test extends TestCase {
@@ -97,7 +97,7 @@ class Data_Source_Factory_Test extends TestCase {
 			'wp_version' => 'irrelevant',
 			'timestart' => 'irrelevant',
 			Clockwork::class => new Clockwork(),
-			ConfigurationInterface::class => $this->create_config( [
+			Read_Only_Configuration::class => $this->create_config( [
 				'data_sources' => [
 					'rest_api' => [ 'enabled' => true ],
 					'theme' => [ 'enabled' => false ],

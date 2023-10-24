@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace Clockwork_For_Wp;
 
+use League\Config\ConfigurationBuilderInterface;
 use League\Config\ConfigurationInterface;
-use League\Config\MutableConfigurationInterface;
 
-/**
- * @internal
- */
-final class Private_Schema_Configuration implements ConfigurationInterface, MutableConfigurationInterface {
+final class Configuration {
+	/**
+	 * @var ConfigurationBuilderInterface&ConfigurationInterface
+	 */
 	private $config;
 
+	/**
+	 * @param ConfigurationBuilderInterface&ConfigurationInterface $config
+	 */
 	public function __construct( $config ) {
 		$this->config = $config;
 	}
@@ -27,6 +30,10 @@ final class Private_Schema_Configuration implements ConfigurationInterface, Muta
 
 	public function merge( array $config = [] ): void {
 		$this->config->merge( $config );
+	}
+
+	public function reader(): Read_Only_Configuration {
+		return new Read_Only_Configuration( $this->config );
 	}
 
 	public function set( string $key, $value ): void {

@@ -39,7 +39,7 @@ Note that if you are trying to debug outside of an HTML context (e.g. wp-cron, r
 ## Configuration
 By default, all data sources are disabled. You can configure data sources and various other Clockwork settings using the `cfw_config_init` action from within a must-use plugin.
 
-Your callback will receive an instance of `\Clockwork_For_Wp\Private_Schema_Configuration` which implements both `\League\Config\ConfigurationInterface` and `\League\Config\MutableConfigurationInterface`.
+Your callback will receive an instance of `\Clockwork_For_Wp\Configuration`.
 
 This config instance can be used to change any of the configuration options found in `config/schema.php`.
 

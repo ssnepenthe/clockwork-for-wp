@@ -6,7 +6,6 @@ namespace Clockwork_For_Wp;
 
 use Clockwork\Clockwork;
 use Clockwork_For_Wp\Data_Source\Data_Source_Factory;
-use League\Config\ConfigurationInterface;
 
 /**
  * @internal
@@ -18,11 +17,7 @@ final class Clockwork_Support {
 
 	private $factory;
 
-	public function __construct(
-		Clockwork $clockwork,
-		Data_Source_Factory $factory,
-		ConfigurationInterface $config
-	) {
+	public function __construct( Clockwork $clockwork, Data_Source_Factory $factory, Read_Only_Configuration $config ) {
 		$this->clockwork = $clockwork;
 		$this->factory = $factory;
 		$this->config = $config;

@@ -8,8 +8,7 @@ use ApheleiaCli\Command;
 use ApheleiaCli\Flag;
 use ApheleiaCli\Option;
 use Clockwork\Storage\StorageInterface;
-use League\Config\ConfigurationBuilderInterface;
-use League\Config\ConfigurationInterface;
+use Clockwork_For_Wp\Configuration;
 use Pimple\Container;
 use WP_CLI;
 
@@ -43,11 +42,13 @@ final class Clean_Command extends Command {
 		$all = $assoc_args['all'] ?? false;
 		$expiration = $assoc_args['expiration'] ?? null;
 
+		$config = $this->container[ Configuration::class ];
+
 		if ( $all ) {
-			$this->container[ ConfigurationBuilderInterface::class ]->set( 'storage.expiration', 0 );
+			$config->set( 'storage.expiration', 0 );
 		} elseif ( null !== $expiration ) {
 			// @todo Should we allow float?
-			$this->container[ ConfigurationBuilderInterface::class ]->set(
+			$config->set(
 				'storage.expiration',
 				\abs( (int) $expiration )
 			);
@@ -57,8 +58,6 @@ final class Clean_Command extends Command {
 
 		// See https://github.com/itsgoingd/clockwork/issues/510
 		// @todo Revisit after the release of Clockwork v6.
-		$config = $this->container[ ConfigurationInterface::class ];
-
 		if ( $all && 'file' === $config->get( 'storage.driver', 'file' ) ) {
 			$path = $config->get( 'storage.drivers.file.path' );
 

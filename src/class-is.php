@@ -6,7 +6,6 @@ namespace Clockwork_For_Wp;
 
 use Clockwork\Clockwork;
 use Clockwork_For_Wp\Cli_Data_Collection\Cli_Collection_Helper;
-use League\Config\ConfigurationInterface;
 
 final class Is {
 	private $clockwork;
@@ -15,7 +14,7 @@ final class Is {
 
 	private $request;
 
-	public function __construct( ConfigurationInterface $config, Clockwork $clockwork, Incoming_Request $request ) {
+	public function __construct( Read_Only_Configuration $config, Clockwork $clockwork, Incoming_Request $request ) {
 		$this->config = $config;
 		$this->clockwork = $clockwork;
 		$this->request = $request;

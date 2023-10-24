@@ -14,7 +14,6 @@ use Clockwork\Request\Request;
 use Clockwork\Storage\StorageInterface;
 use Clockwork_For_Wp\Data_Source\Data_Source_Factory;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
-use League\Config\ConfigurationInterface;
 use Pimple\Container;
 
 /**
@@ -48,7 +47,7 @@ final class Clockwork_Provider extends Base_Provider {
 			return new Clockwork_Support(
 				$pimple[ Clockwork::class ],
 				$pimple[ Data_Source_Factory::class ],
-				$pimple[ ConfigurationInterface::class ]
+				$pimple[ Read_Only_Configuration::class ]
 			);
 		};
 
@@ -64,7 +63,7 @@ final class Clockwork_Provider extends Base_Provider {
 		};
 
 		$pimple[ AuthenticatorInterface::class ] = static function ( Container $pimple ) {
-			$config = $pimple[ ConfigurationInterface::class ]->get( 'authentication' );
+			$config = $pimple[ Read_Only_Configuration::class ]->get( 'authentication' );
 			$factory = $pimple[ Authenticator_Factory::class ];
 
 			if ( ! ( $config['enabled'] ?? false ) ) {
@@ -81,7 +80,7 @@ final class Clockwork_Provider extends Base_Provider {
 		};
 
 		$pimple[ StorageInterface::class ] = $pimple->factory( static function ( Container $pimple ) {
-			$storage_config = $pimple[ ConfigurationInterface::class ]->get( 'storage' );
+			$storage_config = $pimple[ Read_Only_Configuration::class ]->get( 'storage' );
 			$driver = $storage_config['driver'];
 			$driver_config = $storage_config['drivers'][ $driver ] ?? [];
 
