@@ -17,11 +17,13 @@ use Pimple\Container;
  * @internal
  */
 final class Api_Provider extends Base_Provider {
-	public function boot( Event_Manager $events ): void {
-		if ( $this->plugin->is_enabled() ) {
-			$pimple = $this->plugin->get_pimple();
+	public function boot( Plugin $plugin ): void {
+		if ( $plugin->is_enabled() ) {
+			$pimple = $plugin->get_pimple();
 
-			$events->attach( new Api_Subscriber( $pimple[ Plugin::class ], $pimple[ Route_Collection::class ] ) );
+			$pimple[ Event_Manager::class ]->attach(
+				new Api_Subscriber( $pimple[ Plugin::class ], $pimple[ Route_Collection::class ] )
+			);
 		}
 	}
 

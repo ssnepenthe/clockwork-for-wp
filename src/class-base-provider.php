@@ -16,7 +16,7 @@ abstract class Base_Provider implements Provider {
 		$this->plugin = $plugin;
 	}
 
-	public function boot( Event_Manager $events ): void {
+	public function boot( Plugin $plugin ): void {
 	}
 
 	public function register(): void {

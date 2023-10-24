@@ -72,7 +72,7 @@ final class Plugin {
 		}
 
 		foreach ( $this->providers as $provider ) {
-			$provider->boot( $this->pimple[ Event_Manager::class ] );
+			$provider->boot( $this );
 		}
 
 		$this->booted = true;

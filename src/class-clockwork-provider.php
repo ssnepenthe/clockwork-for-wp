@@ -21,16 +21,16 @@ use Pimple\Container;
  * @internal
  */
 final class Clockwork_Provider extends Base_Provider {
-	public function boot( Event_Manager $events ): void {
-		if ( $this->plugin->is_collecting_data() ) {
-			$pimple = $this->plugin->get_pimple();
+	public function boot( Plugin $plugin ): void {
+		if ( $plugin->is_collecting_data() ) {
+			$pimple = $plugin->get_pimple();
 
 			// Clockwork instance is resolved even when we are not collecting data in order to take
 			// advantage of helper methods like shouldCollect.
 			// This ensures data sources are only registered on plugins_loaded when enabled.
 			$pimple[ Clockwork_Support::class ]->add_data_sources();
 
-			$events->attach(
+			$pimple[ Event_Manager::class ]->attach(
 				new Clockwork_Subscriber(
 					$pimple[ Plugin::class ],
 					$pimple[ Event_Manager::class ],
