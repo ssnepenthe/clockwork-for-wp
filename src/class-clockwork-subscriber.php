@@ -44,11 +44,11 @@ final class Clockwork_Subscriber implements Subscriber {
 			true
 		);
 
-		if ( $this->plugin->is_collecting_client_metrics() ) {
+		if ( $this->plugin->is()->collecting_client_metrics() ) {
 			\wp_enqueue_script( 'clockwork-metrics' );
 		}
 
-		if ( $this->plugin->is_toolbar_enabled() ) {
+		if ( $this->plugin->is()->toolbar_enabled() ) {
 			\wp_enqueue_script( 'clockwork-toolbar' );
 		}
 	}
@@ -58,7 +58,7 @@ final class Clockwork_Subscriber implements Subscriber {
 
 		if (
 			! $command instanceof Command_Context
-			|| $this->plugin->is_command_filtered( $command->name() )
+			|| $this->plugin->is()->command_filtered( $command->name() )
 		) {
 			return;
 		}
@@ -93,18 +93,18 @@ final class Clockwork_Subscriber implements Subscriber {
 
 		if (
 			// @todo Redundant conditions?
-			( $this->plugin->is_enabled() && $this->plugin->is_recording() )
-			&& $this->plugin->is_collecting_requests()
+			( $this->plugin->is()->enabled() && $this->plugin->is()->recording() )
+			&& $this->plugin->is()->collecting_requests()
 		) {
 			// wp_loaded fires on frontend but also login, admin, etc.
 			$events['wp_loaded'] = [ 'initialize_request', Event_Manager::LATE_EVENT ];
 		}
 
 		// @todo Redundant conditions?
-		if ( $this->plugin->is_recording() ) {
-			if ( $this->plugin->is_collecting_commands() ) {
+		if ( $this->plugin->is()->recording() ) {
+			if ( $this->plugin->is()->collecting_commands() ) {
 				$events['shutdown'] = [ 'finalize_command', Event_Manager::LATE_EVENT ];
-			} elseif ( $this->plugin->is_collecting_requests() ) {
+			} elseif ( $this->plugin->is()->collecting_requests() ) {
 				$events['shutdown'] = [ 'finalize_request', Event_Manager::LATE_EVENT ];
 			}
 		}
@@ -133,18 +133,18 @@ final class Clockwork_Subscriber implements Subscriber {
 		// @todo Set subrequest headers?
 
 		if (
-			$this->plugin->is_collecting_client_metrics()
-			|| $this->plugin->is_toolbar_enabled()
+			$this->plugin->is()->collecting_client_metrics()
+			|| $this->plugin->is()->toolbar_enabled()
 		) {
 			$cookie = \json_encode(
 				[
 					'requestId' => $this->request->id,
 					'version' => Clockwork::VERSION,
 					'path' => '/__clockwork/',
-					'webPath' => $this->plugin->is_web_installed() ? '/__clockwork' : '/__clockwork/app',
+					'webPath' => $this->plugin->is()->web_installed() ? '/__clockwork' : '/__clockwork/app',
 					'token' => $this->request->updateToken,
-					'metrics' => $this->plugin->is_collecting_client_metrics(),
-					'toolbar' => $this->plugin->is_toolbar_enabled(),
+					'metrics' => $this->plugin->is()->collecting_client_metrics(),
+					'toolbar' => $this->plugin->is()->toolbar_enabled(),
 				]
 			);
 

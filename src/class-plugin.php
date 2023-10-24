@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp;
 
 use Clockwork\Clockwork;
-use Clockwork\Request\IncomingRequest;
 use Clockwork_For_Wp\Api\Api_Provider;
-use Clockwork_For_Wp\Cli_Data_Collection\Cli_Collection_Helper;
 use Clockwork_For_Wp\Cli_Data_Collection\Cli_Data_Collection_Provider;
 use Clockwork_For_Wp\Data_Source\Data_Source_Provider;
 use Clockwork_For_Wp\Data_Source\Errors;
@@ -26,6 +24,8 @@ use RuntimeException;
  */
 final class Plugin {
 	private $booted = false;
+
+	private $is;
 
 	private $locked = false;
 
@@ -92,99 +92,16 @@ final class Plugin {
 		return $this->pimple;
 	}
 
-	public function is_collecting_client_metrics() {
-		return (bool) $this->config( 'collect_client_metrics', true );
-	}
-
-	public function is_collecting_commands() {
-		return ( $this->is_enabled() || $this->config( 'collect_data_always', false ) )
-			&& $this->is_running_in_console()
-			&& $this->config( 'wp_cli.collect', false );
-	}
-
-	public function is_collecting_data() {
-		return $this->is_collecting_commands() || $this->is_collecting_requests();
-	}
-
-	public function is_collecting_heartbeat_requests() {
-		return (bool) $this->config( 'collect_heartbeat', true );
-	}
-
-	public function is_collecting_requests() {
-		$clockwork = $this->pimple[ Clockwork::class ];
-		$request = $this->pimple[ IncomingRequest::class ];
-
-		return ( $this->is_enabled() || $this->config( 'collect_data_always', false ) )
-			&& ! $this->is_running_in_console()
-			&& $clockwork->shouldCollect()->filter( $request )
-			&& ( ! $request->is_heartbeat() || $this->is_collecting_heartbeat_requests() );
-	}
-
-	public function is_command_filtered( $command ) {
-		if ( 'clockwork' === \mb_substr( $command, 0, 9 ) ) {
-			return true;
+	public function is(): Is {
+		if ( ! $this->is instanceof Is ) {
+			$this->is = new Is(
+				$this->pimple[ ConfigurationInterface::class ],
+				$this->pimple[ Clockwork::class ],
+				$this->pimple[ Incoming_Request::class ]
+			);
 		}
 
-		$only = $this->config( 'wp_cli.only', [] );
-
-		if ( \count( $only ) > 0 ) {
-			return ! \in_array( $command, $only, true );
-		}
-
-		$except = $this->config( 'wp_cli.except', [] );
-
-		if ( $this->config( 'wp_cli.except_built_in_commands', true ) ) {
-			$except = \array_merge( $except, Cli_Collection_Helper::get_core_command_list() );
-		}
-
-		return \in_array( $command, $except, true );
-	}
-
-	public function is_enabled() {
-		return (bool) $this->config( 'enable', true );
-	}
-
-	public function is_feature_available( $feature ) {
-		// @todo Allow custom conditions to be registered.
-		if ( 'wpdb' === $feature ) {
-			return \defined( 'SAVEQUERIES' ) && SAVEQUERIES;
-		}
-		if ( 'xdebug' === $feature ) {
-			return \extension_loaded( 'xdebug' ); // @todo get_loaded_extensions()?
-		}
-
-		return true;
-	}
-
-	public function is_feature_enabled( $feature ) {
-		return $this->config( "data_sources.{$feature}.enabled", false )
-			&& $this->is_feature_available( $feature );
-	}
-
-	public function is_recording() {
-		return $this->is_enabled() || $this->config( 'collect_data_always', false );
-	}
-
-	public function is_running_in_console() {
-		// @todo Do we actually care if it is in console but not WP-CLI?
-		return ( \defined( 'WP_CLI' ) && WP_CLI ) || \in_array( \PHP_SAPI, [ 'cli', 'phpdbg' ], true );
-	}
-
-	public function is_toolbar_enabled() {
-		return (bool) $this->config( 'toolbar', true );
-	}
-
-	public function is_web_enabled() {
-		return $this->config( 'enable', true ) && $this->config( 'web', true );
-	}
-
-	public function is_web_installed() {
-		// @todo Don't use wp functions in plugin class?
-		if ( ! \function_exists( 'get_home_path' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/file.php';
-		}
-
-		return \file_exists( \get_home_path() . '__clockwork/index.html' );
+		return $this->is;
 	}
 
 	// @todo Method name?

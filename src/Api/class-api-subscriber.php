@@ -36,7 +36,7 @@ final class Api_Subscriber implements Subscriber {
 			[ Api_Controller::class, 'serve_json' ]
 		);
 
-		if ( $this->plugin->is_collecting_client_metrics() ) {
+		if ( $this->plugin->is()->collecting_client_metrics() ) {
 			$this->routes->put(
 				'^__clockwork/([0-9-]+)$',
 				'index.php?id=$matches[1]&update=1',

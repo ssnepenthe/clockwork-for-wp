@@ -29,7 +29,7 @@ final class Web_Uninstall_Command extends Command {
 
 	public function handle( $_, $assoc_args ): void {
 		// @todo Use wp filesystem classes?
-		if ( ! $this->plugin->is_web_installed() ) {
+		if ( ! $this->plugin->is()->web_installed() ) {
 			WP_CLI::error( 'Clockwork web app does not appear to be installed' );
 		}
 

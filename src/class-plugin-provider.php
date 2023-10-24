@@ -16,7 +16,7 @@ use Pimple\Container;
  */
 final class Plugin_Provider extends Base_Provider {
 	public function boot( Plugin $plugin ): void {
-		if ( $plugin->is_enabled() || $plugin->is_web_enabled() || $plugin->is_web_installed() ) {
+		if ( $plugin->is()->enabled() || $plugin->is()->web_enabled() || $plugin->is()->web_installed() ) {
 			$plugin->get_pimple()[ Event_Manager::class ]->attach( new Plugin_Subscriber() );
 		}
 	}

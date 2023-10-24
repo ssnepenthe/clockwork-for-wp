@@ -38,7 +38,7 @@ final class Data_Source_Provider extends Base_Provider {
 		// configuration now.
 		$errors = Errors::get_instance();
 
-		if ( $plugin->is_feature_enabled( 'errors' ) ) {
+		if ( $plugin->is()->feature_enabled( 'errors' ) ) {
 			$config = $plugin->config( 'data_sources.errors.config', [] );
 
 			$except_types = $config['except_types'] ?? false;

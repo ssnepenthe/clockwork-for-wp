@@ -37,7 +37,7 @@ final class Web_Install_Command extends Command {
 		$force = $assoc_args['force'] ?? false;
 
 		// @todo Use wp filesystem classes?
-		if ( $this->plugin->is_web_installed() ) {
+		if ( $this->plugin->is()->web_installed() ) {
 			if ( $force ) {
 				WP_CLI::log( 'Removing previous Clockwork web app installation...' );
 				WP_CLI::debug( 'Running "clockwork web-uninstall"', 'clockwork' );

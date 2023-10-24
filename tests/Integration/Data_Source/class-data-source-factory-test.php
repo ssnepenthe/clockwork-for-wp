@@ -2,9 +2,11 @@
 
 namespace Clockwork_For_Wp\Tests\Integration\Data_Source;
 
+use Clockwork\Clockwork;
 use Clockwork\DataSource\DataSource;
 use Clockwork_For_Wp\Data_Source;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
+use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Plugin;
 use Clockwork_For_Wp\Tests\Creates_Config;
 use InvalidArgumentException;
@@ -94,6 +96,7 @@ class Data_Source_Factory_Test extends TestCase {
 		return new Data_Source\Data_Source_Factory( new Plugin( [], [
 			'wp_version' => 'irrelevant',
 			'timestart' => 'irrelevant',
+			Clockwork::class => new Clockwork(),
 			ConfigurationInterface::class => $this->create_config( [
 				'data_sources' => [
 					'rest_api' => [ 'enabled' => true ],
@@ -103,7 +106,15 @@ class Data_Source_Factory_Test extends TestCase {
 			] ),
 			Event_Manager::class => new class {
 				public function trigger() { /** irrelevant */ }
-			}
+			},
+			Incoming_Request::class => new Incoming_Request( [
+				'ajax_uri' => 'localhost/wp-admin/admin-ajax.php',
+				'cookies' => [],
+				'headers' => [],
+				'input' => [],
+				'method' => 'GET',
+				'uri' => '/',
+			] ),
 		] ) );
 	}
 }

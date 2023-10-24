@@ -5,6 +5,7 @@ namespace Clockwork_For_Wp\Tests\Integration;
 use Clockwork\Clockwork;
 use Clockwork\Request\IncomingRequest;
 use Clockwork_For_Wp\Clockwork_Provider;
+use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Plugin;
 use Clockwork_For_Wp\Storage_Factory;
 use Clockwork_For_Wp\Tests\Creates_Config;
@@ -34,63 +35,6 @@ class Plugin_Test extends TestCase {
 
 		$this->assertEquals( 'b', $plugin->config( 'a' ) );
 		$this->assertEquals( 'default', $plugin->config( 'b', 'default' ) );
-	}
-
-	/** @test */
-	public function it_can_check_if_a_feature_is_enabled() {
-		$plugin = $this->create_plugin_with_configuration( [
-			'data_sources' => [
-				'one' => [ 'enabled' => true ],
-				'two' => [ 'enabled' => false ],
-			],
-		] );
-
-		$this->assertTrue( $plugin->is_feature_enabled( 'one' ) );
-		$this->assertFalse( $plugin->is_feature_enabled( 'two' ) );
-
-		// False for features that are not registered.
-		$this->assertFalse( $plugin->is_feature_enabled( 'three' ) );
-	}
-
-	/** @test */
-	public function it_can_check_if_clockwork_is_enabled() {
-		// Default true.
-		$plugin = $this->create_plugin_with_configuration( [] );
-
-		$this->assertTrue( $plugin->is_enabled() );
-
-		// Explicitly enabled.
-		$plugin = $this->create_plugin_with_configuration( [ 'enable' => true ] );
-
-		$this->assertTrue( $plugin->is_enabled() );
-
-		// Explicitly disabled.
-		$plugin = $this->create_plugin_with_configuration( [ 'enable' => false ] );
-
-		$this->assertFalse( $plugin->is_enabled() );
-	}
-
-	/** @test */
-	public function it_can_check_if_web_app_is_enabled() {
-		// Default true.
-		$plugin = $this->create_plugin_with_configuration( [] );
-
-		$this->assertTrue( $plugin->is_web_enabled() );
-
-		// Enabled and web enabled.
-		$plugin = $this->create_plugin_with_configuration( [ 'enable' => true, 'web' => true ] );
-
-		$this->assertTrue( $plugin->is_web_enabled() );
-
-		// Enabled, not web enabled.
-		$plugin = $this->create_plugin_with_configuration( [ 'enable' => true, 'web' => false ] );
-
-		$this->assertFalse( $plugin->is_web_enabled() );
-
-		// Disabled, web enabled.
-		$plugin = $this->create_plugin_with_configuration( [ 'enable' => false, 'web' => true ] );
-
-		$this->assertFalse( $plugin->is_web_enabled() );
 	}
 
 	/** @test */
