@@ -22,7 +22,7 @@ final class Api_Provider extends Base_Provider {
 			$pimple = $plugin->get_pimple();
 
 			$pimple[ Event_Manager::class ]->attach(
-				new Api_Subscriber( $pimple[ Plugin::class ], $pimple[ Route_Collection::class ] )
+				new Api_Subscriber( $plugin->is(), $pimple[ Route_Collection::class ] )
 			);
 		}
 	}

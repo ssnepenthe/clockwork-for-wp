@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Api;
 
 use Clockwork_For_Wp\Event_Management\Subscriber;
-use Clockwork_For_Wp\Plugin;
+use Clockwork_For_Wp\Is;
 use Clockwork_For_Wp\Routing\Route_Collection;
 
 final class Api_Subscriber implements Subscriber {
-	protected $plugin;
+	protected $is;
 
 	protected $routes;
 
-	public function __construct( Plugin $plugin, Route_Collection $routes ) {
-		$this->plugin = $plugin;
+	public function __construct( Is $is, Route_Collection $routes ) {
+		$this->is = $is;
 		$this->routes = $routes;
 	}
 
@@ -36,7 +36,7 @@ final class Api_Subscriber implements Subscriber {
 			[ Api_Controller::class, 'serve_json' ]
 		);
 
-		if ( $this->plugin->is()->collecting_client_metrics() ) {
+		if ( $this->is->collecting_client_metrics() ) {
 			$this->routes->put(
 				'^__clockwork/([0-9-]+)$',
 				'index.php?id=$matches[1]&update=1',

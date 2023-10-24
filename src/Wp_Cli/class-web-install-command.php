@@ -7,7 +7,7 @@ namespace Clockwork_For_Wp\Wp_Cli;
 use ApheleiaCli\Command;
 use ApheleiaCli\Flag;
 use Clockwork\Web\Web;
-use Clockwork_For_Wp\Plugin;
+use Clockwork_For_Wp\Is;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use WP_CLI;
@@ -16,10 +16,10 @@ use WP_CLI;
  * @internal
  */
 final class Web_Install_Command extends Command {
-	private Plugin $plugin;
+	private Is $is;
 
-	public function __construct( Plugin $plugin ) {
-		$this->plugin = $plugin;
+	public function __construct( Is $is ) {
+		$this->is = $is;
 
 		parent::__construct();
 	}
@@ -37,7 +37,7 @@ final class Web_Install_Command extends Command {
 		$force = $assoc_args['force'] ?? false;
 
 		// @todo Use wp filesystem classes?
-		if ( $this->plugin->is()->web_installed() ) {
+		if ( $this->is->web_installed() ) {
 			if ( $force ) {
 				WP_CLI::log( 'Removing previous Clockwork web app installation...' );
 				WP_CLI::debug( 'Running "clockwork web-uninstall"', 'clockwork' );
