@@ -22,7 +22,7 @@ abstract class Base_Provider implements Provider {
 	public function register( Plugin $plugin ): void {
 	}
 
-	public function registered(): void {
+	public function registered( Plugin $plugin ): void {
 	}
 
 	protected function subscribers(): array {

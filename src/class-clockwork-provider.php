@@ -116,52 +116,52 @@ final class Clockwork_Provider extends Base_Provider {
 		};
 	}
 
-	public function registered(): void {
-		$this->configure_serializer();
-		$this->configure_should_collect();
+	public function registered( Plugin $plugin ): void {
+		$this->configure_serializer( $plugin );
+		$this->configure_should_collect( $plugin );
 
-		if ( $this->plugin->config( 'register_helpers', true ) ) {
+		if ( $plugin->config( 'register_helpers', true ) ) {
 			require_once __DIR__ . '/clock.php';
 		}
 	}
 
-	private function configure_serializer(): void {
+	private function configure_serializer( Plugin $plugin ): void {
 		Serializer::defaults(
 			[
-				'limit' => $this->plugin->config( 'serialization.depth', 10 ),
-				'blackbox' => $this->plugin->config(
+				'limit' => $plugin->config( 'serialization.depth', 10 ),
+				'blackbox' => $plugin->config(
 					'serialization.blackbox',
 					[
 						\Pimple\Container::class,
 						\Pimple\Psr11\Container::class,
 					]
 				),
-				'traces' => $this->plugin->config( 'stack_traces.enabled', true ),
+				'traces' => $plugin->config( 'stack_traces.enabled', true ),
 				'tracesSkip' => StackFilter::make()
 					->isNotVendor(
 						\array_merge(
-							$this->plugin->config( 'stack_traces.skip_vendors', [] ),
+							$plugin->config( 'stack_traces.skip_vendors', [] ),
 							[ 'itsgoingd' ]
 						)
 					)
-					->isNotNamespace( $this->plugin->config( 'stack_traces.skip_namespaces', [] ) )
+					->isNotNamespace( $plugin->config( 'stack_traces.skip_namespaces', [] ) )
 					->isNotFunction( [ 'call_user_func', 'call_user_func_array' ] )
-					->isNotClass( $this->plugin->config( 'stack_traces.skip_classes', [] ) ),
-				'tracesLimit' => $this->plugin->config( 'stack_traces.limit', 10 ),
+					->isNotClass( $plugin->config( 'stack_traces.skip_classes', [] ) ),
+				'tracesLimit' => $plugin->config( 'stack_traces.limit', 10 ),
 			]
 		);
 	}
 
-	private function configure_should_collect(): void {
-		$should_collect = $this->plugin->get_pimple()[ Clockwork::class ]->shouldCollect();
+	private function configure_should_collect( Plugin $plugin ): void {
+		$should_collect = $plugin->get_pimple()[ Clockwork::class ]->shouldCollect();
 
 		$should_collect->merge(
 			[
-				'onDemand' => $this->plugin->config( 'requests.on_demand', false ),
-				'sample' => $this->plugin->config( 'requests.sample', false ),
-				'except' => $this->plugin->config( 'requests.except', [] ),
-				'only' => $this->plugin->config( 'requests.only', [] ),
-				'exceptPreflight' => $this->plugin->config( 'requests.except_preflight', true ),
+				'onDemand' => $plugin->config( 'requests.on_demand', false ),
+				'sample' => $plugin->config( 'requests.sample', false ),
+				'except' => $plugin->config( 'requests.except', [] ),
+				'only' => $plugin->config( 'requests.only', [] ),
+				'exceptPreflight' => $plugin->config( 'requests.except_preflight', true ),
 			]
 		);
 

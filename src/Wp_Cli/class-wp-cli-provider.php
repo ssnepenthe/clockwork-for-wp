@@ -6,12 +6,13 @@ namespace Clockwork_For_Wp\Wp_Cli;
 
 use ApheleiaCli\CommandRegistry;
 use Clockwork_For_Wp\Base_Provider;
+use Clockwork_For_Wp\Plugin;
 
 /**
  * @internal
  */
 final class Wp_Cli_Provider extends Base_Provider {
-	public function registered(): void {
+	public function registered( Plugin $plugin ): void {
 		if ( ! ( \defined( 'WP_CLI' ) && WP_CLI ) ) {
 			return;
 		}

@@ -9,5 +9,5 @@ interface Provider {
 
 	public function register( Plugin $plugin );
 
-	public function registered();
+	public function registered( Plugin $plugin );
 }

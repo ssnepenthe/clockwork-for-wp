@@ -198,7 +198,7 @@ final class Plugin {
 		}
 
 		foreach ( $this->providers as $provider ) {
-			$provider->registered();
+			$provider->registered( $this );
 		}
 
 		$this->locked = true;

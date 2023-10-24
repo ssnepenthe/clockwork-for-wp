@@ -19,14 +19,14 @@ final class Data_Source_Provider extends Base_Provider {
 		};
 	}
 
-	public function registered(): void {
+	public function registered( Plugin $plugin ): void {
 		// We have registered our error handler as early as possible in order to collect as many
 		// errors as possible. However our config is not available that early so let's apply our
 		// configuration now.
 		$errors = Errors::get_instance();
 
-		if ( $this->plugin->is_feature_enabled( 'errors' ) ) {
-			$config = $this->plugin->config( 'data_sources.errors.config', [] );
+		if ( $plugin->is_feature_enabled( 'errors' ) ) {
+			$config = $plugin->config( 'data_sources.errors.config', [] );
 
 			$except_types = $config['except_types'] ?? false;
 			$only_types = $config['only_types'] ?? false;
