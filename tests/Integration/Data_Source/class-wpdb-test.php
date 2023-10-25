@@ -2,16 +2,20 @@
 
 namespace Clockwork_For_Wp\Tests\Integration\Data_Source;
 
-use Clockwork_For_Wp\Config;
-use Clockwork_For_Wp\Data_Source\Data_Source_Provider;
+use Clockwork\Clockwork;
 use Clockwork_For_Wp\Data_Source\Wpdb;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
-use Clockwork_For_Wp\Plugin;
 use Clockwork\Request\Request;
 use Clockwork_For_Wp\Data_Source\Data_Source_Factory;
+use Clockwork_For_Wp\Incoming_Request;
+use Clockwork_For_Wp\Is;
+use Clockwork_For_Wp\Tests\Creates_Config;
 use PHPUnit\Framework\TestCase;
+use Pimple\Container;
 
 class Wpdb_Test extends TestCase {
+	use Creates_Config;
+
 	protected function pattern_model_map() {
 		// @todo Can we pull this from the bundled config? Would require a method for removing WP constants as dependencies of the config.php file.
 		return [
@@ -182,17 +186,25 @@ class Wpdb_Test extends TestCase {
 		$this->assertEquals( 'TESTMODEL', $request->databaseQueries[0]['model'] );
 	}
 
-	protected function create_data_source_via_factory( $config = [] ) {
-		return ( new Data_Source_Factory( new Plugin( [], [
-			Event_Manager::class => new class {
-				public function trigger( ...$args ) {
-					// Not important...
-				}
-			},
-		] ) ) )->create( 'wpdb', [
-			'pattern_model_map' => $config['pattern_model_map'] ?? $this->pattern_model_map(),
-			'slow_only' => $config['slow_only'] ?? false,
-			'slow_threshold' => $config['slow_threshold'] ?? 50
+	protected function create_data_source_via_factory( $user_config = [] ) {
+		$config = $this->create_config();
+
+		$factory = new Data_Source_Factory(
+			$config,
+			new Is( $config, new Clockwork(), new Incoming_Request() ),
+			new Container( [
+				Event_Manager::class => new class {
+					public function trigger( ...$args ) {
+						// Not important...
+					}
+				},
+			] )
+		);
+
+		return $factory->create( 'wpdb', [
+			'pattern_model_map' => $user_config['pattern_model_map'] ?? $this->pattern_model_map(),
+			'slow_only' => $user_config['slow_only'] ?? false,
+			'slow_threshold' => $user_config['slow_threshold'] ?? 50
 		] );
 	}
 }

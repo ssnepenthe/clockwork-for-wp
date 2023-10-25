@@ -11,10 +11,10 @@ use Clockwork\Helpers\StackFilter;
 use Clockwork\Request\IncomingRequest;
 use Clockwork\Request\Log;
 use Clockwork\Request\Request;
+use Clockwork\Request\ShouldCollect;
 use Clockwork\Storage\StorageInterface;
 use Clockwork_For_Wp\Data_Source\Data_Source_Factory;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
-use League\Config\ConfigurationInterface;
 use Pimple\Container;
 
 /**
@@ -32,7 +32,8 @@ final class Clockwork_Provider extends Base_Provider {
 
 			$pimple[ Event_Manager::class ]->attach(
 				new Clockwork_Subscriber(
-					$pimple[ Plugin::class ],
+					$pimple[ Read_Only_Configuration::class ],
+					$pimple[ Plugin::class ]->is(),
 					$pimple[ Event_Manager::class ],
 					$pimple[ Clockwork::class ],
 					$pimple[ Request::class ]
@@ -48,7 +49,7 @@ final class Clockwork_Provider extends Base_Provider {
 			return new Clockwork_Support(
 				$pimple[ Clockwork::class ],
 				$pimple[ Data_Source_Factory::class ],
-				$pimple[ ConfigurationInterface::class ]
+				$pimple[ Read_Only_Configuration::class ]
 			);
 		};
 
@@ -64,7 +65,7 @@ final class Clockwork_Provider extends Base_Provider {
 		};
 
 		$pimple[ AuthenticatorInterface::class ] = static function ( Container $pimple ) {
-			$config = $pimple[ ConfigurationInterface::class ]->get( 'authentication' );
+			$config = $pimple[ Read_Only_Configuration::class ]->get( 'authentication' );
 			$factory = $pimple[ Authenticator_Factory::class ];
 
 			if ( ! ( $config['enabled'] ?? false ) ) {
@@ -81,7 +82,7 @@ final class Clockwork_Provider extends Base_Provider {
 		};
 
 		$pimple[ StorageInterface::class ] = $pimple->factory( static function ( Container $pimple ) {
-			$storage_config = $pimple[ ConfigurationInterface::class ]->get( 'storage' );
+			$storage_config = $pimple[ Read_Only_Configuration::class ]->get( 'storage' );
 			$driver = $storage_config['driver'];
 			$driver_config = $storage_config['drivers'][ $driver ] ?? [];
 
@@ -117,51 +118,52 @@ final class Clockwork_Provider extends Base_Provider {
 	}
 
 	public function registered( Plugin $plugin ): void {
-		$this->configure_serializer( $plugin );
-		$this->configure_should_collect( $plugin );
+		$pimple = $plugin->get_pimple();
+		$config = $pimple[ Read_Only_Configuration::class ];
 
-		if ( $plugin->config( 'register_helpers', true ) ) {
+		$this->configure_serializer( $config );
+		$this->configure_should_collect( $pimple[ Clockwork::class ]->shouldCollect(), $config );
+
+		if ( $config->get( 'register_helpers', true ) ) {
 			require_once __DIR__ . '/clock.php';
 		}
 	}
 
-	private function configure_serializer( Plugin $plugin ): void {
+	private function configure_serializer( Read_Only_Configuration $config ): void {
 		Serializer::defaults(
 			[
-				'limit' => $plugin->config( 'serialization.depth', 10 ),
-				'blackbox' => $plugin->config(
+				'limit' => $config->get( 'serialization.depth', 10 ),
+				'blackbox' => $config->get(
 					'serialization.blackbox',
 					[
 						\Pimple\Container::class,
 						\Pimple\Psr11\Container::class,
 					]
 				),
-				'traces' => $plugin->config( 'stack_traces.enabled', true ),
+				'traces' => $config->get( 'stack_traces.enabled', true ),
 				'tracesSkip' => StackFilter::make()
 					->isNotVendor(
 						\array_merge(
-							$plugin->config( 'stack_traces.skip_vendors', [] ),
+							$config->get( 'stack_traces.skip_vendors', [] ),
 							[ 'itsgoingd' ]
 						)
 					)
-					->isNotNamespace( $plugin->config( 'stack_traces.skip_namespaces', [] ) )
+					->isNotNamespace( $config->get( 'stack_traces.skip_namespaces', [] ) )
 					->isNotFunction( [ 'call_user_func', 'call_user_func_array' ] )
-					->isNotClass( $plugin->config( 'stack_traces.skip_classes', [] ) ),
-				'tracesLimit' => $plugin->config( 'stack_traces.limit', 10 ),
+					->isNotClass( $config->get( 'stack_traces.skip_classes', [] ) ),
+				'tracesLimit' => $config->get( 'stack_traces.limit', 10 ),
 			]
 		);
 	}
 
-	private function configure_should_collect( Plugin $plugin ): void {
-		$should_collect = $plugin->get_pimple()[ Clockwork::class ]->shouldCollect();
-
+	private function configure_should_collect( ShouldCollect $should_collect, Read_Only_Configuration $config ): void {
 		$should_collect->merge(
 			[
-				'onDemand' => $plugin->config( 'requests.on_demand', false ),
-				'sample' => $plugin->config( 'requests.sample', false ),
-				'except' => $plugin->config( 'requests.except', [] ),
-				'only' => $plugin->config( 'requests.only', [] ),
-				'exceptPreflight' => $plugin->config( 'requests.except_preflight', true ),
+				'onDemand' => $config->get( 'requests.on_demand', false ),
+				'sample' => $config->get( 'requests.sample', false ),
+				'except' => $config->get( 'requests.except', [] ),
+				'only' => $config->get( 'requests.only', [] ),
+				'exceptPreflight' => $config->get( 'requests.except_preflight', true ),
 			]
 		);
 

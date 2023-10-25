@@ -11,16 +11,25 @@ use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
 final class Clockwork_Subscriber implements Subscriber {
-	private $plugin;
+	private $config;
 
 	protected $events;
 
 	protected $clockwork;
 
+	private $is;
+
 	protected $request;
 
-	public function __construct( Plugin $plugin, Event_Manager $events, Clockwork $clockwork, Request $request ) {
-		$this->plugin = $plugin;
+	public function __construct(
+		Read_Only_Configuration $config,
+		Is $is,
+		Event_Manager $events,
+		Clockwork $clockwork,
+		Request $request
+	) {
+		$this->config = $config;
+		$this->is = $is;
 		$this->events = $events;
 		$this->clockwork = $clockwork;
 		$this->request = $request;
@@ -44,11 +53,11 @@ final class Clockwork_Subscriber implements Subscriber {
 			true
 		);
 
-		if ( $this->plugin->is()->collecting_client_metrics() ) {
+		if ( $this->is->collecting_client_metrics() ) {
 			\wp_enqueue_script( 'clockwork-metrics' );
 		}
 
-		if ( $this->plugin->is()->toolbar_enabled() ) {
+		if ( $this->is->toolbar_enabled() ) {
 			\wp_enqueue_script( 'clockwork-toolbar' );
 		}
 	}
@@ -58,7 +67,7 @@ final class Clockwork_Subscriber implements Subscriber {
 
 		if (
 			! $command instanceof Command_Context
-			|| $this->plugin->is()->command_filtered( $command->name() )
+			|| $this->is->command_filtered( $command->name() )
 		) {
 			return;
 		}
@@ -73,7 +82,7 @@ final class Clockwork_Subscriber implements Subscriber {
 				$command->options(),
 				$command->default_arguments(), // @todo Only defaults that aren't set by user???
 				$command->default_options(), // @todo Only defaults that aren't set by user???
-				$this->plugin->config( 'wp_cli.collect_output', false ) ? $command->output() : ''
+				$this->config->get( 'wp_cli.collect_output', false ) ? $command->output() : ''
 			)
 			->storeRequest();
 	}
@@ -93,18 +102,18 @@ final class Clockwork_Subscriber implements Subscriber {
 
 		if (
 			// @todo Redundant conditions?
-			( $this->plugin->is()->enabled() && $this->plugin->is()->recording() )
-			&& $this->plugin->is()->collecting_requests()
+			( $this->is->enabled() && $this->is->recording() )
+			&& $this->is->collecting_requests()
 		) {
 			// wp_loaded fires on frontend but also login, admin, etc.
 			$events['wp_loaded'] = [ 'initialize_request', Event_Manager::LATE_EVENT ];
 		}
 
 		// @todo Redundant conditions?
-		if ( $this->plugin->is()->recording() ) {
-			if ( $this->plugin->is()->collecting_commands() ) {
+		if ( $this->is->recording() ) {
+			if ( $this->is->collecting_commands() ) {
 				$events['shutdown'] = [ 'finalize_command', Event_Manager::LATE_EVENT ];
-			} elseif ( $this->plugin->is()->collecting_requests() ) {
+			} elseif ( $this->is->collecting_requests() ) {
 				$events['shutdown'] = [ 'finalize_request', Event_Manager::LATE_EVENT ];
 			}
 		}
@@ -124,7 +133,7 @@ final class Clockwork_Subscriber implements Subscriber {
 
 		// @todo Set clockwork path header?
 
-		$extra_headers = $this->plugin->config( 'headers' );
+		$extra_headers = $this->config->get( 'headers' );
 
 		foreach ( $extra_headers as $header_name => $header_value ) {
 			\header( "X-Clockwork-Header-{$header_name}: {$header_value}" );
@@ -133,18 +142,18 @@ final class Clockwork_Subscriber implements Subscriber {
 		// @todo Set subrequest headers?
 
 		if (
-			$this->plugin->is()->collecting_client_metrics()
-			|| $this->plugin->is()->toolbar_enabled()
+			$this->is->collecting_client_metrics()
+			|| $this->is->toolbar_enabled()
 		) {
 			$cookie = \json_encode(
 				[
 					'requestId' => $this->request->id,
 					'version' => Clockwork::VERSION,
 					'path' => '/__clockwork/',
-					'webPath' => $this->plugin->is()->web_installed() ? '/__clockwork' : '/__clockwork/app',
+					'webPath' => $this->is->web_installed() ? '/__clockwork' : '/__clockwork/app',
 					'token' => $this->request->updateToken,
-					'metrics' => $this->plugin->is()->collecting_client_metrics(),
-					'toolbar' => $this->plugin->is()->toolbar_enabled(),
+					'metrics' => $this->is->collecting_client_metrics(),
+					'toolbar' => $this->is->toolbar_enabled(),
 				]
 			);
 

@@ -7,11 +7,11 @@ use Clockwork\DataSource\DataSource;
 use Clockwork_For_Wp\Data_Source;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Incoming_Request;
-use Clockwork_For_Wp\Plugin;
+use Clockwork_For_Wp\Is;
 use Clockwork_For_Wp\Tests\Creates_Config;
 use InvalidArgumentException;
-use League\Config\ConfigurationInterface;
 use PHPUnit\Framework\TestCase;
+use Pimple\Container;
 
 class Data_Source_Factory_Test extends TestCase {
 	use Creates_Config;
@@ -93,28 +93,30 @@ class Data_Source_Factory_Test extends TestCase {
 	}
 
 	protected function create_factory() {
-		return new Data_Source\Data_Source_Factory( new Plugin( [], [
+		$config = $this->create_config( [
+			'data_sources' => [
+				'rest_api' => [ 'enabled' => true ],
+				'theme' => [ 'enabled' => false ],
+				'transients' => [ 'enabled' => true ],
+			],
+		] );
+		$clockwork = new Clockwork();
+		$request = new Incoming_Request( [
+			'ajax_uri' => 'localhost/wp-admin/admin-ajax.php',
+			'cookies' => [],
+			'headers' => [],
+			'input' => [],
+			'method' => 'GET',
+			'uri' => '/',
+		] );
+		$pimple = new Container( [
 			'wp_version' => 'irrelevant',
 			'timestart' => 'irrelevant',
-			Clockwork::class => new Clockwork(),
-			ConfigurationInterface::class => $this->create_config( [
-				'data_sources' => [
-					'rest_api' => [ 'enabled' => true ],
-					'theme' => [ 'enabled' => false ],
-					'transients' => [ 'enabled' => true ],
-				],
-			] ),
 			Event_Manager::class => new class {
 				public function trigger() { /** irrelevant */ }
-			},
-			Incoming_Request::class => new Incoming_Request( [
-				'ajax_uri' => 'localhost/wp-admin/admin-ajax.php',
-				'cookies' => [],
-				'headers' => [],
-				'input' => [],
-				'method' => 'GET',
-				'uri' => '/',
-			] ),
-		] ) );
+			}
+		] );
+
+		return new Data_Source\Data_Source_Factory( $config, new Is( $config, $clockwork, $request ), $pimple );
 	}
 }

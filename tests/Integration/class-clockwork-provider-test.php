@@ -4,9 +4,9 @@ namespace Clockwork_For_Wp\Tests\Integration;
 
 use Clockwork_For_Wp\Clockwork_Provider;
 use Clockwork_For_Wp\Plugin;
+use Clockwork_For_Wp\Read_Only_Configuration;
 use Clockwork_For_Wp\Storage_Factory;
 use Clockwork_For_Wp\Tests\Creates_Config;
-use League\Config\ConfigurationInterface;
 use Null_Storage_For_Tests;
 use PHPUnit\Framework\TestCase;
 
@@ -50,7 +50,7 @@ class Clockwork_Provider_Test extends TestCase {
 
 	private function create_plugin( array $user_config = [] ) {
 		$plugin = new Plugin( [], [
-			ConfigurationInterface::class => $this->create_config( $user_config ),
+			Read_Only_Configuration::class => $this->create_config( $user_config ),
 		] );
 
 		$plugin->register( new Clockwork_Provider( $plugin ) );

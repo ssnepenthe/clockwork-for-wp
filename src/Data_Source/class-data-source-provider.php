@@ -8,6 +8,7 @@ use Clockwork_For_Wp\Base_Provider;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Plugin;
 use Clockwork_For_Wp\Provides_Subscriber;
+use Clockwork_For_Wp\Read_Only_Configuration;
 use Pimple\Container;
 
 /**
@@ -28,7 +29,11 @@ final class Data_Source_Provider extends Base_Provider {
 
 	public function register( Plugin $plugin ): void {
 		$plugin->get_pimple()[ Data_Source_Factory::class ] = static function ( Container $pimple ) {
-			return new Data_Source_Factory( $pimple[ Plugin::class ] );
+			return new Data_Source_Factory(
+				$pimple[ Read_Only_Configuration::class ],
+				$pimple[ Plugin::class ]->is(),
+				$pimple
+			);
 		};
 	}
 
@@ -39,7 +44,7 @@ final class Data_Source_Provider extends Base_Provider {
 		$errors = Errors::get_instance();
 
 		if ( $plugin->is()->feature_enabled( 'errors' ) ) {
-			$config = $plugin->config( 'data_sources.errors.config', [] );
+			$config = $plugin->get_pimple()[ Read_Only_Configuration::class ]->get( 'data_sources.errors.config', [] );
 
 			$except_types = $config['except_types'] ?? false;
 			$only_types = $config['only_types'] ?? false;

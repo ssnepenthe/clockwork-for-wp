@@ -5,13 +5,10 @@ namespace Clockwork_For_Wp\Tests\Integration;
 use Clockwork\Clockwork;
 use Clockwork\Request\IncomingRequest;
 use Clockwork_For_Wp\Clockwork_Provider;
-use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Plugin;
+use Clockwork_For_Wp\Read_Only_Configuration;
 use Clockwork_For_Wp\Storage_Factory;
 use Clockwork_For_Wp\Tests\Creates_Config;
-use League\Config\Configuration;
-use League\Config\ConfigurationInterface;
-use Nette\Schema\Expect;
 use Null_Storage_For_Tests;
 use PHPUnit\Framework\TestCase;
 
@@ -23,18 +20,6 @@ class Plugin_Test extends TestCase {
 		$plugin = new Plugin( [], [ 'a' => 'b' ] );
 
 		$this->assertEquals( 'b', $plugin->get_pimple()[ 'a' ] );
-	}
-
-	/** @test */
-	public function it_provides_access_to_config_object() {
-		$config = new Configuration( [ 'a' => Expect::string() ] );
-		$config->merge( [ 'a' => 'b' ] );
-		$plugin = new Plugin( [], [
-			ConfigurationInterface::class => $config,
-		] );
-
-		$this->assertEquals( 'b', $plugin->config( 'a' ) );
-		$this->assertEquals( 'default', $plugin->config( 'b', 'default' ) );
 	}
 
 	/** @test */
@@ -143,7 +128,7 @@ class Plugin_Test extends TestCase {
 
 	private function create_plugin_with_configuration( array $user_config = [] ) {
 		$plugin = new Plugin( [], [
-			ConfigurationInterface::class => $this->create_config( $user_config ),
+			Read_Only_Configuration::class => $this->create_config( $user_config ),
 		] );
 
 		return $plugin;

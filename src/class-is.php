@@ -6,7 +6,6 @@ namespace Clockwork_For_Wp;
 
 use Clockwork\Clockwork;
 use Clockwork_For_Wp\Cli_Data_Collection\Cli_Collection_Helper;
-use League\Config\ConfigurationInterface;
 
 final class Is {
 	private $clockwork;
@@ -15,20 +14,20 @@ final class Is {
 
 	private $request;
 
-	public function __construct( ConfigurationInterface $config, Clockwork $clockwork, Incoming_Request $request ) {
+	public function __construct( Read_Only_Configuration $config, Clockwork $clockwork, Incoming_Request $request ) {
 		$this->config = $config;
 		$this->clockwork = $clockwork;
 		$this->request = $request;
 	}
 
 	public function collecting_client_metrics(): bool {
-		return (bool) $this->config( 'collect_client_metrics', true );
+		return (bool) $this->config->get( 'collect_client_metrics', true );
 	}
 
 	public function collecting_commands(): bool {
-		return ( $this->enabled() || $this->config( 'collect_data_always', false ) )
+		return ( $this->enabled() || $this->config->get( 'collect_data_always', false ) )
 			&& $this->running_in_console()
-			&& $this->config( 'wp_cli.collect', false );
+			&& $this->config->get( 'wp_cli.collect', false );
 	}
 
 	public function collecting_data() {
@@ -36,11 +35,11 @@ final class Is {
 	}
 
 	public function collecting_heartbeat_requests() {
-		return (bool) $this->config( 'collect_heartbeat', true );
+		return (bool) $this->config->get( 'collect_heartbeat', true );
 	}
 
 	public function collecting_requests() {
-		return ( $this->enabled() || $this->config( 'collect_data_always', false ) )
+		return ( $this->enabled() || $this->config->get( 'collect_data_always', false ) )
 			&& ! $this->running_in_console()
 			&& $this->clockwork->shouldCollect()->filter( $this->request )
 			&& ( ! $this->request->is_heartbeat() || $this->collecting_heartbeat_requests() );
@@ -51,15 +50,15 @@ final class Is {
 			return true;
 		}
 
-		$only = $this->config( 'wp_cli.only', [] );
+		$only = $this->config->get( 'wp_cli.only', [] );
 
 		if ( \count( $only ) > 0 ) {
 			return ! \in_array( $command, $only, true );
 		}
 
-		$except = $this->config( 'wp_cli.except', [] );
+		$except = $this->config->get( 'wp_cli.except', [] );
 
-		if ( $this->config( 'wp_cli.except_built_in_commands', true ) ) {
+		if ( $this->config->get( 'wp_cli.except_built_in_commands', true ) ) {
 			$except = \array_merge( $except, Cli_Collection_Helper::get_core_command_list() );
 		}
 
@@ -67,7 +66,7 @@ final class Is {
 	}
 
 	public function enabled() {
-		return (bool) $this->config( 'enable', true );
+		return (bool) $this->config->get( 'enable', true );
 	}
 
 	public function feature_available( $feature ) {
@@ -83,11 +82,11 @@ final class Is {
 	}
 
 	public function feature_enabled( $feature ) {
-		return $this->config( "data_sources.{$feature}.enabled", false ) && $this->feature_available( $feature );
+		return $this->config->get( "data_sources.{$feature}.enabled", false ) && $this->feature_available( $feature );
 	}
 
 	public function recording() {
-		return $this->enabled() || $this->config( 'collect_data_always', false );
+		return $this->enabled() || $this->config->get( 'collect_data_always', false );
 	}
 
 	public function running_in_console() {
@@ -96,11 +95,11 @@ final class Is {
 	}
 
 	public function toolbar_enabled() {
-		return (bool) $this->config( 'toolbar', true );
+		return (bool) $this->config->get( 'toolbar', true );
 	}
 
 	public function web_enabled() {
-		return $this->config( 'enable', true ) && $this->config( 'web', true );
+		return $this->config->get( 'enable', true ) && $this->config->get( 'web', true );
 	}
 
 	public function web_installed() {
@@ -110,14 +109,5 @@ final class Is {
 		}
 
 		return \file_exists( \get_home_path() . '__clockwork/index.html' );
-	}
-
-	// @todo Temporary - revisit after config interface update.
-	private function config( $path, $default = null ) {
-		if ( ! $this->config->exists( $path ) ) {
-			return $default;
-		}
-
-		return $this->config->get( $path );
 	}
 }
