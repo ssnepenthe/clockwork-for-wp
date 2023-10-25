@@ -12,7 +12,7 @@ return [
 	'collect_data_always' => Expect::bool()->default( false ),
 
 	// Enable or disable collection of client metrics.
-	'collect_client_metrics' => Expect::bool()->default( true ),
+	'collect_client_metrics' => Expect::bool()->default( false ),
 
 	// Enable or disable collection of admin-ajax "heartbeat" requests.
 	'collect_heartbeat' => Expect::bool()->default( true ),
@@ -21,7 +21,7 @@ return [
 	'web' => Expect::bool()->default( true ),
 
 	// Enable or disable the Clockwork browser toolbar.
-	'toolbar' => Expect::bool()->default( true ),
+	'toolbar' => Expect::bool()->default( false ),
 
 	// Load the clock() global function.
 	'register_helpers' => Expect::bool()->default( true ),
