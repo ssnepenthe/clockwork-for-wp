@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Clockwork_For_Wp\Data_Source;
 
-use Clockwork\DataSource\DataSource;
+use Clockwork_For_Wp\Base_Factory;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Is;
 use Clockwork_For_Wp\Read_Only_Configuration;
@@ -14,12 +14,10 @@ use Pimple\Container;
 /**
  * @internal
  */
-final class Data_Source_Factory {
+final class Data_Source_Factory extends Base_Factory {
+	protected bool $cache_enabled = true;
+
 	private $config;
-
-	private $custom_factories = [];
-
-	private $instances = [];
 
 	private $is;
 
@@ -29,24 +27,6 @@ final class Data_Source_Factory {
 		$this->config = $config;
 		$this->is = $is;
 		$this->pimple = $pimple;
-	}
-
-	public function create( string $name, array $config = [] ): DataSource {
-		if ( \array_key_exists( $name, $this->instances ) ) {
-			return $this->instances[ $name ];
-		}
-
-		if ( $this->has_custom_factory( $name ) ) {
-			return $this->instances[ $name ] = $this->call_custom_factory( $name, $config );
-		}
-
-		$method = "create_{$name}_data_source";
-
-		if ( \method_exists( $this, $method ) ) {
-			return $this->instances[ $name ] = ( [ $this, $method ] )( $config );
-		}
-
-		throw new InvalidArgumentException( "Unrecognized data source: {$name}" );
 	}
 
 	public function get_enabled_data_sources(): array {
@@ -63,21 +43,7 @@ final class Data_Source_Factory {
 		return $data_sources;
 	}
 
-	public function register_custom_factory( string $name, callable $factory ) {
-		$this->custom_factories[ $name ] = $factory;
-
-		return $this;
-	}
-
-	private function call_custom_factory( string $name, array $config = [] ): DataSource {
-		if ( ! $this->has_custom_factory( $name ) ) {
-			throw new InvalidArgumentException( "Cannot call unregistered custom factory {$name}" );
-		}
-
-		return ( $this->custom_factories[ $name ] )( $config );
-	}
-
-	private function create_conditionals_data_source( array $config ): Conditionals {
+	protected function create_conditionals_instance( array $config ): Conditionals {
 		$conditionals = $config['conditionals'] ?? [];
 
 		if ( ! \is_array( $conditionals ) ) {
@@ -132,19 +98,19 @@ final class Data_Source_Factory {
 		return $data_source;
 	}
 
-	private function create_constants_data_source( array $config ): Constants {
+	protected function create_constants_instance( array $config ): Constants {
 		return Constants::from( $config );
 	}
 
-	private function create_core_data_source(): Core {
+	protected function create_core_instance(): Core {
 		return new Core( $this->pimple[ 'wp_version' ], $this->pimple[ 'timestart' ] );
 	}
 
-	private function create_errors_data_source(): Errors {
+	protected function create_errors_instance(): Errors {
 		return Errors::get_instance();
 	}
 
-	private function create_php_data_source( array $config ): Php {
+	protected function create_php_instance( array $config ): Php {
 		if ( ! (
 			\array_key_exists( 'sensitive_patterns', $config )
 			&& \is_array( $config['sensitive_patterns'] )
@@ -155,23 +121,23 @@ final class Data_Source_Factory {
 		return new Php( ...$config['sensitive_patterns'] );
 	}
 
-	private function create_rest_api_data_source(): Rest_Api {
+	protected function create_rest_api_instance(): Rest_Api {
 		return new Rest_Api();
 	}
 
-	private function create_theme_data_source(): Theme {
+	protected function create_theme_instance(): Theme {
 		return new Theme();
 	}
 
-	private function create_transients_data_source(): Transients {
+	protected function create_transients_instance(): Transients {
 		return new Transients();
 	}
 
-	private function create_wp_data_source(): Wp {
+	protected function create_wp_instance(): Wp {
 		return new Wp();
 	}
 
-	private function create_wp_hook_data_source( array $config ): Wp_Hook {
+	protected function create_wp_hook_instance( array $config ): Wp_Hook {
 		$data_source = new Wp_Hook( $config['all_hooks'] ?? false );
 
 		$data_source->addFilter(
@@ -191,31 +157,31 @@ final class Data_Source_Factory {
 		return $data_source;
 	}
 
-	private function create_wp_http_data_source(): Wp_Http {
+	protected function create_wp_http_instance(): Wp_Http {
 		return new Wp_Http();
 	}
 
-	private function create_wp_mail_data_source(): Wp_Mail {
+	protected function create_wp_mail_instance(): Wp_Mail {
 		return new Wp_Mail();
 	}
 
-	private function create_wp_object_cache_data_source(): Wp_Object_Cache {
+	protected function create_wp_object_cache_instance(): Wp_Object_Cache {
 		return new Wp_Object_Cache();
 	}
 
-	private function create_wp_query_data_source(): Wp_Query {
+	protected function create_wp_query_instance(): Wp_Query {
 		return new Wp_Query();
 	}
 
-	private function create_wp_redirect_data_source(): Wp_Redirect {
+	protected function create_wp_redirect_instance(): Wp_Redirect {
 		return new Wp_Redirect();
 	}
 
-	private function create_wp_rewrite_data_source(): Wp_Rewrite {
+	protected function create_wp_rewrite_instance(): Wp_Rewrite {
 		return new Wp_Rewrite();
 	}
 
-	private function create_wpdb_data_source( array $config ): Wpdb {
+	protected function create_wpdb_instance( array $config ): Wpdb {
 		$data_source = new Wpdb(
 			$config['detect_duplicate_queries'] ?? false,
 			$config['pattern_model_map'] ?? []
@@ -240,11 +206,7 @@ final class Data_Source_Factory {
 		return $data_source;
 	}
 
-	private function create_xdebug_data_source(): Xdebug {
+	protected function create_xdebug_instance(): Xdebug {
 		return new Xdebug();
-	}
-
-	private function has_custom_factory( string $name ): bool {
-		return \array_key_exists( $name, $this->custom_factories );
 	}
 }

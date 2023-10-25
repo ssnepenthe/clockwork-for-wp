@@ -18,6 +18,12 @@ class Authenticator_Factory_Test extends TestCase {
 		);
 	}
 
+	public function test_create_does_not_cache_instances() {
+		$factory = new Authenticator_Factory();
+
+		$this->assertNotSame( $factory->create( 'null' ), $factory->create( 'null' ) );
+	}
+
 	public function test_create_with_custom_factory() {
 		$authenticator = new class implements AuthenticatorInterface {
 			public function attempt( array $credentials ) {}

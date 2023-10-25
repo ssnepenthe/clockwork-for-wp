@@ -16,6 +16,18 @@ class Storage_Factory_Test extends TestCase {
 		$this->assertInstanceOf( $class, ( new Storage_Factory() )->create( $name, $config ) );
 	}
 
+	public function test_create_does_not_cache_instances() {
+		$factory = new Storage_Factory();
+		$config = [
+			'compress' => false,
+			'dir_permissions' => 0700,
+			'expiration' => null,
+			'path' => vfsStream::setup()->url(),
+		];
+
+		$this->assertNotSame( $factory->create( 'file', $config ), $factory->create( 'file', $config ) );
+	}
+
 	public function test_create_with_custom_factory() {
 		$factory = new Storage_Factory();
 		$factory->register_custom_factory( 'null', function() {
