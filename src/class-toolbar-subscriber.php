@@ -9,6 +9,8 @@ use Clockwork\Request\Request;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
 final class Toolbar_Subscriber implements Subscriber {
+	private const COOKIE_NAME = 'x-clockwork';
+
 	private Is $is;
 
 	private Request $request;
@@ -56,41 +58,53 @@ final class Toolbar_Subscriber implements Subscriber {
 	}
 
 	public function on_wp_loaded(): void {
-		// @todo unset cookie if currently set but toolbar disabled.
 		if ( ! $this->guard() ) {
+			$this->unset_cookie();
+
 			return;
 		}
 
 		if ( ! ( $this->is->collecting_client_metrics() || $this->is->toolbar_enabled() ) ) {
+			$this->unset_cookie();
+
 			return;
 		}
 
-		$cookie = \json_encode(
-			[
-				'requestId' => $this->request->id,
-				'version' => Clockwork::VERSION,
-				'path' => '/__clockwork/',
-				'webPath' => $this->is->web_installed() ? '/__clockwork' : '/__clockwork/app',
-				'token' => $this->request->updateToken,
-				'metrics' => $this->is->collecting_client_metrics(),
-				'toolbar' => $this->is->toolbar_enabled(),
-			]
-		);
+		$this->set_cookie();
+	}
 
-		\setcookie(
-			'x-clockwork',
-			$cookie,
-			\time() + 60,
-			COOKIEPATH,
-			COOKIE_DOMAIN ?: '',
-			\is_ssl() && 'https' === \parse_url( \home_url(), \PHP_URL_SCHEME ),
-			false
-		);
+	private function call_setcookie( $value, $expires ): void {
+		$domain = COOKIE_DOMAIN ?: '';
+		$secure = \is_ssl() && 'https' === \parse_url( \home_url(), \PHP_URL_SCHEME );
+
+		\setcookie( self::COOKIE_NAME, $value, $expires, COOKIEPATH, $domain, $secure, false );
 	}
 
 	private function guard(): bool {
 		// @todo When web view is disabled and toolbar is enabled, the "show details" link will 404.
 		// @see https://github.com/underground-works/clockwork-browser/issues/4
 		return $this->is->enabled() && $this->is->collecting_requests();
+	}
+
+	private function set_cookie(): void {
+		$data = [
+			'requestId' => $this->request->id,
+			'version' => Clockwork::VERSION,
+			'path' => '/__clockwork/',
+			'webPath' => $this->is->web_installed() ? '/__clockwork' : '/__clockwork/app',
+			'token' => $this->request->updateToken,
+			'metrics' => $this->is->collecting_client_metrics(),
+			'toolbar' => $this->is->toolbar_enabled(),
+		];
+
+		$this->call_setcookie( \json_encode( $data ), \time() + 60 );
+	}
+
+	private function unset_cookie(): void {
+		// It's probably not *actually* necessary to unset cookie since it expires after 60 seconds...
+		if ( \array_key_exists( self::COOKIE_NAME, $_COOKIE ) ) {
+			$this->call_setcookie( '', \time() - 3600 );
+			unset( $_COOKIE[ self::COOKIE_NAME ] );
+		}
 	}
 }
