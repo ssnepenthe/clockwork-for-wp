@@ -43,19 +43,20 @@ final class Clean_Command extends Command {
 		$force = true;
 		$all = $assoc_args['all'] ?? false;
 		$expiration = $assoc_args['expiration'] ?? null;
+		$driver = $this->config->get( 'storage.driver', 'file' );
 
 		if ( $all ) {
-			$this->config->set( 'storage.expiration', 0 );
+			$this->config->set( "storage.drivers.{$driver}.expiration", 0 );
 		} elseif ( null !== $expiration ) {
 			// @todo Should we allow float?
-			$this->config->set( 'storage.expiration', \abs( (int) $expiration ) );
+			$this->config->set( "storage.drivers.{$driver}.expiration", \abs( (int) $expiration ) );
 		}
 
 		$this->storage_factory->create_default( $this->config->reader() )->cleanup( $force );
 
 		// See https://github.com/itsgoingd/clockwork/issues/510
 		// @todo Revisit after the release of Clockwork v6.
-		if ( $all && 'file' === $this->config->get( 'storage.driver', 'file' ) ) {
+		if ( $all && 'file' === $driver ) {
 			$path = $this->config->get( 'storage.drivers.file.path' );
 
 			foreach ( \glob( $path . '/*.json' ) as $file ) {
