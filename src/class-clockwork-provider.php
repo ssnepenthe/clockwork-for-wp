@@ -65,16 +65,7 @@ final class Clockwork_Provider extends Base_Provider {
 		};
 
 		$pimple[ AuthenticatorInterface::class ] = static function ( Container $pimple ) {
-			$config = $pimple[ Read_Only_Configuration::class ]->get( 'authentication' );
-			$factory = $pimple[ Authenticator_Factory::class ];
-
-			if ( ! ( $config['enabled'] ?? false ) ) {
-				return $factory->create( 'null' );
-			}
-
-			$driver = $config['driver'] ?? 'simple';
-
-			return $factory->create( $driver, $config['drivers'][ $driver ] ?? [] );
+			return $pimple[ Authenticator_Factory::class ]->create_default( $pimple[ Read_Only_Configuration::class ] );
 		};
 
 		$pimple[ Storage_Factory::class ] = static function () {
