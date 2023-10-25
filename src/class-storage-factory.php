@@ -12,43 +12,22 @@ use InvalidArgumentException;
 /**
  * @internal
  */
-final class Storage_Factory {
-	private $custom_factories = [];
+final class Storage_Factory extends Base_Factory {
+	public function create_default( Read_Only_Configuration $config ): StorageInterface {
+		$storage_config = $config->get( 'storage' );
+		$driver = $storage_config['driver'];
+		$driver_config = $storage_config['drivers'][ $driver ] ?? [];
 
-	public function create( string $name, array $config = [] ): StorageInterface {
-		if ( $this->has_custom_factory( $name ) ) {
-			return $this->call_custom_factory( $name, $config );
+		if ( null === ( $driver_config['expiration'] ?? null ) && null !== $storage_config['expiration'] ) {
+			$driver_config['expiration'] = $storage_config['expiration'];
 		}
 
-		$method = "create_{$name}_storage";
-
-		if ( \method_exists( $this, $method ) ) {
-			return ( [ $this, $method ] )( $config );
-		}
-
-		throw new InvalidArgumentException( "Unable to create unsupported storage type {$name}" );
+		return $this->create( $driver, $driver_config );
 	}
 
-	public function register_custom_factory( string $name, callable $factory ) {
-		$this->custom_factories[ $name ] = $factory;
-
-		return $this;
-	}
-
-	private function call_custom_factory( $name, array $config ): StorageInterface {
-		if ( ! $this->has_custom_factory( $name ) ) {
-			// @todo is this necessary in final class on private function?
-			throw new InvalidArgumentException(
-				"No custom factory registered for storage type {$name}"
-			);
-		}
-
-		return ( $this->custom_factories[ $name ] )( $config );
-	}
-
-	private function create_file_storage( array $config ): FileStorage {
+	protected function create_file_instance( array $config ): FileStorage {
 		if ( '' === $config['path'] ) {
-			throw new InvalidArgumentException( '@todo' );
+			throw new InvalidArgumentException( 'Must provide a non-empty path for file storage' );
 		}
 
 		return new FileStorage(
@@ -59,9 +38,9 @@ final class Storage_Factory {
 		);
 	}
 
-	private function create_sql_storage( array $config ): SqlStorage {
+	protected function create_sql_instance( array $config ): SqlStorage {
 		if ( '' === $config['dsn'] ) {
-			throw new InvalidArgumentException( '@todo' );
+			throw new InvalidArgumentException( 'Must provide a non-empty DSN or PDO instance for SQL storage' );
 		}
 
 		return new SqlStorage(
@@ -71,9 +50,5 @@ final class Storage_Factory {
 			$config['password'],
 			$config['expiration']
 		);
-	}
-
-	private function has_custom_factory( $name ): bool {
-		return \array_key_exists( $name, $this->custom_factories );
 	}
 }

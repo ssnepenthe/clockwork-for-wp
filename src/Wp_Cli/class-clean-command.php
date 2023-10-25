@@ -7,19 +7,21 @@ namespace Clockwork_For_Wp\Wp_Cli;
 use ApheleiaCli\Command;
 use ApheleiaCli\Flag;
 use ApheleiaCli\Option;
-use Clockwork\Storage\StorageInterface;
 use Clockwork_For_Wp\Configuration;
-use Pimple\Container;
+use Clockwork_For_Wp\Storage_Factory;
 use WP_CLI;
 
 /**
  * @internal
  */
 final class Clean_Command extends Command {
-	private Container $container;
+	private Configuration $config;
 
-	public function __construct( Container $container ) {
-		$this->container = $container;
+	private Storage_Factory $storage_factory;
+
+	public function __construct( Configuration $config, Storage_Factory $storage_factory ) {
+		$this->config = $config;
+		$this->storage_factory = $storage_factory;
 
 		parent::__construct();
 	}
@@ -41,25 +43,21 @@ final class Clean_Command extends Command {
 		$force = true;
 		$all = $assoc_args['all'] ?? false;
 		$expiration = $assoc_args['expiration'] ?? null;
-
-		$config = $this->container[ Configuration::class ];
+		$driver = $this->config->get( 'storage.driver', 'file' );
 
 		if ( $all ) {
-			$config->set( 'storage.expiration', 0 );
+			$this->config->set( "storage.drivers.{$driver}.expiration", 0 );
 		} elseif ( null !== $expiration ) {
 			// @todo Should we allow float?
-			$config->set(
-				'storage.expiration',
-				\abs( (int) $expiration )
-			);
+			$this->config->set( "storage.drivers.{$driver}.expiration", \abs( (int) $expiration ) );
 		}
 
-		$this->container[ StorageInterface::class ]->cleanup( $force );
+		$this->storage_factory->create_default( $this->config->reader() )->cleanup( $force );
 
 		// See https://github.com/itsgoingd/clockwork/issues/510
 		// @todo Revisit after the release of Clockwork v6.
-		if ( $all && 'file' === $config->get( 'storage.driver', 'file' ) ) {
-			$path = $config->get( 'storage.drivers.file.path' );
+		if ( $all && 'file' === $driver ) {
+			$path = $this->config->get( 'storage.drivers.file.path' );
 
 			foreach ( \glob( $path . '/*.json' ) as $file ) {
 				\unlink( $file );

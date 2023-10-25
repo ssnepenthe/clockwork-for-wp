@@ -12,47 +12,24 @@ use InvalidArgumentException;
 /**
  * @internal
  */
-final class Authenticator_Factory {
-	private $custom_factories = [];
+final class Authenticator_Factory extends Base_Factory {
+	public function create_default( Read_Only_Configuration $config ): AuthenticatorInterface {
+		$auth = $config->get( 'authentication' );
 
-	public function create( string $name, array $config = [] ): AuthenticatorInterface {
-		if ( $this->has_custom_factory( $name ) ) {
-			return $this->call_custom_factory( $name, $config );
+		if ( ! ( $auth['enabled'] ?? false ) ) {
+			return $this->create( 'null' );
 		}
 
-		$method = "create_{$name}_authenticator";
+		$driver = $auth['driver'] ?? 'simple';
 
-		if ( \method_exists( $this, $method ) ) {
-			return ( [ $this, $method ] )( $config );
-		}
-
-		throw new InvalidArgumentException(
-			"Unable to create unsupported authenticator type {$name}"
-		);
+		return $this->create( $driver, $auth['drivers'][ $driver ] ?? [] );
 	}
 
-	public function register_custom_factory( string $name, callable $factory ) {
-		$this->custom_factories[ $name ] = $factory;
-
-		return $this;
-	}
-
-	private function call_custom_factory( $name, array $config ): AuthenticatorInterface {
-		if ( ! $this->has_custom_factory( $name ) ) {
-			// @todo is this necessary in final class on private function?
-			throw new InvalidArgumentException(
-				"No custom factory registered for storage type {$name}"
-			);
-		}
-
-		return ( $this->custom_factories[ $name ] )( $config );
-	}
-
-	private function create_null_authenticator(): NullAuthenticator {
+	protected function create_null_instance(): NullAuthenticator {
 		return new NullAuthenticator();
 	}
 
-	private function create_simple_authenticator( array $config ): SimpleAuthenticator {
+	protected function create_simple_instance( array $config ): SimpleAuthenticator {
 		if ( ! \array_key_exists( 'password', $config ) ) {
 			throw new InvalidArgumentException(
 				'Missing "password" key from simple authenticator config array'
@@ -60,9 +37,5 @@ final class Authenticator_Factory {
 		}
 
 		return new SimpleAuthenticator( $config['password'] );
-	}
-
-	private function has_custom_factory( $name ): bool {
-		return \array_key_exists( $name, $this->custom_factories );
 	}
 }
