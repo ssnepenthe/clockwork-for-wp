@@ -35,33 +35,6 @@ final class Clockwork_Subscriber implements Subscriber {
 		$this->request = $request;
 	}
 
-	public function enqueue_scripts(): void {
-		// @todo Should this be implemented as a separate plugin?
-		\wp_register_script(
-			'clockwork-metrics',
-			'https://cdn.jsdelivr.net/gh/underground-works/clockwork-browser@1/dist/metrics.js',
-			[],
-			'1.0.0',
-			true
-		);
-
-		\wp_register_script(
-			'clockwork-toolbar',
-			'https://cdn.jsdelivr.net/gh/underground-works/clockwork-browser@1/dist/toolbar.js',
-			[],
-			'1.0.0',
-			true
-		);
-
-		if ( $this->is->collecting_client_metrics() ) {
-			\wp_enqueue_script( 'clockwork-metrics' );
-		}
-
-		if ( $this->is->toolbar_enabled() ) {
-			\wp_enqueue_script( 'clockwork-toolbar' );
-		}
-	}
-
 	public function finalize_command(): void {
 		$command = Command_Context::current();
 
@@ -96,9 +69,7 @@ final class Clockwork_Subscriber implements Subscriber {
 	}
 
 	public function get_subscribed_events(): array {
-		$events = [
-			'wp_enqueue_scripts' => 'enqueue_scripts',
-		];
+		$events = [];
 
 		if (
 			// @todo Redundant conditions?
@@ -140,32 +111,5 @@ final class Clockwork_Subscriber implements Subscriber {
 		}
 
 		// @todo Set subrequest headers?
-
-		if (
-			$this->is->collecting_client_metrics()
-			|| $this->is->toolbar_enabled()
-		) {
-			$cookie = \json_encode(
-				[
-					'requestId' => $this->request->id,
-					'version' => Clockwork::VERSION,
-					'path' => '/__clockwork/',
-					'webPath' => $this->is->web_installed() ? '/__clockwork' : '/__clockwork/app',
-					'token' => $this->request->updateToken,
-					'metrics' => $this->is->collecting_client_metrics(),
-					'toolbar' => $this->is->toolbar_enabled(),
-				]
-			);
-
-			\setcookie(
-				'x-clockwork',
-				$cookie,
-				\time() + 60,
-				COOKIEPATH,
-				COOKIE_DOMAIN ?: '',
-				\is_ssl() && 'https' === \parse_url( \home_url(), \PHP_URL_SCHEME ),
-				false
-			);
-		}
 	}
 }
