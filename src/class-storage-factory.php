@@ -27,7 +27,7 @@ final class Storage_Factory extends Base_Factory {
 
 	protected function create_file_instance( array $config ): FileStorage {
 		if ( '' === $config['path'] ) {
-			throw new InvalidArgumentException( '@todo' );
+			throw new InvalidArgumentException( 'Must provide a non-empty path for file storage' );
 		}
 
 		return new FileStorage(
@@ -40,7 +40,7 @@ final class Storage_Factory extends Base_Factory {
 
 	protected function create_sql_instance( array $config ): SqlStorage {
 		if ( '' === $config['dsn'] ) {
-			throw new InvalidArgumentException( '@todo' );
+			throw new InvalidArgumentException( 'Must provide a non-empty DSN or PDO instance for SQL storage' );
 		}
 
 		return new SqlStorage(

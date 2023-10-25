@@ -32,7 +32,7 @@ abstract class Base_Factory {
 			return $this->save_instance( $name, ( [ $this, $method ] )( $config ) );
 		}
 
-		throw new InvalidArgumentException( "@todo Unrecognized data source: {$name}" );
+		throw new InvalidArgumentException( "Unrecognized factory name: {$name}" );
 	}
 
 	public function register_custom_factory( string $name, callable $factory ) {
