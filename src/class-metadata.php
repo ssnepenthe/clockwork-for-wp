@@ -44,11 +44,6 @@ final class Metadata {
 	}
 
 	public function update( Request $request ) {
-		/**
-		 * @psalm-suppress UndefinedInterfaceMethod
-		 *
-		 * @see https://github.com/itsgoingd/clockwork/pull/522
-		 */
 		return $this->storage->update( $request );
 	}
 
