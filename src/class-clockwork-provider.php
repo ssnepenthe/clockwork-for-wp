@@ -73,18 +73,7 @@ final class Clockwork_Provider extends Base_Provider {
 		};
 
 		$pimple[ StorageInterface::class ] = $pimple->factory( static function ( Container $pimple ) {
-			$storage_config = $pimple[ Read_Only_Configuration::class ]->get( 'storage' );
-			$driver = $storage_config['driver'];
-			$driver_config = $storage_config['drivers'][ $driver ] ?? [];
-
-			if (
-				null === ( $driver_config['expiration'] ?? null )
-				&& null !== $storage_config['expiration']
-			) {
-				$driver_config['expiration'] = $storage_config['expiration'];
-			}
-
-			return $pimple[ Storage_Factory::class ]->create( $driver, $driver_config );
+			return $pimple[ Storage_Factory::class ]->create_default( $pimple[ Read_Only_Configuration::class ] );
 		} );
 
 		$pimple[ Log::class ] = static function () {

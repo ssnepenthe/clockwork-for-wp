@@ -6,12 +6,25 @@ namespace Clockwork_For_Wp;
 
 use Clockwork\Storage\FileStorage;
 use Clockwork\Storage\SqlStorage;
+use Clockwork\Storage\StorageInterface;
 use InvalidArgumentException;
 
 /**
  * @internal
  */
 final class Storage_Factory extends Base_Factory {
+	public function create_default( Read_Only_Configuration $config ): StorageInterface {
+		$storage_config = $config->get( 'storage' );
+		$driver = $storage_config['driver'];
+		$driver_config = $storage_config['drivers'][ $driver ] ?? [];
+
+		if ( null === ( $driver_config['expiration'] ?? null ) && null !== $storage_config['expiration'] ) {
+			$driver_config['expiration'] = $storage_config['expiration'];
+		}
+
+		return $this->create( $driver, $driver_config );
+	}
+
 	protected function create_file_instance( array $config ): FileStorage {
 		if ( '' === $config['path'] ) {
 			throw new InvalidArgumentException( '@todo' );
