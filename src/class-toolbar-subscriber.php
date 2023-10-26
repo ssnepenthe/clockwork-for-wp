@@ -29,6 +29,8 @@ final class Toolbar_Subscriber implements Subscriber {
 	public function get_subscribed_events(): array {
 		return [
 			'wp_enqueue_scripts' => 'on_wp_enqueue_scripts',
+			'admin_enqueue_scripts' => 'on_wp_enqueue_scripts',
+			'login_enqueue_scripts' => 'on_wp_enqueue_scripts',
 			'wp_loaded' => 'on_wp_loaded',
 		];
 	}
@@ -49,6 +51,18 @@ final class Toolbar_Subscriber implements Subscriber {
 			'1.0.0',
 			true
 		);
+
+		$login_styles = <<<CSS
+		.login .clockwork-toolbar .success {
+			border-left: none;
+			box-shadow: none;
+			margin: 0;
+			padding: 0;
+			word-wrap: unset;
+		}
+		CSS;
+
+		\wp_add_inline_style( 'login', $login_styles );
 
 		if ( ! $this->guard() ) {
 			return;
