@@ -83,7 +83,14 @@ final class Toolbar_Subscriber implements Subscriber {
 		$domain = COOKIE_DOMAIN ?: '';
 		$secure = \is_ssl() && 'https' === \parse_url( \home_url(), \PHP_URL_SCHEME );
 
-		\setcookie( self::COOKIE_NAME, $value, $expires, COOKIEPATH, $domain, $secure, false );
+		\setcookie( self::COOKIE_NAME, $value, [
+			'expires' => $expires,
+			'path' => COOKIEPATH,
+			'domain' => $domain,
+			'secure' => $secure,
+			'httponly' => false,
+			'samesite' => 'Lax',
+		] );
 	}
 
 	private function guard(): bool {
