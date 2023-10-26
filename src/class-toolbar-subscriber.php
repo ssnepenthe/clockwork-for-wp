@@ -28,14 +28,14 @@ final class Toolbar_Subscriber implements Subscriber {
 
 	public function get_subscribed_events(): array {
 		return [
-			'wp_enqueue_scripts' => 'on_wp_enqueue_scripts',
-			'admin_enqueue_scripts' => 'on_wp_enqueue_scripts',
-			'login_enqueue_scripts' => 'on_wp_enqueue_scripts',
+			'wp_enqueue_scripts' => 'on_enqueue_scripts',
+			'admin_enqueue_scripts' => 'on_enqueue_scripts',
+			'login_enqueue_scripts' => 'on_enqueue_scripts',
 			'wp_loaded' => 'on_wp_loaded',
 		];
 	}
 
-	public function on_wp_enqueue_scripts(): void {
+	public function on_enqueue_scripts(): void {
 		\wp_register_script(
 			'clockwork-metrics',
 			"{$this->scripts_dir_url}js/dist/metrics{$this->scripts_suffix}.js",
