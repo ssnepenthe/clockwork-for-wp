@@ -24,13 +24,14 @@ final class Clockwork_Provider extends Base_Provider {
 	public function boot( Plugin $plugin ): void {
 		if ( $plugin->is()->collecting_data() ) {
 			$pimple = $plugin->get_pimple();
+			$events = $pimple[ Event_Manager::class ];
 
 			// Clockwork instance is resolved even when we are not collecting data in order to take
 			// advantage of helper methods like shouldCollect.
 			// This ensures data sources are only registered on plugins_loaded when enabled.
 			$pimple[ Clockwork_Support::class ]->add_data_sources();
 
-			$pimple[ Event_Manager::class ]->attach(
+			$events->attach(
 				new Clockwork_Subscriber(
 					$pimple[ Read_Only_Configuration::class ],
 					$pimple[ Plugin::class ]->is(),
@@ -39,6 +40,12 @@ final class Clockwork_Provider extends Base_Provider {
 					$pimple[ Request::class ]
 				)
 			);
+			$events->attach( new Toolbar_Subscriber(
+				$pimple[ Plugin::class ]->is(),
+				$pimple[ Request::class ],
+				\plugin_dir_url( $pimple['file'] ),
+				defined( 'SCRIPT_DEBUG' ) ? SCRIPT_DEBUG : false
+			) );
 		}
 	}
 

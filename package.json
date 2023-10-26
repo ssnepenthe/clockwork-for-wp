@@ -20,9 +20,13 @@
   },
   "homepage": "https://github.com/ssnepenthe/clockwork-for-wp#readme",
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
     "@wordpress/env": "^5.10.0",
     "base64url": "^3.0.1",
+    "clockwork-browser": "^1.1.2",
     "cypress": "^12.4.0",
-    "qs": "^6.10.2"
+    "qs": "^6.10.2",
+    "rollup": "^4.1.4"
   }
 }

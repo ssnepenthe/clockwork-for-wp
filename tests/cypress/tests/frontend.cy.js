@@ -250,4 +250,52 @@ describe('Frontend', () => {
 
     });
 
+    context('Toolbar', () => {
+
+        const config = { toolbar: true };
+
+        it('Does not show the toolbar by default', () => {
+
+            cy.visit('/');
+
+            cy.wait(500);
+
+            cy.get('.clockwork-toolbar')
+                .should('not.exist');
+
+        });
+
+        it('Shows the toolbar on the site front end', () => {
+
+            cy.visit(urlWithQuery('/', config))
+                .get('.clockwork-toolbar');
+
+        });
+
+        it('Shows the toolbar on wp-login', () => {
+
+            cy.visit(urlWithQuery('/wp-login.php', config))
+                .get('.clockwork-toolbar');
+
+        });
+
+        it('Shows the toolbar on wp-admin', () => {
+
+            cy.visit('/wp-login.php');
+
+            // @todo Without wait this is flaky - Need to investigate further.
+            // Sometimes it will only type a portion of the username like "min" or just "n".
+            cy.wait(500);
+
+            cy.get('#user_login').type('admin');
+            cy.get('#user_pass').type('password');
+            cy.get('#wp-submit').click();
+
+            cy.visit(urlWithQuery('/wp-admin/', config))
+                .get('.clockwork-toolbar');
+
+        });
+
+    });
+
 });
