@@ -15,9 +15,15 @@ final class Toolbar_Subscriber implements Subscriber {
 
 	private Request $request;
 
-	public function __construct( Is $is, Request $request ) {
+	private string $scripts_dir_url;
+
+	private string $scripts_suffix;
+
+	public function __construct( Is $is, Request $request, string $scripts_dir_url, bool $minified_scripts = false ) {
 		$this->is = $is;
 		$this->request = $request;
+		$this->scripts_dir_url = $scripts_dir_url;
+		$this->scripts_suffix = $minified_scripts ? '.min' : '';
 	}
 
 	public function get_subscribed_events(): array {
@@ -30,7 +36,7 @@ final class Toolbar_Subscriber implements Subscriber {
 	public function on_wp_enqueue_scripts(): void {
 		\wp_register_script(
 			'clockwork-metrics',
-			'https://cdn.jsdelivr.net/gh/underground-works/clockwork-browser@1/dist/metrics.js',
+			"{$this->scripts_dir_url}js/dist/metrics{$this->scripts_suffix}.js",
 			[],
 			'1.0.0',
 			true
@@ -38,7 +44,7 @@ final class Toolbar_Subscriber implements Subscriber {
 
 		\wp_register_script(
 			'clockwork-toolbar',
-			'https://cdn.jsdelivr.net/gh/underground-works/clockwork-browser@1/dist/toolbar.js',
+			"{$this->scripts_dir_url}js/dist/toolbar{$this->scripts_suffix}.js",
 			[],
 			'1.0.0',
 			true
