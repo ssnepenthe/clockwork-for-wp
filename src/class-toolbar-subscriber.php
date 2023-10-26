@@ -101,7 +101,8 @@ final class Toolbar_Subscriber implements Subscriber {
 	}
 
 	private function unset_cookie(): void {
-		// It's probably not *actually* necessary to unset cookie since it expires after 60 seconds...
+		// Reference implementation doesn't unset cookie but I think it is preferable...
+        // @see https://github.com/itsgoingd/clockwork/issues/657
 		if ( \array_key_exists( self::COOKIE_NAME, $_COOKIE ) ) {
 			$this->call_setcookie( '', \time() - 3600 );
 			unset( $_COOKIE[ self::COOKIE_NAME ] );
