@@ -11,6 +11,16 @@ use Clockwork_For_Wp\Event_Management\Subscriber;
 final class Toolbar_Subscriber implements Subscriber {
 	private const COOKIE_NAME = 'x-clockwork';
 
+	private const LOGIN_STYLES = <<<CSS
+		.login .clockwork-toolbar .success {
+			border-left: none;
+			box-shadow: none;
+			margin: 0;
+			padding: 0;
+			word-wrap: unset;
+		}
+	CSS;
+
 	private Is $is;
 
 	private Request $request;
@@ -52,18 +62,6 @@ final class Toolbar_Subscriber implements Subscriber {
 			true
 		);
 
-		$login_styles = <<<CSS
-		.login .clockwork-toolbar .success {
-			border-left: none;
-			box-shadow: none;
-			margin: 0;
-			padding: 0;
-			word-wrap: unset;
-		}
-		CSS;
-
-		\wp_add_inline_style( 'login', $login_styles );
-
 		if ( ! $this->guard() ) {
 			return;
 		}
@@ -73,6 +71,7 @@ final class Toolbar_Subscriber implements Subscriber {
 		}
 
 		if ( $this->is->toolbar_enabled() ) {
+			\wp_add_inline_style( 'login', self::LOGIN_STYLES );
 			\wp_enqueue_script( 'clockwork-toolbar' );
 		}
 	}
