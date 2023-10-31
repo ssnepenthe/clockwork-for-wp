@@ -101,8 +101,8 @@ final class Incoming_Request extends IncomingRequest {
 				'cookies' => $_COOKIE,
 				'headers' => self::extract_headers( $_SERVER ),
 				'input' => $_REQUEST,
-				'method' => $_SERVER['REQUEST_METHOD'],
-				'uri' => $_SERVER['REQUEST_URI'],
+				'method' => $_SERVER['REQUEST_METHOD'] ?? 'GET',
+				'uri' => $_SERVER['REQUEST_URI'] ?? '/',
 			]
 		);
 	}

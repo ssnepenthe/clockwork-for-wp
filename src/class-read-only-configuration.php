@@ -13,10 +13,16 @@ final class Read_Only_Configuration {
 		$this->config = $config;
 	}
 
+	/**
+	 * @psalm-param non-empty-string $key
+	 */
 	public function exists( string $key ): bool {
 		return $this->config->exists( $key );
 	}
 
+	/**
+	 * @psalm-param non-empty-string $key
+	 */
 	public function get( string $key, $default = null ) {
 		if ( ! $this->config->exists( $key ) ) {
 			return $default;
