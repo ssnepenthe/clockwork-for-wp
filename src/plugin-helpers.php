@@ -14,7 +14,7 @@ function array_only( $array, $keys ) {
 }
 
 function container(): Container {
-	return _cfw_instance()->get_pimple();
+	return \_cfw_instance()->get_pimple();
 }
 
 // @todo Name? Or maybe just merge into describe_callable()?
@@ -103,9 +103,9 @@ function describe_value( $value ): string {
 }
 
 function events(): Event_Manager {
-	return _cfw_instance()->get_pimple()[ Event_Manager::class ];
+	return \_cfw_instance()->get_pimple()[ Event_Manager::class ];
 }
 
 function service( string $id ) {
-	return _cfw_instance()->get_pimple()[ $id ];
+	return \_cfw_instance()->get_pimple()[ $id ];
 }

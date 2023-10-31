@@ -44,7 +44,7 @@ final class Clockwork_Provider extends Base_Provider {
 				$pimple[ Plugin::class ]->is(),
 				$pimple[ Request::class ],
 				\plugin_dir_url( $pimple['file'] ),
-				defined( 'SCRIPT_DEBUG' ) ? SCRIPT_DEBUG : false
+				\defined( 'SCRIPT_DEBUG' ) ? SCRIPT_DEBUG : false
 			) );
 		}
 	}
