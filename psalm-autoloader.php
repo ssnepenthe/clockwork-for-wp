@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // I doubt this is the "correct" way to handle this...
 // This is to prevent a bunch of UndefinedFunction errors until I figure out how it is supposed to be done.
 // phpcs:ignoreFile

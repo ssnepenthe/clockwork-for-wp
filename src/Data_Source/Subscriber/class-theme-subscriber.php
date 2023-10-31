@@ -48,9 +48,6 @@ final class Theme_Subscriber implements Subscriber {
 		return $classes;
 	}
 
-	/**
-	 * @param int $content_width
-	 */
 	public function on_cfw_pre_resolve(): void {
 		$this->data_source
 			->set_theme_root( \get_theme_root() )

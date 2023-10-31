@@ -11,7 +11,7 @@ use Clockwork_For_Wp\Event_Management\Subscriber;
 final class Toolbar_Subscriber implements Subscriber {
 	private const COOKIE_NAME = 'x-clockwork';
 
-	private const LOGIN_STYLES = <<<CSS
+	private const LOGIN_STYLES = <<<'CSS'
 		.login .clockwork-toolbar .success {
 			border-left: none;
 			box-shadow: none;

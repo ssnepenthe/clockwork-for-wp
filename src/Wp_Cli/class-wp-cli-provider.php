@@ -24,7 +24,7 @@ final class Wp_Cli_Provider extends Base_Provider {
 		$registry->group(
 			'clockwork',
 			'Manages the Clockwork for WP plugin',
-			static function ( CommandRegistry $registry ) use ( $plugin ) {
+			static function ( CommandRegistry $registry ) use ( $plugin ): void {
 				$pimple = $plugin->get_pimple();
 
 				$registry->add(

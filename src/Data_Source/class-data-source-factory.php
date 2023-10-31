@@ -133,10 +133,6 @@ final class Data_Source_Factory extends Base_Factory {
 		return new Transients();
 	}
 
-	protected function create_wp_instance(): Wp {
-		return new Wp();
-	}
-
 	protected function create_wp_hook_instance( array $config ): Wp_Hook {
 		$data_source = new Wp_Hook( $config['all_hooks'] ?? false );
 
@@ -159,6 +155,10 @@ final class Data_Source_Factory extends Base_Factory {
 
 	protected function create_wp_http_instance(): Wp_Http {
 		return new Wp_Http();
+	}
+
+	protected function create_wp_instance(): Wp {
+		return new Wp();
 	}
 
 	protected function create_wp_mail_instance(): Wp_Mail {

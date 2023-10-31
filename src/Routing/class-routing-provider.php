@@ -51,7 +51,7 @@ final class Routing_Provider extends Base_Provider {
 
 					return $params;
 				},
-				function ( array $callable ) {
+				static function ( array $callable ) {
 					return [ service( $callable[0] ), $callable[1] ];
 				}
 			);

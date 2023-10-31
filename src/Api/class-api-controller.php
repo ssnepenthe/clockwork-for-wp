@@ -37,7 +37,7 @@ final class Api_Controller {
 	public function serve_json( array $params ): void {
 		// @todo Handle 404s.
 		// @todo Is this really necessary?
-		if ( ! \array_key_exists( 'id', $params ) || $params['id'] === null ) {
+		if ( ! \array_key_exists( 'id', $params ) || null === $params['id'] ) {
 			return; // @todo
 		}
 
