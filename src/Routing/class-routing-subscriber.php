@@ -29,7 +29,7 @@ final class Routing_Subscriber implements Subscriber {
 
 		if ( null === $route ) {
 			return;
-	}
+		}
 
 		$this->invoker->invoke_handler( $route );
 	}
@@ -37,7 +37,7 @@ final class Routing_Subscriber implements Subscriber {
 	public function diff_rules( $rules ) {
 		if ( ! $this->should_modify_rules( $rules ) ) {
 			return $rules;
-	}
+		}
 
 		return \array_diff_key( $rules, $this->routes->get_rewrite_array() );
 	}

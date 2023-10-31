@@ -42,7 +42,7 @@ final class Api_Subscriber implements Subscriber {
 				'index.php?id=$matches[1]&update=1',
 				[ Api_Controller::class, 'update_data' ]
 			);
-	}
+		}
 
 		$this->routes->get(
 			'^__clockwork/([0-9-]+|latest)(?:/(next|previous))?(?(2)/(\d+))?$',

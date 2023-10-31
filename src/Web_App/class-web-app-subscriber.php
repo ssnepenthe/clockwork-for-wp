@@ -34,7 +34,7 @@ final class Web_App_Subscriber implements Subscriber {
 		 */
 		if ( \untrailingslashit( $this->request->uri ) !== \home_url( '__clockwork', 'relative' ) ) {
 			return;
-	}
+		}
 
 		\wp_safe_redirect( \home_url( '__clockwork/app' ) );
 		exit;
