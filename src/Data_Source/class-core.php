@@ -10,6 +10,7 @@ use Clockwork\Request\Timeline\Timeline;
 
 final class Core extends DataSource {
 	private $timestart;
+
 	private $version;
 
 	public function __construct( $version, $timestart ) {

@@ -9,7 +9,9 @@ use InvalidArgumentException;
 
 final class Event_Manager {
 	public const DEFAULT_EVENT = 10;
+
 	public const EARLY_EVENT = -999;
+
 	public const LATE_EVENT = 999;
 
 	public function attach( Subscriber $subscriber ) {

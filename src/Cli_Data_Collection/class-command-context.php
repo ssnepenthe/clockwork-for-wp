@@ -13,10 +13,15 @@ use function Clockwork_For_Wp\service;
 
 final class Command_Context {
 	private $args;
+
 	private $command;
+
 	private $command_path;
+
 	private $options;
+
 	private $parser;
+
 	private $synopsis;
 
 	public function __construct( $command, $args, $options, $command_path ) {

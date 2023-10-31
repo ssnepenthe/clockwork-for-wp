@@ -13,6 +13,7 @@ use InvalidArgumentException;
 
 final class Transients extends DataSource implements Provides_Subscriber {
 	private $deleted = [];
+
 	private $setted = [];
 
 	public function create_subscriber(): Subscriber {

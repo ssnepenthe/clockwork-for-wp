@@ -11,15 +11,15 @@ use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
 
 final class Clockwork_Subscriber implements Subscriber {
+	private $clockwork;
+
 	private $config;
 
-	protected $events;
-
-	protected $clockwork;
+	private $events;
 
 	private $is;
 
-	protected $request;
+	private $request;
 
 	public function __construct(
 		Read_Only_Configuration $config,

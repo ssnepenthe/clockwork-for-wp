@@ -8,8 +8,11 @@ use Clockwork\Request\IncomingRequest;
 
 final class Incoming_Request extends IncomingRequest {
 	protected $ajax_uri;
+
 	protected $content;
+
 	protected $headers = [];
+
 	protected $json;
 
 	public function content() {

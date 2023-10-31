@@ -11,11 +11,11 @@ use WP;
 use function Clockwork_For_Wp\service;
 
 final class Routing_Subscriber implements Subscriber {
-	protected $routes;
+	private $invoker;
 
-	protected $invoker;
+	private $request;
 
-	protected $request;
+	private $routes;
 
 	public function __construct( Route_Collection $routes, Route_Handler_Invoker $invoker, Incoming_Request $request ) {
 		$this->routes = $routes;

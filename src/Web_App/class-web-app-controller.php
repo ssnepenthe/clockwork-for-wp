@@ -9,6 +9,7 @@ use WP_Query;
 
 final class Web_App_Controller {
 	private $web_helper;
+
 	private $wp_query;
 
 	public function __construct( Web $web_helper, WP_Query $wp_query ) {

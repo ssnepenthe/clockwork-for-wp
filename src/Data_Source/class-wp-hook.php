@@ -15,6 +15,7 @@ use function Clockwork_For_Wp\describe_unavailable_callable;
 
 final class Wp_Hook extends DataSource implements Provides_Subscriber {
 	private $all_hooks;
+
 	private $hooks = [];
 
 	public function __construct( bool $all_hooks = false ) {

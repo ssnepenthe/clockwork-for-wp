@@ -7,9 +7,11 @@ namespace Clockwork_For_Wp\Routing;
 use Closure;
 
 final class Route_Handler_Invoker {
-	private $param_prefix;
-	private $param_resolver;
 	private $callable_resolver;
+
+	private $param_prefix;
+
+	private $param_resolver;
 
 	public function __construct(
 		string $param_prefix = '',

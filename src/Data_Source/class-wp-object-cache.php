@@ -12,8 +12,11 @@ use Clockwork_For_Wp\Provides_Subscriber;
 
 final class Wp_Object_Cache extends DataSource implements Provides_Subscriber {
 	private $deletes = 0;
+
 	private $hits = 0;
+
 	private $misses = 0;
+
 	private $writes = 0;
 
 	public function create_subscriber(): Subscriber {

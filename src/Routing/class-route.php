@@ -6,9 +6,13 @@ namespace Clockwork_For_Wp\Routing;
 
 final class Route {
 	private $handler;
+
 	private $method;
+
 	private $prefix = '';
+
 	private $query;
+
 	private $regex;
 
 	public function __construct( string $method, string $regex, string $query, $handler ) {

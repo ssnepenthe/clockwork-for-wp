@@ -9,9 +9,9 @@ use Clockwork_For_Wp\Is;
 use Clockwork_For_Wp\Routing\Route_Collection;
 
 final class Api_Subscriber implements Subscriber {
-	protected $is;
+	private $is;
 
-	protected $routes;
+	private $routes;
 
 	public function __construct( Is $is, Route_Collection $routes ) {
 		$this->is = $is;

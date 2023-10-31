@@ -15,6 +15,7 @@ use Clockwork_For_Wp\Provides_Subscriber;
 // @todo Use phpmailer_init hook to get more details?
 final class Wp_Mail extends DataSource implements Provides_Subscriber {
 	private $emails;
+
 	private $log;
 
 	public function __construct( ?Timeline $emails = null, ?Log $log = null ) {

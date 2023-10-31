@@ -14,6 +14,7 @@ use Clockwork_For_Wp\Provides_Subscriber;
 
 final class Wp_Http extends DataSource implements Provides_Subscriber {
 	private $log;
+
 	private $timeline;
 
 	public function __construct( ?Log $log = null, ?Timeline $timeline = null ) {

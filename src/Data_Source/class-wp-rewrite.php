@@ -14,8 +14,11 @@ use function Clockwork_For_Wp\describe_value;
 
 final class Wp_Rewrite extends DataSource implements Provides_Subscriber {
 	private $front = '';
+
 	private $rules = [];
+
 	private $structure = '';
+
 	private $trailing_slash = false;
 
 	public function add_rule( $regex, $query ) {

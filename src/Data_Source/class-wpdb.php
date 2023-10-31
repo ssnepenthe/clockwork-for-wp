@@ -13,9 +13,13 @@ use Clockwork_For_Wp\Provides_Subscriber;
 
 final class Wpdb extends DataSource implements Provides_Subscriber {
 	private $custom_model_identifiers = [];
+
 	private $detect_duplicate_queries;
+
 	private $duplicates = [];
+
 	private $pattern_model_map;
+
 	private $queries = [];
 
 	public function __construct( bool $detect_duplicate_queries, array $pattern_model_map ) {

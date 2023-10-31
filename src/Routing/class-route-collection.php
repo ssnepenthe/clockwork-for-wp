@@ -6,6 +6,7 @@ namespace Clockwork_For_Wp\Routing;
 
 final class Route_Collection {
 	private $prefix;
+
 	private $routes = [];
 
 	public function __construct( string $prefix = '' ) {

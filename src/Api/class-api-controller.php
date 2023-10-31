@@ -11,7 +11,9 @@ use function Clockwork_For_Wp\array_only;
 
 final class Api_Controller {
 	private $authenticator;
+
 	private $metadata;
+
 	private $request;
 
 	public function __construct(

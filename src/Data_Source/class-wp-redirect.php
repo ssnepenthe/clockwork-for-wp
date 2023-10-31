@@ -20,12 +20,15 @@ final class Wp_Redirect extends DataSource implements Provides_Subscriber {
 		'status' => null,
 		'x-redirect-by' => null,
 	];
+
 	private $finalized = false;
+
 	private $initial = [
 		'location' => null,
 		'status' => 302,
 		'x-redirect-by' => 'WordPress',
 	];
+
 	private $trace;
 
 	public function create_subscriber(): Subscriber {
