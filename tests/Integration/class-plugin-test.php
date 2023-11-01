@@ -24,7 +24,7 @@ class Plugin_Test extends TestCase {
 
 	/** @test */
 	public function it_can_filter_data_collection_using_except_uri_list() {
-		$plugin = $this->create_plugin( [
+		$should_collect = $this->create_should_collect( [
 			'requests' => [
 				'except' => [
 					'^clockwork',
@@ -33,13 +33,7 @@ class Plugin_Test extends TestCase {
 					'a-specific-slug#with_hash'
 				],
 			],
-			'storage' => [
-				'driver' => 'null',
-			],
-			'register_helpers' => false,
 		] );
-
-		$should_collect = $plugin->get_pimple()[ Clockwork::class ]->shouldCollect();
 
 		$this->assertTrue( $should_collect->filter( $this->create_request( 'blog/some-post-slug' ) ) );
 		$this->assertTrue( $should_collect->filter( $this->create_request( 'blog/clockwork-rocks' ) ) );
@@ -54,7 +48,7 @@ class Plugin_Test extends TestCase {
 
 	/** @test */
 	public function it_can_filter_data_collection_using_only_uri_list() {
-		$plugin = $this->create_plugin( [
+		$should_collect = $this->create_should_collect( [
 			'requests' => [
 				'only' => [
 					'^blog',
@@ -62,13 +56,7 @@ class Plugin_Test extends TestCase {
 					'#with_hash'
 				],
 			],
-			'storage' => [
-				'driver' => 'null',
-			],
-			'register_helpers' => false,
 		] );
-
-		$should_collect = $plugin->get_pimple()[ Clockwork::class ]->shouldCollect();
 
 		$this->assertTrue( $should_collect->filter( $this->create_request( 'blog/some-post-slug' ) ) );
 		$this->assertTrue( $should_collect->filter( $this->create_request( 'a-specific-slug' ) ) );
@@ -81,30 +69,29 @@ class Plugin_Test extends TestCase {
 
 	/** @test */
 	public function it_can_filter_data_collection_for_preflight_requests() {
-		$should_collect = function( $except_preflight ) {
-			$plugin = $this->create_plugin( [
-				'requests' => [
-					'except_preflight' => $except_preflight,
-				],
-				'storage' => [
-					'driver' => 'null',
-				],
-				'register_helpers' => false,
-			] );
-
-			return $plugin->get_pimple()[ Clockwork::class ]->shouldCollect();
-		};
+		$should_collect = fn( $except_preflight ) => $this->create_should_collect( [
+			'requests' => [
+				'except_preflight' => $except_preflight,
+			],
+		] );
 
 		$this->assertFalse( $should_collect( true )->filter( $this->create_request( '/', 'OPTIONS' ) ) );
 		$this->assertTrue( $should_collect( false )->filter( $this->create_request( '/', 'OPTIONS' ) ) );
 	}
 
 	private function create_plugin( array $user_config = [] ) {
+		$global_config = [
+			'register_helpers' => false,
+			'storage' => [
+				'driver' => 'null',
+			],
+		];
+
 		$plugin = new Plugin( [], [
-			Read_Only_Configuration::class => $this->create_config( $user_config ),
+			Read_Only_Configuration::class => $this->create_config( $user_config + $global_config ),
 		] );
 
-		$plugin->register( new Clockwork_Provider( $plugin ) );
+		$plugin->register( new Clockwork_Provider() );
 
 		$plugin->get_pimple()->extend( Storage_Factory::class, function( $factory ) {
 			$factory->register_custom_factory( 'null', function() {
@@ -124,5 +111,9 @@ class Plugin_Test extends TestCase {
 			'method' => $method,
 			'uri' => $uri,
 		] );
+	}
+
+	private function create_should_collect( array $user_config = [] ) {
+		return $this->create_plugin( $user_config )->get_pimple()[ Clockwork::class ]->shouldCollect();
 	}
 }
