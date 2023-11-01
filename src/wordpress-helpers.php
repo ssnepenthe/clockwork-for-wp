@@ -6,6 +6,7 @@ namespace Clockwork_For_Wp;
 
 use Requests_Utility_CaseInsensitiveDictionary;
 use WP_Error;
+use WpOrg\Requests\Utility\CaseInsensitiveDictionary;
 
 function prepare_rest_route( array $handlers_array ) {
 	// @todo Filter necessary?
@@ -26,7 +27,8 @@ function prepare_http_response( $response ) {
 
 	$headers = \wp_remote_retrieve_headers( $response );
 
-	if ( $headers instanceof Requests_Utility_CaseInsensitiveDictionary ) {
+	// Requests lib switched from PSR-0 to PSR-4 naming in v2.0 which is bundled with WP from v6.2.
+	if ( $headers instanceof CaseInsensitiveDictionary || $headers instanceof Requests_Utility_CaseInsensitiveDictionary ) {
 		$headers = $headers->getAll();
 	} else {
 		$headers = [];
