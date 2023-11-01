@@ -166,15 +166,9 @@ class Wpdb_Test extends TestCase {
 		$data_source = new Wpdb( $detect_dupes = false, $this->pattern_model_map() );
 
 		// It should use the first callback to return a string value.
-		$data_source->add_custom_model_identifier( function( $query ) {
-			return null;
-		} );
-		$data_source->add_custom_model_identifier( function( $query ) {
-			return 'TESTMODEL';
-		} );
-		$data_source->add_custom_model_identifier( function( $query ) {
-			return 'TESTMODEL2';
-		} );
+		$data_source->add_custom_model_identifier( fn( $query ) => null );
+		$data_source->add_custom_model_identifier( fn( $query ) => 'TESTMODEL' );
+		$data_source->add_custom_model_identifier( fn( $query ) => 'TESTMODEL2' );
 
 		$data_source->add_query( 'select * from posts', 500, microtime( true ) );
 

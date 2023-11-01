@@ -76,11 +76,13 @@ class Wp_Hook_Test extends TestCase {
 
 		$data_source->resolve( $request );
 
-		$prepared = array_map( function( $item ) {
-			return $item['Tag'];
-		}, array_filter( $request->userData( 'Hooks' )->toArray()[0], function( $item ) {
-			return array_key_exists( 'Tag', $item );
-		} ) );
+		$prepared = array_map(
+			fn( $item ) => $item['Tag'],
+			array_filter(
+				$request->userData( 'Hooks' )->toArray()[0],
+				fn( $item ) => array_key_exists( 'Tag', $item )
+			)
+		);
 
 		$this->assertCount( 4, $prepared );
 		$this->assertSame( [ 'tag1', 'tag1_xyz', 'tag3', 'tag5_xyz' ], $prepared );
@@ -106,11 +108,13 @@ class Wp_Hook_Test extends TestCase {
 
 		$data_source->resolve( $request );
 
-		$prepared = array_map( function( $item ) {
-			return $item['Tag'];
-		}, array_filter( $request->userData( 'Hooks' )->toArray()[0], function( $item ) {
-			return array_key_exists( 'Tag', $item );
-		} ) );
+		$prepared = array_map(
+			fn( $item ) => $item['Tag'],
+			array_filter(
+				$request->userData( 'Hooks' )->toArray()[0],
+				fn( $item ) => array_key_exists( 'Tag', $item )
+			)
+		);
 
 		$this->assertCount( 6, $prepared );
 		$this->assertSame(
@@ -140,11 +144,13 @@ class Wp_Hook_Test extends TestCase {
 
 		$data_source->resolve( $request );
 
-		$prepared = array_map( function( $item ) {
-			return $item['Tag'];
-		}, array_filter( $request->userData( 'Hooks' )->toArray()[0], function( $item ) {
-			return array_key_exists( 'Tag', $item );
-		} ) );
+		$prepared = array_map(
+			fn( $item ) => $item['Tag'],
+			array_filter(
+				$request->userData( 'Hooks' )->toArray()[0],
+				fn( $item ) => array_key_exists( 'Tag', $item )
+			)
+		);
 
 		$this->assertCount( 2, $prepared );
 		$this->assertSame(
@@ -167,11 +173,13 @@ class Wp_Hook_Test extends TestCase {
 
 		$data_source->resolve( $request );
 
-		$prepared = array_map( function( $item ) {
-			return $item['Tag'];
-		}, array_filter( $request->userData( 'Hooks' )->toArray()[0], function( $item ) {
-			return array_key_exists( 'Tag', $item );
-		} ) );
+		$prepared = array_map(
+			fn( $item ) => $item['Tag'],
+			array_filter(
+				$request->userData( 'Hooks' )->toArray()[0],
+				fn( $item ) => array_key_exists( 'Tag', $item )
+			)
+		);
 
 		$this->assertCount( 2, $prepared );
 		$this->assertSame( [ 'tag2', 'tag2_xyz' ], $prepared );
@@ -191,11 +199,13 @@ class Wp_Hook_Test extends TestCase {
 
 		$data_source->resolve( $request );
 
-		$prepared = array_map( function( $item ) {
-			return $item['Tag'];
-		}, array_filter( $request->userData( 'Hooks' )->toArray()[0], function( $item ) {
-			return array_key_exists( 'Tag', $item );
-		} ) );
+		$prepared = array_map(
+			fn( $item ) => $item['Tag'],
+			array_filter(
+				$request->userData( 'Hooks' )->toArray()[0],
+				fn( $item ) => array_key_exists( 'Tag', $item )
+			)
+		);
 
 		$this->assertCount( 2, $prepared );
 		$this->assertSame( [ 'tag1', 'tag1_xyz' ], $prepared );
@@ -216,11 +226,13 @@ class Wp_Hook_Test extends TestCase {
 
 		$data_source->resolve( $request );
 
-		$prepared = array_map( function( $item ) {
-			return $item['Tag'];
-		}, array_filter( $request->userData( 'Hooks' )->toArray()[0], function( $item ) {
-			return array_key_exists( 'Tag', $item );
-		} ) );
+		$prepared = array_map(
+			fn( $item ) => $item['Tag'],
+			array_filter(
+				$request->userData( 'Hooks' )->toArray()[0],
+				fn( $item ) => array_key_exists( 'Tag', $item )
+			)
+		);
 
 		$this->assertCount( 2, $prepared );
 		$this->assertSame( [ 'tag1', 'tag1_xyz' ], $prepared );

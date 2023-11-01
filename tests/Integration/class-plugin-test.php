@@ -93,13 +93,13 @@ class Plugin_Test extends TestCase {
 
 		$plugin->register( new Clockwork_Provider() );
 
-		$plugin->get_pimple()->extend( Storage_Factory::class, function( $factory ) {
-			$factory->register_custom_factory( 'null', function() {
-				return new Null_Storage_For_Tests();
-			} );
-
-			return $factory;
-		} );
+		$plugin->get_pimple()->extend(
+			Storage_Factory::class,
+			fn( $factory ) => $factory->register_custom_factory(
+				'null',
+				fn() => new Null_Storage_For_Tests()
+			)
+		);
 
 		$plugin->lock();
 

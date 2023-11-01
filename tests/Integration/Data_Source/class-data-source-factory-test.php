@@ -43,9 +43,7 @@ class Data_Source_Factory_Test extends TestCase {
 		$data_source = new class extends DataSource {};
 
 		$factory = $this->create_factory();
-		$factory->register_custom_factory( 'test', function() use ( $data_source ) {
-			return $data_source;
-		} );
+		$factory->register_custom_factory( 'test', fn() => $data_source );
 
 		$this->assertSame( $data_source, $factory->create( 'test' ) );
 	}
@@ -56,9 +54,7 @@ class Data_Source_Factory_Test extends TestCase {
 		};
 
 		$factory = $this->create_factory();
-		$factory->register_custom_factory( 'theme', function() use ( $data_source ) {
-			return $data_source;
-		} );
+		$factory->register_custom_factory( 'theme', fn() => $data_source );
 
 		$this->assertTrue( method_exists( $factory->create( 'theme' ), 'test' ) );
 		$this->assertSame( 'it works', $factory->create( 'theme' )->test() );
