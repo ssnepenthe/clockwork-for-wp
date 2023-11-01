@@ -11,7 +11,7 @@
         "ssnepenthe/apheleia-cli": "^0.1"
     },
     "require-dev": {
-        "psy/psysh": "^0.9.7",
+        "psy/psysh": "^0.11",
         "symfony/var-dumper": "^4.1",
         "phpunit/phpunit": "^9.5",
         "spomky-labs/base64url": "^2.0",
