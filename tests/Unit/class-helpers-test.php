@@ -72,7 +72,7 @@ class Helpers_Test extends TestCase {
 		$line = __LINE__ + 3;
 		$this->assertEquals(
 			"Closure ({$file}, line {$line})",
-			describe_callable( function() {} )
+			describe_callable( fn() => null )
 		);
 
 		// Invokable.

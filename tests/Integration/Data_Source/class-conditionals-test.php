@@ -11,8 +11,8 @@ class Conditionals_Test extends TestCase {
 		$namespace = __NAMESPACE__;
 
 		$data_source = new Conditionals( [
-			[ 'conditional' => "{$namespace}\\boolean_truthy", 'when' => function() { return false; } ],
-			[ 'conditional' => "{$namespace}\\boolean_falsy", 'when' => function() { return true; } ],
+			[ 'conditional' => "{$namespace}\\boolean_truthy", 'when' => fn() => false ],
+			[ 'conditional' => "{$namespace}\\boolean_falsy", 'when' => fn() => true ],
 		] );
 		$request = $data_source->resolve( new Request() );
 		$data = $request->userData( 'WordPress' )->toArray()[0];
