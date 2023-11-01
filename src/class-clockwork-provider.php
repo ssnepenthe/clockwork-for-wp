@@ -36,8 +36,7 @@ final class Clockwork_Provider extends Base_Provider {
 					$pimple[ Read_Only_Configuration::class ],
 					$pimple[ Plugin::class ]->is(),
 					$pimple[ Event_Manager::class ],
-					$pimple[ Clockwork::class ],
-					$pimple[ Request::class ]
+					$pimple[ Clockwork::class ]
 				)
 			);
 			$events->attach( new Toolbar_Subscriber(
