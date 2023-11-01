@@ -6,8 +6,7 @@ namespace Clockwork_For_Wp\Data_Source\Subscriber;
 
 use Clockwork_For_Wp\Data_Source\Wp_Query;
 use Clockwork_For_Wp\Event_Management\Subscriber;
-
-use function Clockwork_For_Wp\service;
+use Clockwork_For_Wp\Globals;
 
 /**
  * @internal
@@ -31,7 +30,7 @@ final class Wp_Query_Subscriber implements Subscriber {
 		$plugin_vars = \apply_filters( 'query_vars', [] );
 
 		$query_vars = \array_filter(
-			service( \WP_Query::class )->query_vars,
+			Globals::get( 'wp_query' )->query_vars,
 			static function ( $value, $key ) use ( $plugin_vars ) {
 				return ( isset( $plugin_vars[ $key ] ) && '' !== $value ) || ! empty( $value );
 			},

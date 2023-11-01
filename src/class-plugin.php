@@ -37,7 +37,6 @@ final class Plugin {
 			$providers = [
 				new Clockwork_Provider(),
 				new Plugin_Provider(),
-				new Wordpress_Provider(),
 
 				new Api_Provider(),
 				new Cli_Data_Collection_Provider(),

@@ -6,8 +6,7 @@ namespace Clockwork_For_Wp\Data_Source\Subscriber;
 
 use Clockwork_For_Wp\Data_Source\Wp;
 use Clockwork_For_Wp\Event_Management\Subscriber;
-
-use function Clockwork_For_Wp\service;
+use Clockwork_For_Wp\Globals;
 
 /**
  * @internal
@@ -26,7 +25,7 @@ final class Wp_Subscriber implements Subscriber {
 	}
 
 	public function on_cfw_pre_resolve(): void {
-		$wp = service( \WP::class );
+		$wp = Globals::get( 'wp' );
 
 		// @todo Move to rewrite?
 		foreach ( [ 'request', 'query_string', 'matched_rule', 'matched_query' ] as $var ) {

@@ -6,6 +6,7 @@ use Clockwork\Clockwork;
 use Clockwork\DataSource\DataSource;
 use Clockwork_For_Wp\Data_Source;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
+use Clockwork_For_Wp\Globals;
 use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Is;
 use Clockwork_For_Wp\Tests\Creates_Config;
@@ -15,6 +16,15 @@ use Pimple\Container;
 
 class Data_Source_Factory_Test extends TestCase {
 	use Creates_Config;
+
+	protected function setUp(): void {
+		Globals::set_getter( 'timestart', fn() => 'irrelevant' );
+		Globals::set_getter( 'wp_version', fn() => 'irrelevant' );
+	}
+
+	protected function tearDown(): void {
+		Globals::reset();
+	}
 
 	/** @dataProvider provide_test_create */
 	public function test_create( $name, $class ) {
@@ -110,8 +120,6 @@ class Data_Source_Factory_Test extends TestCase {
 			'uri' => '/',
 		] );
 		$pimple = new Container( [
-			'wp_version' => 'irrelevant',
-			'timestart' => 'irrelevant',
 			Event_Manager::class => new class {
 				public function trigger() { /** irrelevant */ }
 			}

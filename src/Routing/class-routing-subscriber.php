@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Routing;
 
 use Clockwork_For_Wp\Event_Management\Subscriber;
+use Clockwork_For_Wp\Globals;
 use Clockwork_For_Wp\Incoming_Request;
-use WP;
-
-use function Clockwork_For_Wp\service;
 
 final class Routing_Subscriber implements Subscriber {
 	private $invoker;
@@ -25,7 +23,7 @@ final class Routing_Subscriber implements Subscriber {
 
 	public function call_matched_handler(): void {
 		// @todo $route = $this->routes->match( $request );?
-		$route = $this->routes->match( $this->request->intended_method(), service( WP::class )->matched_rule );
+		$route = $this->routes->match( $this->request->intended_method(), Globals::get( 'wp' )->matched_rule );
 
 		if ( null === $route ) {
 			return;

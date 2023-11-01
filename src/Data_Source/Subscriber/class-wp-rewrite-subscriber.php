@@ -6,8 +6,7 @@ namespace Clockwork_For_Wp\Data_Source\Subscriber;
 
 use Clockwork_For_Wp\Data_Source\Wp_Rewrite;
 use Clockwork_For_Wp\Event_Management\Subscriber;
-
-use function Clockwork_For_Wp\service;
+use Clockwork_For_Wp\Globals;
 
 /**
  * @internal
@@ -26,7 +25,7 @@ final class Wp_Rewrite_Subscriber implements Subscriber {
 	}
 
 	public function on_cfw_pre_resolve(): void {
-		$wp_rewrite = service( \WP_Rewrite::class );
+		$wp_rewrite = Globals::get( 'wp_rewrite' );
 
 		$this->data_source
 			->set_structure( $wp_rewrite->permalink_structure )

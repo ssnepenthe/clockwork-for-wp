@@ -6,6 +6,7 @@ namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork_For_Wp\Base_Factory;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
+use Clockwork_For_Wp\Globals;
 use Clockwork_For_Wp\Is;
 use Clockwork_For_Wp\Read_Only_Configuration;
 use InvalidArgumentException;
@@ -103,7 +104,7 @@ final class Data_Source_Factory extends Base_Factory {
 	}
 
 	protected function create_core_instance(): Core {
-		return new Core( $this->pimple[ 'wp_version' ], $this->pimple[ 'timestart' ] );
+		return new Core( Globals::get( 'wp_version' ), Globals::get( 'timestart' ) );
 	}
 
 	protected function create_errors_instance(): Errors {

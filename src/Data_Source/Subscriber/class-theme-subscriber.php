@@ -7,8 +7,8 @@ namespace Clockwork_For_Wp\Data_Source\Subscriber;
 use Clockwork_For_Wp\Data_Source\Theme;
 use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Event_Management\Subscriber;
+use Clockwork_For_Wp\Globals;
 
-use function Clockwork_For_Wp\container;
 use function Clockwork_For_Wp\events;
 
 /**
@@ -54,7 +54,7 @@ final class Theme_Subscriber implements Subscriber {
 			->set_is_child_theme( \is_child_theme() )
 			->set_template( \get_template() )
 			->set_stylesheet( \get_stylesheet() )
-			->set_content_width( (int) container()[ 'content_width' ] );
+			->set_content_width( (int) Globals::get( 'content_width' ) );
 	}
 
 	/**

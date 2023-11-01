@@ -6,10 +6,8 @@ namespace Clockwork_For_Wp\Data_Source\Subscriber;
 
 use Clockwork_For_Wp\Data_Source\Rest_Api;
 use Clockwork_For_Wp\Event_Management\Subscriber;
-
-use WP_REST_Server;
+use Clockwork_For_Wp\Globals;
 use function Clockwork_For_Wp\prepare_rest_route;
-use function Clockwork_For_Wp\service;
 
 /**
  * @internal
@@ -30,7 +28,7 @@ final class Rest_Api_Subscriber implements Subscriber {
 	public function on_cfw_pre_resolve(): void {
 		// @todo Option for core rest endpoints to be filtered from list.
 		// @todo Option for what route fields get recorded.
-		foreach ( service( WP_REST_Server::class )->get_routes() as $path => $handlers ) {
+		foreach ( Globals::get( 'wp_rest_server' )->get_routes() as $path => $handlers ) {
 			foreach ( $handlers as $handler ) {
 				[ $methods, $callback, $permission_callback ] = prepare_rest_route( $handler );
 
