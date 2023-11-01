@@ -23,7 +23,7 @@ class Transients_Test extends TestCase {
 		$this->request_is_resolved = false;
 	}
 
-	protected function resolve_request() {
+	private function resolve_request() {
 		if ( $this->request_is_resolved ) {
 			return;
 		}
@@ -33,7 +33,7 @@ class Transients_Test extends TestCase {
 		$this->request_is_resolved = true;
 	}
 
-	protected function user_data() {
+	private function user_data() {
 		if ( ! $this->request_is_resolved ) {
 			$this->resolve_request();
 		}

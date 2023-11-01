@@ -16,7 +16,7 @@ use Pimple\Container;
 class Wpdb_Test extends TestCase {
 	use Creates_Config;
 
-	protected function pattern_model_map() {
+	private function pattern_model_map() {
 		// @todo Can we pull this from the bundled config? Would require a method for removing WP constants as dependencies of the config.php file.
 		return [
 			// @todo Should we include "old tables"?
@@ -186,7 +186,7 @@ class Wpdb_Test extends TestCase {
 		$this->assertEquals( 'TESTMODEL', $request->databaseQueries[0]['model'] );
 	}
 
-	protected function create_data_source_via_factory( $user_config = [] ) {
+	private function create_data_source_via_factory( $user_config = [] ) {
 		$config = $this->create_config();
 
 		$factory = new Data_Source_Factory(

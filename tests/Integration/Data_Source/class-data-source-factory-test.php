@@ -102,7 +102,7 @@ class Data_Source_Factory_Test extends TestCase {
 		yield [ 'xdebug', Data_Source\Xdebug::class ];
 	}
 
-	protected function create_factory() {
+	private function create_factory() {
 		$config = $this->create_config( [
 			'data_sources' => [
 				'rest_api' => [ 'enabled' => true ],

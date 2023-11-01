@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 class Php_Test extends TestCase {
 	protected $backed_up_superglobals = [];
 
-	protected function back_up_superglobals() {
+	private function back_up_superglobals() {
 		$this->backed_up_superglobals = [
 			'cookie' => $_COOKIE,
 			'get' => $_GET,
@@ -18,7 +18,7 @@ class Php_Test extends TestCase {
 		];
 	}
 
-	protected function restore_superglobals() {
+	private function restore_superglobals() {
 		$_COOKIE = $this->backed_up_superglobals['cookie'];
 		$_GET = $this->backed_up_superglobals['get'];
 		$_POST = $this->backed_up_superglobals['post'];

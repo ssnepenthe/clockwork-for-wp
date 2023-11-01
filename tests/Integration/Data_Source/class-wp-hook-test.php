@@ -236,7 +236,7 @@ class Wp_Hook_Test extends TestCase {
 		$this->assertEquals( [], $request->userData );
 	}
 
-	protected function create_data_source_via_factory( $filters = [] ) {
+	private function create_data_source_via_factory( $filters = [] ) {
 		$config = $this->create_config();
 		$factory = new Data_Source_Factory(
 			$config,

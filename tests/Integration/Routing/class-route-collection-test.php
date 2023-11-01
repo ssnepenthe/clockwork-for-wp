@@ -7,7 +7,7 @@ use Clockwork_For_Wp\Routing\Route_Collection;
 use PHPUnit\Framework\TestCase;
 
 class Route_Collection_Test extends TestCase {
-	protected function get_route_collection( $prefix = '' ) {
+	private function get_route_collection( $prefix = '' ) {
 		$route_collection = new Route_Collection( $prefix );
 		$route_collection->add(
 			new Route( 'GET', 'add_method_regex', 'index.php?add_method=query', [] )

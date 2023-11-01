@@ -76,7 +76,7 @@ class Is_Test extends TestCase {
 		$this->assertFalse( $is->web_enabled() );
 	}
 
-	protected function create_is( array $user_config ): Is {
+	private function create_is( array $user_config ): Is {
 		$config = $this->create_config( $user_config );
 
 		return new Is( $config, new Clockwork(), new Incoming_Request( [] ) );
