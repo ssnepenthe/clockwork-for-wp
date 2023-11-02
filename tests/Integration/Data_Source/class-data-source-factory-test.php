@@ -123,7 +123,7 @@ class Data_Source_Factory_Test extends TestCase {
 		$pimple = new Container( [
 			Event_Manager::class => new class() {
 				public function trigger(): void {
-					/** irrelevant */
+					// irrelevant
 				}
 			},
 		] );
