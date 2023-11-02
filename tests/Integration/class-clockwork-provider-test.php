@@ -16,7 +16,9 @@ use PHPUnit\Framework\TestCase;
 class Clockwork_Provider_Test extends TestCase {
 	use Creates_Config;
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function the_clock_function_can_be_disabled(): void {
 		$this->assertFalse( \function_exists( 'clock' ) );
 
@@ -27,7 +29,9 @@ class Clockwork_Provider_Test extends TestCase {
 		$this->assertFalse( \function_exists( 'clock' ) );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function the_clock_function_can_be_enabled(): void {
 		$this->assertFalse( \function_exists( 'clock' ) );
 

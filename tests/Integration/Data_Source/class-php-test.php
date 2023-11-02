@@ -25,7 +25,9 @@ class Php_Test extends TestCase {
 		$_SERVER = $this->backed_up_superglobals['server'];
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_correctly_records_php_data(): void {
 		// @todo What is best approach to testing $_SESSION superglobal?
 		$this->back_up_superglobals();

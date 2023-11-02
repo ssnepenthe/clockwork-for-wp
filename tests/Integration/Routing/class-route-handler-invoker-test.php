@@ -7,7 +7,9 @@ use Clockwork_For_Wp\Routing\Route_Handler_Invoker;
 use PHPUnit\Framework\TestCase;
 
 class Route_Handler_Invoker_Test extends TestCase {
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_does_not_inject_any_additional_params_by_default(): void {
 		$invoker = new Route_Handler_Invoker();
 
@@ -16,7 +18,9 @@ class Route_Handler_Invoker_Test extends TestCase {
 		$this->assertCount( 0, $result );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_provides_additional_params_to_route_handler(): void {
 		$params = [ 'a' => 1, 'b' => 2, 'c' => 3 ];
 
@@ -27,7 +31,9 @@ class Route_Handler_Invoker_Test extends TestCase {
 		$this->assertSame( $params, $result );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_binds_param_resolver_to_invoker_instance(): void {
 		$invoker = new Route_Handler_Invoker(
 			'abc_',
@@ -39,7 +45,9 @@ class Route_Handler_Invoker_Test extends TestCase {
 		$this->assertSame( [ 'apples' => 'bananas' ], $result );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_correctly_strips_param_prefixes(): void {
 		$invoker = new Route_Handler_Invoker( 'pfx_' );
 
@@ -47,7 +55,9 @@ class Route_Handler_Invoker_Test extends TestCase {
 		$this->assertSame( 'app_pfx_les', $invoker->strip_param_prefix( 'app_pfx_les' ) );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_can_resolve_non_callable_handlers(): void {
 		$handler = static fn( $params ) => 'called successfully';
 

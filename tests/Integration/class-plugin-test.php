@@ -15,14 +15,18 @@ use PHPUnit\Framework\TestCase;
 class Plugin_Test extends TestCase {
 	use Creates_Config;
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_passes_constructor_values_to_container(): void {
 		$plugin = new Plugin( [], [ 'a' => 'b' ] );
 
 		$this->assertEquals( 'b', $plugin->get_pimple()[ 'a' ] );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_can_filter_data_collection_using_except_uri_list(): void {
 		$should_collect = $this->create_should_collect( [
 			'requests' => [
@@ -46,7 +50,9 @@ class Plugin_Test extends TestCase {
 		$this->assertFalse( $should_collect->filter( $this->create_request( 'a-specific-slug#with_hash' ) ) );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_can_filter_data_collection_using_only_uri_list(): void {
 		$should_collect = $this->create_should_collect( [
 			'requests' => [
@@ -67,7 +73,9 @@ class Plugin_Test extends TestCase {
 		$this->assertFalse( $should_collect->filter( $this->create_request( 'another-one-bites-the-dust' ) ) );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_can_filter_data_collection_for_preflight_requests(): void {
 		$should_collect = fn( $except_preflight ) => $this->create_should_collect( [
 			'requests' => [

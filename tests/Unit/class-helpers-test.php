@@ -13,7 +13,9 @@ use function Clockwork_For_Wp\prepare_rest_route;
 use function Clockwork_For_Wp\prepare_wpdb_query;
 
 class Helpers_Test extends TestCase {
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function test_array_only(): void {
 		$array = [ 'a' => 'b', 'c' => 'd', 'e' => 'f' ];
 
@@ -21,7 +23,9 @@ class Helpers_Test extends TestCase {
 		$this->assertEmpty( array_only( $array, [ 'g' ] ) );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function test_describe_unavailable_callable(): void {
 		// Strings.
 		$this->assertSame( 'pfx_some_func()', describe_unavailable_callable( 'pfx_some_func' ) );
@@ -41,7 +45,9 @@ class Helpers_Test extends TestCase {
 		$this->assertSame( '(Unknown)', describe_unavailable_callable( [ 3, 4 ] ) );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function test_describe_callable(): void {
 		$namespace = __NAMESPACE__;
 
@@ -85,7 +91,9 @@ class Helpers_Test extends TestCase {
 		// @todo Keep an eye out for values we might use to test default/fallback return value.
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function test_describe_value(): void {
 		$this->assertEquals( 'NULL', describe_value( null ) );
 		$this->assertEquals( 'TRUE', describe_value( true ) );
@@ -98,7 +106,9 @@ class Helpers_Test extends TestCase {
 		$this->assertEquals( '(NON-SCALAR VALUE)', describe_value( new stdClass() ) );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function test_prepare_rest_route(): void {
 		$handlers_array = [
 			'methods' => [ 'GET' => true, 'POST' => true ],
@@ -121,7 +131,9 @@ class Helpers_Test extends TestCase {
 		);
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function test_prepare_wpdb_query(): void {
 		$time = \microtime( true );
 		$query_array = [ 'select * from wherever', 0.2, 'irrelevant-callstack', $time ];

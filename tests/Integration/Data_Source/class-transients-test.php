@@ -43,7 +43,9 @@ class Transients_Test extends TestCase {
 		return $this->request->userData( 'Caching' )->toArray();
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_correctly_records_transients_data(): void {
 		// Null values should be correctly removed.
 		$this->data_source->setted( 'key1' );
@@ -108,7 +110,9 @@ class Transients_Test extends TestCase {
 		], $deleted_data[1] );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_doesnt_create_the_userdata_entry_when_there_are_no_transients(): void {
 		$this->resolve_request();
 

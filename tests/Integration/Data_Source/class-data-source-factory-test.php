@@ -26,7 +26,9 @@ class Data_Source_Factory_Test extends TestCase {
 		Globals::reset();
 	}
 
-	/** @dataProvider provide_test_create */
+	/**
+	 * @dataProvider provide_test_create
+	 */
 	public function test_create( $name, $class ): void {
 		$factory = $this->create_factory();
 

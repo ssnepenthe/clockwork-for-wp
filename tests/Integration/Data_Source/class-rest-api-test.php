@@ -7,7 +7,9 @@ use Clockwork_For_Wp\Data_Source\Rest_Api;
 use PHPUnit\Framework\TestCase;
 
 class Rest_Api_Test extends TestCase {
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_correctly_records_rest_api_data(): void {
 		$data_source = new Rest_Api();
 		$request = new Request();
@@ -44,7 +46,9 @@ class Rest_Api_Test extends TestCase {
 		], $request->userData( 'Routing' )->toArray()[0] );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_doesnt_create_the_userdata_entry_when_there_are_no_routes(): void {
 		$data_source = new Rest_Api();
 		$request = new Request();

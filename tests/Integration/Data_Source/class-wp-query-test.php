@@ -7,7 +7,9 @@ use Clockwork_For_Wp\Data_Source\Wp_Query;
 use PHPUnit\Framework\TestCase;
 
 class Wp_Query_Test extends TestCase {
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_correctly_records_wp_query_data(): void {
 		$data_source = new Wp_Query();
 		$request = new Request();

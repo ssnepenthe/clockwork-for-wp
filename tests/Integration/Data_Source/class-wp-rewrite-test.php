@@ -7,7 +7,9 @@ use Clockwork_For_Wp\Data_Source\Wp_Rewrite;
 use PHPUnit\Framework\TestCase;
 
 class Wp_Rewrite_Test extends TestCase {
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_correctly_records_wp_rewrite_data(): void {
 		$data_source = new Wp_Rewrite();
 		$request = new Request();
@@ -64,7 +66,9 @@ class Wp_Rewrite_Test extends TestCase {
 		], $data[1] );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_correctly_describes_trailing_slash_value(): void {
 		$data_source = new Wp_Rewrite();
 		$request = new Request();

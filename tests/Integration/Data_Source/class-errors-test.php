@@ -220,7 +220,9 @@ class Errors_Test extends TestCase {
 		);
 	}
 
-	/** @dataProvider provides_types_to_levels */
+	/**
+	 * @dataProvider provides_types_to_levels
+	 */
 	public function test_resolve_correctly_sets_level_based_on_error_type( $type, $level ): void {
 		$data_source = $this->make_data_source( \E_ALL );
 		$input = $this->get_function_specific_test_input();
@@ -234,7 +236,9 @@ class Errors_Test extends TestCase {
 		$this->assertSame( $level, $messages[0]['level'] );
 	}
 
-	/** @dataProvider provides_types_to_labels */
+	/**
+	 * @dataProvider provides_types_to_labels
+	 */
 	public function test_resolve_converts_error_type_int_to_human_readable_string( $type, $label ): void {
 		$data_source = $this->make_data_source( \E_ALL );
 		$input = $this->get_function_specific_test_input();

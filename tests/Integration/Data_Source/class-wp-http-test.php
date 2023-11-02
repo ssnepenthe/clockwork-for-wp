@@ -7,7 +7,9 @@ use Clockwork_For_Wp\Data_Source\Wp_Http;
 use PHPUnit\Framework\TestCase;
 
 class Wp_Http_Test extends TestCase {
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_only_records_http_request_start_when_meta_is_present_in_args(): void {
 		$data_source = new Wp_Http();
 		$request = new Request();
@@ -19,7 +21,9 @@ class Wp_Http_Test extends TestCase {
 		$this->assertEmpty( $request->timelineData );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_correctly_records_http_request_start(): void {
 		$data_source = new Wp_Http();
 		$request = new Request();
@@ -36,7 +40,9 @@ class Wp_Http_Test extends TestCase {
 		$this->assertGreaterThan( 0, $request->timeline()->events[0]->end()->duration() );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_correctly_records_meta_error(): void {
 		$data_source = new Wp_Http();
 		$request = new Request();
@@ -51,7 +57,9 @@ class Wp_Http_Test extends TestCase {
 		);
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_correctly_records_request_failure(): void {
 		$data_source = new Wp_Http();
 		$request = new Request();
@@ -74,7 +82,9 @@ class Wp_Http_Test extends TestCase {
 		);
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_correctly_records_request_success(): void {
 		$data_source = new Wp_Http();
 		$request = new Request();

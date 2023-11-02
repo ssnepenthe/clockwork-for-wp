@@ -7,7 +7,9 @@ use Clockwork_For_Wp\Data_Source\Core;
 use PHPUnit\Framework\TestCase;
 
 class Core_Test extends TestCase {
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_correctly_records_core_data(): void {
 		$data_source = new Core( '4.7', \microtime( true ) );
 

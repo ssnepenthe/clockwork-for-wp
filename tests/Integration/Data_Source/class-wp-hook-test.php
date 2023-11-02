@@ -15,7 +15,9 @@ use Pimple\Container;
 class Wp_Hook_Test extends TestCase {
 	use Creates_Config;
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_correctly_records_hook_data(): void {
 		$data_source = new Wp_Hook();
 		$request = new Request();
@@ -56,7 +58,9 @@ class Wp_Hook_Test extends TestCase {
 		], $request->userData( 'Hooks' )->toArray()[0][3] );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_can_be_configured_to_collect_all_hook_tags_except_a_subset(): void {
 		$data_source = $this->create_data_source_via_factory( [
 			'except_tags' => [ 'tag2', 'tag3_[\w]', '^tag4', '5$' ],
@@ -88,7 +92,9 @@ class Wp_Hook_Test extends TestCase {
 		$this->assertSame( [ 'tag1', 'tag1_xyz', 'tag3', 'tag5_xyz' ], $prepared );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_can_be_configured_to_only_collect_a_subset_of_hook_tags(): void {
 		$data_source = $this->create_data_source_via_factory( [
 			'only_tags' => [ 'tag2', 'tag3_[\w]', '^tag4', '5$' ],
@@ -123,7 +129,9 @@ class Wp_Hook_Test extends TestCase {
 		);
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_favors_the_only_tags_configuration_over_the_except_tags_configuration(): void {
 		$data_source = $this->create_data_source_via_factory( [
 			'except_tags' => [ 'tag2' ],
@@ -159,7 +167,9 @@ class Wp_Hook_Test extends TestCase {
 		);
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_can_be_configured_to_collect_all_hooks_by_callback_except_a_subset(): void {
 		$data_source = $this->create_data_source_via_factory( [
 			'except_callbacks' => [ '^array_' ],
@@ -185,7 +195,9 @@ class Wp_Hook_Test extends TestCase {
 		$this->assertSame( [ 'tag2', 'tag2_xyz' ], $prepared );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_can_be_configured_to_only_collect_a_subset_of_hooks_by_callback(): void {
 		$data_source = $this->create_data_source_via_factory( [
 			'only_callbacks' => [ '^array_' ],
@@ -211,7 +223,9 @@ class Wp_Hook_Test extends TestCase {
 		$this->assertSame( [ 'tag1', 'tag1_xyz' ], $prepared );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_favors_the_only_callbacks_configuration_over_the_except_callbacks_configuration(): void {
 		$data_source = $this->create_data_source_via_factory( [
 			'except_callbacks' => [ '^array_' ],
@@ -238,7 +252,9 @@ class Wp_Hook_Test extends TestCase {
 		$this->assertSame( [ 'tag1', 'tag1_xyz' ], $prepared );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_doesnt_create_the_userdata_entry_when_there_are_no_hooks(): void {
 		$data_source = new Wp_Hook();
 		$request = new Request();

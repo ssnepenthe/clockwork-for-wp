@@ -33,7 +33,9 @@ class Wpdb_Test extends TestCase {
 		];
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_correctly_records_wpdb_data(): void {
 		$pattern_model_map = $this->pattern_model_map();
 		$pattern_model_map['/somewhere/'] = 'TESTMODEL';
@@ -85,7 +87,9 @@ class Wpdb_Test extends TestCase {
 		$this->assertEquals( 'TESTMODEL', $request->databaseQueries[4]['model'] );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_can_detect_duplicate_queries(): void {
 		$data_source = new Wpdb( $detect_dupes = true, [] );
 		$request = new Request();
@@ -126,7 +130,9 @@ class Wpdb_Test extends TestCase {
 		);
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_can_limit_query_logging_to_slow_queries(): void {
 		$untested_time = \microtime( true );
 		$queries = [
@@ -161,7 +167,9 @@ class Wpdb_Test extends TestCase {
 		$this->assertEquals( 'SELECT * FROM tags', $request->databaseQueries[0]['query'] );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_can_identify_models_with_custom_identifier_callbacks(): void {
 		$data_source = new Wpdb( $detect_dupes = false, $this->pattern_model_map() );
 

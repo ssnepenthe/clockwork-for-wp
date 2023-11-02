@@ -13,7 +13,9 @@ use PHPUnit\Framework\TestCase;
 class Authenticator_Factory_Test extends TestCase {
 	use Creates_Config;
 
-	/** @dataProvider provide_test_create */
+	/**
+	 * @dataProvider provide_test_create
+	 */
 	public function test_create( $name, $config, $class ): void {
 		$this->assertInstanceOf(
 			$class,
@@ -57,7 +59,9 @@ class Authenticator_Factory_Test extends TestCase {
 		( new Authenticator_Factory() )->create( 'test' );
 	}
 
-	/** @dataProvider provide_test_create_default */
+	/**
+	 * @dataProvider provide_test_create_default
+	 */
 	public function test_create_default( $config, $class, $password ): void {
 		$factory = new Authenticator_Factory();
 		$config = $this->create_config( $config );

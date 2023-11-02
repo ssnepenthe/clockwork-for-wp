@@ -6,7 +6,9 @@ use Clockwork_For_Wp\Incoming_Request;
 use PHPUnit\Framework\TestCase;
 
 class Incoming_Request_Test extends TestCase {
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function test_is_put(): void {
 		$request = new Incoming_Request( [ 'method' => 'GET' ] );
 
@@ -40,7 +42,9 @@ class Incoming_Request_Test extends TestCase {
 		$this->assertTrue( $request->is_put() );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function test_get_header(): void {
 		$request = new Incoming_Request( [
 			'headers' => [
@@ -66,7 +70,9 @@ class Incoming_Request_Test extends TestCase {
 		$this->assertSame( 'defaultvalue', $request->header( 'NOT_SET', 'defaultvalue' ) );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function test_extract_headers(): void {
 		$server = [
 			// Discarded.

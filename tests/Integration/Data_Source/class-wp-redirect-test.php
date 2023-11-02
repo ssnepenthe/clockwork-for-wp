@@ -7,7 +7,9 @@ use Clockwork_For_Wp\Data_Source\Wp_Redirect;
 use PHPUnit\Framework\TestCase;
 
 class Wp_Redirect_Test extends TestCase {
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_does_nothing_by_default(): void {
 		$data_source = new Wp_Redirect();
 		$request = new Request();
@@ -17,7 +19,9 @@ class Wp_Redirect_Test extends TestCase {
 		$this->assertCount( 0, $request->log()->messages );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_logs_redirect_data_when_initial_location_is_set(): void {
 		$data_source = new Wp_Redirect();
 
@@ -36,7 +40,9 @@ class Wp_Redirect_Test extends TestCase {
 		$this->assertSame( 'WordPress', $message['context']['Args']['x-redirect-by'] ); // default
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_allows_all_initial_and_filtered_args_to_be_set(): void {
 		$data_source = new Wp_Redirect();
 
@@ -66,7 +72,9 @@ class Wp_Redirect_Test extends TestCase {
 		);
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_omits_filtered_args_when_no_changes_have_been_made(): void {
 		$data_source = new Wp_Redirect();
 
@@ -88,7 +96,9 @@ class Wp_Redirect_Test extends TestCase {
 		$this->assertArrayNotHasKey( 'Filtered Args', $message['context'] );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_correctly_identifies_differences_between_initial_and_filtered_args(): void {
 		$data_source = new Wp_Redirect();
 
@@ -116,7 +126,9 @@ class Wp_Redirect_Test extends TestCase {
 		$this->assertArrayNotHasKey( 'x-redirect-by', $filtered_args );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_can_detect_when_wp_redirect_is_successful(): void {
 		$data_source = new Wp_Redirect();
 
@@ -130,7 +142,9 @@ class Wp_Redirect_Test extends TestCase {
 		$this->assertSame( 'Call to "wp_redirect"', $request->log()->messages[0]['message'] );
 	}
 
-	/** @test */
+	/**
+	 * @test
+	 */
 	public function it_can_detect_when_wp_redirect_call_bails(): void {
 		// Falsy filtered location.
 		$data_source = new Wp_Redirect();

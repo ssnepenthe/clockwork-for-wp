@@ -181,7 +181,7 @@ return $config->setRules([
 	'phpdoc_align' => true,
 	'phpdoc_annotation_without_dot' => true,
 	'phpdoc_indent' => true,
-	// 'phpdoc_line_span' => true,
+	'phpdoc_line_span' => true,
 	'phpdoc_no_alias_tag' => true,
 	'phpdoc_no_empty_return' => true,
 	'phpdoc_order' => true,
