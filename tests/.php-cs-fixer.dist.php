@@ -130,9 +130,9 @@ return $config->setRules([
 	'global_namespace_import' => true,
 	'no_leading_import_slash' => true,
 	'no_unused_imports' => true,
-	// 'ordered_imports' => [
-	//     'imports_order' => ['const', 'class', 'function'],
-	// ],
+	'ordered_imports' => [
+	    'imports_order' => ['const', 'class', 'function'],
+	],
 	'single_import_per_statement' => true,
 	'single_line_after_imports' => true,
 	'combine_consecutive_issets' => true,

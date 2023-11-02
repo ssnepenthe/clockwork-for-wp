@@ -4,13 +4,13 @@ namespace Clockwork_For_Wp\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 
+use stdClass;
 use function Clockwork_For_Wp\array_only;
 use function Clockwork_For_Wp\describe_callable;
 use function Clockwork_For_Wp\describe_unavailable_callable;
 use function Clockwork_For_Wp\describe_value;
 use function Clockwork_For_Wp\prepare_rest_route;
 use function Clockwork_For_Wp\prepare_wpdb_query;
-use stdClass;
 
 class Helpers_Test extends TestCase {
 	/** @test */

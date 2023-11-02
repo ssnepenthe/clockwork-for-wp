@@ -9,9 +9,9 @@ use Clockwork_For_Wp\Tests\Creates_Config;
 use InvalidArgumentException;
 use Null_Storage_For_Tests;
 use org\bovigo\vfs\vfsStream;
+use PDO;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
-use PDO;
 
 class Storage_Factory_Test extends TestCase {
 	use Creates_Config;

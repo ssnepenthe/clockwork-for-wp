@@ -3,10 +3,10 @@
 namespace Clockwork_For_Wp\Tests\Integration\Data_Source;
 
 use Clockwork\Clockwork;
-use Clockwork_For_Wp\Data_Source\Wpdb;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork\Request\Request;
 use Clockwork_For_Wp\Data_Source\Data_Source_Factory;
+use Clockwork_For_Wp\Data_Source\Wpdb;
+use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Is;
 use Clockwork_For_Wp\Tests\Creates_Config;
