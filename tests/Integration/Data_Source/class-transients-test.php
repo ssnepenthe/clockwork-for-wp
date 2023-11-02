@@ -11,19 +11,19 @@ class Transients_Test extends TestCase {
 	protected $request;
 	protected $request_is_resolved;
 
-	protected function setUp() : void {
+	protected function setUp(): void {
 		$this->data_source = new Transients();
 		$this->request = new Request();
 		$this->request_is_resolved = false;
 	}
 
-	protected function tearDown() : void {
+	protected function tearDown(): void {
 		$this->data_source = null;
 		$this->request = null;
 		$this->request_is_resolved = false;
 	}
 
-	private function resolve_request() {
+	private function resolve_request(): void {
 		if ( $this->request_is_resolved ) {
 			return;
 		}
@@ -42,7 +42,7 @@ class Transients_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_correctly_records_transients_data() {
+	public function it_correctly_records_transients_data(): void {
 		// Null values should be correctly removed.
 		$this->data_source->setted( 'key1' );
 		$this->data_source->setted( 'key2', 'value2' );
@@ -107,7 +107,7 @@ class Transients_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_doesnt_create_the_userdata_entry_when_there_are_no_transients() {
+	public function it_doesnt_create_the_userdata_entry_when_there_are_no_transients(): void {
 		$this->resolve_request();
 
 		$this->assertEquals( [], $this->request->userData );

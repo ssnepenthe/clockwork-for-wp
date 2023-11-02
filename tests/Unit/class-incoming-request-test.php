@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class Incoming_Request_Test extends TestCase {
 	/** @test */
-	public function test_is_put() {
+	public function test_is_put(): void {
 		$request = new Incoming_Request( [ 'method' => 'GET' ] );
 
 		$this->assertFalse( $request->is_put() );
@@ -41,13 +41,13 @@ class Incoming_Request_Test extends TestCase {
 	}
 
 	/** @test */
-	public function test_get_header() {
+	public function test_get_header(): void {
 		$request = new Incoming_Request( [
 			'headers' => [
 				'apple' => 'banana',
 				'content-type' => 'text/html',
-				'one-two-three-four' => 'iseethreedashes'
-			]
+				'one-two-three-four' => 'iseethreedashes',
+			],
 		] );
 
 		// Casing is normalized.
@@ -67,7 +67,7 @@ class Incoming_Request_Test extends TestCase {
 	}
 
 	/** @test */
-	public function test_extract_headers() {
+	public function test_extract_headers(): void {
 		$server = [
 			// Discarded.
 			'SOME_VARIABLE' => 'some-value',
@@ -82,7 +82,7 @@ class Incoming_Request_Test extends TestCase {
 			'CONTENT_MD5' => 'abcdef',
 
 			// Underscores to dashes.
-			'HTTP_ONE_TWO_THREE_FOUR' => 'iseethreedashes'
+			'HTTP_ONE_TWO_THREE_FOUR' => 'iseethreedashes',
 		];
 
 		$this->assertSame( [
@@ -91,7 +91,7 @@ class Incoming_Request_Test extends TestCase {
 			'content-type' => 'text/html',
 			'content-length' => '0',
 			'content-md5' => 'abcdef',
-			'one-two-three-four' => 'iseethreedashes'
+			'one-two-three-four' => 'iseethreedashes',
 		], Incoming_Request::extract_headers( $server ) );
 	}
 }

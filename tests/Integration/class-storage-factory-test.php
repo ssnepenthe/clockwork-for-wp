@@ -11,16 +11,17 @@ use Null_Storage_For_Tests;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
+use PDO;
 
 class Storage_Factory_Test extends TestCase {
 	use Creates_Config;
 
 	/** @dataProvider provide_test_create */
-	public function test_create( $name, $config, $class ) {
+	public function test_create( $name, $config, $class ): void {
 		$this->assertInstanceOf( $class, ( new Storage_Factory() )->create( $name, $config ) );
 	}
 
-	public function test_create_does_not_cache_instances() {
+	public function test_create_does_not_cache_instances(): void {
 		$factory = new Storage_Factory();
 		$config = [
 			'compress' => false,
@@ -32,37 +33,38 @@ class Storage_Factory_Test extends TestCase {
 		$this->assertNotSame( $factory->create( 'file', $config ), $factory->create( 'file', $config ) );
 	}
 
-	public function test_create_with_custom_factory() {
+	public function test_create_with_custom_factory(): void {
 		$factory = new Storage_Factory();
 		$factory->register_custom_factory( 'null', fn() => new Null_Storage_For_Tests() );
 
 		$this->assertInstanceOf( Null_Storage_For_Tests::class, $factory->create( 'null' ) );
 	}
 
-	public function test_create_with_custom_factory_override() {
+	public function test_create_with_custom_factory_override(): void {
 		$factory = new Storage_Factory();
 		$factory->register_custom_factory( 'file', fn() => new Null_Storage_For_Tests() );
 
 		$this->assertInstanceOf( Null_Storage_For_Tests::class, $factory->create( 'file' ) );
 	}
 
-	public function test_create_unsupported_storage() {
+	public function test_create_unsupported_storage(): void {
 		$this->expectException( InvalidArgumentException::class );
 
 		( new Storage_Factory() )->create( 'test' );
 	}
 
 	/** @dataProvider provide_test_create_default */
-	public function test_create_default( $config, $class, $expiration ) {
+	public function test_create_default( $config, $class, $expiration ): void {
 		$factory = new Storage_Factory();
 		$config = $this->create_config( $config );
 		$storage = $factory->create_default( $config );
 
 		// Not great but there are no getters on clockwork storage objects.
 		// Would probably be better to register custom factory with class that extends clockwork storage and adds getter...
-		$actual_expiration = ( function( $storage ) {
+		$actual_expiration = ( function ( $storage ) {
 			$r = new ReflectionProperty( $storage, 'expiration' );
 			$r->setAccessible( true );
+
 			return $r->getValue( $storage );
 		} )( $storage );
 
@@ -79,19 +81,19 @@ class Storage_Factory_Test extends TestCase {
 				'expiration' => null,
 				'path' => vfsStream::setup()->url(),
 			],
-			FileStorage::class
+			FileStorage::class,
 		];
 
 		yield [
 			'sql',
 			[
-				'dsn' => $this->createMock( \PDO::class ),
+				'dsn' => $this->createMock( PDO::class ),
 				'expiration' => null,
 				'password' => null,
 				'table' => 'clockwork',
 				'username' => null,
 			],
-			SqlStorage::class
+			SqlStorage::class,
 		];
 	}
 
@@ -136,7 +138,7 @@ class Storage_Factory_Test extends TestCase {
 
 		yield [
 			$config( 'sql', [
-				'dsn' => $this->createMock( \PDO::class ),
+				'dsn' => $this->createMock( PDO::class ),
 				'expiration' => null,
 				'password' => null,
 				'table' => 'clockwork',

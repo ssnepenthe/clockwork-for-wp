@@ -8,15 +8,15 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class Constants_Test extends TestCase {
-	const STRING_VALUE = 'apples';
-	const TRUE_VALUE = true;
-	const FALSE_VALUE = false;
-	const NULL_VALUE = null;
-	const INT_VALUE = 5;
-	const FLOAT_VALUE = 4.7;
-	const ARRAY_VALUE = [ 'a' => 'b' ];
+	public const STRING_VALUE = 'apples';
+	public const TRUE_VALUE = true;
+	public const FALSE_VALUE = false;
+	public const NULL_VALUE = null;
+	public const INT_VALUE = 5;
+	public const FLOAT_VALUE = 4.7;
+	public const ARRAY_VALUE = [ 'a' => 'b' ];
 
-	public function test_resolve_can_ignore_constant_based_on_when() {
+	public function test_resolve_can_ignore_constant_based_on_when(): void {
 		$class = __CLASS__;
 		$data_source = new Constants( [
 			[ 'constant' => "{$class}::STRING_VALUE", 'when' => fn() => true ],
@@ -30,11 +30,11 @@ class Constants_Test extends TestCase {
 			[
 				'constant' => "{$class}::STRING_VALUE",
 				'value' => '"apples"',
-			]
+			],
 		], $data );
 	}
 
-	public function test_resolve_defined_constants() {
+	public function test_resolve_defined_constants(): void {
 		$class = __CLASS__;
 		$data_source = new Constants( [
 			// Strings are wrapped in quotes.
@@ -84,11 +84,11 @@ class Constants_Test extends TestCase {
 			[
 				'constant' => "{$class}::TRUE_VALUE",
 				'value' => 'TRUE',
-			]
+			],
 		], $data );
 	}
 
-	public function test_resolve_undefined_constants() {
+	public function test_resolve_undefined_constants(): void {
 		$class = __CLASS__;
 		$data_source = new Constants( [
 			// Undefined constants are labelled as such.
@@ -103,7 +103,7 @@ class Constants_Test extends TestCase {
 		], $data );
 	}
 
-	public function test_resolve_sort_order() {
+	public function test_resolve_sort_order(): void {
 		$class = __CLASS__;
 		$data_source = new Constants( [
 			[ 'constant' => "{$class}::STRING_VALUE" ],
@@ -152,11 +152,11 @@ class Constants_Test extends TestCase {
 			[
 				'constant' => "{$class}::TRUE_VALUE",
 				'value' => 'TRUE',
-			]
+			],
 		], $data );
 	}
 
-	public function test_resolve_empty_constant_list() {
+	public function test_resolve_empty_constant_list(): void {
 		$class = __CLASS__;
 		$data_source = new Constants( [
 			[ 'constant' => "{$class}::STRING_VALUE", 'when' => fn() => false ],
@@ -165,19 +165,19 @@ class Constants_Test extends TestCase {
 		$this->assertEmpty( $data_source->resolve( new Request() )->userData );
 	}
 
-	public function test_from_no_constants() {
+	public function test_from_no_constants(): void {
 		$data_source = Constants::from( [] );
 
 		$this->assertEmpty( $data_source->resolve( new Request() )->userData );
 	}
 
-	public function test_from_non_array_constants() {
+	public function test_from_non_array_constants(): void {
 		$this->expectException( InvalidArgumentException::class );
 
 		Constants::from( [ 'constants' => 4 ] );
 	}
 
-	public function test_from_string_constant() {
+	public function test_from_string_constant(): void {
 		$class = __CLASS__;
 		$data_source = Constants::from( [ 'constants' => [ "{$class}::STRING_VALUE" ] ] );
 
@@ -187,13 +187,13 @@ class Constants_Test extends TestCase {
 		], $data_source->resolve( new Request() )->userData( 'WordPress' )->toArray()[0][0] );
 	}
 
-	public function test_from_non_array_or_string_constant() {
+	public function test_from_non_array_or_string_constant(): void {
 		$this->expectException( InvalidArgumentException::class );
 
 		Constants::from( [ 'constants' => [ 4 ] ] );
 	}
 
-	public function test_from_array_constant() {
+	public function test_from_array_constant(): void {
 		$class = __CLASS__;
 		$data_source = Constants::from( [
 			'constants' => [ [ 'constant' => "{$class}::STRING_VALUE" ] ],
@@ -205,7 +205,7 @@ class Constants_Test extends TestCase {
 		], $data_source->resolve( new Request() )->userData( 'WordPress' )->toArray()[0][0] );
 	}
 
-	public function test_from_mixed_constants() {
+	public function test_from_mixed_constants(): void {
 		$class = __CLASS__;
 		$data_source = Constants::from( [
 			'constants' => [
@@ -229,19 +229,19 @@ class Constants_Test extends TestCase {
 		], $data );
 	}
 
-	public function test_from_constant_missing_constant_key() {
+	public function test_from_constant_missing_constant_key(): void {
 		$this->expectException( InvalidArgumentException::class );
 
 		Constants::from( [ 'constants' => [ [] ] ] );
 	}
 
-	public function test_from_constant_non_string_constant_value() {
+	public function test_from_constant_non_string_constant_value(): void {
 		$this->expectException( InvalidArgumentException::class );
 
 		Constants::from( [ 'constants' => [ [ 'constant' => 4 ] ] ] );
 	}
 
-	public function test_from_constant_non_callable_when() {
+	public function test_from_constant_non_callable_when(): void {
 		$this->expectException( InvalidArgumentException::class );
 
 		$class = __CLASS__;
@@ -250,7 +250,7 @@ class Constants_Test extends TestCase {
 		] );
 	}
 
-	public function test_from_constant_with_when() {
+	public function test_from_constant_with_when(): void {
 		$class = __CLASS__;
 		$data_source = Constants::from( [
 			'constants' => [
@@ -267,7 +267,7 @@ class Constants_Test extends TestCase {
 		], $data_source->resolve( new Request() )->userData( 'WordPress' )->toArray()[0][0] );
 	}
 
-	public function test_from_constant_without_when() {
+	public function test_from_constant_without_when(): void {
 		$class = __CLASS__;
 		$data_source = Constants::from( [
 			'constants' => [ [ 'constant' => "{$class}::STRING_VALUE" ] ],

@@ -34,7 +34,7 @@ class Wpdb_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_correctly_records_wpdb_data() {
+	public function it_correctly_records_wpdb_data(): void {
 		$pattern_model_map = $this->pattern_model_map();
 		$pattern_model_map['/somewhere/'] = 'TESTMODEL';
 
@@ -86,7 +86,7 @@ class Wpdb_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_can_detect_duplicate_queries() {
+	public function it_can_detect_duplicate_queries(): void {
 		$data_source = new Wpdb( $detect_dupes = true, [] );
 		$request = new Request();
 		$untested_duration = 50;
@@ -101,7 +101,7 @@ class Wpdb_Test extends TestCase {
 						posts
 				',
 				$untested_duration,
-				$untested_time
+				$untested_time,
 			],
 			[ 'select * from users', $untested_duration, $untested_time ],
 			[ 'select * from posts;', $untested_duration, $untested_time ],
@@ -127,7 +127,7 @@ class Wpdb_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_can_limit_query_logging_to_slow_queries() {
+	public function it_can_limit_query_logging_to_slow_queries(): void {
 		$untested_time = microtime( true );
 		$queries = [
 			[ 'select * from posts', 50, $untested_time ],
@@ -162,7 +162,7 @@ class Wpdb_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_can_identify_models_with_custom_identifier_callbacks() {
+	public function it_can_identify_models_with_custom_identifier_callbacks(): void {
 		$data_source = new Wpdb( $detect_dupes = false, $this->pattern_model_map() );
 
 		// It should use the first callback to return a string value.
@@ -187,8 +187,8 @@ class Wpdb_Test extends TestCase {
 			$config,
 			new Is( $config, new Clockwork(), new Incoming_Request() ),
 			new Container( [
-				Event_Manager::class => new class {
-					public function trigger( ...$args ) {
+				Event_Manager::class => new class() {
+					public function trigger( ...$args ): void {
 						// Not important...
 					}
 				},
@@ -198,7 +198,7 @@ class Wpdb_Test extends TestCase {
 		return $factory->create( 'wpdb', [
 			'pattern_model_map' => $user_config['pattern_model_map'] ?? $this->pattern_model_map(),
 			'slow_only' => $user_config['slow_only'] ?? false,
-			'slow_threshold' => $user_config['slow_threshold'] ?? 50
+			'slow_threshold' => $user_config['slow_threshold'] ?? 50,
 		] );
 	}
 }

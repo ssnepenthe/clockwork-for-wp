@@ -7,7 +7,7 @@ use Clockwork_For_Wp\Data_Source\Conditionals;
 use PHPUnit\Framework\TestCase;
 
 class Conditionals_Test extends TestCase {
-	public function test_resolve_can_ignore_conditional_based_on_when() {
+	public function test_resolve_can_ignore_conditional_based_on_when(): void {
 		$namespace = __NAMESPACE__;
 
 		$data_source = new Conditionals( [
@@ -21,7 +21,7 @@ class Conditionals_Test extends TestCase {
 		$this->assertCount( 1, $data );
 	}
 
-	public function test_resolve_allows_for_label_override() {
+	public function test_resolve_allows_for_label_override(): void {
 		$namespace = __NAMESPACE__;
 
 		$data_source = new Conditionals( [
@@ -35,7 +35,7 @@ class Conditionals_Test extends TestCase {
 		);
 	}
 
-	public function test_resolve_non_boolean_descriptions() {
+	public function test_resolve_non_boolean_descriptions(): void {
 		$namespace = __NAMESPACE__;
 
 		$data_source = new Conditionals( [
@@ -53,7 +53,7 @@ class Conditionals_Test extends TestCase {
 		$this->assertSame( 'FALSY ("")', $data[3]['value'] );
 	}
 
-	public function test_resolve_boolean_descriptions() {
+	public function test_resolve_boolean_descriptions(): void {
 		$namespace = __NAMESPACE__;
 
 		$data_source = new Conditionals( [
@@ -67,7 +67,7 @@ class Conditionals_Test extends TestCase {
 		$this->assertSame( 'FALSE', $data[1]['value'] );
 	}
 
-	public function test_resolve_sort_order() {
+	public function test_resolve_sort_order(): void {
 		$namespace = __NAMESPACE__;
 
 		$data_source = new Conditionals( [

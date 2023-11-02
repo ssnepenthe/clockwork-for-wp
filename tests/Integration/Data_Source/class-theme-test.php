@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 use function Clockwork_For_Wp\array_only;
 
 class Theme_Test extends TestCase {
-	public function test_no_theme_data() {
+	public function test_no_theme_data(): void {
 		$data_source = new Theme();
 		$request = new Request();
 
@@ -19,7 +19,7 @@ class Theme_Test extends TestCase {
 		$this->assertArrayNotHasKey( 'Theme', $request->userData );
 	}
 
-	public function test_theme_root() {
+	public function test_theme_root(): void {
 		$data_source = new Theme();
 		$request = new Request();
 
@@ -35,7 +35,7 @@ class Theme_Test extends TestCase {
 		], $request->userData( 'Theme' )->toArray()[0][0] );
 	}
 
-	public function test_theme() {
+	public function test_theme(): void {
 		$data_source = new Theme();
 		$request = new Request();
 
@@ -51,7 +51,7 @@ class Theme_Test extends TestCase {
 		], $request->userData( 'Theme' )->toArray()[0][0] );
 	}
 
-	public function test_child_theme() {
+	public function test_child_theme(): void {
 		$data_source = new Theme();
 		$request = new Request();
 
@@ -76,7 +76,7 @@ class Theme_Test extends TestCase {
 		], array_only( $request->userData( 'Theme' )->toArray()[0], [ 0, 1 ] ) );
 	}
 
-	public function test_content_width() {
+	public function test_content_width(): void {
 		$data_source = new Theme();
 		$request = new Request();
 
@@ -92,7 +92,7 @@ class Theme_Test extends TestCase {
 		], $request->userData( 'Theme' )->toArray()[0][0] );
 	}
 
-	public function test_included_template() {
+	public function test_included_template(): void {
 		$data_source = new Theme();
 		$request = new Request();
 
@@ -113,7 +113,7 @@ class Theme_Test extends TestCase {
 		], $request->userData( 'Theme' )->toArray()[0][2] );
 	}
 
-	public function test_template_hierarchy() {
+	public function test_template_hierarchy(): void {
 		$data_source = new Theme();
 		$request = new Request();
 
@@ -131,7 +131,7 @@ class Theme_Test extends TestCase {
 		], $request->userData( 'Theme' )->toArray()[0][0] );
 	}
 
-	public function test_loaded_template_parts() {
+	public function test_loaded_template_parts(): void {
 		$data_source = new Theme();
 		$request = new Request();
 
@@ -203,7 +203,7 @@ class Theme_Test extends TestCase {
 		], $request->userData( 'Theme' )->toArray()[0][2] );
 	}
 
-	public function test_not_found_template_parts() {
+	public function test_not_found_template_parts(): void {
 		$data_source = new Theme();
 		$request = new Request();
 
@@ -275,7 +275,7 @@ class Theme_Test extends TestCase {
 		], $request->userData( 'Theme' )->toArray()[0][2] );
 	}
 
-	public function test_body_classes() {
+	public function test_body_classes(): void {
 		$data_source = new Theme();
 		$request = new Request();
 
@@ -290,7 +290,7 @@ class Theme_Test extends TestCase {
 		], $request->userData( 'Theme' )->toArray()[0][0] );
 	}
 
-	public function test_theme_relative_path() {
+	public function test_theme_relative_path(): void {
 		$data_source = new Theme();
 		$request = new Request();
 

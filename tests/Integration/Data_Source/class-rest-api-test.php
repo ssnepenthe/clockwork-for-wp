@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class Rest_Api_Test extends TestCase {
 	/** @test */
-	public function it_correctly_records_rest_api_data() {
+	public function it_correctly_records_rest_api_data(): void {
 		$data_source = new Rest_Api();
 		$request = new Request();
 
@@ -45,7 +45,7 @@ class Rest_Api_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_doesnt_create_the_userdata_entry_when_there_are_no_routes() {
+	public function it_doesnt_create_the_userdata_entry_when_there_are_no_routes(): void {
 		$data_source = new Rest_Api();
 		$request = new Request();
 

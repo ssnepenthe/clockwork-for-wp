@@ -9,14 +9,14 @@ use PHPUnit\Framework\TestCase;
 class Errors_Test extends TestCase {
 	private $previous_error_reporting;
 
-	protected function tearDown() : void {
+	protected function tearDown(): void {
 		if ( $this->previous_error_reporting ) {
 			error_reporting( $this->previous_error_reporting );
 			$this->previous_error_reporting = null;
 		}
 	}
 
-	public function test_handle_returns_false_by_default() {
+	public function test_handle_returns_false_by_default(): void {
 		$data_source = $this->make_data_source( E_ERROR );
 		$input = $this->get_function_specific_test_input();
 
@@ -25,11 +25,11 @@ class Errors_Test extends TestCase {
 		);
 	}
 
-	public function test_handle_invokes_original_handler_if_callable() {
+	public function test_handle_invokes_original_handler_if_callable(): void {
 		$data_source = $this->make_data_source( E_ERROR );
 		$input = $this->get_function_specific_test_input();
 		$data_source->set_original_handler(
-			function( $type, $message, $file, $line ) use ( $input ) {
+			function ( $type, $message, $file, $line ) use ( $input ) {
 				$this->assertSame( E_ERROR, $type );
 				$this->assertSame( $input['message'], $message );
 				$this->assertSame( $input['file'], $file );
@@ -44,7 +44,7 @@ class Errors_Test extends TestCase {
 		);
 	}
 
-	public function test_reapply_filters() {
+	public function test_reapply_filters(): void {
 		$data_source = $this->make_data_source( E_ERROR );
 		$input = $this->get_function_specific_test_input();
 
@@ -63,7 +63,7 @@ class Errors_Test extends TestCase {
 		$this->assertSame( $input['line'], array_shift( $errors )['line'] );
 	}
 
-	public function test_record_flags_errors_as_probably_suppressed() {
+	public function test_record_flags_errors_as_probably_suppressed(): void {
 		$data_source = $this->make_data_source( E_ERROR );
 		$input = $this->get_function_specific_test_input();
 
@@ -81,7 +81,7 @@ class Errors_Test extends TestCase {
 		$this->assertTrue( array_shift( $errors  )['suppressed'] );
 	}
 
-	public function test_record_discards_errors_based_on_current_error_reporting() {
+	public function test_record_discards_errors_based_on_current_error_reporting(): void {
 		$data_source = $this->make_data_source( E_ERROR );
 		$input = $this->get_function_specific_test_input();
 
@@ -130,7 +130,7 @@ class Errors_Test extends TestCase {
 		$this->assertSame( E_WARNING, array_shift( $errors )['type'] );
 	}
 
-	public function test_record_discards_suppressed_errors_based_on_original_error_reporting() {
+	public function test_record_discards_suppressed_errors_based_on_original_error_reporting(): void {
 		$data_source = $this->make_data_source( E_ERROR | E_WARNING );
 		$input = $this->get_function_specific_test_input();
 
@@ -180,7 +180,7 @@ class Errors_Test extends TestCase {
 		$this->assertSame( E_WARNING, array_shift( $errors )['type'] );
 	}
 
-	public function test_record_discards_errors_based_on_user_defined_callbacks() {
+	public function test_record_discards_errors_based_on_user_defined_callbacks(): void {
 		$data_source = $this->make_data_source( E_ERROR );
 		$input = $this->get_function_specific_test_input();
 		$data_source->addFilter( fn( $error ) => $error['line'] <= $input['line'] );
@@ -194,7 +194,7 @@ class Errors_Test extends TestCase {
 		$this->assertSame( $input['line'], array_shift( $errors )['line'] );
 	}
 
-	public function test_record_prevents_duplicate_errors_from_being_recorded() {
+	public function test_record_prevents_duplicate_errors_from_being_recorded(): void {
 		$data_source = $this->make_data_source( E_ERROR );
 		$input = $this->get_function_specific_test_input();
 
@@ -204,7 +204,7 @@ class Errors_Test extends TestCase {
 		$this->assertCount( 1, $data_source->get_errors() );
 	}
 
-	public function test_resolve_adds_error_suppression_note_to_message() {
+	public function test_resolve_adds_error_suppression_note_to_message(): void {
 		$data_source = $this->make_data_source( E_ERROR );
 		$input = $this->get_function_specific_test_input();
 
@@ -221,7 +221,7 @@ class Errors_Test extends TestCase {
 	}
 
 	/** @dataProvider provides_types_to_levels */
-	public function test_resolve_correctly_sets_level_based_on_error_type( $type, $level ) {
+	public function test_resolve_correctly_sets_level_based_on_error_type( $type, $level ): void {
 		$data_source = $this->make_data_source( E_ALL );
 		$input = $this->get_function_specific_test_input();
 
@@ -235,7 +235,7 @@ class Errors_Test extends TestCase {
 	}
 
 	/** @dataProvider provides_types_to_labels */
-	public function test_resolve_converts_error_type_int_to_human_readable_string( $type, $label ) {
+	public function test_resolve_converts_error_type_int_to_human_readable_string( $type, $label ): void {
 		$data_source = $this->make_data_source( E_ALL );
 		$input = $this->get_function_specific_test_input();
 
@@ -248,7 +248,7 @@ class Errors_Test extends TestCase {
 		$this->assertSame( $label, $messages[0]['context']['type'] );
 	}
 
-	public function test_resolve_stores_data_on_request() {
+	public function test_resolve_stores_data_on_request(): void {
 		$data_source = $this->make_data_source( E_ALL );
 		$input = $this->get_function_specific_test_input();
 		$data_source->record( E_ERROR, $input['message'], $input['file'], $input['line'] );

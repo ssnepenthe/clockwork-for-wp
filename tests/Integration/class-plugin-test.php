@@ -16,21 +16,21 @@ class Plugin_Test extends TestCase {
 	use Creates_Config;
 
 	/** @test */
-	public function it_passes_constructor_values_to_container() {
+	public function it_passes_constructor_values_to_container(): void {
 		$plugin = new Plugin( [], [ 'a' => 'b' ] );
 
 		$this->assertEquals( 'b', $plugin->get_pimple()[ 'a' ] );
 	}
 
 	/** @test */
-	public function it_can_filter_data_collection_using_except_uri_list() {
+	public function it_can_filter_data_collection_using_except_uri_list(): void {
 		$should_collect = $this->create_should_collect( [
 			'requests' => [
 				'except' => [
 					'^clockwork',
 					'^something',
 					'^another',
-					'a-specific-slug#with_hash'
+					'a-specific-slug#with_hash',
 				],
 			],
 		] );
@@ -47,13 +47,13 @@ class Plugin_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_can_filter_data_collection_using_only_uri_list() {
+	public function it_can_filter_data_collection_using_only_uri_list(): void {
 		$should_collect = $this->create_should_collect( [
 			'requests' => [
 				'only' => [
 					'^blog',
 					'^a-specific-slug$',
-					'#with_hash'
+					'#with_hash',
 				],
 			],
 		] );
@@ -68,7 +68,7 @@ class Plugin_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_can_filter_data_collection_for_preflight_requests() {
+	public function it_can_filter_data_collection_for_preflight_requests(): void {
 		$should_collect = fn( $except_preflight ) => $this->create_should_collect( [
 			'requests' => [
 				'except_preflight' => $except_preflight,

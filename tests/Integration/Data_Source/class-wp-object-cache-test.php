@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class Wp_Object_Cache_Test extends TestCase {
 	/** @test */
-	public function it_correctly_records_object_cache_data() {
+	public function it_correctly_records_object_cache_data(): void {
 		$data_source = new Wp_Object_Cache();
 		$request = new Request();
 
@@ -39,7 +39,7 @@ class Wp_Object_Cache_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_filters_out_unused_stats() {
+	public function it_filters_out_unused_stats(): void {
 		$data_source = new Wp_Object_Cache();
 		$request = new Request();
 
@@ -62,7 +62,7 @@ class Wp_Object_Cache_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_doesnt_create_the_userdata_entry_when_there_are_no_cache_stats() {
+	public function it_doesnt_create_the_userdata_entry_when_there_are_no_cache_stats(): void {
 		$data_source = new Wp_Object_Cache();
 		$request = new Request();
 

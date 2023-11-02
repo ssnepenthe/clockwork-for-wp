@@ -10,7 +10,7 @@ use function Clockwork_For_Wp\Tests\fixture_path;
 
 class Xdebug_Test extends TestCase {
 	/** @test */
-	public function it_correctly_records_profiler_data() {
+	public function it_correctly_records_profiler_data(): void {
 		$data_source = new Xdebug();
 		$request = new Request();
 

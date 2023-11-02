@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class Route_Handler_Invoker_Test extends TestCase {
 	/** @test */
-	public function it_does_not_inject_any_additional_params_by_default() {
+	public function it_does_not_inject_any_additional_params_by_default(): void {
 		$invoker = new Route_Handler_Invoker();
 
 		$result = $invoker->invoke_handler( new Route( '', '', '', fn( $params ) => $params ) );
@@ -17,7 +17,7 @@ class Route_Handler_Invoker_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_provides_additional_params_to_route_handler() {
+	public function it_provides_additional_params_to_route_handler(): void {
 		$params = [ 'a' => 1, 'b' => 2, 'c' => 3 ];
 
 		$invoker = new Route_Handler_Invoker( '', fn() => $params );
@@ -28,7 +28,7 @@ class Route_Handler_Invoker_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_binds_param_resolver_to_invoker_instance() {
+	public function it_binds_param_resolver_to_invoker_instance(): void {
 		$invoker = new Route_Handler_Invoker(
 			'abc_',
 			fn() => [ $this->strip_param_prefix( 'abc_apples' ) => 'bananas' ]
@@ -40,7 +40,7 @@ class Route_Handler_Invoker_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_correctly_strips_param_prefixes() {
+	public function it_correctly_strips_param_prefixes(): void {
 		$invoker = new Route_Handler_Invoker( 'pfx_' );
 
 		$this->assertSame( 'apples', $invoker->strip_param_prefix( 'pfx_apples' ) );
@@ -48,7 +48,7 @@ class Route_Handler_Invoker_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_can_resolve_non_callable_handlers() {
+	public function it_can_resolve_non_callable_handlers(): void {
 		$handler = fn( $params ) => 'called successfully';
 
 		$invoker = new Route_Handler_Invoker(

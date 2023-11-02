@@ -10,10 +10,11 @@ use function Clockwork_For_Wp\describe_unavailable_callable;
 use function Clockwork_For_Wp\describe_value;
 use function Clockwork_For_Wp\prepare_rest_route;
 use function Clockwork_For_Wp\prepare_wpdb_query;
+use stdClass;
 
 class Helpers_Test extends TestCase {
 	/** @test */
-	public function test_array_only() {
+	public function test_array_only(): void {
 		$array = [ 'a' => 'b', 'c' => 'd', 'e' => 'f' ];
 
 		$this->assertSame( [ 'a' => 'b', 'c' => 'd' ], array_only( $array, [ 'a', 'c' ] ) );
@@ -21,7 +22,7 @@ class Helpers_Test extends TestCase {
 	}
 
 	/** @test */
-	public function test_describe_unavailable_callable() {
+	public function test_describe_unavailable_callable(): void {
 		// Strings.
 		$this->assertSame( 'pfx_some_func()', describe_unavailable_callable( 'pfx_some_func' ) );
 		$this->assertSame( 'Pfx::some_func()', describe_unavailable_callable( 'Pfx::some_func' ) );
@@ -41,7 +42,7 @@ class Helpers_Test extends TestCase {
 	}
 
 	/** @test */
-	public function test_describe_callable() {
+	public function test_describe_callable(): void {
 		$namespace = __NAMESPACE__;
 
 		// Non-callable.
@@ -54,7 +55,7 @@ class Helpers_Test extends TestCase {
 		// Instance method.
 		$this->assertEquals(
 			"{$namespace}\\Describe_Callable_Tester->instance_method()",
-			describe_callable( [ new Describe_Callable_Tester, 'instance_method' ] )
+			describe_callable( [ new Describe_Callable_Tester(), 'instance_method' ] )
 		);
 
 		// Static method.
@@ -85,7 +86,7 @@ class Helpers_Test extends TestCase {
 	}
 
 	/** @test */
-	public function test_describe_value() {
+	public function test_describe_value(): void {
 		$this->assertEquals( 'NULL', describe_value( null ) );
 		$this->assertEquals( 'TRUE', describe_value( true ) );
 		$this->assertEquals( 'FALSE', describe_value( false ) );
@@ -94,11 +95,11 @@ class Helpers_Test extends TestCase {
 		$this->assertEquals( '4.2', describe_value( 4.2 ) );
 		// @todo !!!
 		$this->assertEquals( '(NON-SCALAR VALUE)', describe_value( [] ) );
-		$this->assertEquals( '(NON-SCALAR VALUE)', describe_value( new \stdClass() ) );
+		$this->assertEquals( '(NON-SCALAR VALUE)', describe_value( new stdClass() ) );
 	}
 
 	/** @test */
-	public function test_prepare_rest_route() {
+	public function test_prepare_rest_route(): void {
 		$handlers_array = [
 			'methods' => [ 'GET' => true, 'POST' => true ],
 			'callback' => [ 'a', 'b' ],
@@ -121,7 +122,7 @@ class Helpers_Test extends TestCase {
 	}
 
 	/** @test */
-	public function test_prepare_wpdb_query() {
+	public function test_prepare_wpdb_query(): void {
 		$time = microtime( true );
 		$query_array = [ 'select * from wherever', 0.2, 'irrelevant-callstack', $time ];
 
@@ -133,9 +134,12 @@ class Helpers_Test extends TestCase {
 }
 
 class Describe_Callable_Tester {
-	public function __invoke() {}
+	public function __invoke(): void {
+	}
 
-	public function instance_method() {}
+	public function instance_method(): void {
+	}
 
-	public static function static_method() {}
+	public static function static_method(): void {
+	}
 }

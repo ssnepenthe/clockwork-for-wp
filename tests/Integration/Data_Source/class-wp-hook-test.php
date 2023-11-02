@@ -16,7 +16,7 @@ class Wp_Hook_Test extends TestCase {
 	use Creates_Config;
 
 	/** @test */
-	public function it_correctly_records_hook_data() {
+	public function it_correctly_records_hook_data(): void {
 		$data_source = new Wp_Hook();
 		$request = new Request();
 
@@ -32,32 +32,32 @@ class Wp_Hook_Test extends TestCase {
 			'Priority' => '',
 			'Callback' => '',
 			'Accepted Args' => '',
-		] , $request->userData( 'Hooks' )->toArray()[0][0] );
+		], $request->userData( 'Hooks' )->toArray()[0][0] );
 
 		$this->assertEquals( [
 			'Tag' => 'tag2',
 			'Priority' => '15',
 			'Callback' => '',
 			'Accepted Args' => '',
-		] , $request->userData( 'Hooks' )->toArray()[0][1] );
+		], $request->userData( 'Hooks' )->toArray()[0][1] );
 
 		$this->assertEquals( [
 			'Tag' => 'tag3',
 			'Priority' => '15',
 			'Callback' => 'array_map()',
 			'Accepted Args' => '',
-		] , $request->userData( 'Hooks' )->toArray()[0][2] );
+		], $request->userData( 'Hooks' )->toArray()[0][2] );
 
 		$this->assertEquals( [
 			'Tag' => 'tag4',
 			'Priority' => '15',
 			'Callback' => 'array_map()',
 			'Accepted Args' => '3',
-		] , $request->userData( 'Hooks' )->toArray()[0][3] );
+		], $request->userData( 'Hooks' )->toArray()[0][3] );
 	}
 
 	/** @test */
-	public function it_can_be_configured_to_collect_all_hook_tags_except_a_subset() {
+	public function it_can_be_configured_to_collect_all_hook_tags_except_a_subset(): void {
 		$data_source = $this->create_data_source_via_factory( [
 			'except_tags' => [ 'tag2', 'tag3_[\w]', '^tag4', '5$' ],
 		] );
@@ -89,7 +89,7 @@ class Wp_Hook_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_can_be_configured_to_only_collect_a_subset_of_hook_tags() {
+	public function it_can_be_configured_to_only_collect_a_subset_of_hook_tags(): void {
 		$data_source = $this->create_data_source_via_factory( [
 			'only_tags' => [ 'tag2', 'tag3_[\w]', '^tag4', '5$' ],
 		] );
@@ -124,7 +124,7 @@ class Wp_Hook_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_favors_the_only_tags_configuration_over_the_except_tags_configuration() {
+	public function it_favors_the_only_tags_configuration_over_the_except_tags_configuration(): void {
 		$data_source = $this->create_data_source_via_factory( [
 			'except_tags' => [ 'tag2' ],
 			'only_tags' => [ 'tag2' ],
@@ -160,7 +160,7 @@ class Wp_Hook_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_can_be_configured_to_collect_all_hooks_by_callback_except_a_subset() {
+	public function it_can_be_configured_to_collect_all_hooks_by_callback_except_a_subset(): void {
 		$data_source = $this->create_data_source_via_factory( [
 			'except_callbacks' => [ '^array_' ],
 		] );
@@ -186,7 +186,7 @@ class Wp_Hook_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_can_be_configured_to_only_collect_a_subset_of_hooks_by_callback() {
+	public function it_can_be_configured_to_only_collect_a_subset_of_hooks_by_callback(): void {
 		$data_source = $this->create_data_source_via_factory( [
 			'only_callbacks' => [ '^array_' ],
 		] );
@@ -212,7 +212,7 @@ class Wp_Hook_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_favors_the_only_callbacks_configuration_over_the_except_callbacks_configuration() {
+	public function it_favors_the_only_callbacks_configuration_over_the_except_callbacks_configuration(): void {
 		$data_source = $this->create_data_source_via_factory( [
 			'except_callbacks' => [ '^array_' ],
 			'only_callbacks' => [ '^array_' ],
@@ -239,7 +239,7 @@ class Wp_Hook_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_doesnt_create_the_userdata_entry_when_there_are_no_hooks() {
+	public function it_doesnt_create_the_userdata_entry_when_there_are_no_hooks(): void {
 		$data_source = new Wp_Hook();
 		$request = new Request();
 

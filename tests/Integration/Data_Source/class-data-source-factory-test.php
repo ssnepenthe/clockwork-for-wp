@@ -27,20 +27,21 @@ class Data_Source_Factory_Test extends TestCase {
 	}
 
 	/** @dataProvider provide_test_create */
-	public function test_create( $name, $class ) {
+	public function test_create( $name, $class ): void {
 		$factory = $this->create_factory();
 
 		$this->assertInstanceOf( $class, $factory->create( $name ) );
 	}
 
-	public function test_create_caches_instances() {
+	public function test_create_caches_instances(): void {
 		$factory = $this->create_factory();
 
 		$this->assertSame( $factory->create( 'theme' ), $factory->create( 'theme' ) );
 	}
 
-	public function test_create_with_custom_factory() {
-		$data_source = new class extends DataSource {};
+	public function test_create_with_custom_factory(): void {
+		$data_source = new class() extends DataSource {
+		};
 
 		$factory = $this->create_factory();
 		$factory->register_custom_factory( 'test', fn() => $data_source );
@@ -48,9 +49,11 @@ class Data_Source_Factory_Test extends TestCase {
 		$this->assertSame( $data_source, $factory->create( 'test' ) );
 	}
 
-	public function test_create_with_custom_factory_override_for_built_in_data_source() {
-		$data_source = new class extends DataSource {
-			public function test() { return 'it works'; }
+	public function test_create_with_custom_factory_override_for_built_in_data_source(): void {
+		$data_source = new class() extends DataSource {
+			public function test() {
+				return 'it works';
+			}
 		};
 
 		$factory = $this->create_factory();
@@ -60,14 +63,14 @@ class Data_Source_Factory_Test extends TestCase {
 		$this->assertSame( 'it works', $factory->create( 'theme' )->test() );
 	}
 
-	public function test_create_unsupported_data_source() {
+	public function test_create_unsupported_data_source(): void {
 		$this->expectException( InvalidArgumentException::class );
 
 		$factory = $this->create_factory();
 		$factory->create( 'not-registered' );
 	}
 
-	public function test_get_enabled_data_sources() {
+	public function test_get_enabled_data_sources(): void {
 		$factory = $this->create_factory();
 
 		$this->assertEquals(
@@ -116,9 +119,11 @@ class Data_Source_Factory_Test extends TestCase {
 			'uri' => '/',
 		] );
 		$pimple = new Container( [
-			Event_Manager::class => new class {
-				public function trigger() { /** irrelevant */ }
-			}
+			Event_Manager::class => new class() {
+				public function trigger(): void {
+					/** irrelevant */
+				}
+			},
 		] );
 
 		return new Data_Source\Data_Source_Factory( $config, new Is( $config, $clockwork, $request ), $pimple );

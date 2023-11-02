@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class Wp_Redirect_Test extends TestCase {
 	/** @test */
-	public function it_does_nothing_by_default() {
+	public function it_does_nothing_by_default(): void {
 		$data_source = new Wp_Redirect();
 		$request = new Request();
 
@@ -18,7 +18,7 @@ class Wp_Redirect_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_logs_redirect_data_when_initial_location_is_set() {
+	public function it_logs_redirect_data_when_initial_location_is_set(): void {
 		$data_source = new Wp_Redirect();
 
 		$data_source->set_initial( 'location', 'test-location' );
@@ -37,7 +37,7 @@ class Wp_Redirect_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_allows_all_initial_and_filtered_args_to_be_set() {
+	public function it_allows_all_initial_and_filtered_args_to_be_set(): void {
 		$data_source = new Wp_Redirect();
 
 		$data_source->set_initial( 'location', 'initiallocation' );
@@ -67,7 +67,7 @@ class Wp_Redirect_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_omits_filtered_args_when_no_changes_have_been_made() {
+	public function it_omits_filtered_args_when_no_changes_have_been_made(): void {
 		$data_source = new Wp_Redirect();
 
 		$data_source->set_initial( 'location', 'initiallocation' );
@@ -89,7 +89,7 @@ class Wp_Redirect_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_correctly_identifies_differences_between_initial_and_filtered_args() {
+	public function it_correctly_identifies_differences_between_initial_and_filtered_args(): void {
 		$data_source = new Wp_Redirect();
 
 		$data_source->set_initial( 'location', 'initiallocation' );
@@ -117,7 +117,7 @@ class Wp_Redirect_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_can_detect_when_wp_redirect_is_successful() {
+	public function it_can_detect_when_wp_redirect_is_successful(): void {
 		$data_source = new Wp_Redirect();
 
 		$data_source->set_initial( 'location', 'test-location' );
@@ -131,7 +131,7 @@ class Wp_Redirect_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_can_detect_when_wp_redirect_call_bails() {
+	public function it_can_detect_when_wp_redirect_call_bails(): void {
 		// Falsy filtered location.
 		$data_source = new Wp_Redirect();
 

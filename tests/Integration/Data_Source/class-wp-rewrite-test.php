@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class Wp_Rewrite_Test extends TestCase {
 	/** @test */
-	public function it_correctly_records_wp_rewrite_data() {
+	public function it_correctly_records_wp_rewrite_data(): void {
 		$data_source = new Wp_Rewrite();
 		$request = new Request();
 
@@ -65,7 +65,7 @@ class Wp_Rewrite_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_correctly_describes_trailing_slash_value() {
+	public function it_correctly_describes_trailing_slash_value(): void {
 		$data_source = new Wp_Rewrite();
 		$request = new Request();
 

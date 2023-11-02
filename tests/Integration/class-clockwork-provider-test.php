@@ -12,12 +12,12 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
-*/
+ */
 class Clockwork_Provider_Test extends TestCase {
 	use Creates_Config;
 
 	/** @test */
-	public function the_clock_function_can_be_disabled() {
+	public function the_clock_function_can_be_disabled(): void {
 		$this->assertFalse( function_exists( 'clock' ) );
 
 		$this->create_plugin( [
@@ -28,7 +28,7 @@ class Clockwork_Provider_Test extends TestCase {
 	}
 
 	/** @test */
-	public function the_clock_function_can_be_enabled() {
+	public function the_clock_function_can_be_enabled(): void {
 		$this->assertFalse( function_exists( 'clock' ) );
 
 		$this->create_plugin( [

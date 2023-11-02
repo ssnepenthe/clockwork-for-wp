@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class Wp_Test extends TestCase {
 	/** @test */
-	public function it_correctly_records_wp_data() {
+	public function it_correctly_records_wp_data(): void {
 		$data_source = new Wp();
 		$request = new Request();
 

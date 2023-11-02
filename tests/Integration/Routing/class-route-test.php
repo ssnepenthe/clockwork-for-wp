@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class Route_Test extends TestCase {
 	/** @test */
-	public function it_rebuilds_query_with_variable_prefix() {
+	public function it_rebuilds_query_with_variable_prefix(): void {
 		$route = new Route( '', '', 'index.php?a=b&c=d', [] );
 		$route->set_prefix( 'pfx_' );
 
@@ -16,7 +16,7 @@ class Route_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_automatically_parses_query() {
+	public function it_automatically_parses_query(): void {
 		$route = new Route( '', '', 'index.php?a=b&c=d', [] );
 
 		$this->assertEquals( [
@@ -26,7 +26,7 @@ class Route_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_automatically_parses_and_prefixes_query() {
+	public function it_automatically_parses_and_prefixes_query(): void {
 		$route = new Route( '', '', 'index.php?a=b&c=d', [] );
 		$route->set_prefix( 'pfx_' );
 
@@ -41,14 +41,14 @@ class Route_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_provides_a_list_of_query_variables() {
+	public function it_provides_a_list_of_query_variables(): void {
 		$route = new Route( '', '', 'index.php?a=b&c=d', [] );
 
 		$this->assertEquals( [ 'a', 'c' ], $route->get_query_vars() );
 	}
 
 	/** @test */
-	public function it_provides_a_list_of_prefixed_query_variables() {
+	public function it_provides_a_list_of_prefixed_query_variables(): void {
 		$route = new Route( '', '', 'index.php?a=b&c=d', [] );
 		$route->set_prefix( 'pfx_' );
 

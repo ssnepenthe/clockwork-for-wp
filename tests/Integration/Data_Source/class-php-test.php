@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 class Php_Test extends TestCase {
 	protected $backed_up_superglobals = [];
 
-	private function back_up_superglobals() {
+	private function back_up_superglobals(): void {
 		$this->backed_up_superglobals = [
 			'cookie' => $_COOKIE,
 			'get' => $_GET,
@@ -18,7 +18,7 @@ class Php_Test extends TestCase {
 		];
 	}
 
-	private function restore_superglobals() {
+	private function restore_superglobals(): void {
 		$_COOKIE = $this->backed_up_superglobals['cookie'];
 		$_GET = $this->backed_up_superglobals['get'];
 		$_POST = $this->backed_up_superglobals['post'];
@@ -26,7 +26,7 @@ class Php_Test extends TestCase {
 	}
 
 	/** @test */
-	public function it_correctly_records_php_data() {
+	public function it_correctly_records_php_data(): void {
 		// @todo What is best approach to testing $_SESSION superglobal?
 		$this->back_up_superglobals();
 
