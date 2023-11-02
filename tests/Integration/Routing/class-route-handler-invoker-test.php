@@ -26,7 +26,7 @@ class Route_Handler_Invoker_Test extends TestCase {
 	public function it_provides_additional_params_to_route_handler(): void {
 		$params = [ 'a' => 1, 'b' => 2, 'c' => 3 ];
 
-		$invoker = new Route_Handler_Invoker( '', static fn() => $params );
+		$invoker = new Route_Handler_Invoker( '', fn() => $params );
 
 		$result = $invoker->invoke_handler( new Route( '', '', '', static fn( $params ) => $params ) );
 
