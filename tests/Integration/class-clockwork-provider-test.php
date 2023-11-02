@@ -53,9 +53,9 @@ class Clockwork_Provider_Test extends TestCase {
 
 		$plugin->get_pimple()->extend(
 			Storage_Factory::class,
-			fn( $factory ) => $factory->register_custom_factory(
+			static fn( $factory ) => $factory->register_custom_factory(
 				'null',
-				fn() => new Null_Storage_For_Tests()
+				static fn() => new Null_Storage_For_Tests()
 			)
 		);
 

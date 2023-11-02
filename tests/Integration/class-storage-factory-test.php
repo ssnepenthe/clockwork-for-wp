@@ -35,14 +35,14 @@ class Storage_Factory_Test extends TestCase {
 
 	public function test_create_with_custom_factory(): void {
 		$factory = new Storage_Factory();
-		$factory->register_custom_factory( 'null', fn() => new Null_Storage_For_Tests() );
+		$factory->register_custom_factory( 'null', static fn() => new Null_Storage_For_Tests() );
 
 		$this->assertInstanceOf( Null_Storage_For_Tests::class, $factory->create( 'null' ) );
 	}
 
 	public function test_create_with_custom_factory_override(): void {
 		$factory = new Storage_Factory();
-		$factory->register_custom_factory( 'file', fn() => new Null_Storage_For_Tests() );
+		$factory->register_custom_factory( 'file', static fn() => new Null_Storage_For_Tests() );
 
 		$this->assertInstanceOf( Null_Storage_For_Tests::class, $factory->create( 'file' ) );
 	}
@@ -61,7 +61,7 @@ class Storage_Factory_Test extends TestCase {
 
 		// Not great but there are no getters on clockwork storage objects.
 		// Would probably be better to register custom factory with class that extends clockwork storage and adds getter...
-		$actual_expiration = ( function ( $storage ) {
+		$actual_expiration = ( static function ( $storage ) {
 			$r = new ReflectionProperty( $storage, 'expiration' );
 			$r->setAccessible( true );
 
@@ -98,7 +98,7 @@ class Storage_Factory_Test extends TestCase {
 	}
 
 	public function provide_test_create_default() {
-		$config = fn( $d, $c ) => [
+		$config = static fn( $d, $c ) => [
 			'storage' => [
 				'driver' => $d,
 				'drivers' => [

@@ -25,8 +25,8 @@ class Constants_Test extends TestCase {
 	public function test_resolve_can_ignore_constant_based_on_when(): void {
 		$class = __CLASS__;
 		$data_source = new Constants( [
-			[ 'constant' => "{$class}::STRING_VALUE", 'when' => fn() => true ],
-			[ 'constant' => "{$class}::TRUE_VALUE", 'when' => fn() => false ],
+			[ 'constant' => "{$class}::STRING_VALUE", 'when' => static fn() => true ],
+			[ 'constant' => "{$class}::TRUE_VALUE", 'when' => static fn() => false ],
 		] );
 
 		$data = $data_source->resolve( new Request() )->userData( 'WordPress' )->toArray()[0];
@@ -165,7 +165,7 @@ class Constants_Test extends TestCase {
 	public function test_resolve_empty_constant_list(): void {
 		$class = __CLASS__;
 		$data_source = new Constants( [
-			[ 'constant' => "{$class}::STRING_VALUE", 'when' => fn() => false ],
+			[ 'constant' => "{$class}::STRING_VALUE", 'when' => static fn() => false ],
 		] );
 
 		$this->assertEmpty( $data_source->resolve( new Request() )->userData );
@@ -262,7 +262,7 @@ class Constants_Test extends TestCase {
 			'constants' => [
 				[
 					'constant' => "{$class}::STRING_VALUE",
-					'when' => fn() => true,
+					'when' => static fn() => true,
 				],
 			],
 		] );

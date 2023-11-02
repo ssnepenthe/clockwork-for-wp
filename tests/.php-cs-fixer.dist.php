@@ -124,7 +124,7 @@ return $config->setRules([
 	'nullable_type_declaration_for_default_null_value' => true,
 	'regular_callable_call' => true,
 	'return_type_declaration' => true,
-	// 'static_lambda' => true,
+	'static_lambda' => true,
 	'void_return' => true,
 	'fully_qualified_strict_types' => true,
 	'global_namespace_import' => true,

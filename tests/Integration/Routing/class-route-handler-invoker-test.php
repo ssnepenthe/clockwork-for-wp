@@ -11,7 +11,7 @@ class Route_Handler_Invoker_Test extends TestCase {
 	public function it_does_not_inject_any_additional_params_by_default(): void {
 		$invoker = new Route_Handler_Invoker();
 
-		$result = $invoker->invoke_handler( new Route( '', '', '', fn( $params ) => $params ) );
+		$result = $invoker->invoke_handler( new Route( '', '', '', static fn( $params ) => $params ) );
 
 		$this->assertCount( 0, $result );
 	}
@@ -20,9 +20,9 @@ class Route_Handler_Invoker_Test extends TestCase {
 	public function it_provides_additional_params_to_route_handler(): void {
 		$params = [ 'a' => 1, 'b' => 2, 'c' => 3 ];
 
-		$invoker = new Route_Handler_Invoker( '', fn() => $params );
+		$invoker = new Route_Handler_Invoker( '', static fn() => $params );
 
-		$result = $invoker->invoke_handler( new Route( '', '', '', fn( $params ) => $params ) );
+		$result = $invoker->invoke_handler( new Route( '', '', '', static fn( $params ) => $params ) );
 
 		$this->assertSame( $params, $result );
 	}
@@ -34,7 +34,7 @@ class Route_Handler_Invoker_Test extends TestCase {
 			fn() => [ $this->strip_param_prefix( 'abc_apples' ) => 'bananas' ]
 		);
 
-		$result = $invoker->invoke_handler( new Route( '', '', '', fn( $params ) => $params ) );
+		$result = $invoker->invoke_handler( new Route( '', '', '', static fn( $params ) => $params ) );
 
 		$this->assertSame( [ 'apples' => 'bananas' ], $result );
 	}
@@ -49,12 +49,12 @@ class Route_Handler_Invoker_Test extends TestCase {
 
 	/** @test */
 	public function it_can_resolve_non_callable_handlers(): void {
-		$handler = fn( $params ) => 'called successfully';
+		$handler = static fn( $params ) => 'called successfully';
 
 		$invoker = new Route_Handler_Invoker(
 			'',
 			null,
-			fn( $callable ) => ( 'handler' === $callable ) ? $handler : $callable
+			static fn( $callable ) => ( 'handler' === $callable ) ? $handler : $callable
 		);
 
 		$this->assertSame( 'called successfully', $invoker->invoke_handler( new Route( '', '', '', 'handler' ) ) );

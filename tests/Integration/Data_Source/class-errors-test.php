@@ -54,7 +54,7 @@ class Errors_Test extends TestCase {
 		// With no filters, both errors should be recorded.
 		$this->assertCount( 2, $data_source->get_errors() );
 
-		$data_source->addFilter( fn( $error ) => $error['line'] <= $input['line'] );
+		$data_source->addFilter( static fn( $error ) => $error['line'] <= $input['line'] );
 		$data_source->reapply_filters();
 		$errors = $data_source->get_errors();
 
@@ -183,7 +183,7 @@ class Errors_Test extends TestCase {
 	public function test_record_discards_errors_based_on_user_defined_callbacks(): void {
 		$data_source = $this->make_data_source( \E_ERROR );
 		$input = $this->get_function_specific_test_input();
-		$data_source->addFilter( fn( $error ) => $error['line'] <= $input['line'] );
+		$data_source->addFilter( static fn( $error ) => $error['line'] <= $input['line'] );
 
 		$data_source->record( \E_ERROR, $input['message'], $input['file'], $input['line'] );
 		$data_source->record( \E_ERROR, $input['message'], $input['file'], $input['line'] + 1 );

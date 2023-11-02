@@ -18,8 +18,8 @@ class Data_Source_Factory_Test extends TestCase {
 	use Creates_Config;
 
 	protected function setUp(): void {
-		Globals::set_getter( 'timestart', fn() => 'irrelevant' );
-		Globals::set_getter( 'wp_version', fn() => 'irrelevant' );
+		Globals::set_getter( 'timestart', static fn() => 'irrelevant' );
+		Globals::set_getter( 'wp_version', static fn() => 'irrelevant' );
 	}
 
 	protected function tearDown(): void {
@@ -44,7 +44,7 @@ class Data_Source_Factory_Test extends TestCase {
 		};
 
 		$factory = $this->create_factory();
-		$factory->register_custom_factory( 'test', fn() => $data_source );
+		$factory->register_custom_factory( 'test', static fn() => $data_source );
 
 		$this->assertSame( $data_source, $factory->create( 'test' ) );
 	}
@@ -57,7 +57,7 @@ class Data_Source_Factory_Test extends TestCase {
 		};
 
 		$factory = $this->create_factory();
-		$factory->register_custom_factory( 'theme', fn() => $data_source );
+		$factory->register_custom_factory( 'theme', static fn() => $data_source );
 
 		$this->assertTrue( \method_exists( $factory->create( 'theme' ), 'test' ) );
 		$this->assertSame( 'it works', $factory->create( 'theme' )->test() );

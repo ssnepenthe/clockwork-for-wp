@@ -39,14 +39,14 @@ class Authenticator_Factory_Test extends TestCase {
 			}
 		};
 		$factory = new Authenticator_Factory();
-		$factory->register_custom_factory( 'test', fn() => $authenticator );
+		$factory->register_custom_factory( 'test', static fn() => $authenticator );
 
 		$this->assertSame( $authenticator, $factory->create( 'test' ) );
 	}
 
 	public function test_create_with_custom_factory_override(): void {
 		$factory = new Authenticator_Factory();
-		$factory->register_custom_factory( 'simple', fn() => new NullAuthenticator() );
+		$factory->register_custom_factory( 'simple', static fn() => new NullAuthenticator() );
 
 		$this->assertInstanceOf( NullAuthenticator::class, $factory->create( 'simple' ) );
 	}
