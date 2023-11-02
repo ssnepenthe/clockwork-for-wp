@@ -18,7 +18,7 @@ class Clockwork_Provider_Test extends TestCase {
 
 	/** @test */
 	public function the_clock_function_can_be_disabled(): void {
-		$this->assertFalse( function_exists( 'clock' ) );
+		$this->assertFalse( \function_exists( 'clock' ) );
 
 		$this->create_plugin( [
 			'register_helpers' => false,
@@ -29,7 +29,7 @@ class Clockwork_Provider_Test extends TestCase {
 
 	/** @test */
 	public function the_clock_function_can_be_enabled(): void {
-		$this->assertFalse( function_exists( 'clock' ) );
+		$this->assertFalse( \function_exists( 'clock' ) );
 
 		$this->create_plugin( [
 			'register_helpers' => true,

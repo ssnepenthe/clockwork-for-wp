@@ -59,7 +59,7 @@ class Data_Source_Factory_Test extends TestCase {
 		$factory = $this->create_factory();
 		$factory->register_custom_factory( 'theme', fn() => $data_source );
 
-		$this->assertTrue( method_exists( $factory->create( 'theme' ), 'test' ) );
+		$this->assertTrue( \method_exists( $factory->create( 'theme' ), 'test' ) );
 		$this->assertSame( 'it works', $factory->create( 'theme' )->test() );
 	}
 

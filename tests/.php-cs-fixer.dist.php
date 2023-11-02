@@ -114,10 +114,10 @@ return $config->setRules([
 	'implode_call' => true,
 	'lambda_not_used_import' => true,
 	'method_argument_space' => true,
-	// 'native_function_invocation' => [
-	//     'include' => ['@all'],
-	//     'exclude' => ['add_command', 'array_get', 'array_has', 'array_only', 'array_set'],
-	// ],
+	'native_function_invocation' => [
+	    'include' => ['@all'],
+	    'exclude' => ['add_command', 'array_get', 'array_has', 'array_only', 'array_set'],
+	],
 	'no_spaces_after_function_name' => true,
 	'no_unreachable_default_argument_value' => true,
 	'no_useless_sprintf' => true,

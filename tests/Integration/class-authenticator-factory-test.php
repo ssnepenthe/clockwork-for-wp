@@ -67,7 +67,7 @@ class Authenticator_Factory_Test extends TestCase {
 
 		// Attempt returns false on failure, true or the hashed password on success.
 		$attempt = $authenticator->attempt( [ 'password' => $password ] );
-		$this->assertTrue( true === $attempt || is_string( $attempt ) );
+		$this->assertTrue( true === $attempt || \is_string( $attempt ) );
 	}
 
 	public function provide_test_create() {

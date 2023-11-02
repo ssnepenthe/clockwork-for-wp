@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 class Core_Test extends TestCase {
 	/** @test */
 	public function it_correctly_records_core_data(): void {
-		$data_source = new Core( '4.7', microtime( true ) );
+		$data_source = new Core( '4.7', \microtime( true ) );
 
 		$request = new Request( [
 			'time' => $_SERVER['REQUEST_TIME_FLOAT'],

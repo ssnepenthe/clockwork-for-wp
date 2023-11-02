@@ -76,11 +76,11 @@ class Wp_Hook_Test extends TestCase {
 
 		$data_source->resolve( $request );
 
-		$prepared = array_map(
+		$prepared = \array_map(
 			fn( $item ) => $item['Tag'],
-			array_filter(
+			\array_filter(
 				$request->userData( 'Hooks' )->toArray()[0],
-				fn( $item ) => array_key_exists( 'Tag', $item )
+				fn( $item ) => \array_key_exists( 'Tag', $item )
 			)
 		);
 
@@ -108,11 +108,11 @@ class Wp_Hook_Test extends TestCase {
 
 		$data_source->resolve( $request );
 
-		$prepared = array_map(
+		$prepared = \array_map(
 			fn( $item ) => $item['Tag'],
-			array_filter(
+			\array_filter(
 				$request->userData( 'Hooks' )->toArray()[0],
-				fn( $item ) => array_key_exists( 'Tag', $item )
+				fn( $item ) => \array_key_exists( 'Tag', $item )
 			)
 		);
 
@@ -144,11 +144,11 @@ class Wp_Hook_Test extends TestCase {
 
 		$data_source->resolve( $request );
 
-		$prepared = array_map(
+		$prepared = \array_map(
 			fn( $item ) => $item['Tag'],
-			array_filter(
+			\array_filter(
 				$request->userData( 'Hooks' )->toArray()[0],
-				fn( $item ) => array_key_exists( 'Tag', $item )
+				fn( $item ) => \array_key_exists( 'Tag', $item )
 			)
 		);
 
@@ -173,11 +173,11 @@ class Wp_Hook_Test extends TestCase {
 
 		$data_source->resolve( $request );
 
-		$prepared = array_map(
+		$prepared = \array_map(
 			fn( $item ) => $item['Tag'],
-			array_filter(
+			\array_filter(
 				$request->userData( 'Hooks' )->toArray()[0],
-				fn( $item ) => array_key_exists( 'Tag', $item )
+				fn( $item ) => \array_key_exists( 'Tag', $item )
 			)
 		);
 
@@ -199,11 +199,11 @@ class Wp_Hook_Test extends TestCase {
 
 		$data_source->resolve( $request );
 
-		$prepared = array_map(
+		$prepared = \array_map(
 			fn( $item ) => $item['Tag'],
-			array_filter(
+			\array_filter(
 				$request->userData( 'Hooks' )->toArray()[0],
-				fn( $item ) => array_key_exists( 'Tag', $item )
+				fn( $item ) => \array_key_exists( 'Tag', $item )
 			)
 		);
 
@@ -226,11 +226,11 @@ class Wp_Hook_Test extends TestCase {
 
 		$data_source->resolve( $request );
 
-		$prepared = array_map(
+		$prepared = \array_map(
 			fn( $item ) => $item['Tag'],
-			array_filter(
+			\array_filter(
 				$request->userData( 'Hooks' )->toArray()[0],
-				fn( $item ) => array_key_exists( 'Tag', $item )
+				fn( $item ) => \array_key_exists( 'Tag', $item )
 			)
 		);
 

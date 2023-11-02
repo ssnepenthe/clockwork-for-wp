@@ -123,7 +123,7 @@ class Helpers_Test extends TestCase {
 
 	/** @test */
 	public function test_prepare_wpdb_query(): void {
-		$time = microtime( true );
+		$time = \microtime( true );
 		$query_array = [ 'select * from wherever', 0.2, 'irrelevant-callstack', $time ];
 
 		$this->assertEquals(

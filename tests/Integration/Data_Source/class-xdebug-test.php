@@ -15,7 +15,7 @@ class Xdebug_Test extends TestCase {
 		$request = new Request();
 
 		$file = fixture_path( 'xdebug/profile-stand-in.txt' );
-		$contents = file_get_contents( $file );
+		$contents = \file_get_contents( $file );
 
 		$data_source->set_profiler_filename( $file );
 

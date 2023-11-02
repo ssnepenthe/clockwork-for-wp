@@ -11,7 +11,7 @@ class Errors_Test extends TestCase {
 
 	protected function tearDown(): void {
 		if ( $this->previous_error_reporting ) {
-			error_reporting( $this->previous_error_reporting );
+			\error_reporting( $this->previous_error_reporting );
 			$this->previous_error_reporting = null;
 		}
 	}
@@ -60,7 +60,7 @@ class Errors_Test extends TestCase {
 
 		// With filter, the second error should have been discarded.
 		$this->assertCount( 1, $errors );
-		$this->assertSame( $input['line'], array_shift( $errors )['line'] );
+		$this->assertSame( $input['line'], \array_shift( $errors )['line'] );
 	}
 
 	public function test_record_flags_errors_as_probably_suppressed(): void {
@@ -70,22 +70,22 @@ class Errors_Test extends TestCase {
 		$data_source->record( \E_ERROR, $input['message'], $input['file'], $input['line'] );
 
 		// When current error reporting setting is 0 and initial error reporting setting is not, we assume error suppression.
-		$error_reporting = error_reporting( 0 );
+		$error_reporting = \error_reporting( 0 );
 		$data_source->record( \E_ERROR, $input['message'], $input['file'], $input['line'] + 1 );
-		error_reporting( $error_reporting );
+		\error_reporting( $error_reporting );
 
 		$errors = $data_source->get_errors();
 
 		$this->assertCount( 2, $errors );
-		$this->assertFalse( array_shift( $errors )['suppressed'] );
-		$this->assertTrue( array_shift( $errors  )['suppressed'] );
+		$this->assertFalse( \array_shift( $errors )['suppressed'] );
+		$this->assertTrue( \array_shift( $errors  )['suppressed'] );
 	}
 
 	public function test_record_discards_errors_based_on_current_error_reporting(): void {
 		$data_source = $this->make_data_source( \E_ERROR );
 		$input = $this->get_function_specific_test_input();
 
-		$error_reporting = error_reporting( \E_ERROR | \E_WARNING );
+		$error_reporting = \error_reporting( \E_ERROR | \E_WARNING );
 
 		// Should be recorded.
 		$data_source->record( \E_ERROR, $input['message'], $input['file'], $input['line'] );
@@ -121,13 +121,13 @@ class Errors_Test extends TestCase {
 			$input['line']
 		);
 
-		error_reporting( $error_reporting );
+		\error_reporting( $error_reporting );
 
 		$errors = $data_source->get_errors();
 
 		$this->assertCount( 2, $errors );
-		$this->assertSame( \E_ERROR, array_shift( $errors )['type'] );
-		$this->assertSame( \E_WARNING, array_shift( $errors )['type'] );
+		$this->assertSame( \E_ERROR, \array_shift( $errors )['type'] );
+		$this->assertSame( \E_WARNING, \array_shift( $errors )['type'] );
 	}
 
 	public function test_record_discards_suppressed_errors_based_on_original_error_reporting(): void {
@@ -135,7 +135,7 @@ class Errors_Test extends TestCase {
 		$input = $this->get_function_specific_test_input();
 
 		// Errors are flagged as suppressed when error reporting is currently set to 0 but was set to something else when error handle instance was created.
-		$error_reporting = error_reporting( 0 );
+		$error_reporting = \error_reporting( 0 );
 
 		// Should be recorded.
 		$data_source->record( \E_ERROR, $input['message'], $input['file'], $input['line'] );
@@ -171,13 +171,13 @@ class Errors_Test extends TestCase {
 			$input['line']
 		);
 
-		error_reporting( $error_reporting );
+		\error_reporting( $error_reporting );
 
 		$errors = $data_source->get_errors();
 
 		$this->assertCount( 2, $errors );
-		$this->assertSame( \E_ERROR, array_shift( $errors )['type'] );
-		$this->assertSame( \E_WARNING, array_shift( $errors )['type'] );
+		$this->assertSame( \E_ERROR, \array_shift( $errors )['type'] );
+		$this->assertSame( \E_WARNING, \array_shift( $errors )['type'] );
 	}
 
 	public function test_record_discards_errors_based_on_user_defined_callbacks(): void {
@@ -191,7 +191,7 @@ class Errors_Test extends TestCase {
 		$errors = $data_source->get_errors();
 
 		$this->assertCount( 1, $errors );
-		$this->assertSame( $input['line'], array_shift( $errors )['line'] );
+		$this->assertSame( $input['line'], \array_shift( $errors )['line'] );
 	}
 
 	public function test_record_prevents_duplicate_errors_from_being_recorded(): void {
@@ -208,9 +208,9 @@ class Errors_Test extends TestCase {
 		$data_source = $this->make_data_source( \E_ERROR );
 		$input = $this->get_function_specific_test_input();
 
-		$error_reporting = error_reporting( 0 );
+		$error_reporting = \error_reporting( 0 );
 		$data_source->record( \E_ERROR, $input['message'], $input['file'], $input['line'] );
-		error_reporting( $error_reporting );
+		\error_reporting( $error_reporting );
 
 		$request = $data_source->resolve( new Request() );
 
@@ -308,7 +308,7 @@ class Errors_Test extends TestCase {
 
 	private function make_data_source( int $error_reporting ): Errors {
 		if ( $error_reporting ) {
-			$this->previous_error_reporting = error_reporting( $error_reporting );
+			$this->previous_error_reporting = \error_reporting( $error_reporting );
 		}
 
 		return new Errors();
@@ -316,7 +316,7 @@ class Errors_Test extends TestCase {
 
 	private function get_function_specific_test_input(): array {
 		// This data is all arbitrary - we are just verifying that what goes into the data source comes back out of the request...
-		$backtrace = debug_backtrace( \DEBUG_BACKTRACE_IGNORE_ARGS, 2 );
+		$backtrace = \debug_backtrace( \DEBUG_BACKTRACE_IGNORE_ARGS, 2 );
 
 		// So lets use the test method name name as our error message and file path...
 		$function = $backtrace[1]['function'];
@@ -326,7 +326,7 @@ class Errors_Test extends TestCase {
 
 		return [
 			'message' => $function,
-			'file' => '/' . str_replace( '_', '/', $function ),
+			'file' => '/' . \str_replace( '_', '/', $function ),
 			'line' => $line,
 		];
 	}

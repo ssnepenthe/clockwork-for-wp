@@ -40,7 +40,7 @@ class Wpdb_Test extends TestCase {
 
 		$data_source = new Wpdb( $detect_dupes = false, $pattern_model_map );
 		$request = new Request();
-		$time = microtime( true );
+		$time = \microtime( true );
 
 		$data_source->set_queries( [
 			[ 'select * from posts', 500, $time ],
@@ -90,7 +90,7 @@ class Wpdb_Test extends TestCase {
 		$data_source = new Wpdb( $detect_dupes = true, [] );
 		$request = new Request();
 		$untested_duration = 50;
-		$untested_time = microtime( true );
+		$untested_time = \microtime( true );
 
 		$data_source->set_queries( [
 			[
@@ -128,7 +128,7 @@ class Wpdb_Test extends TestCase {
 
 	/** @test */
 	public function it_can_limit_query_logging_to_slow_queries(): void {
-		$untested_time = microtime( true );
+		$untested_time = \microtime( true );
 		$queries = [
 			[ 'select * from posts', 50, $untested_time ],
 			[ 'select * from users', 100, $untested_time ],
@@ -170,7 +170,7 @@ class Wpdb_Test extends TestCase {
 		$data_source->add_custom_model_identifier( fn( $query ) => 'TESTMODEL' );
 		$data_source->add_custom_model_identifier( fn( $query ) => 'TESTMODEL2' );
 
-		$data_source->add_query( 'select * from posts', 500, microtime( true ) );
+		$data_source->add_query( 'select * from posts', 500, \microtime( true ) );
 
 		$request = new Request();
 
