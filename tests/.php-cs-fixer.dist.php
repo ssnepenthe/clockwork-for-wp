@@ -89,7 +89,7 @@ return $config->setRules([
 	'no_empty_comment' => true,
 	'no_trailing_whitespace_in_comment' => true,
 	'single_line_comment_style' => true,
-	// 'native_constant_invocation' => true,
+	'native_constant_invocation' => true,
 	'elseif' => true,
 	'include' => true,
 	'no_break_comment' => true,
