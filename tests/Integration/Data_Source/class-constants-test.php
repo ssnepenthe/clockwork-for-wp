@@ -9,11 +9,17 @@ use PHPUnit\Framework\TestCase;
 
 class Constants_Test extends TestCase {
 	public const STRING_VALUE = 'apples';
+
 	public const TRUE_VALUE = true;
+
 	public const FALSE_VALUE = false;
+
 	public const NULL_VALUE = null;
+
 	public const INT_VALUE = 5;
+
 	public const FLOAT_VALUE = 4.7;
+
 	public const ARRAY_VALUE = [ 'a' => 'b' ];
 
 	public function test_resolve_can_ignore_constant_based_on_when(): void {

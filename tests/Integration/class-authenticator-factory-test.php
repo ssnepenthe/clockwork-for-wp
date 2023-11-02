@@ -31,8 +31,10 @@ class Authenticator_Factory_Test extends TestCase {
 		$authenticator = new class() implements AuthenticatorInterface {
 			public function attempt( array $credentials ): void {
 			}
+
 			public function check( $token ): void {
 			}
+
 			public function requires(): void {
 			}
 		};

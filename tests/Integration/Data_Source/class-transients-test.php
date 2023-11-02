@@ -8,7 +8,9 @@ use PHPUnit\Framework\TestCase;
 
 class Transients_Test extends TestCase {
 	protected $data_source;
+
 	protected $request;
+
 	protected $request_is_resolved;
 
 	protected function setUp(): void {
