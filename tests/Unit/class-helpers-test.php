@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;

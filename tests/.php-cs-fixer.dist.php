@@ -207,7 +207,7 @@ return $config->setRules([
 	'no_singleline_whitespace_before_semicolons' => true,
 	'semicolon_after_instruction' => true,
 	'space_after_semicolon' => true,
-	// 'declare_strict_types' => true,
+	'declare_strict_types' => true,
 	'strict_comparison' => true,
 	'strict_param' => true,
 	'escape_implicit_backslashes' => true,

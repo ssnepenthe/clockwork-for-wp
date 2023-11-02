@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Clockwork_For_Wp\Tests\Integration;
 
 use Clockwork_For_Wp\Clockwork_Provider;
