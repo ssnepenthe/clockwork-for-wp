@@ -151,9 +151,9 @@ return $config->setRules([
 	'no_leading_namespace_whitespace' => true,
 	'single_blank_line_before_namespace' => true,
 	'binary_operator_spaces' => true,
-	// 'concat_space' => [
-	//     'spacing' => 'one',
-	// ],
+	'concat_space' => [
+	    'spacing' => 'one',
+	],
 	'logical_operators' => true,
 	'new_with_braces' => true,
 	'not_operator_with_space' => true,
@@ -171,9 +171,9 @@ return $config->setRules([
 	'linebreak_after_opening_tag' => true,
 	'no_closing_tag' => true,
 	// // @todo PHPUnit rules?
-	// 'align_multiline_comment' => [
-	//     'comment_type' => 'phpdocs_like',
-	// ],
+	'align_multiline_comment' => [
+	    'comment_type' => 'phpdocs_like',
+	],
 	'no_blank_lines_after_phpdoc' => true,
 	'no_empty_phpdoc' => true,
 	'no_superfluous_phpdoc_tags' => true,
