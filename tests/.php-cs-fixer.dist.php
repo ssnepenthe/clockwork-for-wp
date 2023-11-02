@@ -45,7 +45,7 @@ return $config->setRules([
 	'no_short_bool_cast' => true,
 	'no_unset_cast' => true,
 	'short_scalar_cast' => true,
-	// 'class_attributes_separation' => true,
+	'class_attributes_separation' => true,
 	'class_definition' => true,
 	'final_internal_class' => true,
 	'no_blank_lines_after_class_opening' => true,
