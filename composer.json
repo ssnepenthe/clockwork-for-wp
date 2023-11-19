@@ -8,7 +8,8 @@
         "itsgoingd/clockwork": "^5.0",
         "pimple/pimple": "^3.2",
         "league/config": "^1.1",
-        "ssnepenthe/apheleia-cli": "^0.1"
+        "ssnepenthe/apheleia-cli": "^0.1",
+        "ssnepenthe/wp-event-dispatcher": "dev-main"
     },
     "require-dev": {
         "psy/psysh": "^0.11",
@@ -23,6 +24,12 @@
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
         "mikey179/vfsstream": "^1.6.7"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:ssnepenthe/wp-event-dispatcher.git"
+        }
+    ],
     "autoload": { "classmap": ["src/"] },
     "autoload-dev": { "classmap": ["tests/"] },
     "minimum-stability": "dev",
