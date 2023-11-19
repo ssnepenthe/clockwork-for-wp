@@ -12,7 +12,7 @@
         "ssnepenthe/wp-event-dispatcher": "^0.1"
     },
     "require-dev": {
-        "brain/monkey": "^2.6",
+        "brain/monkey": "^2.6.1",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
         "friendsofphp/php-cs-fixer": "^3.1",
         "humanmade/psalm-plugin-wordpress": "dev-master",
