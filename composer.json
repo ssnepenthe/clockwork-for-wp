@@ -22,7 +22,8 @@
         "humanmade/psalm-plugin-wordpress": "dev-master",
         "wp-coding-standards/wpcs": "^2.3",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
-        "mikey179/vfsstream": "^1.6.7"
+        "mikey179/vfsstream": "^1.6.7",
+        "brain/monkey": "^2.6"
     },
     "repositories": [
         {
