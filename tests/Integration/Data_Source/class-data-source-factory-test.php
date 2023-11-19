@@ -4,28 +4,35 @@ declare(strict_types=1);
 
 namespace Clockwork_For_Wp\Tests\Integration\Data_Source;
 
+use Brain\Monkey;
 use Clockwork\Clockwork;
 use Clockwork\DataSource\DataSource;
 use Clockwork_For_Wp\Data_Source;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Globals;
 use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Is;
 use Clockwork_For_Wp\Tests\Creates_Config;
 use InvalidArgumentException;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
-use Pimple\Container;
 
 class Data_Source_Factory_Test extends TestCase {
 	use Creates_Config;
+	use MockeryPHPUnitIntegration;
 
 	protected function setUp(): void {
+		parent::setUp();
+		Monkey\setUp();
+
 		Globals::set_getter( 'timestart', static fn() => 'irrelevant' );
 		Globals::set_getter( 'wp_version', static fn() => 'irrelevant' );
 	}
 
 	protected function tearDown(): void {
 		Globals::reset();
+
+		Monkey\tearDown();
+		parent::tearDown();
 	}
 
 	/**
@@ -122,14 +129,7 @@ class Data_Source_Factory_Test extends TestCase {
 			'method' => 'GET',
 			'uri' => '/',
 		] );
-		$pimple = new Container( [
-			Event_Manager::class => new class() {
-				public function trigger(): void {
-					// irrelevant
-				}
-			},
-		] );
 
-		return new Data_Source\Data_Source_Factory( $config, new Is( $config, $clockwork, $request ), $pimple );
+		return new Data_Source\Data_Source_Factory( $config, new Is( $config, $clockwork, $request ) );
 	}
 }

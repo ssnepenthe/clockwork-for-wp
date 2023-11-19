@@ -7,8 +7,8 @@ namespace Clockwork_For_Wp\Data_Source;
 use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Request;
 use Clockwork_For_Wp\Data_Source\Subscriber\Wp_Subscriber;
-use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Provides_Subscriber;
+use WpEventDispatcher\SubscriberInterface;
 
 final class Wp extends DataSource implements Provides_Subscriber {
 	private $variables = [];
@@ -23,7 +23,7 @@ final class Wp extends DataSource implements Provides_Subscriber {
 		return $this;
 	}
 
-	public function create_subscriber(): Subscriber {
+	public function create_subscriber(): SubscriberInterface {
 		return new Wp_Subscriber( $this );
 	}
 

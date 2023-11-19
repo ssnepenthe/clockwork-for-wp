@@ -5,22 +5,22 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Data_Source\Subscriber;
 
 use Clockwork_For_Wp\Data_Source\Wpdb;
-use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Globals;
+use WpEventDispatcher\SubscriberInterface;
 
 use function Clockwork_For_Wp\prepare_wpdb_query;
 
 /**
  * @internal
  */
-final class Wpdb_Subscriber implements Subscriber {
+final class Wpdb_Subscriber implements SubscriberInterface {
 	private Wpdb $data_source;
 
 	public function __construct( Wpdb $data_source ) {
 		$this->data_source = $data_source;
 	}
 
-	public function get_subscribed_events(): array {
+	public function getSubscribedEvents(): array {
 		return [
 			'cfw_pre_resolve' => 'on_cfw_pre_resolve',
 		];

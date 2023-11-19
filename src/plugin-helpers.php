@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Clockwork_For_Wp;
 
-use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Closure;
 use Pimple\Container;
 use ReflectionFunction;
@@ -100,10 +99,6 @@ function describe_value( $value ): string {
 
 	// @todo More specificity when array or resource.
 	return '(NON-SCALAR VALUE)';
-}
-
-function events(): Event_Manager {
-	return \_cfw_instance()->get_pimple()[ Event_Manager::class ];
 }
 
 function service( string $id ) {

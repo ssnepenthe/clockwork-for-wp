@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Routing;
 
 use Clockwork_For_Wp\Base_Provider;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Plugin;
+use WpEventDispatcher\EventDispatcherInterface;
 
 use function Clockwork_For_Wp\service;
 
@@ -18,7 +18,7 @@ final class Routing_Provider extends Base_Provider {
 	public function boot( Plugin $plugin ): void {
 		$pimple = $plugin->get_pimple();
 
-		$pimple[ Event_Manager::class ]->attach(
+		$pimple[ EventDispatcherInterface::class ]->addSubscriber(
 			new Routing_Subscriber(
 				$pimple[ Route_Collection::class ],
 				$pimple[ Route_Handler_Invoker::class ],

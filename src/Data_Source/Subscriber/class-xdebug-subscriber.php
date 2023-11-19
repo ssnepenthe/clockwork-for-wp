@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Data_Source\Subscriber;
 
 use Clockwork_For_Wp\Data_Source\Xdebug;
-use Clockwork_For_Wp\Event_Management\Subscriber;
+use WpEventDispatcher\SubscriberInterface;
 
 /**
  * @internal
  */
-final class Xdebug_Subscriber implements Subscriber {
+final class Xdebug_Subscriber implements SubscriberInterface {
 	private Xdebug $data_source;
 
 	public function __construct( Xdebug $data_source ) {
 		$this->data_source = $data_source;
 	}
 
-	public function get_subscribed_events(): array {
+	public function getSubscribedEvents(): array {
 		return [
 			'init' => 'on_init',
 		];

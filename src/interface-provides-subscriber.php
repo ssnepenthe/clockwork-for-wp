@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Clockwork_For_Wp;
 
-use Clockwork_For_Wp\Event_Management\Subscriber;
+use WpEventDispatcher\SubscriberInterface;
 
 interface Provides_Subscriber {
-	public function create_subscriber(): Subscriber;
+	public function create_subscriber(): SubscriberInterface;
 }

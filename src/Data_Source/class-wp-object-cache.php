@@ -7,8 +7,8 @@ namespace Clockwork_For_Wp\Data_Source;
 use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Request;
 use Clockwork_For_Wp\Data_Source\Subscriber\Wp_Object_Cache_Subscriber;
-use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Provides_Subscriber;
+use WpEventDispatcher\SubscriberInterface;
 
 final class Wp_Object_Cache extends DataSource implements Provides_Subscriber {
 	private $deletes = 0;
@@ -19,7 +19,7 @@ final class Wp_Object_Cache extends DataSource implements Provides_Subscriber {
 
 	private $writes = 0;
 
-	public function create_subscriber(): Subscriber {
+	public function create_subscriber(): SubscriberInterface {
 		return new Wp_Object_Cache_Subscriber( $this );
 	}
 

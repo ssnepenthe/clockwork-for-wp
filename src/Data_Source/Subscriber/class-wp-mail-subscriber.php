@@ -5,22 +5,22 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Data_Source\Subscriber;
 
 use Clockwork_For_Wp\Data_Source\Wp_Mail;
-use Clockwork_For_Wp\Event_Management\Subscriber;
 use WP_Error;
+use WpEventDispatcher\SubscriberInterface;
 
 use function Clockwork_For_Wp\wp_error_to_array;
 
 /**
  * @internal
  */
-final class Wp_Mail_Subscriber implements Subscriber {
+final class Wp_Mail_Subscriber implements SubscriberInterface {
 	private Wp_Mail $data_source;
 
 	public function __construct( Wp_Mail $data_source ) {
 		$this->data_source = $data_source;
 	}
 
-	public function get_subscribed_events(): array {
+	public function getSubscribedEvents(): array {
 		return [
 			'wp_mail_failed' => 'on_wp_mail_failed',
 			'wp_mail' => 'on_wp_mail',

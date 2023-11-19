@@ -7,8 +7,9 @@ namespace Clockwork_For_Wp\Data_Source;
 use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Request;
 use Clockwork_For_Wp\Data_Source\Subscriber\Rest_Api_Subscriber;
-use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Provides_Subscriber;
+use WpEventDispatcher\SubscriberInterface;
+
 use function Clockwork_For_Wp\describe_callable;
 
 final class Rest_Api extends DataSource implements Provides_Subscriber {
@@ -42,7 +43,7 @@ final class Rest_Api extends DataSource implements Provides_Subscriber {
 		return $this;
 	}
 
-	public function create_subscriber(): Subscriber {
+	public function create_subscriber(): SubscriberInterface {
 		return new Rest_Api_Subscriber( $this );
 	}
 

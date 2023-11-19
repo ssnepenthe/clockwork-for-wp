@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Data_Source\Subscriber;
 
 use Clockwork_For_Wp\Data_Source\Wp_Rewrite;
-use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Globals;
+use WpEventDispatcher\SubscriberInterface;
 
 /**
  * @internal
  */
-final class Wp_Rewrite_Subscriber implements Subscriber {
+final class Wp_Rewrite_Subscriber implements SubscriberInterface {
 	private Wp_Rewrite $data_source;
 
 	public function __construct( Wp_Rewrite $data_source ) {
 		$this->data_source = $data_source;
 	}
 
-	public function get_subscribed_events(): array {
+	public function getSubscribedEvents(): array {
 		return [
 			'cfw_pre_resolve' => 'on_cfw_pre_resolve',
 		];

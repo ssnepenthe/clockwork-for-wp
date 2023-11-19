@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp;
 
 use Clockwork\Clockwork;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
 use League\Config\Configuration as LeagueConfiguration;
 use Pimple\Container;
+use WpEventDispatcher\EventDispatcher;
+use WpEventDispatcher\EventDispatcherInterface;
 
 /**
  * @internal
@@ -15,7 +16,7 @@ use Pimple\Container;
 final class Plugin_Provider extends Base_Provider {
 	public function boot( Plugin $plugin ): void {
 		if ( $plugin->is()->enabled() || $plugin->is()->web_enabled() || $plugin->is()->web_installed() ) {
-			$plugin->get_pimple()[ Event_Manager::class ]->attach( new Plugin_Subscriber() );
+			$plugin->get_pimple()[ EventDispatcherInterface::class ]->addSubscriber( new Plugin_Subscriber() );
 		}
 	}
 
@@ -33,9 +34,13 @@ final class Plugin_Provider extends Base_Provider {
 
 			$config->merge( $defaults );
 
-			$pimple[ Event_Manager::class ]->trigger( 'cfw_config_init', $config );
+			\do_action( 'cfw_config_init', $config );
 
 			return $config;
+		};
+
+		$pimple[ EventDispatcherInterface::class ] = static function () {
+			return new EventDispatcher();
 		};
 
 		$pimple[ Read_Only_Configuration::class ] = static function ( Container $pimple ) {

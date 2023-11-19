@@ -9,9 +9,9 @@ use Clockwork\Helpers\StackFilter;
 use Clockwork\Helpers\StackTrace;
 use Clockwork\Request\Request;
 use Clockwork_For_Wp\Data_Source\Subscriber\Wp_Redirect_Subscriber;
-use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Provides_Subscriber;
 use InvalidArgumentException;
+use WpEventDispatcher\SubscriberInterface;
 
 // @todo Would be nice to get this tested by our browser tests.
 final class Wp_Redirect extends DataSource implements Provides_Subscriber {
@@ -31,7 +31,7 @@ final class Wp_Redirect extends DataSource implements Provides_Subscriber {
 
 	private $trace;
 
-	public function create_subscriber(): Subscriber {
+	public function create_subscriber(): SubscriberInterface {
 		return new Wp_Redirect_Subscriber( $this );
 	}
 

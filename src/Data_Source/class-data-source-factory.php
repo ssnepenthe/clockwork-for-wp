@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork_For_Wp\Base_Factory;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Globals;
 use Clockwork_For_Wp\Is;
 use Clockwork_For_Wp\Read_Only_Configuration;
 use InvalidArgumentException;
-use Pimple\Container;
 
 /**
  * @internal
@@ -22,12 +20,9 @@ final class Data_Source_Factory extends Base_Factory {
 
 	private $is;
 
-	private $pimple;
-
-	public function __construct( Read_Only_Configuration $config, Is $is, Container $pimple ) {
+	public function __construct( Read_Only_Configuration $config, Is $is ) {
 		$this->config = $config;
 		$this->is = $is;
-		$this->pimple = $pimple;
 	}
 
 	public function get_enabled_data_sources(): array {
@@ -199,10 +194,7 @@ final class Data_Source_Factory extends Base_Factory {
 			);
 		}
 
-		$this->pimple[ Event_Manager::class ]->trigger(
-			'cfw_data_sources_wpdb_init',
-			$data_source
-		);
+		\do_action( 'cfw_data_sources_wpdb_init', $data_source );
 
 		return $data_source;
 	}
