@@ -1,34 +1,42 @@
 {
     "name": "ssnepenthe/clockwork-for-wp",
     "description": "A basic Clockwork integration for WordPress",
-    "type": "wordpress-plugin",
     "license": "MIT",
+    "type": "wordpress-plugin",
     "require": {
         "php": "^7.4 || ^8.0",
         "itsgoingd/clockwork": "^5.0",
-        "pimple/pimple": "^3.2",
         "league/config": "^1.1",
+        "pimple/pimple": "^3.2",
         "ssnepenthe/apheleia-cli": "^0.1",
         "ssnepenthe/wp-event-dispatcher": "^0.1"
     },
     "require-dev": {
-        "psy/psysh": "^0.11",
-        "symfony/var-dumper": "^4.1",
-        "phpunit/phpunit": "^9.5",
-        "spomky-labs/base64url": "^2.0",
-        "wp-cli/wp-cli-bundle": "^2.5",
-        "friendsofphp/php-cs-fixer": "^3.1",
-        "vimeo/psalm": "^4.10",
-        "humanmade/psalm-plugin-wordpress": "dev-master",
-        "wp-coding-standards/wpcs": "^2.3",
+        "brain/monkey": "^2.6",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
+        "friendsofphp/php-cs-fixer": "^3.1",
+        "humanmade/psalm-plugin-wordpress": "dev-master",
         "mikey179/vfsstream": "^1.6.7",
-        "brain/monkey": "^2.6"
+        "phpunit/phpunit": "^9.5",
+        "psy/psysh": "^0.11",
+        "spomky-labs/base64url": "^2.0",
+        "symfony/var-dumper": "^4.1",
+        "vimeo/psalm": "^4.10",
+        "wp-cli/wp-cli-bundle": "^2.5",
+        "wp-coding-standards/wpcs": "^2.3"
     },
-    "autoload": { "classmap": ["src/"] },
-    "autoload-dev": { "classmap": ["tests/"] },
     "minimum-stability": "dev",
     "prefer-stable": true,
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    },
+    "autoload-dev": {
+        "classmap": [
+            "tests/"
+        ]
+    },
     "config": {
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true
