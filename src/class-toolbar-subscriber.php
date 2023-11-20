@@ -6,9 +6,9 @@ namespace Clockwork_For_Wp;
 
 use Clockwork\Clockwork;
 use Clockwork\Request\Request;
-use Clockwork_For_Wp\Event_Management\Subscriber;
+use WpEventDispatcher\SubscriberInterface;
 
-final class Toolbar_Subscriber implements Subscriber {
+final class Toolbar_Subscriber implements SubscriberInterface {
 	private const COOKIE_NAME = 'x-clockwork';
 
 	private const LOGIN_STYLES = <<<'CSS'
@@ -36,7 +36,7 @@ final class Toolbar_Subscriber implements Subscriber {
 		$this->scripts_suffix = $minified_scripts ? '.min' : '';
 	}
 
-	public function get_subscribed_events(): array {
+	public function getSubscribedEvents(): array {
 		return [
 			'admin_enqueue_scripts' => 'on_enqueue_scripts',
 			'login_enqueue_scripts' => 'on_enqueue_scripts',

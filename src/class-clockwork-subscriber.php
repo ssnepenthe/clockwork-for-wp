@@ -6,30 +6,27 @@ namespace Clockwork_For_Wp;
 
 use Clockwork\Clockwork;
 use Clockwork_For_Wp\Cli_Data_Collection\Command_Context;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
-use Clockwork_For_Wp\Event_Management\Subscriber;
+use WpEventDispatcher\Priority;
+use WpEventDispatcher\SubscriberInterface;
 
-final class Clockwork_Subscriber implements Subscriber {
+final class Clockwork_Subscriber implements SubscriberInterface {
 	private $clockwork;
 
 	private $config;
 
-	private $events;
-
 	private $is;
 
-	public function __construct( Read_Only_Configuration $config, Is $is, Event_Manager $events, Clockwork $clockwork ) {
+	public function __construct( Read_Only_Configuration $config, Is $is, Clockwork $clockwork ) {
 		$this->config = $config;
 		$this->is = $is;
-		$this->events = $events;
 		$this->clockwork = $clockwork;
 	}
 
-	public function get_subscribed_events(): array {
+	public function getSubscribedEvents(): array {
 		if ( $this->is->collecting_data() ) {
 			return [
-				'wp_loaded' => [ 'on_wp_loaded', Event_Manager::LATE_EVENT ],
-				'shutdown' => [ 'on_shutdown', Event_Manager::LATE_EVENT ],
+				'wp_loaded' => [ 'on_wp_loaded', Priority::LATE ],
+				'shutdown' => [ 'on_shutdown', Priority::LATE ],
 			];
 		}
 
@@ -61,7 +58,7 @@ final class Clockwork_Subscriber implements Subscriber {
 			return;
 		}
 
-		$this->events->trigger( 'cfw_pre_resolve' ); // @todo pass $clockwork? $container?
+		\do_action( 'cfw_pre_resolve' ); // @todo pass $clockwork? $container?
 
 		$this->clockwork
 			->resolveAsCommand(
@@ -77,7 +74,7 @@ final class Clockwork_Subscriber implements Subscriber {
 	}
 
 	private function resolve_request(): void {
-		$this->events->trigger( 'cfw_pre_resolve' ); // @todo pass $clockwork? $container?
+		\do_action( 'cfw_pre_resolve' ); // @todo pass $clockwork? $container?
 
 		$this->clockwork
 			->resolveRequest()

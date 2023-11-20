@@ -7,8 +7,8 @@ namespace Clockwork_For_Wp\Data_Source;
 use Clockwork\DataSource\DataSource;
 use Clockwork\Request\Request;
 use Clockwork_For_Wp\Data_Source\Subscriber\Wp_Hook_Subscriber;
-use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Provides_Subscriber;
+use WpEventDispatcher\SubscriberInterface;
 
 use function Clockwork_For_Wp\describe_callable;
 use function Clockwork_For_Wp\describe_unavailable_callable;
@@ -51,7 +51,7 @@ final class Wp_Hook extends DataSource implements Provides_Subscriber {
 		$this->hooks[] = $hook;
 	}
 
-	public function create_subscriber(): Subscriber {
+	public function create_subscriber(): SubscriberInterface {
 		return new Wp_Hook_Subscriber( $this );
 	}
 

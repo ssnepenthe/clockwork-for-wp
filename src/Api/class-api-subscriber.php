@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Clockwork_For_Wp\Api;
 
-use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Is;
 use Clockwork_For_Wp\Routing\Route_Collection;
+use WpEventDispatcher\SubscriberInterface;
 
-final class Api_Subscriber implements Subscriber {
+final class Api_Subscriber implements SubscriberInterface {
 	private $is;
 
 	private $routes;
@@ -18,7 +18,7 @@ final class Api_Subscriber implements Subscriber {
 		$this->routes = $routes;
 	}
 
-	public function get_subscribed_events(): array {
+	public function getSubscribedEvents(): array {
 		return [
 			'init' => 'register_routes',
 		];

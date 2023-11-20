@@ -7,8 +7,8 @@ namespace Clockwork_For_Wp\Data_Source;
 use Clockwork\DataSource\XdebugDataSource;
 use Clockwork\Request\Request;
 use Clockwork_For_Wp\Data_Source\Subscriber\Xdebug_Subscriber;
-use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Provides_Subscriber;
+use WpEventDispatcher\SubscriberInterface;
 
 /**
  * Adapted from the Xdebug datasource bundled with Clockwork.
@@ -24,7 +24,7 @@ use Clockwork_For_Wp\Provides_Subscriber;
 final class Xdebug extends XdebugDataSource implements Provides_Subscriber {
 	private $profiler_filename;
 
-	public function create_subscriber(): Subscriber {
+	public function create_subscriber(): SubscriberInterface {
 		return new Xdebug_Subscriber( $this );
 	}
 

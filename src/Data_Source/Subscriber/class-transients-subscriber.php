@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Data_Source\Subscriber;
 
 use Clockwork_For_Wp\Data_Source\Transients;
-use Clockwork_For_Wp\Event_Management\Subscriber;
+use WpEventDispatcher\SubscriberInterface;
 
 /**
  * @internal
  */
-final class Transients_Subscriber implements Subscriber {
+final class Transients_Subscriber implements SubscriberInterface {
 	private Transients $data_source;
 
 	public function __construct( Transients $data_source ) {
 		$this->data_source = $data_source;
 	}
 
-	public function get_subscribed_events(): array {
+	public function getSubscribedEvents(): array {
 		return [
 			'setted_transient' => 'on_setted_transient',
 			'setted_site_transient' => 'on_setted_site_transient',

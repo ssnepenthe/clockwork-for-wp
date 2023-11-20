@@ -9,14 +9,13 @@ use Clockwork_For_Wp\Api\Api_Provider;
 use Clockwork_For_Wp\Cli_Data_Collection\Cli_Data_Collection_Provider;
 use Clockwork_For_Wp\Data_Source\Data_Source_Provider;
 use Clockwork_For_Wp\Data_Source\Errors;
-use Clockwork_For_Wp\Event_Management\Event_Management_Provider;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Routing\Routing_Provider;
 use Clockwork_For_Wp\Web_App\Web_App_Provider;
 use Clockwork_For_Wp\Wp_Cli\Wp_Cli_Provider;
 use InvalidArgumentException;
 use Pimple\Container;
 use RuntimeException;
+use WpEventDispatcher\Priority;
 
 /**
  * @internal
@@ -41,7 +40,6 @@ final class Plugin {
 				new Api_Provider(),
 				new Cli_Data_Collection_Provider(),
 				new Data_Source_Provider(),
-				new Event_Management_Provider(),
 				new Routing_Provider(),
 				new Web_App_Provider(),
 				new Wp_Cli_Provider(),
@@ -118,18 +116,14 @@ final class Plugin {
 		// @todo Move to plugin constructor?
 		Errors::get_instance()->register();
 
-		$this->pimple[ Event_Manager::class ]
-			->on(
-				'plugin_loaded',
-				function ( $file ): void {
-					if ( $this->pimple[ 'file' ] !== \realpath( $file ) ) {
-						return;
-					}
+		\add_action( 'plugin_loaded', function ( $file ): void {
+			if ( $this->pimple[ 'file' ] !== \realpath( $file ) ) {
+				return;
+			}
 
-					$this->lock();
-				},
-				Event_Manager::EARLY_EVENT
-			)
-			->on( 'plugins_loaded', [ $this, 'boot' ], Event_Manager::EARLY_EVENT );
+			$this->lock();
+		}, Priority::EARLY );
+
+		\add_action( 'plugins_loaded', [ $this, 'boot' ], Priority::EARLY );
 	}
 }

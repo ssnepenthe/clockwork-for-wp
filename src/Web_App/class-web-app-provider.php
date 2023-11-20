@@ -6,11 +6,11 @@ namespace Clockwork_For_Wp\Web_App;
 
 use Clockwork\Web\Web;
 use Clockwork_For_Wp\Base_Provider;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Clockwork_For_Wp\Globals;
 use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Plugin;
 use Clockwork_For_Wp\Routing\Route_Collection;
+use WpEventDispatcher\EventDispatcherInterface;
 
 /**
  * @internal
@@ -20,7 +20,7 @@ final class Web_App_Provider extends Base_Provider {
 		if ( $plugin->is()->web_enabled() && ! $plugin->is()->web_installed() ) {
 			$pimple = $plugin->get_pimple();
 
-			$pimple[ Event_Manager::class ]->attach(
+			$pimple[ EventDispatcherInterface::class ]->addSubscriber(
 				new Web_App_Subscriber( $pimple[ Incoming_Request::class ], $pimple[ Route_Collection::class ] )
 			);
 		}

@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Data_Source\Subscriber;
 
 use Clockwork_For_Wp\Data_Source\Wp_Http;
-use Clockwork_For_Wp\Event_Management\Subscriber;
+use WpEventDispatcher\SubscriberInterface;
 
 use function Clockwork_For_Wp\prepare_http_response;
 
 /**
  * @internal
  */
-final class Wp_Http_Subscriber implements Subscriber {
+final class Wp_Http_Subscriber implements SubscriberInterface {
 	private Wp_Http $data_source;
 
 	public function __construct( Wp_Http $data_source ) {
 		$this->data_source = $data_source;
 	}
 
-	public function get_subscribed_events(): array {
+	public function getSubscribedEvents(): array {
 		return [
 			'http_api_debug' => 'on_http_api_debug',
 			'http_request_args' => 'on_http_request_args',

@@ -5,24 +5,24 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Data_Source\Subscriber;
 
 use Clockwork_For_Wp\Data_Source\Wp_Redirect;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
-use Clockwork_For_Wp\Event_Management\Subscriber;
+use WpEventDispatcher\Priority;
+use WpEventDispatcher\SubscriberInterface;
 
 /**
  * @internal
  */
-final class Wp_Redirect_Subscriber implements Subscriber {
+final class Wp_Redirect_Subscriber implements SubscriberInterface {
 	private Wp_Redirect $data_source;
 
 	public function __construct( Wp_Redirect $data_source ) {
 		$this->data_source = $data_source;
 	}
 
-	public function get_subscribed_events(): array {
+	public function getSubscribedEvents(): array {
 		return [
-			'wp_redirect' => [ 'on_wp_redirect', Event_Manager::LATE_EVENT ],
-			'wp_redirect_status' => [ 'on_wp_redirect_status', Event_Manager::LATE_EVENT ],
-			'x_redirect_by' => [ 'on_x_redirect_by', Event_Manager::LATE_EVENT ],
+			'wp_redirect' => [ 'on_wp_redirect', Priority::LATE ],
+			'wp_redirect_status' => [ 'on_wp_redirect_status', Priority::LATE ],
+			'x_redirect_by' => [ 'on_x_redirect_by', Priority::LATE ],
 		];
 	}
 

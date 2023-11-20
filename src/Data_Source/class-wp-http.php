@@ -9,8 +9,8 @@ use Clockwork\Request\Log;
 use Clockwork\Request\Request;
 use Clockwork\Request\Timeline\Timeline;
 use Clockwork_For_Wp\Data_Source\Subscriber\Wp_Http_Subscriber;
-use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Provides_Subscriber;
+use WpEventDispatcher\SubscriberInterface;
 
 final class Wp_Http extends DataSource implements Provides_Subscriber {
 	private $log;
@@ -22,7 +22,7 @@ final class Wp_Http extends DataSource implements Provides_Subscriber {
 		$this->timeline = $timeline ?: new Timeline();
 	}
 
-	public function create_subscriber(): Subscriber {
+	public function create_subscriber(): SubscriberInterface {
 		return new Wp_Http_Subscriber( $this );
 	}
 

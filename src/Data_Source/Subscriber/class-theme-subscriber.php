@@ -5,28 +5,26 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Data_Source\Subscriber;
 
 use Clockwork_For_Wp\Data_Source\Theme;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
-use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Globals;
-
-use function Clockwork_For_Wp\events;
+use WpEventDispatcher\Priority;
+use WpEventDispatcher\SubscriberInterface;
 
 /**
  * @internal
  */
-final class Theme_Subscriber implements Subscriber {
+final class Theme_Subscriber implements SubscriberInterface {
 	private Theme $data_source;
 
 	public function __construct( Theme $data_source ) {
 		$this->data_source = $data_source;
 	}
 
-	public function get_subscribed_events(): array {
+	public function getSubscribedEvents(): array {
 		return [
 			'cfw_pre_resolve' => 'on_cfw_pre_resolve',
-			'body_class' => [ 'on_body_class', Event_Manager::LATE_EVENT ],
+			'body_class' => [ 'on_body_class', Priority::LATE ],
 			'get_template_part' => 'on_get_template_part',
-			'template_include' => [ 'on_template_include', Event_Manager::LATE_EVENT ],
+			'template_include' => [ 'on_template_include', Priority::LATE ],
 			'template_redirect' => 'on_template_redirect',
 		];
 	}
@@ -96,7 +94,7 @@ final class Theme_Subscriber implements Subscriber {
 
 		foreach ( $conditional_filter_map as $conditional => $filter ) {
 			if ( \function_exists( $conditional ) && $conditional() ) {
-				events()->on(
+				\add_filter(
 					$filter,
 					/**
 					 * @param array $templates
@@ -114,7 +112,7 @@ final class Theme_Subscriber implements Subscriber {
 
 						return $templates;
 					},
-					Event_Manager::LATE_EVENT
+					Priority::LATE
 				);
 			}
 		}

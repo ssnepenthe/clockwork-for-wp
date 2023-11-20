@@ -9,8 +9,8 @@ use Clockwork\Request\Log;
 use Clockwork\Request\Request;
 use Clockwork\Request\Timeline\Timeline;
 use Clockwork_For_Wp\Data_Source\Subscriber\Wp_Mail_Subscriber;
-use Clockwork_For_Wp\Event_Management\Subscriber;
 use Clockwork_For_Wp\Provides_Subscriber;
+use WpEventDispatcher\SubscriberInterface;
 
 // @todo Use phpmailer_init hook to get more details?
 final class Wp_Mail extends DataSource implements Provides_Subscriber {
@@ -23,7 +23,7 @@ final class Wp_Mail extends DataSource implements Provides_Subscriber {
 		$this->log = $log ?: new Log();
 	}
 
-	public function create_subscriber(): Subscriber {
+	public function create_subscriber(): SubscriberInterface {
 		return new Wp_Mail_Subscriber( $this );
 	}
 

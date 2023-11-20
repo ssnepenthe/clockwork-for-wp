@@ -14,8 +14,8 @@ use Clockwork\Request\Request;
 use Clockwork\Request\ShouldCollect;
 use Clockwork\Storage\StorageInterface;
 use Clockwork_For_Wp\Data_Source\Data_Source_Factory;
-use Clockwork_For_Wp\Event_Management\Event_Manager;
 use Pimple\Container;
+use WpEventDispatcher\EventDispatcherInterface;
 
 /**
  * @internal
@@ -24,22 +24,21 @@ final class Clockwork_Provider extends Base_Provider {
 	public function boot( Plugin $plugin ): void {
 		if ( $plugin->is()->collecting_data() ) {
 			$pimple = $plugin->get_pimple();
-			$events = $pimple[ Event_Manager::class ];
+			$events = $pimple[ EventDispatcherInterface::class ];
 
 			// Clockwork instance is resolved even when we are not collecting data in order to take
 			// advantage of helper methods like shouldCollect.
 			// This ensures data sources are only registered on plugins_loaded when enabled.
 			$pimple[ Clockwork_Support::class ]->add_data_sources();
 
-			$events->attach(
+			$events->addSubscriber(
 				new Clockwork_Subscriber(
 					$pimple[ Read_Only_Configuration::class ],
 					$pimple[ Plugin::class ]->is(),
-					$pimple[ Event_Manager::class ],
 					$pimple[ Clockwork::class ]
 				)
 			);
-			$events->attach( new Toolbar_Subscriber(
+			$events->addSubscriber( new Toolbar_Subscriber(
 				$pimple[ Plugin::class ]->is(),
 				$pimple[ Request::class ],
 				\plugin_dir_url( $pimple['file'] ),
