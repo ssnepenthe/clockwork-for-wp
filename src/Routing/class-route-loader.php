@@ -25,7 +25,7 @@ final class Route_Loader {
 
 	private function do_initialize( Router $router ): void {
 		foreach ( $this->route_files as $file ) {
-			$loader = ( static fn ( $f ) => include $f )( $file );
+			$loader = ( static fn ( string $f ) => include $f )( $file );
 
 			$loader( $router );
 		}
