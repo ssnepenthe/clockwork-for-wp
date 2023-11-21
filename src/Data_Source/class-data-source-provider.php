@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Data_Source;
 
 use Clockwork_For_Wp\Base_Provider;
+use Clockwork_For_Wp\Is;
 use Clockwork_For_Wp\Plugin;
 use Clockwork_For_Wp\Provides_Subscriber;
 use Clockwork_For_Wp\Read_Only_Configuration;
@@ -29,7 +30,7 @@ final class Data_Source_Provider extends Base_Provider {
 
 	public function register( Plugin $plugin ): void {
 		$plugin->get_pimple()[ Data_Source_Factory::class ] = static function ( Container $pimple ) {
-			return new Data_Source_Factory( $pimple[ Read_Only_Configuration::class ], $pimple[ Plugin::class ]->is() );
+			return new Data_Source_Factory( $pimple[ Read_Only_Configuration::class ], $pimple[ Is::class ] );
 		};
 	}
 

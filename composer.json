@@ -9,6 +9,7 @@
         "league/config": "^1.1",
         "pimple/pimple": "^3.2",
         "ssnepenthe/apheleia-cli": "^0.1",
+        "ssnepenthe/toy-wp-routing": "dev-and-now-for-something-completely-different",
         "ssnepenthe/wp-event-dispatcher": "^0.1"
     },
     "require-dev": {
@@ -25,6 +26,12 @@
         "wp-cli/wp-cli-bundle": "^2.5",
         "wp-coding-standards/wpcs": "^2.3"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/ssnepenthe/toy-wp-routing"
+        }
+    ],
     "minimum-stability": "dev",
     "prefer-stable": true,
     "autoload": {

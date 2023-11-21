@@ -34,12 +34,12 @@ final class Clockwork_Provider extends Base_Provider {
 			$events->addSubscriber(
 				new Clockwork_Subscriber(
 					$pimple[ Read_Only_Configuration::class ],
-					$pimple[ Plugin::class ]->is(),
+					$pimple[ Is::class ],
 					$pimple[ Clockwork::class ]
 				)
 			);
 			$events->addSubscriber( new Toolbar_Subscriber(
-				$pimple[ Plugin::class ]->is(),
+				$pimple[ Is::class ],
 				$pimple[ Request::class ],
 				\plugin_dir_url( $pimple['file'] ),
 				\defined( 'SCRIPT_DEBUG' ) ? SCRIPT_DEBUG : false

@@ -43,6 +43,10 @@ final class Plugin_Provider extends Base_Provider {
 			return new EventDispatcher();
 		};
 
+		$pimple[ Is::class ] = static function ( Container $pimple ) {
+			return $pimple[ Plugin::class ]->is();
+		};
+
 		$pimple[ Read_Only_Configuration::class ] = static function ( Container $pimple ) {
 			return $pimple[ Configuration::class ]->reader();
 		};
