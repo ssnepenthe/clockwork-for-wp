@@ -17,21 +17,25 @@ class Routing_Provider extends Base_Provider {
 		$pimple = $plugin->get_pimple();
 
 		$pimple[ EventDispatcherInterface::class ]->addSubscriber(
-			new Routing_Subscriber( $pimple[ Route_Loader::class ] )
+			new Routing_Subscriber( $pimple[ Router::class ], $pimple[ Route_Loader::class ] )
 		);
 	}
 
 	public function register( Plugin $plugin ): void {
 		$pimple = $plugin->get_pimple();
 
-		$pimple[ Route_Loader::class ] = static function ( Container $pimple ) {
+		$pimple[ Route_Loader::class ] = static function () {
+			return new Route_Loader();
+		};
+
+		$pimple[ Router::class ] = static function ( Container $pimple ) {
 			$router = new Router();
 
 			$router->setPrefix( 'cfw_' );
 			$router->setCallableResolver( new PsrContainerCallableResolver( new Psr11Container( $pimple ) ) );
 			$router->enableCache( \dirname( $pimple['file'] ) . '/generated' );
 
-			return new Route_Loader( $router );
+			return $router;
 		};
 	}
 }
