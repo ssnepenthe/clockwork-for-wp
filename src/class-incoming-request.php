@@ -30,11 +30,6 @@ final class Incoming_Request extends IncomingRequest {
 		return null !== $header ? $header : $default;
 	}
 
-	public function intended_method() {
-		// Placeholder in case we ever need to support other methods.
-		return $this->is_put() ? 'PUT' : $this->method;
-	}
-
 	public function is_heartbeat() {
 		return 'POST' === $this->method
 			&& $this->ajax_uri === $this->uri
@@ -44,24 +39,6 @@ final class Incoming_Request extends IncomingRequest {
 
 	public function is_json() {
 		return 0 === \mb_strpos( $this->header( 'CONTENT_TYPE', '' ), 'application/json' );
-	}
-
-	public function is_put() {
-		$method = \mb_strtoupper( $this->method );
-
-		if ( 'PUT' === $method ) {
-			return true;
-		}
-
-		$override = $this->header( 'X-HTTP-METHOD-OVERRIDE' );
-
-		if ( ! \is_string( $override ) ) {
-			return false;
-		}
-
-		$override = \mb_strtoupper( $override );
-
-		return 'POST' === $method && 'PUT' === $override;
 	}
 
 	public function json() {

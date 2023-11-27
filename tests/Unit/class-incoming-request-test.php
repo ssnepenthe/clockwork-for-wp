@@ -11,42 +11,6 @@ class Incoming_Request_Test extends TestCase {
 	/**
 	 * @test
 	 */
-	public function test_is_put(): void {
-		$request = new Incoming_Request( [ 'method' => 'GET' ] );
-
-		$this->assertFalse( $request->is_put() );
-
-		$request = new Incoming_Request( [ 'method' => 'PUT' ] );
-
-		$this->assertTrue( $request->is_put() );
-
-		$request = new Incoming_Request( [ 'method' => 'POST' ] );
-
-		$this->assertFalse( $request->is_put() );
-
-		$request = new Incoming_Request( [
-			'headers' => [
-				'x-http-method-override' => 'PUT',
-			],
-			'method' => 'POST',
-		] );
-
-		$this->assertTrue( $request->is_put() );
-
-		// Casing is normalized.
-		$request = new Incoming_Request( [
-			'headers' => [
-				'x-http-method-override' => 'put',
-			],
-			'method' => 'post',
-		] );
-
-		$this->assertTrue( $request->is_put() );
-	}
-
-	/**
-	 * @test
-	 */
 	public function test_get_header(): void {
 		$request = new Incoming_Request( [
 			'headers' => [
