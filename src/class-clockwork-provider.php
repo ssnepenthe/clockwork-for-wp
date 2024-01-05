@@ -93,12 +93,13 @@ final class Clockwork_Provider extends Base_Provider {
 		// Could probably even create it within Plugin::__construct() and save it to container.
 		$pimple[ Request::class ];
 
-		$pimple[ IncomingRequest::class ] = $pimple->factory( static function ( Container $pimple ) {
-			return $pimple[ Incoming_Request::class ];
-		} );
-
-		$pimple[ Incoming_Request::class ] = static function () {
-			return Incoming_Request::from_globals();
+		$pimple[ IncomingRequest::class ] = static function () {
+			return new IncomingRequest( [
+				'cookies' => $_COOKIE,
+				'input' => $_REQUEST,
+				'method' => $_SERVER['REQUEST_METHOD'] ?? 'GET',
+				'uri' => $_SERVER['REQUEST_URI'] ?? '/',
+			] );
 		};
 	}
 

@@ -6,14 +6,16 @@ namespace Clockwork_For_Wp\Tests\Integration\Data_Source;
 
 use Brain\Monkey;
 use Clockwork\Clockwork;
-use Clockwork\Request\Request;
+use Clockwork\Request\IncomingRequest;
+use Clockwork\Request\Request as Clockwork_Request;
 use Clockwork_For_Wp\Data_Source\Data_Source_Factory;
 use Clockwork_For_Wp\Data_Source\Wpdb;
-use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Is;
+use Clockwork_For_Wp\Request;
 use Clockwork_For_Wp\Tests\Creates_Config;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
+use SimpleWpRouting\Support\RequestContext;
 
 class Wpdb_Test extends TestCase {
 	use Creates_Config;
@@ -54,7 +56,7 @@ class Wpdb_Test extends TestCase {
 		$pattern_model_map['/somewhere/'] = 'TESTMODEL';
 
 		$data_source = new Wpdb( $detect_dupes = false, $pattern_model_map );
-		$request = new Request();
+		$request = new Clockwork_Request();
 		$time = \microtime( true );
 
 		$data_source->set_queries( [
@@ -105,7 +107,7 @@ class Wpdb_Test extends TestCase {
 	 */
 	public function it_can_detect_duplicate_queries(): void {
 		$data_source = new Wpdb( $detect_dupes = true, [] );
-		$request = new Request();
+		$request = new Clockwork_Request();
 		$untested_duration = 50;
 		$untested_time = \microtime( true );
 
@@ -158,7 +160,7 @@ class Wpdb_Test extends TestCase {
 			'slow_only' => true,
 			'slow_threshold' => 75,
 		] );
-		$request = new Request();
+		$request = new Clockwork_Request();
 
 		$data_source->set_queries( $queries );
 		$data_source->resolve( $request );
@@ -171,7 +173,7 @@ class Wpdb_Test extends TestCase {
 			'slow_only' => true,
 			'slow_threshold' => 100,
 		] );
-		$request = new Request();
+		$request = new Clockwork_Request();
 
 		$data_source->set_queries( $queries );
 		$data_source->resolve( $request );
@@ -193,7 +195,7 @@ class Wpdb_Test extends TestCase {
 
 		$data_source->add_query( 'select * from posts', 500, \microtime( true ) );
 
-		$request = new Request();
+		$request = new Clockwork_Request();
 
 		$data_source->resolve( $request );
 
@@ -203,8 +205,9 @@ class Wpdb_Test extends TestCase {
 
 	private function create_data_source_via_factory( $user_config = [] ) {
 		$config = $this->create_config();
+		$request = new Request( new IncomingRequest(), new RequestContext( 'GET', [] ) );
 
-		$factory = new Data_Source_Factory( $config, new Is( $config, new Clockwork(), new Incoming_Request() ) );
+		$factory = new Data_Source_Factory( $config, new Is( $config, new Clockwork(), $request ) );
 
 		return $factory->create( 'wpdb', [
 			'pattern_model_map' => $user_config['pattern_model_map'] ?? $this->pattern_model_map(),

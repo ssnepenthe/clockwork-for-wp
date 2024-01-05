@@ -7,14 +7,16 @@ namespace Clockwork_For_Wp\Tests\Integration\Data_Source;
 use Brain\Monkey;
 use Clockwork\Clockwork;
 use Clockwork\DataSource\DataSource;
+use Clockwork\Request\IncomingRequest;
 use Clockwork_For_Wp\Data_Source;
 use Clockwork_For_Wp\Globals;
-use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Is;
+use Clockwork_For_Wp\Request;
 use Clockwork_For_Wp\Tests\Creates_Config;
 use InvalidArgumentException;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
+use SimpleWpRouting\Support\RequestContext;
 
 class Data_Source_Factory_Test extends TestCase {
 	use Creates_Config;
@@ -121,14 +123,15 @@ class Data_Source_Factory_Test extends TestCase {
 			],
 		] );
 		$clockwork = new Clockwork();
-		$request = new Incoming_Request( [
-			'ajax_uri' => 'localhost/wp-admin/admin-ajax.php',
-			'cookies' => [],
-			'headers' => [],
-			'input' => [],
-			'method' => 'GET',
-			'uri' => '/',
-		] );
+		$request = new Request(
+			new IncomingRequest( [
+				'cookies' => [],
+				'input' => [],
+				'method' => 'GET',
+				'uri' => '/',
+			] ),
+			new RequestContext( 'GET', [] )
+		);
 
 		return new Data_Source\Data_Source_Factory( $config, new Is( $config, $clockwork, $request ) );
 	}

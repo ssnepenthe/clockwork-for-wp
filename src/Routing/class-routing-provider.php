@@ -10,6 +10,7 @@ use Pimple\Container;
 use Pimple\Psr11\Container as Psr11Container;
 use SimpleWpRouting\CallableResolver\PsrContainerCallableResolver;
 use SimpleWpRouting\Router;
+use SimpleWpRouting\Support\RequestContext;
 use WpEventDispatcher\EventDispatcherInterface;
 
 class Routing_Provider extends Base_Provider {
@@ -23,6 +24,10 @@ class Routing_Provider extends Base_Provider {
 
 	public function register( Plugin $plugin ): void {
 		$pimple = $plugin->get_pimple();
+
+		$pimple[ RequestContext::class ] = static function ( Container $pimple ) {
+			return $pimple[ Router::class ]->getRequestContext();
+		};
 
 		$pimple[ Route_Loader::class ] = static function () {
 			return new Route_Loader();

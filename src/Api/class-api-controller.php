@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Api;
 
 use Clockwork\Authentication\AuthenticatorInterface;
-use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Is;
 use Clockwork_For_Wp\Metadata;
+use Clockwork_For_Wp\Request;
 use Clockwork_For_Wp\Routing\Json_Responder;
 use SimpleWpRouting\Exception\NotFoundHttpException;
 
@@ -22,12 +22,7 @@ final class Api_Controller {
 
 	private $request;
 
-	public function __construct(
-		AuthenticatorInterface $authenticator,
-		Metadata $metadata,
-		Incoming_Request $request,
-		Is $is
-	) {
+	public function __construct( AuthenticatorInterface $authenticator, Metadata $metadata, Request $request, Is $is ) {
 		$this->authenticator = $authenticator;
 		$this->metadata = $metadata;
 		$this->request = $request;
@@ -55,7 +50,7 @@ final class Api_Controller {
 		$direction = $params['direction'] ?? null;
 		$count = $params['count'] ?? null;
 
-		$authenticated = $this->authenticator->check( $this->request->header( 'X_CLOCKWORK_AUTH' ) );
+		$authenticated = $this->authenticator->check( $this->request->get_header( 'X_CLOCKWORK_AUTH' ) );
 
 		if ( true !== $authenticated ) {
 			return new Json_Responder( [
@@ -102,12 +97,8 @@ final class Api_Controller {
 	}
 
 	private function apply_filters( $data ) {
-		$except = isset( $this->request->input['except'] )
-			? \explode( ',', $this->request->input['except'] )
-			: [];
-		$only = isset( $this->request->input['only'] )
-			? \explode( ',', $this->request->input['only'] )
-			: null;
+		$except = \array_filter( \explode( ',', $this->request->get_input( 'except', '' ) ) );
+		$only = \array_filter( \explode( ',', $this->request->get_input( 'only', '' ) ) );
 
 		$transformer = static function ( $request ) use ( $except, $only ) {
 			return $only

@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Tests\Integration\Data_Source;
 
 use Clockwork\Clockwork;
-use Clockwork\Request\Request;
+use Clockwork\Request\IncomingRequest;
+use Clockwork\Request\Request as Clockwork_Request;
 use Clockwork_For_Wp\Data_Source\Data_Source_Factory;
 use Clockwork_For_Wp\Data_Source\Wp_Hook;
-use Clockwork_For_Wp\Incoming_Request;
 use Clockwork_For_Wp\Is;
+use Clockwork_For_Wp\Request;
 use Clockwork_For_Wp\Tests\Creates_Config;
 use PHPUnit\Framework\TestCase;
 use Pimple\Container;
+use SimpleWpRouting\Support\RequestContext;
 
 class Wp_Hook_Test extends TestCase {
 	use Creates_Config;
@@ -22,7 +24,7 @@ class Wp_Hook_Test extends TestCase {
 	 */
 	public function it_correctly_records_hook_data(): void {
 		$data_source = new Wp_Hook();
-		$request = new Request();
+		$request = new Clockwork_Request();
 
 		$data_source->add_hook( 'tag1' );
 		$data_source->add_hook( 'tag2', 15 );
@@ -67,7 +69,7 @@ class Wp_Hook_Test extends TestCase {
 		$data_source = $this->create_data_source_via_factory( [
 			'except_tags' => [ 'tag2', 'tag3_[\w]', '^tag4', '5$' ],
 		] );
-		$request = new Request();
+		$request = new Clockwork_Request();
 
 		$data_source->add_hook( 'tag1' ); // yes
 		$data_source->add_hook( 'tag1_xyz' ); // yes
@@ -101,7 +103,7 @@ class Wp_Hook_Test extends TestCase {
 		$data_source = $this->create_data_source_via_factory( [
 			'only_tags' => [ 'tag2', 'tag3_[\w]', '^tag4', '5$' ],
 		] );
-		$request = new Request();
+		$request = new Clockwork_Request();
 
 		$data_source->add_hook( 'tag1' ); // no
 		$data_source->add_hook( 'tag1_xyz' ); // no
@@ -139,7 +141,7 @@ class Wp_Hook_Test extends TestCase {
 			'except_tags' => [ 'tag2' ],
 			'only_tags' => [ 'tag2' ],
 		] );
-		$request = new Request();
+		$request = new Clockwork_Request();
 
 		$data_source->add_hook( 'tag1' ); // no
 		$data_source->add_hook( 'tag1_xyz' ); // no
@@ -176,7 +178,7 @@ class Wp_Hook_Test extends TestCase {
 		$data_source = $this->create_data_source_via_factory( [
 			'except_callbacks' => [ '^array_' ],
 		] );
-		$request = new Request();
+		$request = new Clockwork_Request();
 
 		$data_source->add_hook( 'tag1', null, 'array_map' ); // no
 		$data_source->add_hook( 'tag1_xyz', null, 'array_filter' ); // no
@@ -204,7 +206,7 @@ class Wp_Hook_Test extends TestCase {
 		$data_source = $this->create_data_source_via_factory( [
 			'only_callbacks' => [ '^array_' ],
 		] );
-		$request = new Request();
+		$request = new Clockwork_Request();
 
 		$data_source->add_hook( 'tag1', null, 'array_map' ); // yes
 		$data_source->add_hook( 'tag1_xyz', null, 'array_filter' ); // yes
@@ -233,7 +235,7 @@ class Wp_Hook_Test extends TestCase {
 			'except_callbacks' => [ '^array_' ],
 			'only_callbacks' => [ '^array_' ],
 		] );
-		$request = new Request();
+		$request = new Clockwork_Request();
 
 		$data_source->add_hook( 'tag1', null, 'array_map' ); // yes
 		$data_source->add_hook( 'tag1_xyz', null, 'array_filter' ); // yes
@@ -259,7 +261,7 @@ class Wp_Hook_Test extends TestCase {
 	 */
 	public function it_doesnt_create_the_userdata_entry_when_there_are_no_hooks(): void {
 		$data_source = new Wp_Hook();
-		$request = new Request();
+		$request = new Clockwork_Request();
 
 		$data_source->resolve( $request );
 
@@ -268,9 +270,10 @@ class Wp_Hook_Test extends TestCase {
 
 	private function create_data_source_via_factory( $filters = [] ) {
 		$config = $this->create_config();
+		$request = new Request( new IncomingRequest(), new RequestContext( 'GET', [] ) );
 		$factory = new Data_Source_Factory(
 			$config,
-			new Is( $config, new Clockwork(), new Incoming_Request() ),
+			new Is( $config, new Clockwork(), $request ),
 			new Container()
 		);
 

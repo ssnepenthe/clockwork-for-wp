@@ -9,7 +9,7 @@
         "league/config": "^1.1",
         "pimple/pimple": "^3.2",
         "ssnepenthe/apheleia-cli": "^0.1",
-        "ssnepenthe/simple-wp-routing": "^0.1",
+        "ssnepenthe/simple-wp-routing": "^0.1.1",
         "ssnepenthe/wp-event-dispatcher": "^0.1"
     },
     "require-dev": {

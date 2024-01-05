@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Tests\Integration;
 
 use Clockwork\Clockwork;
-use Clockwork_For_Wp\Incoming_Request;
+use Clockwork\Request\IncomingRequest;
 use Clockwork_For_Wp\Is;
+use Clockwork_For_Wp\Request;
 use Clockwork_For_Wp\Tests\Creates_Config;
 use PHPUnit\Framework\TestCase;
+use SimpleWpRouting\Support\RequestContext;
 
 class Is_Test extends TestCase {
 	use Creates_Config;
@@ -78,7 +80,8 @@ class Is_Test extends TestCase {
 
 	private function create_is( array $user_config ): Is {
 		$config = $this->create_config( $user_config );
+		$request = new Request( new IncomingRequest(), new RequestContext( 'GET', [] ) );
 
-		return new Is( $config, new Clockwork(), new Incoming_Request( [] ) );
+		return new Is( $config, new Clockwork(), $request );
 	}
 }

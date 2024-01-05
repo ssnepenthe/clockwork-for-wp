@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp;
 
 use Clockwork\Clockwork;
+use Clockwork\Request\IncomingRequest;
 use League\Config\Configuration as LeagueConfiguration;
 use Pimple\Container;
+use SimpleWpRouting\Support\RequestContext;
 use WpEventDispatcher\EventDispatcher;
 use WpEventDispatcher\EventDispatcherInterface;
 
@@ -49,6 +51,10 @@ final class Plugin_Provider extends Base_Provider {
 
 		$pimple[ Read_Only_Configuration::class ] = static function ( Container $pimple ) {
 			return $pimple[ Configuration::class ]->reader();
+		};
+
+		$pimple[ Request::class ] = static function ( Container $pimple ) {
+			return new Request( $pimple[ IncomingRequest::class ], $pimple[ RequestContext::class ] );
 		};
 
 		$pimple[ Metadata::class ] = static function ( Container $pimple ) {

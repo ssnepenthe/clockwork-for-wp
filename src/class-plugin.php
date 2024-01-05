@@ -80,7 +80,7 @@ final class Plugin {
 			$this->is = new Is(
 				$this->pimple[ Read_Only_Configuration::class ],
 				$this->pimple[ Clockwork::class ],
-				$this->pimple[ Incoming_Request::class ]
+				$this->pimple[ Request::class ]
 			);
 		}
 

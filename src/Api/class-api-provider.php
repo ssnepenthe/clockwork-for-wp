@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Api;
 
 use Clockwork\Authentication\AuthenticatorInterface;
-use Clockwork\Request\IncomingRequest;
 use Clockwork_For_Wp\Base_Provider;
 use Clockwork_For_Wp\Is;
 use Clockwork_For_Wp\Metadata;
 use Clockwork_For_Wp\Plugin;
+use Clockwork_For_Wp\Request;
 use Clockwork_For_Wp\Routing\Route_Loader;
 use Pimple\Container;
 
@@ -26,7 +26,7 @@ final class Api_Provider extends Base_Provider {
 			return new Api_Controller(
 				$pimple[ AuthenticatorInterface::class ],
 				$pimple[ Metadata::class ],
-				$pimple[ IncomingRequest::class ],
+				$pimple[ Request::class ],
 				$pimple[ Is::class ]
 			);
 		};
