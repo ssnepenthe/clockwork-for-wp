@@ -102,7 +102,7 @@ final class Api_Controller {
 
 		$transformer = static function ( $request ) use ( $except, $only ) {
 			return $only
-				? $request->only( $only )
+				? $request->only( \array_diff( $only, [ 'updateToken' ] ) )
 				: $request->except( \array_merge( $except, [ 'updateToken' ] ) );
 		};
 

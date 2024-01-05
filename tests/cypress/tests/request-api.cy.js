@@ -25,6 +25,7 @@ describe('Request API', () => {
                         .should(response => {
                             expect(response.status).to.equal(200);
                             expect(response.body.id).to.equal(request.id);
+                            expect(response.body.updateToken).to.not.exist;
                         });
                 });
 
@@ -38,6 +39,7 @@ describe('Request API', () => {
                         .should(response => {
                             expect(response.status).to.equal(200);
                             expect(response.body.id).to.equal(two.id);
+                            expect(response.body.updateToken).to.not.exist;
                         });
                 });
 
@@ -65,6 +67,7 @@ describe('Request API', () => {
                         .should(response => {
                             expect(response.status).to.equal(200);
                             expect(response.body[0].id).to.equal(three.id);
+                            expect(response.body[0].updateToken).to.not.exist;
                         });
                 });
 
@@ -78,6 +81,7 @@ describe('Request API', () => {
                         .should(response => {
                             expect(response.status).to.equal(200);
                             expect(response.body[0].id).to.equal(one.id);
+                            expect(response.body[0].updateToken).to.not.exist;
                         });
                 });
 
@@ -265,6 +269,17 @@ describe('Request API', () => {
 
         });
 
+        it('Prevents updateToken leaks via "only" filter', () => {
+
+            cy.createRequests(1)
+                .then(([request]) => {
+                    cy.request(`/__clockwork/${request.id}?only=updateToken`)
+                        .its('body')
+                        .should('be.empty');
+                });
+
+        });
+
     });
 
     context('Filters on list endpoint', () => {
@@ -295,6 +310,21 @@ describe('Request API', () => {
                         .its('body.0')
                         .should('not.have.a.property', 'id');
                 });
+        });
+
+        it('Prevents updateToken leaks via "only" filter', () => {
+
+            cy.createRequests(2)
+                .then(([one, two]) => {
+                    cy.request(`/__clockwork/${two.id}/previous`)
+                        .its('body.0')
+                        .should('have.property', 'id');
+
+                    cy.request(`/__clockwork/${two.id}/previous?only=updateToken`)
+                        .its('body.0')
+                        .should('be.empty');
+                });
+
         });
 
     });
