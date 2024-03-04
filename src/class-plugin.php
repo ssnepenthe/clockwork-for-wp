@@ -37,12 +37,13 @@ final class Plugin {
 				new Clockwork_Provider(),
 				new Plugin_Provider(),
 
-				new Api_Provider(),
 				new Cli_Data_Collection_Provider(),
 				new Data_Source_Provider(),
 				new Routing_Provider(),
-				new Web_App_Provider(),
 				new Wp_Cli_Provider(),
+
+				new Api_Provider(),
+				new Web_App_Provider(),
 			];
 		}
 
@@ -79,7 +80,7 @@ final class Plugin {
 			$this->is = new Is(
 				$this->pimple[ Read_Only_Configuration::class ],
 				$this->pimple[ Clockwork::class ],
-				$this->pimple[ Incoming_Request::class ]
+				$this->pimple[ Request::class ]
 			);
 		}
 

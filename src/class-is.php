@@ -14,7 +14,7 @@ final class Is {
 
 	private $request;
 
-	public function __construct( Read_Only_Configuration $config, Clockwork $clockwork, Incoming_Request $request ) {
+	public function __construct( Read_Only_Configuration $config, Clockwork $clockwork, Request $request ) {
 		$this->config = $config;
 		$this->clockwork = $clockwork;
 		$this->request = $request;
@@ -41,7 +41,7 @@ final class Is {
 	public function collecting_requests() {
 		return ( $this->enabled() || $this->config->get( 'collect_data_always', false ) )
 			&& ! $this->running_in_console()
-			&& $this->clockwork->shouldCollect()->filter( $this->request )
+			&& $this->clockwork->shouldCollect()->filter( $this->request->get_incoming_request() )
 			&& ( ! $this->request->is_heartbeat() || $this->collecting_heartbeat_requests() );
 	}
 

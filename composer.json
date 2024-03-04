@@ -9,13 +9,14 @@
         "league/config": "^1.1",
         "pimple/pimple": "^3.2",
         "ssnepenthe/apheleia-cli": "^0.1",
+        "ssnepenthe/simple-wp-routing": "^0.1.1",
         "ssnepenthe/wp-event-dispatcher": "^0.1"
     },
     "require-dev": {
         "brain/monkey": "^2.6.1",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
         "friendsofphp/php-cs-fixer": "^3.1",
-        "humanmade/psalm-plugin-wordpress": "dev-master",
+        "humanmade/psalm-plugin-wordpress": "^2.2",
         "mikey179/vfsstream": "^1.6.7",
         "phpunit/phpunit": "^9.5",
         "psy/psysh": "^0.11",
