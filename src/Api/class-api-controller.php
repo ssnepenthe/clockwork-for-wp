@@ -32,9 +32,16 @@ final class Api_Controller {
 	public function authenticate(): Json_Responder {
 		$this->ensure_clockwork_is_enabled();
 
-		$token = $this->authenticator->attempt(
-			\array_filter( $this->extract_credentials() ) // @todo Filter necessary?
-		);
+		// @todo Verify this is still necessary with latest versions of clockwork.
+		// At one point the clockwork browser extension was sending multipart/form-data requests but the web app was sending application/json.
+		$credentials = $this->request->is_json()
+			? array_only( $this->request->json(), [ 'username', 'password' ] )
+			: array_filter( [
+				'username' => \filter_input( \INPUT_POST, 'username' ),
+				'password' => \filter_input( \INPUT_POST, 'password' ),
+			] );
+
+		$token = $this->authenticator->attempt( $credentials );
 
 		return new Json_Responder( [ 'token' => $token ], $token ? 200 : 403 );
 	}
@@ -119,30 +126,5 @@ final class Api_Controller {
 		if ( ! $this->is->enabled() ) {
 			throw new NotFoundHttpException();
 		}
-	}
-
-	// @todo Move to route handler invoker?
-	private function extract_credentials() {
-		if ( ! $this->request->is_json() ) {
-			// Clockwork as browser extension sends POST request as multipart/form-data.
-			return [
-				'username' => \filter_input( \INPUT_POST, 'username' ),
-				'password' => \filter_input( \INPUT_POST, 'password' ),
-			];
-		}
-
-		// @todo Verify this is still necessary after updating clockwork.
-		// Clockwork as web-app sends POST request as application/json.
-		$input = \file_get_contents( 'php://input' );
-		$decoded = \json_decode( $input, true );
-
-		if ( null === $decoded || \JSON_ERROR_NONE !== \json_last_error() ) {
-			return [];
-		}
-
-		return [
-			'username' => $decoded['username'] ?? null,
-			'password' => $decoded['password'] ?? null,
-		];
 	}
 }
