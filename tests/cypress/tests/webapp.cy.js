@@ -16,7 +16,7 @@ describe('Clockwork Webapp', () => {
 
         it('Serves images', () => {
 
-            cy.request('/__clockwork/img/icons/apple-touch-icon-60x60.png')
+            cy.request('/__clockwork/img/icon-128x128.png')
                 .should(response => {
                     expect(response.status).to.equal(200);
                     expect(response.headers['content-type']).to.equal('image/png');
@@ -27,7 +27,7 @@ describe('Clockwork Webapp', () => {
         it('Serves scripts', () => {
 
             cy.visit('/__clockwork/app')
-                .get('script[src^="js/app"]')
+                .get('script[src^="assets/index"]')
                 .invoke('attr', 'src')
                 .as('scriptPath');
 
@@ -45,7 +45,7 @@ describe('Clockwork Webapp', () => {
         it('Serves styles', () => {
 
             cy.visit('/__clockwork/app')
-                .get('link[rel="stylesheet"][href^="css/app"]')
+                .get('link[rel="stylesheet"][href^="assets/index"]')
                 .invoke('attr', 'href')
                 .as('stylePath');
 
