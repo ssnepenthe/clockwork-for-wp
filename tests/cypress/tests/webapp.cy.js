@@ -182,7 +182,7 @@ describe('Clockwork Webapp', () => {
             cy.wait('@auth');
 
             cy.get('input[type="password"]')
-                .should('not.be.visible');
+                .should('not.exist');
 
         });
 
