@@ -9,8 +9,8 @@ module.exports = defineConfig({
     async setupNodeEvents(on, config) {
       let baseUrl = 'http://localhost:8889/';
 
-      const { readConfig } = require('@wordpress/env/lib/config');
-      const wpEnvConfig = await readConfig('.wp-env.json');
+      const { loadConfig } = require('@wordpress/env/lib/config');
+      const wpEnvConfig = await loadConfig(__dirname);
 
       if (wpEnvConfig) {
         baseUrl = wpEnvConfig.env.tests.config.WP_SITEURL;

@@ -19,9 +19,9 @@
         "humanmade/psalm-plugin-wordpress": "^2.2",
         "mikey179/vfsstream": "^1.6.7",
         "phpunit/phpunit": "^9.5",
-        "psy/psysh": "^0.11",
+        "psy/psysh": "^0.12",
         "spomky-labs/base64url": "^2.0",
-        "symfony/var-dumper": "^4.1",
+        "symfony/var-dumper": "^5.4 || ^6.0 || ^7.0 || ^8.0",
         "vimeo/psalm": "^4.10",
         "wp-cli/wp-cli-bundle": "^2.5",
         "wp-coding-standards/wpcs": "^2.3"

@@ -108,7 +108,13 @@ class Errors_Test extends TestCase {
 		$data_source->record( \E_USER_ERROR, $input['message'], $input['file'], $input['line'] );
 		$data_source->record( \E_USER_WARNING, $input['message'], $input['file'], $input['line'] );
 		$data_source->record( \E_USER_NOTICE, $input['message'], $input['file'], $input['line'] );
-		$data_source->record( \E_STRICT, $input['message'], $input['file'], $input['line'] );
+
+		if ( PHP_VERSION_ID < 80400 ) {
+			// @todo If we decide to use E_STRICT in tests going forward we should move all uses to dedicated testcases
+			// and mark those test cases as skipped when installed php is less than 8.4.
+			$data_source->record( \E_STRICT, $input['message'], $input['file'], $input['line'] );
+		}
+
 		$data_source->record(
 			\E_RECOVERABLE_ERROR,
 			$input['message'],
@@ -158,7 +164,12 @@ class Errors_Test extends TestCase {
 		$data_source->record( \E_USER_ERROR, $input['message'], $input['file'], $input['line'] );
 		$data_source->record( \E_USER_WARNING, $input['message'], $input['file'], $input['line'] );
 		$data_source->record( \E_USER_NOTICE, $input['message'], $input['file'], $input['line'] );
-		$data_source->record( \E_STRICT, $input['message'], $input['file'], $input['line'] );
+
+		if ( PHP_VERSION_ID < 80400 ) {
+			// @todo see note above about E_STRICT.
+			$data_source->record( \E_STRICT, $input['message'], $input['file'], $input['line'] );
+		}
+
 		$data_source->record(
 			\E_RECOVERABLE_ERROR,
 			$input['message'],
@@ -291,7 +302,11 @@ class Errors_Test extends TestCase {
 		yield [ \E_USER_DEPRECATED, 'warning' ];
 		yield [ \E_NOTICE, 'notice' ];
 		yield [ \E_USER_NOTICE, 'notice' ];
-		yield [ \E_STRICT, 'notice' ];
+
+		if ( PHP_VERSION_ID < 80400 ) {
+			yield [ \E_STRICT, 'notice' ];
+		}
+
 	}
 
 	public function provides_types_to_labels() {
@@ -309,7 +324,11 @@ class Errors_Test extends TestCase {
 		yield [ \E_USER_DEPRECATED, 'E_USER_DEPRECATED' ];
 		yield [ \E_NOTICE, 'E_NOTICE' ];
 		yield [ \E_USER_NOTICE, 'E_USER_NOTICE' ];
-		yield [ \E_STRICT, 'E_STRICT' ];
+
+		if ( PHP_VERSION_ID < 80400 ) {
+			yield [ \E_STRICT, 'E_STRICT' ];
+		}
+
 	}
 
 	private function make_data_source( int $error_reporting ): Errors {
