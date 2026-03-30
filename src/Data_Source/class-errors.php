@@ -167,7 +167,7 @@ final class Errors extends DataSource {
 	}
 
 	private function friendly_type( $type ) {
-		foreach ( [
+		$constants = [
 			'E_ERROR',
 			'E_WARNING',
 			'E_PARSE',
@@ -179,12 +179,17 @@ final class Errors extends DataSource {
 			'E_USER_ERROR',
 			'E_USER_WARNING',
 			'E_USER_NOTICE',
-			'E_STRICT',
 			'E_RECOVERABLE_ERROR',
 			'E_DEPRECATED',
 			'E_USER_DEPRECATED',
 			'E_ALL',
-		] as $constant ) {
+		];
+
+		if ( PHP_VERSION_ID < 80400 ) {
+			$constants[] = 'E_STRICT';
+		}
+
+		foreach ( $constants as $constant ) {
 			if ( \defined( $constant ) && \constant( $constant ) === $type ) {
 				return $constant;
 			}
