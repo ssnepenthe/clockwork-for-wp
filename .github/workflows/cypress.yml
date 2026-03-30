@@ -71,8 +71,8 @@ jobs:
 
       - name: Install Composer dependencies
         run: |
-          npx wp-env run cli composer config platform.php ${{ matrix.php }}
-          npx wp-env run cli composer update --ansi --no-interaction --no-progress --prefer-dist
+          npx wp-env run cli --env-cwd=/var/www/html/wp-content/plugins/clockwork-for-wp composer config platform.php ${{ matrix.php }}
+          npx wp-env run cli --env-cwd=/var/www/html/wp-content/plugins/clockwork-for-wp composer update --ansi --no-interaction --no-progress --prefer-dist
 
       - name: Set rewrite structure
         run: |
