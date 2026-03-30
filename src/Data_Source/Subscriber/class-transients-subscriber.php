@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Clockwork_For_Wp\Data_Source\Subscriber;
 
 use Clockwork_For_Wp\Data_Source\Transients;
+use Clockwork_For_Wp\Globals;
 use WpEventDispatcher\SubscriberInterface;
 
 /**
@@ -18,9 +19,18 @@ final class Transients_Subscriber implements SubscriberInterface {
 	}
 
 	public function getSubscribedEvents(): array {
+		if ( \version_compare( Globals::get( 'wp_version' ), '6.8', '<' ) ) {
+			return [
+				'setted_transient' => 'on_setted_transient',
+				'setted_site_transient' => 'on_setted_site_transient',
+				'deleted_transient' => 'on_deleted_transient',
+				'deleted_site_transient' => 'on_deleted_site_transient',
+			];
+		}
+
 		return [
-			'setted_transient' => 'on_setted_transient',
-			'setted_site_transient' => 'on_setted_site_transient',
+			'set_transient' => 'on_setted_transient',
+			'set_site_transient' => 'on_setted_site_transient',
 			'deleted_transient' => 'on_deleted_transient',
 			'deleted_site_transient' => 'on_deleted_site_transient',
 		];
