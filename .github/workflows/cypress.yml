@@ -58,28 +58,28 @@ jobs:
       - name: Start WP environment
         run: |
           npx wp-env start
-          npx wp-env clean all
+          npx wp-env reset all
 
       - name: Prepare necessary container directories
         run: |
-          npx wp-env run wordpress "chmod -c ugo+w /var/www/html"
-          npx wp-env run wordpress "mkdir -p /var/www/html/wp-content/cfw-data"
-          npx wp-env run wordpress "chmod -c ugo+w /var/www/html/wp-content/cfw-data"
-          npx wp-env run tests-wordpress "chmod -c ugo+w /var/www/html"
-          npx wp-env run tests-wordpress "mkdir -p /var/www/html/wp-content/cfw-data"
-          npx wp-env run tests-wordpress "chmod -c ugo+w /var/www/html/wp-content/cfw-data"
+          npx wp-env run wordpress chmod -c ugo+w /var/www/html
+          npx wp-env run wordpress mkdir -p /var/www/html/wp-content/cfw-data
+          npx wp-env run wordpress chmod -c ugo+w /var/www/html/wp-content/cfw-data
+          npx wp-env run tests-wordpress chmod -c ugo+w /var/www/html
+          npx wp-env run tests-wordpress mkdir -p /var/www/html/wp-content/cfw-data
+          npx wp-env run tests-wordpress chmod -c ugo+w /var/www/html/wp-content/cfw-data
 
       - name: Install Composer dependencies
         run: |
-          npx wp-env run composer "config platform.php ${{ matrix.php }}"
-          npx wp-env run composer "update --ansi --no-interaction --no-progress --prefer-dist"
+          npx wp-env run cli composer config platform.php ${{ matrix.php }}
+          npx wp-env run cli composer update --ansi --no-interaction --no-progress --prefer-dist
 
       - name: Set rewrite structure
         run: |
-          npx wp-env run tests-cli "wp rewrite structure '/%postname%/' --hard"
+          npx wp-env run tests-cli wp rewrite structure '/%postname%/' --hard
 
       - name: Ensure plugins are active
-        run: npx wp-env run tests-cli "wp plugin activate clockwork-for-wp cfw-test-helper"
+        run: npx wp-env run tests-cli wp plugin activate clockwork-for-wp cfw-test-helper
 
       - name: Debug info
         run: |
@@ -90,17 +90,17 @@ jobs:
           echo "Full WP-Env config"
           wp-env/print-config.js | jq
           echo "Current PHP version"
-          npx wp-env run tests-wordpress "php -v"
+          npx wp-env run tests-wordpress php -v
           echo "Composer platform overrides"
           cat composer.json | jq .config.platform
           echo "Current WP version"
-          npx wp-env run tests-cli "wp core version"
+          npx wp-env run tests-cli wp core version
           echo "Current WP environment type"
-          npx wp-env run tests-cli "wp eval 'echo wp_get_environment_type() . PHP_EOL;'"
+          npx wp-env run tests-cli wp eval 'echo wp_get_environment_type() . PHP_EOL;'
           echo "Current WP-CLI version"
-          npx wp-env run tests-cli "wp cli version"
+          npx wp-env run tests-cli wp cli version
           echo "Plugin list"
-          npx wp-env run tests-cli "wp plugin list"
+          npx wp-env run tests-cli wp plugin list
 
       - name: Run e2e tests
         run: npx cypress run
