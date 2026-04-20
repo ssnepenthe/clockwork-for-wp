@@ -27,6 +27,6 @@
     "clockwork-browser": "^1.1.2",
     "cypress": "^12.4.0",
     "qs": "^6.10.2",
-    "rollup": "^4.1.4"
+    "rollup": "^4.22.4"
   }
 }
